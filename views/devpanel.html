@@ -1,0 +1,91 @@
+<!doctype html>
+<html>
+<head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="object-src 'none'; script-src 'self' 'unsafe-eval'">
+
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/dialog.css">
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/inspector.css">
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/inspectorCommon.css">
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/inspectorSyntaxHighlight.css">
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/popover.css">
+
+    <script src="../blink/Source/devtools/front_end/inspector.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/utilities.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/Linkifier.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/DOMExtension.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/treeoutline.js"></script>
+    <script src="../blink/Source/devtools/front_end/UIString.js"></script>
+    <script src="../blink/Source/devtools/front_end/Object.js"></script>
+    <script src="../blink/Source/devtools/front_end/View.js"></script>
+    <script src="../blink/Source/devtools/front_end/Settings.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/HelpScreen.js"></script>
+    <script src="../blink/Source/devtools/front_end/InspectorFrontendHostStub.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/UIUtils.js"></script>
+    <script src="../blink/Source/devtools/front_end/ContextMenu.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/ParsedURL.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/ResourceUtils.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/DOMAgent.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/TabbedPane.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/SidebarPane.js"></script>
+    <script src="../blink/Source/devtools/front_end/ElementsTreeOutline.js"></script>
+    <script src="../blink/Source/devtools/front_end/SplitView.js"></script>
+    <script src="../blink/Source/devtools/front_end/SidebarView.js"></script>
+    <script src="../blink/Source/devtools/front_end/SidebarTreeElement.js"></script>
+
+
+    <script src="../blink/Source/devtools/front_end/Popover.js"></script>
+    <script src="../blink/Source/devtools/front_end/SuggestBox.js"></script>
+    <script src="../blink/Source/devtools/front_end/TextPrompt.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/Section.js"></script>
+    <script src="../blink/Source/devtools/front_end/PropertiesSection.js"></script>
+    <script src="../blink/Source/devtools/front_end/RemoteObject.js"></script>
+    <script src="../blink/Source/devtools/front_end/ObjectPropertiesSection.js"></script>
+    <script src="../blink/Source/devtools/front_end/ObjectPopoverHelper.js"></script>
+    <script src="../blink/Source/devtools/front_end/NativeBreakpointsSidebarPane.js"></script>
+    <script src="../blink/Source/devtools/front_end/DOMBreakpointsSidebarPane.js"></script>
+    <script src="../blink/Source/devtools/front_end/Color.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/ContextMenu.js"></script>
+    <script src="../blink/Source/devtools/front_end/SoftContextMenu.js"></script>
+    <script src="../blink/Source/devtools/front_end/KeyboardShortcut.js"></script>
+    <script src="../blink/Source/devtools/front_end/DOMPresentationUtils.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/ResourceTreeModel.js"></script>
+    <script src="../blink/Source/devtools/front_end/RuntimeModel.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/SearchableView.js"></script>
+
+    <script src="../blink/Source/devtools/front_end/CSSNamedFlowCollectionsView.js"></script>
+    <script src="../blink/Source/devtools/front_end/CSSNamedFlowView.js"></script>
+    <script src="../blink/Source/devtools/front_end/EventListenersSidebarPane.js"></script>
+
+<!-- custom scripts -->
+
+    <script src="components/WebInspectorPatch.js"></script>
+
+    <script src="components/ReactPanel.js"></script>
+    <script src="components/ObjectSidebarPane.js"></script>
+
+</head>
+<body class="undocked" id="-blink-dev-tools">
+    <div class="fill vbox inspector-view visible" spellcheck="false">
+        <div class="tabbed-pane vbox visible">
+            <div id="main-panel-holder" class="tabbed-pane-content scroll-target"></div>
+        </div>
+    </div>
+    <script src="devpanel.js"></script>
+</body>
+</html>
