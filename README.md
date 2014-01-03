@@ -21,6 +21,12 @@ Clone the GitHub repository.
 git clone git@github.com:facebook/react-devtools.git
 ```
 
+Clone the blink submodule.
+
+```
+git submodule init && git submodule update
+```
+
 Open the URL [chrome://extensions/](chrome://extensions/) in your browser.
 
 Check the box for **Developer Mode**
