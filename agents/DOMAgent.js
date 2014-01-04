@@ -84,11 +84,26 @@ var DOMAgent = {
     );
   },
 
+  pushNodeByPathToFrontend: function(path, callback) {
+    ReactInspectorAgent.call('DOM.getNodeForPath', path,
+      function(result, error) {
+        if (error) {
+          callback(error);
+          return;
+        }
+        var changeLog = result.changeLog;
+        for (var i = 0; i < changeLog.length; i++) {
+          var change = changeLog[i];
+          InspectorBackend.notifyDOM(change.method, change.args);
+        }
+        callback(null, result.node ? result.node.nodeId : 0);
+      }
+    );
+  },
+
   // ???
 
   setInspectModeEnabled: function() {},
-
-  pushNodeByPathToFrontend: function(path, callback) {},
 
   // Search
   performSearch: function(query, callback) {},
