@@ -297,11 +297,12 @@ DOMHost.highlightElement = function(id, config) {
   hoverElement = document.createElement('div');
 
   // style the hover element with sexy inline CSS
+  var bounds = element.getBoundingClientRect();
   hoverElement.style.position = 'absolute';
-  hoverElement.style.left = element.offsetLeft + 'px';
-  hoverElement.style.top = element.offsetTop + 'px';
-  hoverElement.style.width = element.offsetWidth + 'px';
-  hoverElement.style.height = element.offsetHeight + 'px';
+  hoverElement.style.left =  (window.scrollX + bounds.left) + 'px';
+  hoverElement.style.top =  (window.scrollY + bounds.top) + 'px';
+  hoverElement.style.width = bounds.width + 'px';
+  hoverElement.style.height = bounds.height + 'px';
   hoverElement.style.pointerEvents = 'none';
 
   // retrieve colors from config
@@ -315,7 +316,7 @@ DOMHost.highlightElement = function(id, config) {
     borderColor.g + ', ' + borderColor.b + ', ' + borderColor.a + ')';
 
   // show the magic
-  element.parentNode.appendChild(hoverElement);
+  document.body.appendChild(hoverElement);
 };
 
 DOMHost.hideHighlightElement = function() {
