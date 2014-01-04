@@ -148,6 +148,10 @@ var DOMAgent = {
     });
   },
 
+  toggleInspectMode: function() {
+    ReactInspectorAgent.call('DOM.enableInspectMode', function() {});
+  },
+
   initialize: function() {
     if (DOMAgent._polling) return;
     if (!InspectorBackend._domDispatcher) return; // Don't start polling yet

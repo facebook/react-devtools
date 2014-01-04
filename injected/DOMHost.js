@@ -286,6 +286,18 @@ DOMHost.inspectDOMNode = function(domNode) {
   inspectedDOMNode = domNode;
 };
 
+var inspectModeEnabled = false;
+DOMHost.enableInspectMode = function() {
+  inspectModeEnabled = !inspectModeEnabled;
+
+  if (inspectModeEnabled) {
+    console.log('enable inspect');
+  } else {
+    console.log('disable inspect');
+  }
+
+};
+
 DOMHost.getEventListenersForNode = function(id, objectGroup) {
   var instance = instanceCache[id];
   if (!instance) return [];

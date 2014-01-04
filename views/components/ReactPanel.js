@@ -222,7 +222,7 @@ ReactPanel.prototype = {
 
     _inspectElement: function(event) {
         event.target.parentNode.classList.toggle("toggled-on");
-        console.log('TODO: highlight on hover!');
+        DOMAgent.toggleInspectMode();
         return true;
     },
 
