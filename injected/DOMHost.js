@@ -286,14 +286,31 @@ DOMHost.inspectDOMNode = function(domNode) {
   inspectedDOMNode = domNode;
 };
 
+function inspectModeMouseMove(event) {
+  var instances = instanceCache;
+  var target;
+  if (target !== event.target) {
+    target = event.target;
+    if (target.dataset.reactid) {
+      // TODO: should use other PR to show highlight,
+      // TODO: but also need to inform the devtool
+      console.log('highlight element:', target);
+    }
+    else {
+      console.log('remove highlight if there is one');
+    }
+  }
+}
+
 var inspectModeEnabled = false;
 DOMHost.toggleInspectMode = function() {
   inspectModeEnabled = !inspectModeEnabled;
 
   if (inspectModeEnabled) {
-    console.log('enable inspect');
+    document.addEventListener('mousemove', inspectModeMouseMove, false);
   } else {
-    console.log('disable inspect');
+    // TODO: remove highlighted element
+    document.removeEventListener('mousemove', inspectModeMouseMove, false);
   }
 
 };
