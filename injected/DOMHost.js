@@ -286,6 +286,47 @@ DOMHost.inspectDOMNode = function(domNode) {
   inspectedDOMNode = domNode;
 };
 
+var hoverElement;
+
+DOMHost.highlightElement = function(id, config) {
+  DOMHost.hideHighlightElement();
+
+  // retrieve the element
+  var reactId = instanceCache[id]._rootNodeID;
+  var query = '[data-reactid=\'' + reactId + '\']';
+  var element = document.querySelector(query);
+
+  hoverElement = document.createElement('div');
+
+  // style the hover element with sexy inline CSS
+  hoverElement.style.position = 'absolute';
+  hoverElement.style.left = element.offsetLeft + 'px';
+  hoverElement.style.top = element.offsetTop + 'px';
+  hoverElement.style.width = element.offsetWidth + 'px';
+  hoverElement.style.height = element.offsetHeight + 'px';
+  hoverElement.style.pointerEvents = 'none';
+
+  // retrieve colors from config
+  var contentColor = config.contentColor;
+  var borderColor = config.borderColor;
+
+  // set colors
+  hoverElement.style.backgroundColor = 'rgba(' + contentColor.r + ', ' +
+    contentColor.g + ', ' + contentColor.b + ', ' + contentColor.a + ')';
+  hoverElement.style.outline = 'solid 1px rgba(' + borderColor.r + ', ' +
+    borderColor.g + ', ' + borderColor.b + ', ' + borderColor.a + ')';
+
+  // show the magic
+  element.parentNode.appendChild(hoverElement);
+};
+
+DOMHost.hideHighlightElement = function() {
+  if (hoverElement) {
+    hoverElement.parentNode.removeChild(hoverElement);
+    hoverElement = null;
+  }
+};
+
 DOMHost.getEventListenersForNode = function(id, objectGroup) {
   var instance = instanceCache[id];
   if (!instance) return [];
