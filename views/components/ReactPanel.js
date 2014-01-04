@@ -46,6 +46,8 @@ var ReactPanel = function()
     this.registerRequiredCSS("textPrompt.css");
     this.setHideOnDetach();
 
+    this.toolbar = this._createToolbar();
+
     const initialSidebarWidth = 325;
     const minimumContentWidthPercent = 0.34;
     const initialSidebarHeight = 325;
@@ -185,6 +187,59 @@ ReactPanel.prototype = {
     },
 
     /* END FROM PANEL */
+
+    /**
+     * @param {WebInspector.StatusBarButton} button
+     * @param {string} buttonTitle
+     */
+    _updateButtonTitle: function(button, buttonTitle)
+    {
+        var hasShortcuts = button.shortcuts && button.shortcuts.length;
+        if (hasShortcuts)
+            button.title = String.vsprintf(buttonTitle, [button.shortcuts[0].name]);
+        else
+            button.title = buttonTitle;
+    },
+
+
+
+  /**
+     * @param {string} buttonId
+     * @param {string} buttonTitle
+     * @param {function(Event=):boolean} handler
+     * @param {!Array.<!WebInspector.KeyboardShortcut.Descriptor>} shortcuts
+     * @return {WebInspector.StatusBarButton}
+     */
+    _createButtonAndRegisterShortcuts: function(buttonId, buttonTitle, handler, shortcuts)
+    {
+        var button = new WebInspector.StatusBarButton(buttonTitle, buttonId);
+        button.element.addEventListener("click", handler, false);
+        // button.shortcuts = shortcuts;
+        this._updateButtonTitle(button, buttonTitle);
+        // this.registerShortcuts(shortcuts, handler);
+        return button;
+    },
+
+    _inspectElement: function(event) {
+        event.target.parentNode.classList.toggle("toggled-on");
+        console.log('TODO: highlight on hover!');
+        return true;
+    },
+
+    _createToolbar: function() {
+        var toolbar = document.createElement("div");
+        toolbar.className = "status-bar";
+        toolbar.id = "react-toolbar";
+        var title, handler;
+
+        title = WebInspector.UIString("Select an element in the page to inspect it.");
+        handler = this._inspectElement.bind(this);
+
+        this._inspectButton = this._createButtonAndRegisterShortcuts("node-search-status-bar-item", title, handler);
+        toolbar.appendChild(this._inspectButton.element);
+
+        return toolbar;
+    },
 
     _updateTreeOutlineVisibleWidth: function()
     {
@@ -1138,6 +1193,7 @@ ReactPanel.prototype = {
 
         if (!vertically) {
             this.sidebarPaneView = new WebInspector.SidebarPaneStack();
+            this.sidebarElement.appendChild(this.toolbar);
         } else {
             this.sidebarPaneView = new WebInspector.SidebarTabbedPane();
         }

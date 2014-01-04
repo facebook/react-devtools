@@ -1,0 +1,12 @@
+/* from sourcesPanel.css */
+#react-toolbar {
+    position: relative;
+    margin-top: -1px;
+    height: 24px;
+    border-bottom: 1px solid rgb(202, 202, 202);
+    background-color: rgb(236, 236, 236);
+}
+
+#react-toolbar + .sidebar-pane-stack {
+    margin-top: 23px;
+}
