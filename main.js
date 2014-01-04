@@ -42,6 +42,7 @@ function createMainPanel() {
 
 function mainPanelShown(mainPanelWindow) {
   if (!mainPanelWindow.wasShown) {
+    mainPanelWindow.focus();
     mainPanelWindow.initialize({
       InspectorBackend: InspectorBackend,
       DOMAgent: DOMAgent,
