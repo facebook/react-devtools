@@ -292,9 +292,7 @@ DOMHost.highlightElement = function(id, config) {
   DOMHost.hideHighlightElement();
 
   // retrieve the element
-  var reactId = instanceCache[id]._rootNodeID;
-  var query = '[data-reactid=\'' + reactId + '\']';
-  var element = document.querySelector(query);
+  var element = instanceCache[id].getDOMNode();
 
   hoverElement = document.createElement('div');
 
