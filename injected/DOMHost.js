@@ -304,6 +304,7 @@ DOMHost.highlightElement = function(id, config) {
   hoverElement.style.width = bounds.width + 'px';
   hoverElement.style.height = bounds.height + 'px';
   hoverElement.style.pointerEvents = 'none';
+  hoverElement.style.zIndex = 2147483647;
 
   // retrieve colors from config
   var contentColor = config.contentColor;
