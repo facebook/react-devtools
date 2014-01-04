@@ -287,7 +287,7 @@ DOMHost.inspectDOMNode = function(domNode) {
 };
 
 var inspectModeEnabled = false;
-DOMHost.enableInspectMode = function() {
+DOMHost.toggleInspectMode = function() {
   inspectModeEnabled = !inspectModeEnabled;
 
   if (inspectModeEnabled) {

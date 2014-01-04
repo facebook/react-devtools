@@ -149,7 +149,7 @@ var DOMAgent = {
   },
 
   toggleInspectMode: function() {
-    ReactInspectorAgent.call('DOM.enableInspectMode', function() {});
+    ReactInspectorAgent.call('DOM.toggleInspectMode', function() {});
   },
 
   initialize: function() {
