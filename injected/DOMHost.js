@@ -4,21 +4,21 @@
  */
 /**
  * Copyright (c) 2013, Facebook, Inc. All rights reserved.
- * 
+ *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
- * 
+ *
  *  * Redistributions of source code must retain the above copyright notice,
  *    this list of conditions and the following disclaimer.
- * 
+ *
  *  * Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
  *    and/or other materials provided with the distribution.
- * 
+ *
  *  * Neither the name Facebook nor the names of its contributors may be used to
  *    endorse or promote products derived from this software without specific
  *    prior written permission.
- * 
+ *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
@@ -287,37 +287,104 @@ DOMHost.inspectDOMNode = function(domNode) {
 };
 
 var hoverElement;
+var inspectorOverlayPage;
+function addInspectorOverlayPage() {
+  var el = document.createElement('iframe');
+  el.style.position = 'fixed';
+  el.style.left = '0';
+  el.style.top = '0';
+  el.style.height = '100%';
+  el.style.width = '100%';
+  el.style.border = '0';
+  el.style.zIndex = 2147483647;
+  el.style.pointerEvents = 'none';
+
+  document.body.appendChild(el);
+
+  el.contentDocument.open();
+  el.contentDocument.write(decodeURIComponent(window.__InspectorOverlayPage_html));
+  el.contentDocument.write('<script>var InspectorOverlayHost = {stepOver: function(){}, resume: function(){} };</script>');
+  el.contentDocument.close();
+
+  inspectorOverlayPage = el.contentWindow;
+}
 
 DOMHost.highlightElement = function(id, config) {
-  DOMHost.hideHighlightElement();
+  if (!inspectorOverlayPage) {
+    addInspectorOverlayPage();
+  }
 
-  // retrieve the element
-  var element = instanceCache[id].getDOMNode();
-
-  hoverElement = document.createElement('div');
-
-  // style the hover element with sexy inline CSS
+  var instance = instanceCache[id];
+  var element = instance.getDOMNode();
   var bounds = element.getBoundingClientRect();
-  hoverElement.style.position = 'absolute';
-  hoverElement.style.left =  (window.scrollX + bounds.left) + 'px';
-  hoverElement.style.top =  (window.scrollY + bounds.top) + 'px';
-  hoverElement.style.width = bounds.width + 'px';
-  hoverElement.style.height = bounds.height + 'px';
-  hoverElement.style.pointerEvents = 'none';
-  hoverElement.style.zIndex = 2147483647;
+  var scrollX = window.scrollX;
+  var scrollY = window.scrollY;
 
-  // retrieve colors from config
+  var contentQuad = [
+    {x: scrollX + bounds.left, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
+    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
+  ];
+  var style = window.getComputedStyle(element);
+  console.log(style.margin, style.padding);
+
+  var paddingQuad = [
+    {x: scrollX + bounds.left, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
+    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
+  ];
+  var borderQuad = [
+    {x: scrollX + bounds.left, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
+    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
+  ];
+  var marginQuad = [
+    {x: scrollX + bounds.left, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
+    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
+    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
+  ];
+
+  inspectorOverlayPage.reset({
+    viewportSize: {
+      width: window.innerWidth,
+      height: window.innerHeight
+    },
+    deviceScaleFactor: 1,
+    pageScaleFactor: 1,
+    pageZoomFactor: 1,
+    scrollX: window.scrollX,
+    scrollY: window.scrollY
+  });
+
   var contentColor = config.contentColor;
+  var marginColor = config.marginColor;
   var borderColor = config.borderColor;
+  var paddingColor = config.paddingColor;
 
-  // set colors
-  hoverElement.style.backgroundColor = 'rgba(' + contentColor.r + ', ' +
-    contentColor.g + ', ' + contentColor.b + ', ' + contentColor.a + ')';
-  hoverElement.style.outline = 'solid 1px rgba(' + borderColor.r + ', ' +
-    borderColor.g + ', ' + borderColor.b + ', ' + borderColor.a + ')';
+  inspectorOverlayPage.drawNodeHighlight({
+    elementInfo: {
+      tagName: element.tagName, /* would be nice to have the React name here */
+      idValue: element.id,
+      className: '.' + element.className,
+      nodeWidth: bounds.width,
+      nodeHeight: bounds.height
+    },
+    marginColor: 'rgba(' + marginColor.r + ', ' + marginColor.g + ', '+ marginColor.b + ', ' + (marginColor.a || 1) + ')',
+    contentColor: 'rgba(' + contentColor.r + ', ' + contentColor.g + ', '+ contentColor.b + ', ' + (contentColor.a || 1) + ')',
+    borderColor: 'rgba(' + borderColor.r + ', ' + borderColor.g + ', '+ borderColor.b + ', ' + (borderColor.a || 1) + ')',
+    paddingColor: 'rgba(' + paddingColor.r + ', ' + paddingColor.g + ', '+ paddingColor.b + ', ' + (paddingColor.a || 1) + ')',
+    quads: [
+      marginQuad,
+      borderQuad,
+      paddingQuad,
+      contentQuad
+    ]
+  });
 
-  // show the magic
-  document.body.appendChild(hoverElement);
 };
 
 DOMHost.hideHighlightElement = function() {
