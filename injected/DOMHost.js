@@ -286,7 +286,7 @@ DOMHost.inspectDOMNode = function(domNode) {
   inspectedDOMNode = domNode;
 };
 
-var hoverElement;
+var inspectorIframe;
 var inspectorOverlayPage;
 function addInspectorOverlayPage() {
   var el = document.createElement('iframe');
@@ -304,49 +304,86 @@ function addInspectorOverlayPage() {
   el.contentDocument.open();
   el.contentDocument.write(decodeURIComponent(window.__InspectorOverlayPage_html));
   el.contentDocument.write('<script>var InspectorOverlayHost = {stepOver: function(){}, resume: function(){} };</script>');
+  el.contentWindow.onload = function() {
+    el.contentWindow.setPlatform('mac'); // TODO: add support for other browsers
+  };
   el.contentDocument.close();
 
   inspectorOverlayPage = el.contentWindow;
+  inspectorIframe = el;
 }
 
-DOMHost.highlightElement = function(id, config) {
+function createQuad(x, y, width, height) {
+  return [
+    {x: x, y: y},
+    {x: x + width, y: y},
+    {x: x + width, y: y + height},
+    {x: x, y: y + height}
+  ]
+};
+
+function getElementDimensions(element) {
+  var calculatedStyle = window.getComputedStyle(element);
+
+  return {
+    borderLeft: +calculatedStyle.borderLeftWidth.match(/[0-9]*/)[0],
+    borderRight: +calculatedStyle.borderRightWidth.match(/[0-9]*/)[0],
+    borderTop: +calculatedStyle.borderTopWidth.match(/[0-9]*/)[0],
+    borderBottom: +calculatedStyle.borderBottomWidth.match(/[0-9]*/)[0],
+    marginLeft: +calculatedStyle.marginLeft.match(/[0-9]*/)[0],
+    marginRight: +calculatedStyle.marginRight.match(/[0-9]*/)[0],
+    marginTop: +calculatedStyle.marginTop.match(/[0-9]*/)[0],
+    marginBottom: +calculatedStyle.marginBottom.match(/[0-9]*/)[0],
+    paddingLeft: +calculatedStyle.paddingLeft.match(/[0-9]*/)[0],
+    paddingRight: +calculatedStyle.paddingRight.match(/[0-9]*/)[0],
+    paddingTop: +calculatedStyle.paddingTop.match(/[0-9]*/)[0],
+    paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0]
+  }
+}
+
+DOMHost.highlightNode = function(id, config) {
   if (!inspectorOverlayPage) {
     addInspectorOverlayPage();
   }
+
+  inspectorIframe.style.display = '';
 
   var instance = instanceCache[id];
   var element = instance.getDOMNode();
   var bounds = element.getBoundingClientRect();
   var scrollX = window.scrollX;
   var scrollY = window.scrollY;
+  var dimensions = getElementDimensions(element);
 
-  var contentQuad = [
-    {x: scrollX + bounds.left, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
-    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
-  ];
-  var style = window.getComputedStyle(element);
-  console.log(style.margin, style.padding);
 
-  var paddingQuad = [
-    {x: scrollX + bounds.left, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
-    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
-  ];
-  var borderQuad = [
-    {x: scrollX + bounds.left, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
-    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
-  ];
-  var marginQuad = [
-    {x: scrollX + bounds.left, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top},
-    {x: scrollX + bounds.left + bounds.width, y: scrollY + bounds.top + bounds.height},
-    {x: scrollX + bounds.left, y: scrollY + bounds.top + bounds.height}
-  ];
+  var contentQuad = createQuad(
+    scrollX + bounds.left + dimensions.borderLeft + dimensions.paddingLeft + dimensions.marginLeft,
+    scrollY + bounds.top + dimensions.borderTop + dimensions.paddingTop + dimensions.marginTop,
+    bounds.width - dimensions.borderLeft - dimensions.paddingLeft - dimensions.marginLeft - dimensions.borderRight - dimensions.paddingRight - dimensions.marginRight,
+    bounds.height - dimensions.borderTop - dimensions.paddingTop - dimensions.marginTop - dimensions.borderBottom - dimensions.paddingBottom - dimensions.marginBottom
+  );
+
+  var paddingQuad = createQuad(
+    scrollX + bounds.left + dimensions.borderLeft + dimensions.marginLeft,
+    scrollY + bounds.top + dimensions.borderTop + dimensions.marginTop,
+    bounds.width - dimensions.borderLeft - dimensions.marginLeft - dimensions.borderRight - dimensions.marginRight,
+    bounds.height - dimensions.borderTop - dimensions.marginTop - dimensions.borderBottom - dimensions.marginBottom
+
+  );
+
+  var borderQuad = createQuad(
+    scrollX + bounds.left + dimensions.marginLeft,
+    scrollY + bounds.top + dimensions.marginTop,
+    bounds.width - dimensions.marginLeft - dimensions.marginRight,
+    bounds.height - dimensions.marginTop - dimensions.marginBottom
+  );
+
+  var marginQuad = createQuad(
+    scrollX + bounds.left,
+    scrollY + bounds.top,
+    bounds.width,
+    bounds.height
+  );
 
   inspectorOverlayPage.reset({
     viewportSize: {
@@ -367,11 +404,11 @@ DOMHost.highlightElement = function(id, config) {
 
   inspectorOverlayPage.drawNodeHighlight({
     elementInfo: {
-      tagName: element.tagName, /* would be nice to have the React name here */
+      tagName: descriptorCache[id].nodeName || '',
       idValue: element.id,
-      className: '.' + element.className,
-      nodeWidth: bounds.width,
-      nodeHeight: bounds.height
+      className: (element.className.length ? '.' : '') + element.className,
+      nodeWidth: Math.round(bounds.width),
+      nodeHeight: Math.round(bounds.height)
     },
     marginColor: 'rgba(' + marginColor.r + ', ' + marginColor.g + ', '+ marginColor.b + ', ' + (marginColor.a || 1) + ')',
     contentColor: 'rgba(' + contentColor.r + ', ' + contentColor.g + ', '+ contentColor.b + ', ' + (contentColor.a || 1) + ')',
@@ -384,14 +421,10 @@ DOMHost.highlightElement = function(id, config) {
       contentQuad
     ]
   });
-
 };
 
-DOMHost.hideHighlightElement = function() {
-  if (hoverElement) {
-    hoverElement.parentNode.removeChild(hoverElement);
-    hoverElement = null;
-  }
+DOMHost.hideHighlight = function() {
+  inspectorIframe.style.display = 'none';
 };
 
 DOMHost.getEventListenersForNode = function(id, objectGroup) {

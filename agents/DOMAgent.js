@@ -108,12 +108,12 @@ var DOMAgent = {
     }
 
     if (nodeId) {
-      ReactInspectorAgent.call('DOM.highlightElement', nodeId, config, function() { });
+      ReactInspectorAgent.call('DOM.highlightNode', nodeId, config, function() { });
     }
   },
 
   hideHighlight: function() {
-    ReactInspectorAgent.call('DOM.hideHighlightElement', function() { });
+    ReactInspectorAgent.call('DOM.hideHighlight', function() { });
   },
 
   // Editing
