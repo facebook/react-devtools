@@ -402,7 +402,7 @@ ReactPanel.prototype = {
         }
 
         var contextMenu = new WebInspector.ContextMenu(event);
-        // Disabled
+        this._populateContextMenu(contextMenu, event);
         contextMenu.appendCheckboxItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Word wrap" : "Word Wrap"), toggleWordWrap.bind(this), WebInspector.settings.domWordWrap.get());
 
         contextMenu.show();
@@ -442,10 +442,30 @@ ReactPanel.prototype = {
     _populateContextMenu: function(contextMenu, node)
     {
         // Add debbuging-related actions
-        contextMenu.appendSeparator();
-        var pane = WebInspector.domBreakpointsSidebarPane;
-        pane.populateNodeContextMenu(node, contextMenu);
+        var treeElement = this.treeOutline._treeElementFromEvent(event);
+        if (!treeElement)
+            return;
+
+        var isPseudoElement = !!treeElement._node.pseudoType();
+        var isTag = treeElement._node.nodeType() === Node.ELEMENT_NODE && !isPseudoElement;
+        var textNode = event.target.enclosingNodeOrSelfWithClass("webkit-html-text-node");
+        if (textNode && textNode.hasStyleClass("bogus"))
+            textNode = null;
+        var commentNode = event.target.enclosingNodeOrSelfWithClass("webkit-html-comment");
+        contextMenu.appendApplicableItems(event.target);
+        if (textNode) {
+            contextMenu.appendSeparator();
+            this._populateTextContextMenu(treeElement, contextMenu, textNode);
+        } else if (isTag) {
+            contextMenu.appendSeparator();
+            this._populateTagContextMenu(contextMenu, event);
+        }
     },
+
+    _populateTextContextMenu: function(treeElement, contextMenu, textNode)
+    {
+        contextMenu.appendItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Edit text" : "Edit Text"), treeElement._startEditingTextNode.bind(treeElement, textNode));
+    },       
 
     _getPopoverAnchor: function(element)
     {
