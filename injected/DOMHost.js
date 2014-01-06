@@ -357,32 +357,32 @@ DOMHost.highlightNode = function(id, config) {
 
 
   var contentQuad = createQuad(
-    scrollX + bounds.left + dimensions.borderLeft + dimensions.paddingLeft + dimensions.marginLeft,
-    scrollY + bounds.top + dimensions.borderTop + dimensions.paddingTop + dimensions.marginTop,
-    bounds.width - dimensions.borderLeft - dimensions.paddingLeft - dimensions.marginLeft - dimensions.borderRight - dimensions.paddingRight - dimensions.marginRight,
-    bounds.height - dimensions.borderTop - dimensions.paddingTop - dimensions.marginTop - dimensions.borderBottom - dimensions.paddingBottom - dimensions.marginBottom
+    scrollX + bounds.left + dimensions.borderLeft + dimensions.paddingLeft,
+    scrollY + bounds.top + dimensions.borderTop + dimensions.paddingTop,
+    bounds.width - dimensions.borderLeft - dimensions.paddingLeft - dimensions.borderRight - dimensions.paddingRight,
+    bounds.height - dimensions.borderTop - dimensions.paddingTop - dimensions.borderBottom - dimensions.paddingBottom
   );
 
   var paddingQuad = createQuad(
-    scrollX + bounds.left + dimensions.borderLeft + dimensions.marginLeft,
-    scrollY + bounds.top + dimensions.borderTop + dimensions.marginTop,
-    bounds.width - dimensions.borderLeft - dimensions.marginLeft - dimensions.borderRight - dimensions.marginRight,
-    bounds.height - dimensions.borderTop - dimensions.marginTop - dimensions.borderBottom - dimensions.marginBottom
+    scrollX + bounds.left + dimensions.borderLeft,
+    scrollY + bounds.top + dimensions.borderTop,
+    bounds.width - dimensions.borderLeft - dimensions.borderRight,
+    bounds.height - dimensions.borderTop - dimensions.borderBottom
 
   );
 
   var borderQuad = createQuad(
-    scrollX + bounds.left + dimensions.marginLeft,
-    scrollY + bounds.top + dimensions.marginTop,
-    bounds.width - dimensions.marginLeft - dimensions.marginRight,
-    bounds.height - dimensions.marginTop - dimensions.marginBottom
-  );
-
-  var marginQuad = createQuad(
     scrollX + bounds.left,
     scrollY + bounds.top,
     bounds.width,
     bounds.height
+  );
+
+  var marginQuad = createQuad(
+    scrollX + bounds.left - dimensions.marginLeft,
+    scrollY + bounds.top - dimensions.marginTop,
+    bounds.width + dimensions.marginLeft + dimensions.marginRight,
+    bounds.height + dimensions.marginTop + dimensions.marginBottom
   );
 
   inspectorOverlayPage.reset({
