@@ -406,7 +406,7 @@ function getElementInfo(id, element, bounds) {
   return {
     tagName: descriptorCache[id].nodeName || '',
     idValue: element.id,
-    className: (element.className.length ? '.' : '') + element.className,
+    className: (' ' + element.className.trim()).replace(/\s{1,}/g, '.'),
     nodeWidth: Math.round(bounds.width),
     nodeHeight: Math.round(bounds.height)
   }
