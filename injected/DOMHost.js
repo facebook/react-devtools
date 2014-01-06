@@ -305,7 +305,7 @@ function addInspectorOverlayPage() {
 
   el.contentDocument.open();
   el.contentDocument.write(
-    decodeURIComponent(window.__InspectorOverlayPage_html)
+    window.__InspectorOverlayPage_html
   );
   el.contentDocument.write(
     '<script>' +
