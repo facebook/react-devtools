@@ -337,7 +337,7 @@ function createQuad(x, y, width, height) {
     {x: x + width, y: y},
     {x: x + width, y: y + height},
     {x: x, y: y + height}
-  ]
+  ];
 }
 
 function getElementDimensions(element) {
@@ -356,7 +356,7 @@ function getElementDimensions(element) {
     paddingRight: +calculatedStyle.paddingRight.match(/[0-9]*/)[0],
     paddingTop: +calculatedStyle.paddingTop.match(/[0-9]*/)[0],
     paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0]
-  }
+  };
 }
 
 function getQuads(element, bounds) {
@@ -399,17 +399,18 @@ function getQuads(element, bounds) {
     borderQuad,
     paddingQuad,
     contentQuad
-  ]
+  ];
 }
 
 function getElementInfo(id, element, bounds) {
   return {
     tagName: descriptorCache[id].nodeName || '',
     idValue: element.id,
-    className: (' ' + element.className.trim()).replace(/\s{1,}/g, '.'),
+    className: element.className.trim().length ?
+      (' ' + element.className.trim()).replace(/\s{1,}/g, '.') : '',
     nodeWidth: Math.round(bounds.width),
     nodeHeight: Math.round(bounds.height)
-  }
+  };
 }
 
 function getHighlightColor(color) {
