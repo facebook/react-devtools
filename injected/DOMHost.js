@@ -288,6 +288,8 @@ DOMHost.inspectDOMNode = function(domNode) {
 
 var inspectorIframe;
 var inspectorOverlayPage;
+var inspectorIframeVisible = false;
+
 function addInspectorOverlayPage() {
   var el = document.createElement('iframe');
   el.style.position = 'fixed';
@@ -302,10 +304,26 @@ function addInspectorOverlayPage() {
   document.body.appendChild(el);
 
   el.contentDocument.open();
-  el.contentDocument.write(decodeURIComponent(window.__InspectorOverlayPage_html));
-  el.contentDocument.write('<script>var InspectorOverlayHost = {stepOver: function(){}, resume: function(){} };</script>');
+  el.contentDocument.write(
+    decodeURIComponent(window.__InspectorOverlayPage_html)
+  );
+  el.contentDocument.write(
+    '<script>' +
+      'var InspectorOverlayHost = {' +
+      ' stepOver: function() {}, ' +
+      ' resume: function() {} ' +
+      '};' +
+    '</script>');
   el.contentWindow.onload = function() {
-    el.contentWindow.setPlatform('mac'); // TODO: add support for other browsers
+    var platform = "mac";
+    var appVersion = navigator.appVersion;
+    if (appVersion.indexOf('Win') > -1) {
+      platform = "windows";
+    }
+    else if (appVersion.indexOf('Linux') > -1) {
+      platform = "linux"
+    }
+    el.contentWindow.setPlatform(platform); // TODO: add support for other browsers
   };
   el.contentDocument.close();
 
@@ -320,7 +338,7 @@ function createQuad(x, y, width, height) {
     {x: x + width, y: y + height},
     {x: x, y: y + height}
   ]
-};
+}
 
 function getElementDimensions(element) {
   var calculatedStyle = window.getComputedStyle(element);
@@ -341,26 +359,18 @@ function getElementDimensions(element) {
   }
 }
 
-DOMHost.highlightNode = function(id, config) {
-  if (!inspectorOverlayPage) {
-    addInspectorOverlayPage();
-  }
-
-  inspectorIframe.style.display = '';
-
-  var instance = instanceCache[id];
-  var element = instance.getDOMNode();
-  var bounds = element.getBoundingClientRect();
+function getQuads(element, bounds) {
   var scrollX = window.scrollX;
   var scrollY = window.scrollY;
   var dimensions = getElementDimensions(element);
 
-
   var contentQuad = createQuad(
     scrollX + bounds.left + dimensions.borderLeft + dimensions.paddingLeft,
     scrollY + bounds.top + dimensions.borderTop + dimensions.paddingTop,
-    bounds.width - dimensions.borderLeft - dimensions.paddingLeft - dimensions.borderRight - dimensions.paddingRight,
-    bounds.height - dimensions.borderTop - dimensions.paddingTop - dimensions.borderBottom - dimensions.paddingBottom
+    bounds.width - dimensions.borderLeft - dimensions.paddingLeft -
+      dimensions.borderRight - dimensions.paddingRight,
+    bounds.height - dimensions.borderTop - dimensions.paddingTop -
+      dimensions.borderBottom - dimensions.paddingBottom
   );
 
   var paddingQuad = createQuad(
@@ -368,7 +378,6 @@ DOMHost.highlightNode = function(id, config) {
     scrollY + bounds.top + dimensions.borderTop,
     bounds.width - dimensions.borderLeft - dimensions.borderRight,
     bounds.height - dimensions.borderTop - dimensions.borderBottom
-
   );
 
   var borderQuad = createQuad(
@@ -385,6 +394,44 @@ DOMHost.highlightNode = function(id, config) {
     bounds.height + dimensions.marginTop + dimensions.marginBottom
   );
 
+  return [
+    marginQuad,
+    borderQuad,
+    paddingQuad,
+    contentQuad
+  ]
+}
+
+function getElementInfo(id, element, bounds) {
+  return {
+    tagName: descriptorCache[id].nodeName || '',
+    idValue: element.id,
+    className: (element.className.length ? '.' : '') + element.className,
+    nodeWidth: Math.round(bounds.width),
+    nodeHeight: Math.round(bounds.height)
+  }
+}
+
+function getHighlightColor(color) {
+  return 'rgba(' + color.r + ', ' + color.g + ', ' + color.b + ', ' +
+    (color.a || 1) + ')';
+}
+
+DOMHost.highlightNode = function(id, config) {
+  if (!inspectorOverlayPage) {
+    addInspectorOverlayPage();
+  }
+
+  if (!inspectorIframeVisible) {
+    inspectorIframe.style.display = '';
+    inspectorIframeVisible = true;
+  }
+
+  var instance = instanceCache[id];
+  var element = instance.getDOMNode();
+  var bounds = element.getBoundingClientRect();
+  var quads = getQuads(element, bounds);
+
   inspectorOverlayPage.reset({
     viewportSize: {
       width: window.innerWidth,
@@ -397,34 +444,26 @@ DOMHost.highlightNode = function(id, config) {
     scrollY: window.scrollY
   });
 
-  var contentColor = config.contentColor;
-  var marginColor = config.marginColor;
-  var borderColor = config.borderColor;
-  var paddingColor = config.paddingColor;
+  var elementInfo = null;
+  if (config.showInfo) {
+    elementInfo = getElementInfo(id, element, bounds);
+  }
 
+  // highlight the element
   inspectorOverlayPage.drawNodeHighlight({
-    elementInfo: {
-      tagName: descriptorCache[id].nodeName || '',
-      idValue: element.id,
-      className: (element.className.length ? '.' : '') + element.className,
-      nodeWidth: Math.round(bounds.width),
-      nodeHeight: Math.round(bounds.height)
-    },
-    marginColor: 'rgba(' + marginColor.r + ', ' + marginColor.g + ', '+ marginColor.b + ', ' + (marginColor.a || 1) + ')',
-    contentColor: 'rgba(' + contentColor.r + ', ' + contentColor.g + ', '+ contentColor.b + ', ' + (contentColor.a || 1) + ')',
-    borderColor: 'rgba(' + borderColor.r + ', ' + borderColor.g + ', '+ borderColor.b + ', ' + (borderColor.a || 1) + ')',
-    paddingColor: 'rgba(' + paddingColor.r + ', ' + paddingColor.g + ', '+ paddingColor.b + ', ' + (paddingColor.a || 1) + ')',
-    quads: [
-      marginQuad,
-      borderQuad,
-      paddingQuad,
-      contentQuad
-    ]
+    elementInfo: elementInfo,
+    marginColor: getHighlightColor(config.marginColor),
+    contentColor: getHighlightColor(config.contentColor),
+    borderColor: getHighlightColor(config.borderColor),
+    paddingColor: getHighlightColor(config.paddingColor),
+    quads: quads,
+    showRulers: config.showRulers
   });
 };
 
 DOMHost.hideHighlight = function() {
   inspectorIframe.style.display = 'none';
+  inspectorIframeVisible = false;
 };
 
 DOMHost.getEventListenersForNode = function(id, objectGroup) {

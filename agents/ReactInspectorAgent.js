@@ -83,12 +83,11 @@ function loadRuntime() {
     });
   }
 
-
-
   function fetchContents(name, fileName) {
     fetch(fileName, {
       onLoad: function(xhr) {
-        chrome.devtools.inspectedWindow.eval("this." + name + " = '" + encodeURIComponent(xhr.responseText) + "';");
+        chrome.devtools.inspectedWindow.eval("this." + name + " = '"  +
+          encodeURIComponent(xhr.responseText) + "';");
       }
     });
   }
