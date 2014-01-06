@@ -458,14 +458,44 @@ ReactPanel.prototype = {
             this._populateTextContextMenu(treeElement, contextMenu, textNode);
         } else if (isTag) {
             contextMenu.appendSeparator();
-            this._populateTagContextMenu(contextMenu, event);
+            this._populateTagContextMenu(treeElement, contextMenu, event);
+        } else if (commentNode) {
+            this._populateNodeContextMenu(treeElement, contextMenu);
         }
     },
 
     _populateTextContextMenu: function(treeElement, contextMenu, textNode)
     {
-        contextMenu.appendItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Edit text" : "Edit Text"), treeElement._startEditingTextNode.bind(treeElement, textNode));
-    },       
+        contextMenu.appendItem(WebInspector.UIString("Edit Text"), treeElement._startEditingTextNode.bind(treeElement, textNode));
+        this._populateNodeContextMenu(treeElement, contextMenu);
+    },
+
+    _populateNodeContextMenu: function(treeElement, contextMenu)
+    {
+        contextMenu.appendSeparator();
+        contextMenu.appendItem(WebInspector.UIString("Copy as HTML"), this._copyHTML.bind(treeElement));
+        contextMenu.appendItem(WebInspector.UIString("Inspect DOM properties"), this._inspectDOMProperties.bind(treeElement));
+    },
+
+    _populateTagContextMenu: function(treeElement, contextMenu, event)
+    {
+        var attribute = event.target.enclosingNodeOrSelfWithClass("webkit-html-attribute");
+        if (attribute)
+            contextMenu.appendItem(WebInspector.UIString("Edit Attribute"), treeElement._startEditingAttribute.bind(treeElement, attribute, event.target));
+        contextMenu.appendSeparator();
+
+        this._populateNodeContextMenu(treeElement, contextMenu);
+    },  
+
+    _copyHTML: function()
+    {
+        //clone node
+    },
+
+    _inspectDOMProperties: function()     
+    {
+        //throw object properties to console
+    },
 
     _getPopoverAnchor: function(element)
     {
