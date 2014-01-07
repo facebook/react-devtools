@@ -429,7 +429,18 @@ DOMHost.highlightNode = function(id, config) {
   }
 
   var instance = instanceCache[id];
-  var element = instance.getDOMNode();
+  var element;
+  try {
+    // ART will throw on this lookup. TODO: Calculate ART rectangle.
+    element = instance.getDOMNode();
+  } catch (x) {
+    element = null;
+  }
+  if (element == null) {
+    DOMHost.hideHighlight();
+    return;
+  }
+
   var bounds = element.getBoundingClientRect();
   var quads = getQuads(element, bounds);
 
