@@ -393,7 +393,7 @@ ReactPanel.prototype = {
             if (!candidateFocusNode)
                 return;
 
-            this.selectDOMNode(candidateFocusNode);
+            this.selectDOMNode(candidateFocusNode, true);
             if (this.treeOutline.selectedTreeElement)
                 this.treeOutline.selectedTreeElement.expand();
         }

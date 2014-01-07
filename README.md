@@ -48,6 +48,13 @@ Tools.
 You can test this on the [React website](http://facebook.github.io/react/)
 or by inspecting [Facebook](https://www.facebook.com/).
 
+### The React Tab Is Blank?
+
+Due to a [bug in Chrome](https://code.google.com/p/chromium/issues/detail?id=319328),
+devtools extensions are unable to use `localStorage` if the "Block third-party
+cookies and site data" option is checked in the Chrome content settings. Until
+this bug is fixed, please make sure this preference is unchecked.
+
 ## Usage
 
 You should have a new tab called **React** in your Chrome DevTools. This shows
