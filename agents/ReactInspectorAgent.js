@@ -57,18 +57,39 @@ function loadRuntime() {
   var moduleDependencies = {};
   var pending = 0;
 
-  function fetch(name, filename, dependency) {
-    moduleDependencies[name] = dependency;
-    pending++;
+  function fetch(fileName, options) {
     var xhr = new XMLHttpRequest();
+    pending++;
     xhr.onload = function() {
-      moduleScripts[name] = xhr.responseText;
+      if (options.onLoad) {
+        options.onLoad.call(null, xhr);
+      }
       pending--;
-      if (pending == 0) complete();
-    };
-    var runtimeURL = chrome.extension.getURL(filename);
+      if (pending == 0){
+        complete();
+      }
+    }
+    var runtimeURL = chrome.extension.getURL(fileName);
     xhr.open('GET', runtimeURL, true);
     xhr.send();
+  }
+
+  function fetchScript(name, fileName, dependency) {
+    moduleDependencies[name] = dependency;
+    fetch(fileName, {
+      onLoad: function(xhr) {
+        moduleScripts[name] = xhr.responseText;
+      }
+    });
+  }
+
+  function fetchContents(name, fileName) {
+    fetch(fileName, {
+      onLoad: function(xhr) {
+        chrome.devtools.inspectedWindow.eval("this." + name + " = "  +
+          JSON.stringify(xhr.responseText) + ";");
+      }
+    });
   }
 
   function complete() {
@@ -86,11 +107,12 @@ function loadRuntime() {
     chrome.devtools.inspectedWindow.eval(script, runtimeLoaded);
   }
 
-  fetch('React', '/injected/ReactHost.js');
-  fetch('_injectedScriptHost', '/injected/InjectedScriptHost.js');
-  fetch('_injectedScript', '/blink/Source/core/inspector/InjectedScriptSource.js', ['_injectedScriptHost']);
-  fetch('Runtime', '/injected/RuntimeHost.js', ['React', '_injectedScript']);
-  fetch('DOM', '/injected/DOMHost.js', ['React', '_injectedScript']);
+  fetchScript('React', '/injected/ReactHost.js');
+  fetchScript('_injectedScriptHost', '/injected/InjectedScriptHost.js');
+  fetchScript('_injectedScript', '/blink/Source/core/inspector/InjectedScriptSource.js', ['_injectedScriptHost']);
+  fetchScript('Runtime', '/injected/RuntimeHost.js', ['React', '_injectedScript']);
+  fetchScript('DOM', '/injected/DOMHost.js', ['React', '_injectedScript']);
+  fetchContents('__InspectorOverlayPage_html', '/blink/Source/core/inspector/InspectorOverlayPage.html');
 }
 
 ReactInspectorAgent = {

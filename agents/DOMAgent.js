@@ -102,8 +102,19 @@ var DOMAgent = {
   redo: function() {},
 
   // Highlight on screen
-  highlightNode: function(config, nodeId, objectId) {},
-  hideHighlight: function() {},
+  highlightNode: function(config, nodeId) {
+    if (nodeId === 'react_root_element') {
+      return;
+    }
+
+    if (nodeId) {
+      ReactInspectorAgent.call('DOM.highlightNode', nodeId, config, function() { });
+    }
+  },
+
+  hideHighlight: function() {
+    ReactInspectorAgent.call('DOM.hideHighlight', function() { });
+  },
 
   // Editing
   setNodeName: function(id, name, callback) { callback('Not implemented'); },
