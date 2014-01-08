@@ -41,6 +41,11 @@ var InspectorBackend = {
     this._domDispatcher[methodName].apply(this._domDispatcher, args);
   },
 
+  notifyDOMAgent: function(methodName, args) {
+    if (!this._domDispatcher) return;
+    this._domDispatcher._domAgent[methodName].apply(this._domDispatcher._domAgent, args);
+  },
+
   registerDOMDispatcher: function(domDispatcher) {
     if (this._domDispatcher) { new Error('Expected there to be only one.'); }
     this._domDispatcher = domDispatcher;

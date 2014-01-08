@@ -42,6 +42,7 @@ var instanceIDCounter = 0;
 
 var instanceCache = {};
 var descriptorCache = {};
+var reactIdInstanceIdMapping = {};
 var rootCache = {};
 
 var updatedInstances = {};
@@ -67,8 +68,10 @@ var foundInstance = null; // Used to extract a deep search for an instance
 
 function bindNode(instance) {
   if (!instance[ID]) {
-    instance[ID] = (instanceIDCounter++) + '';
+    var instanceId = (instanceIDCounter++) + '';
+    instance[ID] = instanceId;
     instanceCache[instance[ID]] = instance;
+    reactIdInstanceIdMapping[instance._rootNodeID] = instanceId;
   }
   return instance[ID];
 }
@@ -323,7 +326,7 @@ function addInspectorOverlayPage() {
     else if (appVersion.indexOf('Linux') > -1) {
       platform = "linux"
     }
-    el.contentWindow.setPlatform(platform); // TODO: add support for other browsers
+    el.contentWindow.setPlatform(platform);
   };
   el.contentDocument.close();
 
@@ -478,19 +481,19 @@ DOMHost.hideHighlight = function() {
   inspectorIframeVisible = false;
 };
 
+var hoverElementReactID;
 function inspectModeMouseMove(event) {
-  var instances = instanceCache;
   var target;
+  var elementReactId;
   if (target !== event.target) {
     target = event.target;
-    if (target.dataset.reactid) {
-      // TODO: should use other PR to show highlight,
-      // TODO: but also need to inform the devtool
-      console.log('highlight element:', target);
+
+    while (target && target.dataset && !reactIdInstanceIdMapping[elementReactId]) {
+      elementReactId = target.dataset.reactid;
+      target = target.parentNode;
     }
-    else {
-      console.log('remove highlight if there is one');
-    }
+
+    hoverElementReactID = elementReactId;
   }
 }
 
@@ -501,7 +504,7 @@ DOMHost.toggleInspectMode = function() {
   if (inspectModeEnabled) {
     document.addEventListener('mousemove', inspectModeMouseMove, false);
   } else {
-    // TODO: remove highlighted element
+    hoverElementReactID = null;
     document.removeEventListener('mousemove', inspectModeMouseMove, false);
   }
 
@@ -783,6 +786,7 @@ DOMHost.reset = function() {
   lastBreakpointInstance = null;
 };
 
+var currentHoverElementReactID;
 DOMHost.getChanges = function() {
   var changeLog = [];
   var descriptor;
@@ -826,6 +830,17 @@ DOMHost.getChanges = function() {
         id
       ]
     });
+  }
+
+  // highlight
+  if (hoverElementReactID !== currentHoverElementReactID) {
+    currentHoverElementReactID = hoverElementReactID;
+    changeLog.push({
+      method: 'highlightDOMNode',
+      args: [
+        reactIdInstanceIdMapping[hoverElementReactID]
+      ]
+    })
   }
 
   updatedInstances = {};

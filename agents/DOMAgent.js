@@ -152,7 +152,11 @@ var DOMAgent = {
       if (result) {
         for (var i = 0; i < result.length; i++) {
           var change = result[i];
-          InspectorBackend.notifyDOM(change.method, change.args);
+          if ('|highlightDOMNode|'.indexOf('|' + change.method + '|') > -1) {
+            InspectorBackend.notifyDOMAgent(change.method, change.args);
+          } else {
+            InspectorBackend.notifyDOM(change.method, change.args);
+          }
         }
       }
       setTimeout(DOMAgent._pollForChanges, 300);
