@@ -126,3 +126,6 @@ for (var key in WebInspector._DOMNode) {
     WebInspector.DOMNode[key] = WebInspector._DOMNode[key];
   }
 }
+
+WebInspector.DOMNode.prototype.nodeNameInCorrectCase = 
+  WebInspector.DOMNode.prototype.nodeName;

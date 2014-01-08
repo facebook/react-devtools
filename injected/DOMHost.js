@@ -261,7 +261,6 @@ DOMHost.getDocument = function() {
     nodeName: 'document',
     localName: 'document',
     attributes: [],
-    xmlVersion: 1,
     childNodeCount: 1,
     children: [root]
   };
