@@ -221,7 +221,7 @@ ReactPanel.prototype = {
     },
 
     _inspectElement: function(event) {
-        event.target.parentNode.classList.toggle("toggled-on");
+        this._inspectButton.state = (this._inspectButton.state === 0) ? 2 : 0;
         DOMAgent.toggleInspectMode();
         return true;
     },
@@ -377,6 +377,7 @@ ReactPanel.prototype = {
         this._reset();
         this.searchCanceled();
 
+        this._inspectButton.state = 0;
         this.treeOutline.rootDOMNode = inspectedRootDocument;
 
         if (!inspectedRootDocument) {
