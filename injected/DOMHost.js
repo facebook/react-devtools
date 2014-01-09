@@ -497,15 +497,34 @@ function inspectModeMouseMove(event) {
   }
 }
 
+var clickElementReactID;
+function inspectModeMouseClick(event) {
+  var target;
+  var elementReactId;
+  if (target !== event.target) {
+    target = event.target;
+
+    while (target && target.dataset && !reactIdInstanceIdMapping[elementReactId]) {
+      elementReactId = target.dataset.reactid;
+      target = target.parentNode;
+    }
+
+    clickElementReactID = elementReactId;
+    DOMHost.inspectDOMNode(event.target);
+  }
+}
+
 var inspectModeEnabled = false;
 DOMHost.toggleInspectMode = function() {
   inspectModeEnabled = !inspectModeEnabled;
 
   if (inspectModeEnabled) {
     document.addEventListener('mousemove', inspectModeMouseMove, false);
+    document.addEventListener('click', inspectModeMouseClick, false);
   } else {
     hoverElementReactID = null;
     document.removeEventListener('mousemove', inspectModeMouseMove, false);
+    document.removeEventListener('click', inspectModeMouseClick, false);
   }
 
 };

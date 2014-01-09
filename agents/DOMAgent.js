@@ -159,7 +159,7 @@ var DOMAgent = {
           }
         }
       }
-      setTimeout(DOMAgent._pollForChanges, 300);
+      setTimeout(DOMAgent._pollForChanges, 50);
     });
   },
 
