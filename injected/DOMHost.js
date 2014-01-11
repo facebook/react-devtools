@@ -482,18 +482,24 @@ DOMHost.hideHighlight = function() {
 };
 
 var hoverElementReactID;
+var hoverElement;
 function inspectModeMouseMove(event) {
   var target;
   var elementReactId;
   if (target !== event.target) {
     target = event.target;
 
-    while (target && target.dataset && !reactIdInstanceIdMapping[elementReactId]) {
-      elementReactId = target.dataset.reactid;
-      target = target.parentNode;
+    while (target && target.parentNode && !elementReactId) {
+      if (target.dataset) {
+        elementReactId = target.dataset.reactid;
+      }
+      if(!elementReactId) {
+        target = target.parentNode;
+      }
     }
 
     hoverElementReactID = elementReactId;
+    hoverElement = target;
   }
 }
 
@@ -790,6 +796,48 @@ function appendInspectionEvents(domNodeOrInstance, changeLog) {
   });
 }
 
+// TODO: reduce code duplication
+function appendInspectionHoverEvents(domNodeOrInstance, changeLog) {
+  if (reactIdInstanceIdMapping[currentHoverElementReactID]) {
+    changeLog.push({
+      method: 'highlightDOMNode',
+      args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+    });
+    return;
+  }
+
+  foundInstance = null;
+  var ancestor = findAncestorWithMissingChildrenInSet(
+    ReactHost.instancesByRootID,
+    domNodeOrInstance
+  );
+  if (!ancestor) {
+    var instance = foundInstance;
+    foundInstance = null;
+    if (!instance) {
+      return;
+    }
+    bindNode(instance);
+    changeLog.push({
+      method: 'highlightDOMNode',
+      args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+    });
+    return;
+  }
+  var children = getChildren(ancestor, -1, domNodeOrInstance);
+  var instance = foundInstance;
+  foundInstance = null;
+  descriptorCache[getID(ancestor)].children = children;
+  bindNode(instance);
+  changeLog.push({
+    method: 'setChildNodes',
+    args: [getID(ancestor), children]
+  },  {
+    method: 'highlightDOMNode',
+    args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+  });
+}
+
 DOMHost.reset = function() {
   // Reset the state
   for (var id in instanceCache) {
@@ -854,12 +902,10 @@ DOMHost.getChanges = function() {
   // highlight
   if (hoverElementReactID !== currentHoverElementReactID) {
     currentHoverElementReactID = hoverElementReactID;
-    changeLog.push({
-      method: 'highlightDOMNode',
-      args: [
-        reactIdInstanceIdMapping[hoverElementReactID]
-      ]
-    })
+
+    if (currentHoverElementReactID) {
+      appendInspectionHoverEvents(hoverElement, changeLog);
+    }
   }
 
   updatedInstances = {};
