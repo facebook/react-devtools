@@ -481,43 +481,38 @@ DOMHost.hideHighlight = function() {
   inspectorIframeVisible = false;
 };
 
+
+var elementReactId;
+var inspectTarget;
+function findInspectTarget(event) {
+  inspectTarget = event.target;
+  elementReactId = null;
+
+  while (inspectTarget && inspectTarget.parentNode && !elementReactId) {
+    if (inspectTarget.dataset) {
+      elementReactId = inspectTarget.dataset.reactid;
+    }
+    if(!elementReactId) {
+      inspectTarget = inspectTarget.parentNode;
+    }
+  }
+}
+
 var hoverElementReactID;
 var hoverElement;
 function inspectModeMouseMove(event) {
-  var target;
-  var elementReactId;
-  if (target !== event.target) {
-    target = event.target;
+  findInspectTarget(event);
 
-    while (target && target.parentNode && !elementReactId) {
-      if (target.dataset) {
-        elementReactId = target.dataset.reactid;
-      }
-      if(!elementReactId) {
-        target = target.parentNode;
-      }
-    }
-
-    hoverElementReactID = elementReactId;
-    hoverElement = elementReactId ? target : null;
-  }
+  hoverElementReactID = elementReactId;
+  hoverElement = elementReactId ? inspectTarget : null;
 }
 
 var clickElementReactID;
 function inspectModeMouseClick(event) {
-  var target;
-  var elementReactId;
-  if (target !== event.target) {
-    target = event.target;
+  findInspectTarget(event);
 
-    while (target && target.dataset && !reactIdInstanceIdMapping[elementReactId]) {
-      elementReactId = target.dataset.reactid;
-      target = target.parentNode;
-    }
-
-    clickElementReactID = elementReactId;
-    DOMHost.inspectDOMNode(event.target);
-  }
+  clickElementReactID = elementReactId;
+  DOMHost.inspectDOMNode(inspectTarget);
 }
 
 var inspectModeEnabled = false;
@@ -911,7 +906,6 @@ DOMHost.getChanges = function() {
     currentHoverElementReactID = hoverElementReactID;
 
     appendInspectionHoverEvents(hoverElement, changeLog);
-
   }
 
   updatedInstances = {};
