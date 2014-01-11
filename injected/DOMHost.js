@@ -499,7 +499,7 @@ function inspectModeMouseMove(event) {
     }
 
     hoverElementReactID = elementReactId;
-    hoverElement = target;
+    hoverElement = elementReactId ? target : null;
   }
 }
 
@@ -805,6 +805,15 @@ function appendInspectionHoverEvents(domNodeOrInstance, changeLog) {
     });
     return;
   }
+  if(!domNodeOrInstance) {
+    if (!instance) {
+      changeLog.push({
+        method: 'highlightDOMNode',
+        args: null
+      });
+
+      return;
+    }}
 
   foundInstance = null;
   var ancestor = findAncestorWithMissingChildrenInSet(
@@ -814,9 +823,7 @@ function appendInspectionHoverEvents(domNodeOrInstance, changeLog) {
   if (!ancestor) {
     var instance = foundInstance;
     foundInstance = null;
-    if (!instance) {
-      return;
-    }
+
     bindNode(instance);
     changeLog.push({
       method: 'highlightDOMNode',
@@ -903,9 +910,8 @@ DOMHost.getChanges = function() {
   if (hoverElementReactID !== currentHoverElementReactID) {
     currentHoverElementReactID = hoverElementReactID;
 
-    if (currentHoverElementReactID) {
-      appendInspectionHoverEvents(hoverElement, changeLog);
-    }
+    appendInspectionHoverEvents(hoverElement, changeLog);
+
   }
 
   updatedInstances = {};
