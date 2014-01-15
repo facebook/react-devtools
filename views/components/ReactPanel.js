@@ -402,7 +402,7 @@ ReactPanel.prototype = {
         }
 
         var contextMenu = new WebInspector.ContextMenu(event);
-        // Disabled
+        this._populateContextMenu(contextMenu, event);
         contextMenu.appendCheckboxItem(WebInspector.UIString(WebInspector.useLowerCaseMenuTitles() ? "Word wrap" : "Word Wrap"), toggleWordWrap.bind(this), WebInspector.settings.domWordWrap.get());
 
         contextMenu.show();
@@ -442,9 +442,59 @@ ReactPanel.prototype = {
     _populateContextMenu: function(contextMenu, node)
     {
         // Add debbuging-related actions
+        var treeElement = this.treeOutline._treeElementFromEvent(event);
+        if (!treeElement)
+            return;
+
+        var isPseudoElement = !!treeElement._node.pseudoType();
+        var isTag = treeElement._node.nodeType() === Node.ELEMENT_NODE && !isPseudoElement;
+        var textNode = event.target.enclosingNodeOrSelfWithClass("webkit-html-text-node");
+        if (textNode && textNode.hasStyleClass("bogus"))
+            textNode = null;
+        var commentNode = event.target.enclosingNodeOrSelfWithClass("webkit-html-comment");
+        contextMenu.appendApplicableItems(event.target);
+        if (textNode) {
+            contextMenu.appendSeparator();
+            this._populateTextContextMenu(treeElement, contextMenu, textNode);
+        } else if (isTag) {
+            contextMenu.appendSeparator();
+            this._populateTagContextMenu(treeElement, contextMenu, event);
+        } else if (commentNode) {
+            this._populateNodeContextMenu(treeElement, contextMenu);
+        }
+    },
+
+    _populateTextContextMenu: function(treeElement, contextMenu, textNode)
+    {
+        contextMenu.appendItem(WebInspector.UIString("Edit Text"), treeElement._startEditingTextNode.bind(treeElement, textNode));
+        this._populateNodeContextMenu(treeElement, contextMenu);
+    },
+
+    _populateNodeContextMenu: function(treeElement, contextMenu)
+    {
         contextMenu.appendSeparator();
-        var pane = WebInspector.domBreakpointsSidebarPane;
-        pane.populateNodeContextMenu(node, contextMenu);
+        contextMenu.appendItem(WebInspector.UIString("Copy as HTML"), this._copyHTML.bind(treeElement));
+        contextMenu.appendItem(WebInspector.UIString("Inspect DOM properties"), this._inspectDOMProperties.bind(treeElement));
+    },
+
+    _populateTagContextMenu: function(treeElement, contextMenu, event)
+    {
+        var attribute = event.target.enclosingNodeOrSelfWithClass("webkit-html-attribute");
+        if (attribute)
+            contextMenu.appendItem(WebInspector.UIString("Edit Attribute"), treeElement._startEditingAttribute.bind(treeElement, attribute, event.target));
+        contextMenu.appendSeparator();
+
+        this._populateNodeContextMenu(treeElement, contextMenu);
+    },  
+
+    _copyHTML: function()
+    {
+        //clone node
+    },
+
+    _inspectDOMProperties: function()     
+    {
+        //throw object properties to console
     },
 
     _getPopoverAnchor: function(element)
