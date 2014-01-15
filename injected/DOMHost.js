@@ -274,6 +274,40 @@ DOMHost.getChildNodes = function(parentId, depth) {
   return children;
 };
 
+DOMHost.getNodeForPath = function(path) {
+  // https://github.com/mirrors/blink/blob/b9bce8c/Source/core/inspector/InspectorDOMAgent.cpp#L1942-L1971
+  var changeLog = [];
+  var ancestorWithMissingChildren = null;
+  var node = DOMHost.getDocument();
+  var pathTokens = path.split(',');
+  if (!pathTokens) {
+    return {changeLog: changeLog, node: null};
+  }
+  for (var i = 0; i < pathTokens.length; i += 2) {
+    var childNumber = +pathTokens[i];
+    var childName = pathTokens[i + 1];
+    if (isNaN(childNumber) || childNumber >= node.children.length) {
+      return {changeLog: changeLog, node: null};
+    }
+    child = node.children[childNumber];
+    if (!child || child.nodeName != childName) {
+      return {changeLog: changeLog, node: null};
+    }
+    node = child;
+    if (!node.children) {
+      node.children = getChildren(instanceCache[node.nodeId], 0);
+      if (!ancestorWithMissingChildren) {
+        ancestorWithMissingChildren = node;
+        changeLog.push({
+          method: 'setChildNodes',
+          args: [node.nodeId, node.children]
+        });
+      }
+    }
+  }
+  return {changeLog: changeLog, node: node};
+};
+
 DOMHost.resolveNode = function(id, objectGroup) {
   var instance = instanceCache[id];
   if (!instance) return null;
@@ -850,7 +884,7 @@ var Subscriber = {
 
 };
 
-ReactHost.subscribeToChanges(Subscriber)
+ReactHost.subscribeToChanges(Subscriber);
 
 return DOMHost;
 

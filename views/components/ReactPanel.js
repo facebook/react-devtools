@@ -333,7 +333,7 @@ ReactPanel.prototype = {
         function selectNode(candidateFocusNode)
         {
             if (!candidateFocusNode)
-                candidateFocusNode = inspectedRootDocument.body || inspectedRootDocument.documentElement;
+                candidateFocusNode = inspectedRootDocument;
 
             if (!candidateFocusNode)
                 return;
