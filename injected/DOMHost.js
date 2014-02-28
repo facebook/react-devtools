@@ -109,7 +109,8 @@ function getAttributes(instance) {
          prop === 'key' ||
          prop === 'children' ||
          prop === '__owner__' ||
-         prop === '{owner}') {
+         prop === '{owner}' ||
+         prop.substr(0,2) == '__') {
       continue;
     }
     var value = instance.props[prop];
