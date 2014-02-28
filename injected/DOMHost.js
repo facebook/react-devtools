@@ -188,7 +188,11 @@ function getDOMNode(instance, depth, diveTo) {
 
   var id = bindNode(instance);
   var tagName = instance.tagName && instance.tagName.toLowerCase();
-  var name = instance.constructor.displayName || tagName || 'Unknown';
+  // For several reasons, there's only one React class in Om. So we
+  // check for getDisplayName on the instance itself (if available).
+  var instanceName = instance.getDisplayName && instance.getDisplayName();
+  var name = instance.constructor.displayName || tagName ||
+             instanceName || 'Unknown';
   var children = null;
 
   if (depth != 0 || ReactHost.hasTextContent(instance)) {
