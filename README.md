@@ -61,7 +61,7 @@ You should have a new tab called **React** in your Chrome DevTools. This shows
 you the root React components that was rendered on the page, as well as the
 subcomponents that they ended up rendering.
 
-By selecting one of the components in the tree you can inspect and edit it's
+By selecting one of the components in the tree you can inspect and edit its
 current props and state in the panel on the right. In the breadcrumbs you can
 inspect the selected Component, the Component that created it, the Component
 that created that one, and so on.
