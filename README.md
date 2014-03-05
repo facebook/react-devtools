@@ -1,6 +1,6 @@
 # React Developer Tools
 
-React Developer Tools is a Chrome extension allow you to inspect the React
+React Developer Tools is a Chrome extension that allows you to inspect the React
 component hierarchy in the Chrome Developer Tools (formerly WebKit Web
 Inspector).
 
