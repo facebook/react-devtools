@@ -29,8 +29,8 @@
  * THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-importScript("CSSNamedFlowCollectionsView.js");
-importScript("CSSNamedFlowView.js");
+importScript("DOMSyntaxHighlighter.js");
+importScript("ElementsTreeOutline.js");
 importScript("EventListenersSidebarPane.js");
 importScript("ObjectSidebarPane.js");
 
@@ -38,8 +38,8 @@ var ReactPanel = function()
 {
     WebInspector.View.call(this);
 
-    this.element.addStyleClass("panel");
-    this.element.addStyleClass("elements");
+    this.element.classList.add("panel");
+    this.element.classList.add("elements");
 
     this.registerRequiredCSS("breadcrumbList.css");
     this.registerRequiredCSS("elementsPanel.css");
@@ -50,26 +50,27 @@ var ReactPanel = function()
     const minimumContentWidthPercent = 0.34;
     const initialSidebarHeight = 325;
     const minimumContentHeightPercent = 0.34;
-    this.createSidebarView(this.element, WebInspector.SidebarView.SidebarPosition.End, initialSidebarWidth, initialSidebarHeight);
-    this.splitView.setSidebarElementConstraints(Preferences.minElementsSidebarWidth, Preferences.minElementsSidebarHeight);
-    this.splitView.setMainElementConstraints(minimumContentWidthPercent, minimumContentHeightPercent);
-    this.splitView.addEventListener(WebInspector.SidebarView.EventTypes.Resized, this._updateTreeOutlineVisibleWidth.bind(this));
+
+    this._splitView = new WebInspector.SplitView(true, true, "reactPanelSplitViewState", initialSidebarWidth, initialSidebarHeight);
+    this._splitView.setSidebarElementConstraints(Preferences.minSidebarWidth, Preferences.minSidebarHeight);
+    this._splitView.setMainElementConstraints(minimumContentWidthPercent, minimumContentHeightPercent);
+    this._splitView.addEventListener(WebInspector.SplitView.Events.SidebarSizeChanged, this._updateTreeOutlineVisibleWidth.bind(this));
+    this._splitView.show(this.element);
 
     this._searchableView = new WebInspector.SearchableView(this);
-    this.splitView.mainElement.addStyleClass("vbox");
-    this._searchableView.show(this.splitView.mainElement);
+    this._searchableView.show(this._splitView.mainElement());
     var stackElement = this._searchableView.element;
 
     this.contentElement = stackElement.createChild("div");
     this.contentElement.id = "elements-content";
-    this.contentElement.addStyleClass("outline-disclosure");
-    this.contentElement.addStyleClass("source-code");
+    this.contentElement.classList.add("outline-disclosure");
+    this.contentElement.classList.add("source-code");
     if (!WebInspector.settings.domWordWrap.get())
         this.contentElement.classList.add("nowrap");
     WebInspector.settings.domWordWrap.addChangeListener(this._domWordWrapSettingChanged.bind(this));
 
     this.contentElement.addEventListener("contextmenu", this._contextMenuEventFired.bind(this), true);
-    this.splitView.sidebarElement.addEventListener("contextmenu", this._sidebarContextMenuEventFired.bind(this), false);
+    this._splitView.sidebarElement().addEventListener("contextmenu", this._sidebarContextMenuEventFired.bind(this), false);
 
     this.treeOutline = new WebInspector.ElementsTreeOutline(true, true, this._populateContextMenu.bind(this), this._setPseudoClassForNodeId.bind(this));
     this.treeOutline.wireToDomAgent();
@@ -107,9 +108,6 @@ var ReactPanel = function()
 
 
     WebInspector.domAgent.addEventListener(WebInspector.DOMAgent.Events.DocumentUpdated, this._documentUpdatedEvent, this);
-
-    if (WebInspector.domAgent.existingDocument())
-        this._documentUpdated(WebInspector.domAgent.existingDocument());
 }
 
 ReactPanel.prototype = {
@@ -158,54 +156,22 @@ ReactPanel.prototype = {
         return null;
     },
 
-    /* FROM PANEL */
-
-    createSidebarView: function(parentElement, position, defaultWidth, defaultHeight)
-    {
-        if (this.splitView)
-            return;
-
-        if (!parentElement)
-            parentElement = this.element;
-
-        this.splitView = new WebInspector.SidebarView(position, this._sidebarWidthSettingName(), defaultWidth, defaultHeight);
-        this.splitView.show(parentElement);
-        this.splitView.addEventListener(WebInspector.SidebarView.EventTypes.Resized, this.sidebarResized.bind(this));
-
-        this.sidebarElement = this.splitView.sidebarElement;
-    },
-
-    sidebarResized: function(event)
-    {
-    },
-
-    _sidebarWidthSettingName: function()
-    {
-        return "ElementsSidebarWidth";
-    },
-
-    /* END FROM PANEL */
-
     _updateTreeOutlineVisibleWidth: function()
     {
         if (!this.treeOutline)
             return;
 
-        var width = this.splitView.element.offsetWidth;
-        if (this.splitView.isVertical())
-            width -= this.splitView.sidebarWidth();
+        var width = this._splitView.element.offsetWidth;
+        if (this._splitView.isVertical())
+            width -= this._splitView.sidebarSize();
         this.treeOutline.setVisibleWidth(width);
         this.updateBreadcrumbSizes();
+        this.treeOutline.updateSelection();
     },
 
     defaultFocusedElement: function()
     {
         return this.treeOutline.element;
-    },
-
-    statusBarResized: function()
-    {
-        this.updateBreadcrumbSizes();
     },
 
     wasShown: function()
@@ -219,7 +185,10 @@ ReactPanel.prototype = {
         this.treeOutline.setVisible(true);
 
         if (!this.treeOutline.rootDOMNode)
-            WebInspector.domAgent.requestDocument();
+            if (WebInspector.domAgent.existingDocument())
+                this._documentUpdated(WebInspector.domAgent.existingDocument());
+            else
+                WebInspector.domAgent.requestDocument();
     },
 
     willHide: function()
@@ -236,15 +205,17 @@ ReactPanel.prototype = {
 
     onResize: function()
     {
-        this.treeOutline.updateSelection();
-        this.updateBreadcrumbSizes();
+        this._updateTreeOutlineVisibleWidth();
     },
 
-    createView: function(id)
+    omitDefaultSelection: function()
     {
-        if (!this._overridesView)
-            this._overridesView = new WebInspector.OverridesView();
-        return this._overridesView;
+        this._omitDefaultSelection = true;
+    },
+
+    stopOmittingDefaultSelection: function()
+    {
+        delete this._omitDefaultSelection;
     },
 
     _setPseudoClassForNodeId: function(nodeId, pseudoClass, enable)
@@ -275,7 +246,7 @@ ReactPanel.prototype = {
 
         WebInspector.notifications.dispatchEventToListeners(WebInspector.UserMetrics.UserAction, {
             action: WebInspector.UserMetrics.UserActionNames.ForcedElementState,
-            selector: node.appropriateSelectorFor(false),
+            selector: WebInspector.DOMPresentationUtils.fullQualifiedSelector(node, false),
             enabled: enable,
             state: pseudoClass
         });
@@ -295,7 +266,7 @@ ReactPanel.prototype = {
             //ConsoleAgent.addInspectedNode(selectedNode.id);
             this._lastValidSelectedNode = selectedNode;
         }
-        WebInspector.notifications.dispatchEventToListeners(WebInspector.ElementsTreeOutline.Events.SelectedNodeChanged);
+        WebInspector.notifications.dispatchEventToListeners(WebInspector.NotificationService.Events.SelectedNodeChanged);
     },
 
     _updateSidebars: function()
@@ -353,10 +324,13 @@ ReactPanel.prototype = {
             selectNode.call(this, node);
         }
 
+        if (this._omitDefaultSelection)
+            return;
+
         if (this._selectedPathOnReset)
             WebInspector.domAgent.pushNodeByPathToFrontend(this._selectedPathOnReset, selectLastSelectedNode.bind(this));
         else
-            selectNode.call(this);
+            selectNode.call(this, null);
         delete this._selectedPathOnReset;
     },
 
@@ -408,19 +382,12 @@ ReactPanel.prototype = {
         contextMenu.show();
     },
 
-    _showNamedFlowCollections: function()
-    {
-        if (!WebInspector.cssNamedFlowCollectionsView)
-            WebInspector.cssNamedFlowCollectionsView = new WebInspector.CSSNamedFlowCollectionsView();
-        WebInspector.cssNamedFlowCollectionsView.showInDrawer();
-    },
-
     _domWordWrapSettingChanged: function(event)
     {
         if (event.data)
-            this.contentElement.removeStyleClass("nowrap");
+            this.contentElement.classList.remove("nowrap");
         else
-            this.contentElement.addStyleClass("nowrap");
+            this.contentElement.classList.add("nowrap");
 
         var selectedNode = this.selectedDOMNode();
         if (!selectedNode)
@@ -544,14 +511,19 @@ ReactPanel.prototype = {
             return;
         }
 
+        /**
+         * @param {?WebInspector.DOMNode} node
+         * @this {WebInspector.ElementsPanel}
+         */
+        function searchCallback(node)
+        {
+            searchResults[index] = node;
+            this._highlightCurrentSearchResult();
+        }
+
         if (typeof searchResult === "undefined") {
             // No data for slot, request it.
-            function callback(node)
-            {
-                searchResults[index] = node || null;
-                this._highlightCurrentSearchResult();
-            }
-            WebInspector.domAgent.searchResult(index, callback.bind(this));
+            WebInspector.domAgent.searchResult(index, searchCallback.bind(this));
             return;
         }
 
@@ -640,10 +612,10 @@ ReactPanel.prototype = {
         var crumb = crumbs.firstChild;
         while (crumb) {
             if (crumb.representedObject === this.selectedDOMNode()) {
-                crumb.addStyleClass("selected");
+                crumb.classList.add("selected");
                 handled = true;
             } else {
-                crumb.removeStyleClass("selected");
+                crumb.classList.remove("selected");
             }
 
             crumb = crumb.nextSibling;
@@ -663,15 +635,15 @@ ReactPanel.prototype = {
         function selectCrumbFunction(event)
         {
             var crumb = event.currentTarget;
-            if (crumb.hasStyleClass("collapsed")) {
+            if (crumb.classList.contains("collapsed")) {
                 // Clicking a collapsed crumb will expose the hidden crumbs.
                 if (crumb === panel.crumbsElement.firstChild) {
                     // If the focused crumb is the first child, pick the farthest crumb
                     // that is still hidden. This allows the user to expose every crumb.
                     var currentCrumb = crumb;
                     while (currentCrumb) {
-                        var hidden = currentCrumb.hasStyleClass("hidden");
-                        var collapsed = currentCrumb.hasStyleClass("collapsed");
+                        var hidden = currentCrumb.classList.contains("hidden");
+                        var collapsed = currentCrumb.classList.contains("collapsed");
                         if (!hidden && !collapsed)
                             break;
                         crumb = currentCrumb;
@@ -734,15 +706,15 @@ ReactPanel.prototype = {
             }
 
             if (current === this.selectedDOMNode())
-                crumb.addStyleClass("selected");
+                crumb.classList.add("selected");
             if (!crumbs.childNodes.length)
-                crumb.addStyleClass("end");
+                crumb.classList.add("end");
 
             crumbs.insertBefore(crumb, crumbs.firstChild);
         }
 
         if (crumbs.hasChildNodes())
-            crumbs.lastChild.addStyleClass("start");
+            crumbs.lastChild.classList.add("start");
 
         this.updateBreadcrumbSizes();
     },
@@ -771,7 +743,7 @@ ReactPanel.prototype = {
         var crumb = crumbs.firstChild;
         while (crumb) {
             // Find the selected crumb and index.
-            if (!selectedCrumb && crumb.hasStyleClass("selected")) {
+            if (!selectedCrumb && crumb.classList.contains("selected")) {
                 selectedCrumb = crumb;
                 selectedIndex = i;
             }
@@ -783,13 +755,13 @@ ReactPanel.prototype = {
             // Remove any styles that affect size before
             // deciding to shorten any crumbs.
             if (crumb !== crumbs.lastChild)
-                crumb.removeStyleClass("start");
+                crumb.classList.remove("start");
             if (crumb !== crumbs.firstChild)
-                crumb.removeStyleClass("end");
+                crumb.classList.remove("end");
 
-            crumb.removeStyleClass("compact");
-            crumb.removeStyleClass("collapsed");
-            crumb.removeStyleClass("hidden");
+            crumb.classList.remove("compact");
+            crumb.classList.remove("collapsed");
+            crumb.classList.remove("hidden");
 
             crumb = crumb.nextSibling;
             ++i;
@@ -797,8 +769,8 @@ ReactPanel.prototype = {
 
         // Restore the start and end crumb classes in case they got removed in coalesceCollapsedCrumbs().
         // The order of the crumbs in the document is opposite of the visual order.
-        crumbs.firstChild.addStyleClass("end");
-        crumbs.lastChild.addStyleClass("start");
+        crumbs.firstChild.classList.add("end");
+        crumbs.lastChild.classList.add("start");
 
         var contentElement = this.contentElement;
         function crumbsAreSmallerThanContainer()
@@ -881,21 +853,21 @@ ReactPanel.prototype = {
             var newStartNeeded = false;
             var newEndNeeded = false;
             while (crumb) {
-                var hidden = crumb.hasStyleClass("hidden");
+                var hidden = crumb.classList.contains("hidden");
                 if (!hidden) {
-                    var collapsed = crumb.hasStyleClass("collapsed");
+                    var collapsed = crumb.classList.contains("collapsed");
                     if (collapsedRun && collapsed) {
-                        crumb.addStyleClass("hidden");
-                        crumb.removeStyleClass("compact");
-                        crumb.removeStyleClass("collapsed");
+                        crumb.classList.add("hidden");
+                        crumb.classList.remove("compact");
+                        crumb.classList.remove("collapsed");
 
-                        if (crumb.hasStyleClass("start")) {
-                            crumb.removeStyleClass("start");
+                        if (crumb.classList.contains("start")) {
+                            crumb.classList.remove("start");
                             newStartNeeded = true;
                         }
 
-                        if (crumb.hasStyleClass("end")) {
-                            crumb.removeStyleClass("end");
+                        if (crumb.classList.contains("end")) {
+                            crumb.classList.remove("end");
                             newEndNeeded = true;
                         }
 
@@ -906,7 +878,7 @@ ReactPanel.prototype = {
 
                     if (newEndNeeded) {
                         newEndNeeded = false;
-                        crumb.addStyleClass("end");
+                        crumb.classList.add("end");
                     }
                 } else
                     collapsedRun = true;
@@ -916,8 +888,8 @@ ReactPanel.prototype = {
             if (newStartNeeded) {
                 crumb = crumbs.lastChild;
                 while (crumb) {
-                    if (!crumb.hasStyleClass("hidden")) {
-                        crumb.addStyleClass("start");
+                    if (!crumb.classList.contains("hidden")) {
+                        crumb.classList.add("start");
                         break;
                     }
                     crumb = crumb.previousSibling;
@@ -927,17 +899,17 @@ ReactPanel.prototype = {
 
         function compact(crumb)
         {
-            if (crumb.hasStyleClass("hidden"))
+            if (crumb.classList.contains("hidden"))
                 return;
-            crumb.addStyleClass("compact");
+            crumb.classList.add("compact");
         }
 
         function collapse(crumb, dontCoalesce)
         {
-            if (crumb.hasStyleClass("hidden"))
+            if (crumb.classList.contains("hidden"))
                 return;
-            crumb.addStyleClass("collapsed");
-            crumb.removeStyleClass("compact");
+            crumb.classList.add("collapsed");
+            crumb.classList.remove("compact");
             if (!dontCoalesce)
                 coalesceCollapsedCrumbs();
         }
@@ -1060,11 +1032,6 @@ ReactPanel.prototype = {
         this.selectedDOMNode().copyNode();
     },
 
-    sidebarResized: function(event)
-    {
-        this.treeOutline.updateSelection();
-    },
-
     _inspectElementRequested: function(event)
     {
         var node = event.data;
@@ -1128,13 +1095,15 @@ ReactPanel.prototype = {
 
     _splitVertically: function(vertically)
     {
-        if (this.sidebarPaneView && vertically === !this.splitView.isVertical())
+        if (this.sidebarPaneView && vertically === !this._splitView.isVertical())
             return;
 
-        if (this.sidebarPaneView)
+        if (this.sidebarPaneView) {
             this.sidebarPaneView.detach();
+            this._splitView.uninstallResizer(this.sidebarPaneView.headerElement());
+        }
 
-        this.splitView.setVertical(!vertically);
+        this._splitView.setVertical(!vertically);
 
         if (!vertically) {
             this.sidebarPaneView = new WebInspector.SidebarPaneStack();
@@ -1143,7 +1112,7 @@ ReactPanel.prototype = {
         }
         for (var pane in this.sidebarPanes)
             this.sidebarPaneView.addPane(this.sidebarPanes[pane]);
-        this.sidebarPaneView.show(this.splitView.sidebarElement);
+        this.sidebarPaneView.show(this._splitView.sidebarElement());
     },
 
     forceUpdate: function()

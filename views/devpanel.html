@@ -9,6 +9,7 @@
     <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/inspectorCommon.css">
     <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/inspectorSyntaxHighlight.css">
     <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/popover.css">
+    <link rel="stylesheet" type="text/css" href="../blink/Source/devtools/front_end/tabbedPane.css">
 
     <script src="../blink/Source/devtools/front_end/inspector.js"></script>
 
@@ -21,6 +22,7 @@
     <script src="../blink/Source/devtools/front_end/treeoutline.js"></script>
     <script src="../blink/Source/devtools/front_end/UIString.js"></script>
     <script src="../blink/Source/devtools/front_end/Object.js"></script>
+    <script src="../blink/Source/devtools/front_end/NotificationService.js"></script>
     <script src="../blink/Source/devtools/front_end/View.js"></script>
     <script src="../blink/Source/devtools/front_end/Settings.js"></script>
 
@@ -28,6 +30,7 @@
     <script src="../blink/Source/devtools/front_end/InspectorFrontendHostStub.js"></script>
 
     <script src="../blink/Source/devtools/front_end/UIUtils.js"></script>
+    <script src="../blink/Source/devtools/front_end/Platform.js"></script>
     <script src="../blink/Source/devtools/front_end/ContextMenu.js"></script>
 
     <script src="../blink/Source/devtools/front_end/ParsedURL.js"></script>
@@ -39,9 +42,9 @@
     <script src="../blink/Source/devtools/front_end/TabbedPane.js"></script>
 
     <script src="../blink/Source/devtools/front_end/SidebarPane.js"></script>
+    <script src="../blink/Source/devtools/front_end/DOMSyntaxHighlighter.js"></script>
     <script src="../blink/Source/devtools/front_end/ElementsTreeOutline.js"></script>
     <script src="../blink/Source/devtools/front_end/SplitView.js"></script>
-    <script src="../blink/Source/devtools/front_end/SidebarView.js"></script>
     <script src="../blink/Source/devtools/front_end/SidebarTreeElement.js"></script>
 
 
@@ -68,8 +71,6 @@
 
     <script src="../blink/Source/devtools/front_end/SearchableView.js"></script>
 
-    <script src="../blink/Source/devtools/front_end/CSSNamedFlowCollectionsView.js"></script>
-    <script src="../blink/Source/devtools/front_end/CSSNamedFlowView.js"></script>
     <script src="../blink/Source/devtools/front_end/EventListenersSidebarPane.js"></script>
 
 <!-- custom scripts -->
@@ -81,8 +82,8 @@
 
 </head>
 <body class="undocked" id="-blink-dev-tools">
-    <div class="fill vbox inspector-view visible" spellcheck="false">
-        <div class="tabbed-pane vbox visible">
+    <div class="view fill root-view visible" spellcheck="false">
+        <div class="view tabbed-pane vbox visible">
             <div id="main-panel-holder" class="tabbed-pane-content scroll-target"></div>
         </div>
     </div>
