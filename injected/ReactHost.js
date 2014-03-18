@@ -89,7 +89,7 @@ var ReactHost = {
 
   _changeSubscriber: null,
 
-  instancesByRootID: ReactMount._instancesByReactRootID,
+  instancesByRootID: ReactMount._instancesByReactRootID || ReactMount._instancesByContainerID,
 
   subscribeToChanges: function(subscriber) {
     this._changeSubscriber = subscriber;
