@@ -7,7 +7,14 @@
     "16": "icons/icon16.png", "48": "icons/icon48.png", "128": "icons/icon128.png"
   },
 
+  "background": {
+    "scripts": [ "device/RegisterExtension.js" ],
+    "persistent": false
+  },
+
   "devtools_page": "main.html",
 
-  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+  "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
+  "permissions": [ "http://localhost/" ],
+  "web_accessible_resources": [ "main.html", "views/devpanel.html" ]
 }
