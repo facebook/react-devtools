@@ -15,6 +15,5 @@
   "devtools_page": "main.html",
 
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "permissions": [ "http://localhost/" ],
   "web_accessible_resources": [ "main.html", "views/devpanel.html" ]
 }
