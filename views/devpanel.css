@@ -1,0 +1,7 @@
+/*
+ * Fixes long delay observed when expanding an object with many properties in
+ * the sidebar panel.
+ */
+.fill {
+    overflow: auto;
+}
