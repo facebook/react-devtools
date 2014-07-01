@@ -42,6 +42,7 @@ var instanceIDCounter = 0;
 
 var instanceCache = {};
 var descriptorCache = {};
+var reactIdInstanceIdMapping = {};
 var rootCache = {};
 
 var updatedInstances = {};
@@ -67,8 +68,10 @@ var foundInstance = null; // Used to extract a deep search for an instance
 
 function bindNode(instance) {
   if (!instance[ID]) {
-    instance[ID] = (instanceIDCounter++) + '';
+    var instanceId = (instanceIDCounter++) + '';
+    instance[ID] = instanceId;
     instanceCache[instance[ID]] = instance;
+    reactIdInstanceIdMapping[instance._rootNodeID] = instanceId;
   }
   return instance[ID];
 }
@@ -361,7 +364,7 @@ function addInspectorOverlayPage() {
     else if (appVersion.indexOf('Linux') > -1) {
       platform = "linux"
     }
-    el.contentWindow.setPlatform(platform); // TODO: add support for other browsers
+    el.contentWindow.setPlatform(platform);
   };
   el.contentDocument.close();
 
@@ -514,6 +517,55 @@ DOMHost.highlightNode = function(id, config) {
 DOMHost.hideHighlight = function() {
   inspectorIframe.style.display = 'none';
   inspectorIframeVisible = false;
+};
+
+
+var elementReactId;
+var inspectTarget;
+function findInspectTarget(event) {
+  inspectTarget = event.target;
+  elementReactId = null;
+
+  while (inspectTarget && inspectTarget.parentNode && !elementReactId) {
+    if (inspectTarget.dataset) {
+      elementReactId = inspectTarget.dataset.reactid;
+    }
+    if(!elementReactId) {
+      inspectTarget = inspectTarget.parentNode;
+    }
+  }
+}
+
+var hoverElementReactID;
+var hoverElement;
+function inspectModeMouseMove(event) {
+  findInspectTarget(event);
+
+  hoverElementReactID = elementReactId;
+  hoverElement = elementReactId ? inspectTarget : null;
+}
+
+var clickElementReactID;
+function inspectModeMouseClick(event) {
+  findInspectTarget(event);
+
+  clickElementReactID = elementReactId;
+  DOMHost.inspectDOMNode(inspectTarget);
+}
+
+var inspectModeEnabled = false;
+DOMHost.toggleInspectMode = function() {
+  inspectModeEnabled = !inspectModeEnabled;
+
+  if (inspectModeEnabled) {
+    document.addEventListener('mousemove', inspectModeMouseMove, false);
+    document.addEventListener('click', inspectModeMouseClick, false);
+  } else {
+    hoverElementReactID = null;
+    document.removeEventListener('mousemove', inspectModeMouseMove, false);
+    document.removeEventListener('click', inspectModeMouseClick, false);
+  }
+
 };
 
 DOMHost.getEventListenersForNode = function(id, objectGroup) {
@@ -777,6 +829,55 @@ function appendInspectionEvents(domNodeOrInstance, changeLog) {
   });
 }
 
+// TODO: reduce code duplication
+function appendInspectionHoverEvents(domNodeOrInstance, changeLog) {
+  if (reactIdInstanceIdMapping[currentHoverElementReactID]) {
+    changeLog.push({
+      method: 'highlightDOMNode',
+      args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+    });
+    return;
+  }
+  if(!domNodeOrInstance) {
+    if (!instance) {
+      changeLog.push({
+        method: 'highlightDOMNode',
+        args: null
+      });
+
+      return;
+    }}
+
+  foundInstance = null;
+  var ancestor = findAncestorWithMissingChildrenInSet(
+    ReactHost.instancesByRootID,
+    domNodeOrInstance
+  );
+  if (!ancestor) {
+    var instance = foundInstance;
+    foundInstance = null;
+
+    bindNode(instance);
+    changeLog.push({
+      method: 'highlightDOMNode',
+      args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+    });
+    return;
+  }
+  var children = getChildren(ancestor, -1, domNodeOrInstance);
+  var instance = foundInstance;
+  foundInstance = null;
+  descriptorCache[getID(ancestor)].children = children;
+  bindNode(instance);
+  changeLog.push({
+    method: 'setChildNodes',
+    args: [getID(ancestor), children]
+  },  {
+    method: 'highlightDOMNode',
+    args: [reactIdInstanceIdMapping[currentHoverElementReactID]]
+  });
+}
+
 DOMHost.reset = function() {
   // Reset the state
   for (var id in instanceCache) {
@@ -792,6 +893,7 @@ DOMHost.reset = function() {
   lastBreakpointInstance = null;
 };
 
+var currentHoverElementReactID;
 DOMHost.getChanges = function() {
   var changeLog = [];
   var descriptor;
@@ -835,6 +937,13 @@ DOMHost.getChanges = function() {
         id
       ]
     });
+  }
+
+  // highlight
+  if (hoverElementReactID !== currentHoverElementReactID) {
+    currentHoverElementReactID = hoverElementReactID;
+
+    appendInspectionHoverEvents(hoverElement, changeLog);
   }
 
   updatedInstances = {};
