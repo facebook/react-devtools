@@ -97,7 +97,12 @@ var ReactHost = {
 
   isTextComponent: function(component) {
     if (!ReactTextComponent) return false;
-    return component instanceof ReactTextComponent;
+    // ReactTextComponent is the type in React 0.10 but is the element factory
+    // in React 0.11+, so check both
+    return component instanceof ReactTextComponent || (
+      ReactTextComponent.type &&
+      component instanceof ReactTextComponent.type
+    );
   },
 
   _unwrapMethod: function(method, targetEventName) {
