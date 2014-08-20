@@ -183,8 +183,13 @@ function getDOMNode(instance, depth, diveTo) {
 
   // TODO: Better duck checking, of what is a text component
   if (ReactHost.isTextComponent(instance)) {
-    // ReactTextComponent
-    return getTextNode(instance.props.text, bindNode(instance));
+    if (typeof instance.props === "string") {
+      // React 0.11+
+      return getTextNode(instance.props, bindNode(instance));
+    } else {
+      // React 0.10
+      return getTextNode(instance.props.text, bindNode(instance));
+    }
   }
 
   var id = bindNode(instance);
@@ -393,7 +398,12 @@ function parseValue(stringValue, currentType) {
 DOMHost.setNodeValue = function(id, value) {
   var instance = instanceCache[id];
   var currentValue;
-  if (ReactHost.isTextComponent(instance)) {
+  if (ReactHost.isTextComponent(instance) &&
+      typeof instance.props === "string") {
+    // React 0.11+
+    instance.props = parseValue(value, typeof instance.props);
+  } else if (ReactHost.isTextComponent(instance)) {
+    // React 0.10+
     instance.props.text = parseValue(value, typeof instance.props.text);
   } else {
     instance.props.children = parseValue(value, typeof instance.props.children);
