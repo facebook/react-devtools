@@ -87,7 +87,7 @@ var ReactPanel = function()
     this.sidebarPanes = {};
     this.sidebarPanes.props = new ReactPanel.ObjectSidebarPane(WebInspector.UIString("Props"), WebInspector.UIString("No Props"), this.forceUpdate.bind(this));
     this.sidebarPanes.state = new ReactPanel.ObjectSidebarPane(WebInspector.UIString("State"), WebInspector.UIString("No State"), this.forceUpdate.bind(this));
-    this.sidebarPanes.instance = new ReactPanel.ObjectSidebarPane(WebInspector.UIString("Instance"), null, this.forceUpdate.bind(this));;
+    this.sidebarPanes.instance = new ReactPanel.ObjectSidebarPane(WebInspector.UIString("Component"), null, this.forceUpdate.bind(this));;
     this.sidebarPanes.eventListeners = new WebInspector.EventListenersSidebarPane();
 
     this.sidebarPanes.props.addEventListener(WebInspector.SidebarPane.EventTypes.wasShown, this.updateInstance.bind(this));
