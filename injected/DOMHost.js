@@ -197,7 +197,7 @@ function getDOMNode(instance, depth, diveTo) {
   // For several reasons, there's only one React class in Om. So we
   // check for getDisplayName on the instance itself (if available).
   var instanceName = instance.getDisplayName && instance.getDisplayName();
-  var name = instanceName || instance.constructor.displayName || tagName ||
+  var name = tagName || instanceName || instance.constructor.displayName ||
              'Unknown';
   var children = null;
 
