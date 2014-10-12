@@ -39,7 +39,10 @@
 // Detect React environment
 
 var ReactInternals;
-if (typeof React !== 'undefined' && React.__internals) {
+if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
+    __REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime) {
+  ReactInternals = __REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime;
+} else if (typeof React !== 'undefined' && React.__internals) {
   ReactInternals = React.__internals;
 } else if (typeof require === 'function') {
   try { ReactInternals = require('React').__internals; } catch (x) {

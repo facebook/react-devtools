@@ -47,7 +47,7 @@ var rootCache = {};
 var updatedInstances = {};
 var newRoots = {};
 var deletedRoots = {};
-var inspectedDOMNode = null;
+var inspectedNodeOrInstance = null;
 var lastBreakpointInstance = null;
 
 var ID = '__inspectorID' + (+new Date());
@@ -325,8 +325,18 @@ DOMHost.resolveNode = function(id, objectGroup) {
   return descriptor;
 };
 
-DOMHost.inspectDOMNode = function(domNode) {
-  inspectedDOMNode = domNode;
+var getSelectedInstance;
+if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
+    typeof __REACT_DEVTOOLS_GLOBAL_HOOK__.getSelectedInstance === 'function') {
+  getSelectedInstance = __REACT_DEVTOOLS_GLOBAL_HOOK__.getSelectedInstance;
+} else {
+  getSelectedInstance = function() {
+    return $0;
+  };
+}
+
+DOMHost.inspectSelectedNode = function() {
+  inspectedNodeOrInstance = getSelectedInstance();
 };
 
 DOMHost.highlightNode = function(id, config) {
@@ -620,7 +630,7 @@ DOMHost.reset = function() {
   updatedInstances = {};
   newRoots = {};
   deletedRoots = {};
-  inspectedDOMNode = null;
+  inspectedNodeOrInstance = null;
   lastBreakpointInstance = null;
 };
 
@@ -684,16 +694,16 @@ DOMHost.getChanges = function() {
     // If this is a new breakpoint, let's inspect that instance
     if (lastBreakpointInstance !== breakpointInstance) {
       appendInspectionEvents(breakpointInstance, changeLog);
-      inspectedDOMNode = null;
+      inspectedNodeOrInstance = null;
     }
   }
   lastBreakpointInstance = breakpointInstance;
 
   // Inspected node
 
-  if (inspectedDOMNode) {
-    appendInspectionEvents(inspectedDOMNode, changeLog);
-    inspectedDOMNode = null;
+  if (inspectedNodeOrInstance) {
+    appendInspectionEvents(inspectedNodeOrInstance, changeLog);
+    inspectedNodeOrInstance = null;
   }
 
   return changeLog;

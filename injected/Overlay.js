@@ -221,6 +221,11 @@ var Overlay = {
 
 };
 
+if (typeof __REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
+    __REACT_DEVTOOLS_GLOBAL_HOOK__.Overlay) {
+  return __REACT_DEVTOOLS_GLOBAL_HOOK__.Overlay;
+}
+
 return Overlay;
 
 })

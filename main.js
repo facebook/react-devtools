@@ -54,7 +54,7 @@ function mainPanelShown(mainPanelWindow) {
   // Refresh selection
   if (hasNewSelection) {
     hasNewSelection = false;
-    ReactInspectorAgent.eval('DOM.inspectDOMNode($0)', function() {});
+    ReactInspectorAgent.eval('DOM.inspectSelectedNode()', function() {});
   }
 }
 

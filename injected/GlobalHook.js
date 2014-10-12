@@ -2,7 +2,11 @@
 // devtools are installed (and skip its suggestion to install the devtools).
 var js = (
   "Object.defineProperty(" +
-    "window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {value: true}" +
+    "window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {value: {" +
+      "inject: function(runtime) { this._reactRuntime = runtime; }" +
+      "getSelectedInstance: null," +
+      "Overlay: null" +
+    "}}" +
   ")"
 );
 
