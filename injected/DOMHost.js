@@ -39,6 +39,9 @@ var ELEMENT_NODE = 1;
 var TEXT_NODE = 3;
 
 var instanceIDCounter = 0;
+// This is assumed to be a native WeakMap or equivalent that works on frozen
+// objects as keys.
+var instanceIDMap = new WeakMap();
 
 var instanceCache = {};
 var descriptorCache = {};
@@ -49,8 +52,6 @@ var newRoots = {};
 var deletedRoots = {};
 var inspectedNodeOrInstance = null;
 var lastBreakpointInstance = null;
-
-var ID = '__inspectorID' + (+new Date());
 
 // base URL
 
@@ -66,26 +67,27 @@ function getBaseURL() {
 var foundInstance = null; // Used to extract a deep search for an instance
 
 function bindNode(instance) {
-  if (!instance[ID]) {
-    instance[ID] = (instanceIDCounter++) + '';
-    instanceCache[instance[ID]] = instance;
+  if (!instanceIDMap.has(instance)) {
+    var id = (instanceIDCounter++) + '';
+    instanceIDMap.set(instance, id);
+    instanceCache[id] = instance;
   }
-  return instance[ID];
+  return instanceIDMap.get(instance);
 }
 
 function isBound(instance) {
-  return !!instance[ID];
+  return instanceIDMap.has(instance);
 }
 
 function getID(instance) {
-  if (!instance[ID]) {
+  if (!instanceIDMap.has(instance)) {
     throw new Error('This instance should already be bound.')
   }
-  return instance[ID];
+  return instanceIDMap.get(instance);
 }
 
 function unbindNode(instance) {
-  var id = instance[ID];
+  var id = instanceIDMap.get(instance);
   if (id) {
     delete instanceCache[id];
     delete instanceCache[id + '_text']; // incase this had text content
@@ -97,15 +99,17 @@ function unbindNode(instance) {
       deletedRoots[id] = 1;
       delete rootCache[id];
     }
-    instance[ID] = null;
+    instanceIDMap.delete(instance);
   }
 }
 
 function getAttributes(instance) {
   var attrs = [];
-  if (!instance.props) return attrs;
-  for (var prop in instance.props) {
-    if (!instance.props.hasOwnProperty(prop) ||
+  var props = instance.props ||
+              (instance._currentElement && instance._currentElement.props);
+  if (!props) return attrs;
+  for (var prop in props) {
+    if (!props.hasOwnProperty(prop) ||
          prop === 'key' ||
          prop === 'children' ||
          prop === '__owner__' ||
@@ -113,7 +117,7 @@ function getAttributes(instance) {
          prop.substr(0,2) == '__') {
       continue;
     }
-    var value = instance.props[prop];
+    var value = props[prop];
     if (typeof value === 'function' || typeof value === 'undefined') {
       // Skip event listeners and undefined
       continue;
@@ -137,14 +141,28 @@ function getTextNode(text, id) {
   return descriptor;
 }
 
+function isWrappedNativeComponent(instance) {
+  return instance._renderedComponent.hasOwnProperty('_renderedChildren') &&
+        instance._currentElement &&
+        typeof instance._currentElement.type === 'string';
+}
+
 function getChildren(instance, depth, diveTo) {
   var children = null;
   if (ReactHost.hasTextContent(instance)) {
     var textId = bindNode(instance) + '_text';
     instanceCache[textId] = instance;
-    children = [getTextNode(instance.props.children, textId)];
+    var content = ReactHost.getTextContent(instance);
+    children = [getTextNode(content, textId)];
   } else if (instance._renderedComponent) {
-    children = [getDOMNode(instance._renderedComponent, depth, diveTo)];
+    if (isWrappedNativeComponent(instance)) {
+      // This is a workaround that by passes the internal DOM component and gets
+      // to it's children directly. The internal node isn't relevant and should
+      // never be exposed. Even for debugging.
+      children = getChildren(instance._renderedComponent, depth, diveTo);
+    } else {
+      children = [getDOMNode(instance._renderedComponent, depth, diveTo)];
+    }
   } else if (instance._renderedChildren) {
     children = getDOMNodes(instance._renderedChildren, depth, diveTo);
   } else {
@@ -157,7 +175,14 @@ function getChildCount(instance) {
   if (ReactHost.hasTextContent(instance)) {
     return 1;
   } else if (instance._renderedComponent) {
-    return 1;
+    if (isWrappedNativeComponent(instance)) {
+      // This is a workaround that by passes the internal DOM component and gets
+      // to it's children directly. The internal node isn't relevant and should
+      // never be exposed. Even for debugging.
+      return getChildCount(instance._renderedComponent);
+    } else {
+      return 1;
+    }
   } else if (instance._renderedChildren) {
     var count = 0;
     for (var key in instance._renderedChildren) {
@@ -193,12 +218,15 @@ function getDOMNode(instance, depth, diveTo) {
   }
 
   var id = bindNode(instance);
-  var tagName = instance.tagName && instance.tagName.toLowerCase();
+  var publicInstance = instance.getPublicInstance ? instance.getPublicInstance()
+                       : instance;
+  var tagName = publicInstance.tagName && publicInstance.tagName.toLowerCase();
   // For several reasons, there's only one React class in Om. So we
   // check for getDisplayName on the instance itself (if available).
-  var instanceName = instance.getDisplayName && instance.getDisplayName();
-  var name = instanceName || tagName || instance.constructor.displayName ||
-             'Unknown';
+  var instanceName = publicInstance.getDisplayName &&
+                     publicInstance.getDisplayName();
+  var name = instanceName || tagName || publicInstance.constructor.displayName
+             || 'Unknown';
   var children = null;
 
   if (depth != 0 || ReactHost.hasTextContent(instance)) {
@@ -206,6 +234,8 @@ function getDOMNode(instance, depth, diveTo) {
     children = getChildren(instance, depth - 1, diveTo);
   }
 
+  // TODO: The owner has moved to the element, but is also going away. Not sure
+  // what to do about this. Perhaps add a DEV-only version.
   var owner = instance._owner || (instance.props && instance.props.__owner__);
   var ownerId = null;
   if (owner) {
@@ -321,7 +351,11 @@ DOMHost.getNodeForPath = function(path) {
 DOMHost.resolveNode = function(id, objectGroup) {
   var instance = instanceCache[id];
   if (!instance) return null;
-  var descriptor = InjectedScript.wrapObject(instance, objectGroup, true, true);
+  var publicInstance = instance.getPublicInstance ? instance.getPublicInstance()
+                       : instance;
+  var descriptor = InjectedScript.wrapObject(
+    publicInstance, objectGroup, true, true
+  );
   return descriptor;
 };
 
@@ -342,8 +376,11 @@ DOMHost.inspectSelectedNode = function() {
 DOMHost.highlightNode = function(id, config) {
   var descriptor = descriptorCache[id];
   var instance = instanceCache[id];
+  var publicInstance = instance.getPublicInstance ?
+                       instance.getPublicInstance() :
+                       instance;
   OverlayPage.highlightComponentInstance(
-    instance,
+    publicInstance,
     (descriptor && descriptor.nodeName) || '',
     config
   );
@@ -363,7 +400,10 @@ DOMHost.getEventListenersForNode = function(id, objectGroup) {
     );
     var sourceName = null;
     if (listener.owner) {
-      sourceName = listener.owner.constructor.displayName || 'Unknown';
+      var publicInstance = listener.owner.getPublicInstance ?
+                           listener.owner.getPublicInstance() :
+                           listener.owner;
+      sourceName = publicInstance.constructor.displayName || 'Unknown';
       if (listener.methodName) {
         sourceName += '::' + listener.methodName;
       }
@@ -408,6 +448,7 @@ function parseValue(stringValue, currentType) {
 DOMHost.setNodeValue = function(id, value) {
   var instance = instanceCache[id];
   var currentValue;
+  // TODO: Fix for the 0.13+ case
   if (ReactHost.isTextComponent(instance) &&
       typeof instance.props === "string") {
     // React 0.11+
@@ -425,18 +466,23 @@ DOMHost.setNodeValue = function(id, value) {
 
 DOMHost.setAttributesAsText = function(id, text, name) {
   var instance = instanceCache[id];
-  var currentValue = instance.props[name];
+  var props = instance.props ||
+              (instance._currentElement && instance._currentElement.props);
+  if (!props) {
+    return;
+  }
+  var currentValue = props[name];
   if (text == '') {
-    delete instance.props[name];
+    delete props[name];
   } else {
     var match = (/\s*([^=\s]+)\s*=\s*\"(.*)\"\s*/).exec(text);
     if (!match) throw new Error('Unsupported string');
     var newName = match[1];
     var newValue = parseValue(match[2], typeof currentValue);
     if (name !== newName) {
-      delete instance.props[name];
+      delete props[name];
     }
-    instance.props[newName] = newValue;
+    props[newName] = newValue;
   }
   if (instance.forceUpdate) {
     instance.forceUpdate();
@@ -567,7 +613,7 @@ function findAncestorWithMissingChildren(instance, decendant) {
   if (!descriptor.children) {
     return instance;
   }
-  if (instance.props && ReactHost.hasTextContent(instance)) {
+  if (ReactHost.hasTextContent(instance)) {
     return null;
   } else if (instance._renderedComponent) {
     return findAncestorWithMissingChildren(instance._renderedComponent, decendant);
@@ -589,6 +635,7 @@ function findAncestorWithMissingChildrenInSet(children, decendant) {
 }
 
 function appendInspectionEvents(domNodeOrInstance, changeLog) {
+  // TODO: Convert a public instance to an internal one
   foundInstance = null;
   var ancestor = findAncestorWithMissingChildrenInSet(
     ReactHost.instancesByRootID,

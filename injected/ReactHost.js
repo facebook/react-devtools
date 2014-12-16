@@ -138,8 +138,8 @@ var ReactHost = {
   },
 
   getEventListeners: function(instance) {
-    if (!instance || !instance.props) return [];
-    var props = instance.props;
+    if (!instance || (!instance.props && !instance._currentElement)) return [];
+    var props = instance.props || instance._currentElement.props;
     var listeners = [];
     for (var key in props) {
       var listener = props[key];
@@ -154,7 +154,17 @@ var ReactHost = {
     if (instance === instanceOrNode) return true;
     if (!ReactMount.isRenderedByReact(instanceOrNode)) return false;
     var nodeID = ReactMount.getID(instanceOrNode);
-    return nodeID === instance._rootNodeID && !instance._renderedComponent;
+    if (nodeID !== instance._rootNodeID) {
+      return false;
+    }
+    if (!instance._renderedComponent) {
+      return true;
+    }
+    // This heuristic is used to determine that we're at the bottom layer, the
+    // rest is just a wrapped component.
+    return instance._renderedComponent.hasOwnProperty('_renderedChildren') &&
+           instance._currentElement &&
+           typeof instance._currentElement.type === 'string';
   },
 
   isAncestorOf: function(ancestor, descendant) {
@@ -164,6 +174,16 @@ var ReactHost = {
   },
 
   hasTextContent: function(component) {
+    if (component._currentElement) {
+      var element = component._currentElement;
+      return (
+        typeof element.type === 'string' && // if it's native
+        element.props && ( // and has text content as children
+          typeof element.props.children === 'string' ||
+          typeof element.props.children === 'number'
+        )
+      );
+    }
     // Return true if this is a native component with text content
     return (
       component.tagName &&
@@ -172,6 +192,13 @@ var ReactHost = {
         typeof component.props.children === 'number'
       )
     );
+  },
+
+  getTextContent: function(component) {
+    if (component._currentElement) {
+      return component._currentElement.props.children;
+    }
+    return component.props.children;
   },
 
   getCurrentlyRenderingComponent: function() {
