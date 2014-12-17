@@ -103,8 +103,8 @@ function loadRuntime() {
       script += RUNTIME_NAMESPACE + '.' + name + ' = ' + moduleScripts[name] +
                 '(' + dependencies + ')\n\n';
     }
-    // TODO: Remove this before publishing to avoid spamming content
-    script += '//@ sourceURL=InjectedRuntime.js';
+    // Uncomment this to get debugging support of the devtools internals.
+    // script += '//@ sourceURL=InjectedRuntime.js';
     chrome.devtools.inspectedWindow.eval(script, runtimeLoaded);
   }
 
