@@ -238,9 +238,11 @@ function getDOMNode(instance, depth, diveTo) {
     children = getChildren(instance, depth - 1, diveTo);
   }
 
-  // TODO: The owner has moved to the element, but is also going away. Not sure
-  // what to do about this. Perhaps add a DEV-only version.
-  var owner = instance._owner || (instance.props && instance.props.__owner__);
+  // TODO: Owner is going away. Not sure what to do about this.
+  // Perhaps add a DEV-only version.
+  var owner = instance._owner ||
+              (instance._currentElement && instance._currentElement._owner) ||
+              (instance.props && instance.props.__owner__);
   var ownerId = null;
   if (owner) {
     ownerId = bindNode(owner);
@@ -501,6 +503,9 @@ DOMHost.setAttributesAsText = function(id, text, name) {
   }
   if (instance.forceUpdate) {
     instance.forceUpdate();
+  } else if (instance.getPublicInstance &&
+             instance.getPublicInstance().forceUpdate) {
+    instance.getPublicInstance().forceUpdate();
   }
 };
 
