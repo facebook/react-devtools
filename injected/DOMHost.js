@@ -3,7 +3,7 @@
  * DOM from the React component tree.
  */
 /**
- * Copyright (c) 2013-2014, Facebook, Inc. All rights reserved.
+ * Copyright (c) 2013-2015, Facebook, Inc. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -208,8 +208,11 @@ function getDOMNode(instance, depth, diveTo) {
 
   // TODO: Better duck checking, of what is a text component
   if (ReactHost.isTextComponent(instance)) {
-    if (typeof instance.props === "string") {
-      // React 0.11+
+    if (typeof instance._stringText === 'string') {
+      // React 0.13
+      return getTextNode(instance._stringText, bindNode(instance));
+    } else if (typeof instance.props === "string") {
+      // React 0.11 - 0.12
       return getTextNode(instance.props, bindNode(instance));
     } else {
       // React 0.10
@@ -226,6 +229,7 @@ function getDOMNode(instance, depth, diveTo) {
   var instanceName = publicInstance.getDisplayName &&
                      publicInstance.getDisplayName();
   var name = instanceName || tagName || publicInstance.constructor.displayName
+             || publicInstance.constructor.name
              || 'Unknown';
   var children = null;
 
@@ -403,7 +407,8 @@ DOMHost.getEventListenersForNode = function(id, objectGroup) {
       var publicInstance = listener.owner.getPublicInstance ?
                            listener.owner.getPublicInstance() :
                            listener.owner;
-      sourceName = publicInstance.constructor.displayName || 'Unknown';
+      sourceName = publicInstance.constructor.displayName ||
+                   publicInstance.constructor.name || 'Unknown';
       if (listener.methodName) {
         sourceName += '::' + listener.methodName;
       }
@@ -448,19 +453,29 @@ function parseValue(stringValue, currentType) {
 DOMHost.setNodeValue = function(id, value) {
   var instance = instanceCache[id];
   var currentValue;
-  // TODO: Fix for the 0.13+ case
-  if (ReactHost.isTextComponent(instance) &&
-      typeof instance.props === "string") {
-    // React 0.11+
-    instance.props = parseValue(value, typeof instance.props);
-  } else if (ReactHost.isTextComponent(instance)) {
-    // React 0.10+
-    instance.props.text = parseValue(value, typeof instance.props.text);
+  if (ReactHost.isTextComponent(instance)) {
+    if (typeof instance._stringText === "string") {
+      // React 0.13
+      instance.receiveComponent(
+        parseValue(value, typeof instance._currentElement)
+      );
+      Subscriber.componentWillUpdate(instance);
+      return;
+    } else if (typeof instance.props === "string") {
+      // React 0.11 - 0.12
+      instance.props = parseValue(value, typeof instance.props);
+    } else if (ReactHost.isTextComponent(instance)) {
+      // React 0.10+
+      instance.props.text = parseValue(value, typeof instance.props.text);
+    }
   } else {
     instance.props.children = parseValue(value, typeof instance.props.children);
   }
   if (instance.forceUpdate) {
     instance.forceUpdate();
+  } else if (instance.getPublicInstance &&
+             instance.getPublicInstance().forceUpdate) {
+    instance.getPublicInstance().forceUpdate();
   }
 };
 
@@ -522,6 +537,11 @@ function appendAttributeChanges(id, descriptor, instance, changeLog) {
 
 function appendChildChanges(id, descriptor, instance, changeLog) {
   if (descriptor.nodeType === TEXT_NODE) {
+    var newDescriptor = getDOMNode(instance);
+    changeLog.push({
+      method: 'characterDataModified',
+      args: [id, newDescriptor.nodeValue]
+    });
     return;
   }
 
