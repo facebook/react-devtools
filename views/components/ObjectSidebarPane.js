@@ -46,7 +46,7 @@ ReactPanel.ObjectSidebarPane.prototype = {
 
     var section = new WebInspector.ObjectPropertiesSection(object, '', '', this._emptyPlaceholder, false, null, ReactPanel.EditableObjectPropertyTreeElement.bind(null, this.onedit.bind(this)));
     section.expanded = true;
-    section.editable = true;
+    section.editable = false;
     section.headerElement.addStyleClass("hidden");
     body.appendChild(section.element);
   },
@@ -89,7 +89,15 @@ ReactPanel.EditableObjectPropertyTreeElement.prototype = {
     };
     this.property.parentObject.setPropertyValue(this.property.name, expression.trim(), callback.bind(this));
   },
-
   __proto__: WebInspector.ObjectPropertyTreeElement.prototype
-
 };
+
+
+
+TreeElement.prototype.isEventWithinDisclosureTriangle = function(event)
+{
+    var paddingLeftValue = window.getComputedStyle(this._listItemNode).paddingLeft;
+    var computedLeftPadding = parseFloat(paddingLeftValue);
+    var left = this._listItemNode.totalOffsetLeft() + computedLeftPadding;
+    return event.pageX >= left && event.pageX <= left + TreeElement._ArrowToggleWidth && this._expandable;
+}
