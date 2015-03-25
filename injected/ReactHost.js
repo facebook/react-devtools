@@ -134,6 +134,8 @@ var ReactHost = {
 
   instancesByRootID: ReactMount._instancesByReactRootID || ReactMount._instancesByContainerID,
 
+  getNodeFromInstance: ReactMount.getNodeFromInstance,
+
   subscribeToChanges: function(subscriber) {
     this._changeSubscriber = subscriber;
   },

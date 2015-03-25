@@ -32,7 +32,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-(function() {
+(function(ReactHost) {
 
 var inspectorIframe;
 var inspectorOverlayPage;
@@ -173,7 +173,12 @@ var Overlay = {
     var element;
     try {
       // ART will throw on this lookup. TODO: Calculate ART rectangle.
-      element = instance.getDOMNode();
+      if (ReactHost.getNodeFromInstance) {
+        // React 0.13
+        element = ReactHost.getNodeFromInstance(instance);
+      } else {
+        element = instance.getDOMNode();
+      }
     } catch (x) {
       element = null;
     }
