@@ -3,7 +3,7 @@
  *  All rights reserved.
  *
  *  This source code is licensed under the BSD-style license found in the
- *  LICENSE file in the root directory of this source tree. An additional grant 
+ *  LICENSE file in the root directory of this source tree. An additional grant
  *  of patent rights can be found in the PATENTS file in the same directory.
  *
  */
@@ -15,6 +15,7 @@ function runtimeLoaded(error) {
   if (!error) {
     elements.onSelectionChanged.addListener(refreshSelection);
     createMainPanel();
+    createPluginPanels()
   } else {
     elements.onSelectionChanged.addListener(retryRuntime);
   }
@@ -36,6 +37,17 @@ function createMainPanel() {
   chrome.devtools.panels.create(
     'React', 'icon.png', 'views/devpanel.html', function(panel) {
       panel.onShown.addListener(mainPanelShown);
+    }
+  );
+}
+
+function createPluginPanels() {
+  chrome.devtools.panels.create(
+    'Bananaslug',
+    'plugins/bananaslug/build/icon.png',
+    'plugins/bananaslug/build/devpanel.html',
+    function(panel) {
+      // panel.onShown.addListener(mainPanelShown);
     }
   );
 }
