@@ -1,4 +1,4 @@
-# Banana Slug **[Employee Only]**
+# Banana Slug
 
 ![mascot](images/mascot.jpg?raw=true "mascot")
 
