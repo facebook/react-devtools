@@ -10,13 +10,13 @@ var {
   localStorage,
 } = global;
 
-var DEBUG_MODE = true;
+var SHOW_DEBUG_LOGGER = 0;
 
-var _logger = DEBUG_MODE ? new Logger() : null;
+var _logger = SHOW_DEBUG_LOGGER ? new Logger() : null;
 var _setting = UserDefaultSetting.getInstance('devpanel');
 
 function log() {
-  if (DEBUG_MODE) {
+  if (SHOW_DEBUG_LOGGER) {
     _logger.log.apply(_logger, arguments);
   }
 }
