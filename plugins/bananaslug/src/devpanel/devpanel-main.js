@@ -8,7 +8,7 @@ var {
   document,
 } = global;
 
-var _enabled = UserDefaultSetting.isDefaultEnabled();
+var _enabled;
 
 /**
  * @param {boolean} enabled
@@ -28,7 +28,7 @@ function notifyIsEnabled(enabled) {
 }
 
 function main() {
-  notifyIsEnabled(_enabled);
+  notifyIsEnabled(UserDefaultSetting.isDefaultEnabled());
 
   var checkbox = document.getElementById('checkbox');
   checkbox.checked = _enabled;

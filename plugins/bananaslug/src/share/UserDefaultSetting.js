@@ -14,7 +14,7 @@ var UserDefaultSetting = {
       }
     } else {
       try {
-        localStorage.removeItem(KEY_ENABLED);
+        localStorage.setItem(KEY_ENABLED, '0');
       } catch (ex) {
         return false;
       }
@@ -23,7 +23,7 @@ var UserDefaultSetting = {
 
   isDefaultEnabled() {
     try {
-      return !!localStorage.getItem(KEY_ENABLED);
+      return String(localStorage.getItem(KEY_ENABLED)) !== '0';
     } catch (ex) {
       // default.
       return true;
