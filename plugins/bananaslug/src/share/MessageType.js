@@ -1,0 +1,6 @@
+var MessageType = {
+  'REACT_RUNERTIME_READY': 'REACT_RUNERTIME_READY',
+  'REACT_COMPONENTS_DID_UPDATE': 'REACT_COMPONENTS_DID_UPDATE',
+};
+
+module.exports = MessageType;
