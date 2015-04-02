@@ -29,7 +29,6 @@
  */
 
 /**
- * @fileOverview
  * This file is injected into thw native web page.
  */
 
