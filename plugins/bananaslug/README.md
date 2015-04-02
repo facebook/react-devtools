@@ -4,7 +4,7 @@
 
 ## About
 
-React Tracer (codename: bananaslug) is the plugin for the extension ExtensionReact Developer Tools that helps you to observe React components updates.
+Bananaslug (codename) is the plugin for the extension React Developer Tools that helps you to observe React components updates.
 
 ## Quick Dev Guide for Developer
 * Switch the working directory to `plugins/bananaslug` from where you downloaded the repository.
