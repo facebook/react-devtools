@@ -40,6 +40,12 @@ var MIN_MEASUREMENT_DURATION = 500;
 var _BananaSlugID = 1;
 var _measurementQueue = {};
 
+var KEY_BananaSlugID = '_BananaSlugID';
+var KEY_lastMeasuredInfo = '_BananaSlug_lastMeasuredInfo';
+var KEY_lastMeasuredTime = '_BananaSlug_lastMeasuredTime';
+var KEY_shouldUpdate = '_BananaSlug_shouldUpdate';
+var KEY_originalComponentDidUpdate = '_BananaSlug_originalComponentDidUpdate';
+
 function performScheduledMeasurement() {
   var ii = 0;
   var batchedInfo = {};
@@ -113,24 +119,24 @@ function measureComponent(component) {
   var now = Date.now();
   var info = null;
 
-  var duration = now - (component._BananaSlug_lastMeasuredTime || 0);
+  var duration = now - (component[KEY_lastMeasuredTime] || 0);
 
   if (duration < MIN_MEASUREMENT_DURATION) {
     // Measuring is too expensive. Limit the rate.
-    info = component._BananaSlug_lastMeasuredInfo;
+    info = component[KEY_lastMeasuredInfo];
     if (info.reactid !== reactid) {
       // Invalid cache. Clean up.
-      delete component._BananaSlug_lastMeasuredTime;
-      delete component._BananaSlug_lastMeasuredInfo;
+      delete component[KEY_lastMeasuredTime];
+      delete component[KEY_lastMeasuredInfo];
       info = null;
     }
-    info.should_update = component._BananaSlug_shouldUpdate;
+    info.should_update = component[KEY_shouldUpdate];
   }
 
   if (info === null) {
     var rect = node.getBoundingClientRect();
     info = {
-      should_update: component._BananaSlug_shouldUpdate,
+      should_update: component[KEY_shouldUpdate],
       reactid: reactid,
       left: rect.left,
       top: rect.top,
@@ -138,8 +144,8 @@ function measureComponent(component) {
       height: rect.height,
       bottom: rect.bottom,
     };
-    component._BananaSlug_lastMeasuredTime = now;
-    component._BananaSlug_lastMeasuredInfo = info;
+    component[KEY_lastMeasuredTime] = now;
+    component[KEY_lastMeasuredInfo] = info;
   }
 
   return info;
@@ -171,8 +177,8 @@ function getComponent(instance) {
  * @param {boolean} shouldUpdate
  */
 function scheduleMeasurement(component, shouldUpdate) {
-  component._BananaSlug_shouldUpdate = shouldUpdate;
-  _measurementQueue[component._BananaSlugID] = component;
+  component[KEY_shouldUpdate] = shouldUpdate;
+  _measurementQueue[component[KEY_BananaSlugID]] = component;
   requestAnimationFrame(performScheduledMeasurement);
 }
 
@@ -187,10 +193,11 @@ function componentWillUpdate() {
     return;
   }
 
-  if (!component._BananaSlugID) {
-    component._BananaSlugID = 'bs-' + _BananaSlugID++;
+  if (!component[KEY_BananaSlugID]) {
+    component[KEY_BananaSlugID] = 'bs-' + _BananaSlugID++;
     if (component.componentDidUpdate) {
-      component._originalComponentDidUpdate = component.componentDidUpdate;
+      component[KEY_originalComponentDidUpdate] =
+        component.componentDidUpdate;
     }
     component.componentDidUpdate = componentDidUpdate;
   }
@@ -207,8 +214,12 @@ function componentDidUpdate(prevProps, prevState) {
     return;
   }
 
-  if (component._originalComponentDidUpdate) {
-    component._originalComponentDidUpdate.call(component, prevProps, prevState);
+  if (component[KEY_originalComponentDidUpdate]) {
+    component[KEY_originalComponentDidUpdate].call(
+      component,
+      prevProps,
+      prevState
+    );
   }
 
   var shouldUpdate = !shallowCompare(component, prevProps, prevState);
@@ -230,6 +241,10 @@ function componentWillUnmount() {
   if (!component) {
     return;
   }
+  delete component[KEY_BananaSlugID];
+  delete component[KEY_lastMeasuredInfo];
+  delete component[KEY_lastMeasuredTime];
+  delete component[KEY_shouldUpdate];
 }
 
 var ReactComponentInjection = {

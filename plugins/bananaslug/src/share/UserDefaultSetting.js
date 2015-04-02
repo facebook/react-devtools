@@ -37,7 +37,7 @@ class UserDefaultSettingClass {
    * @param {string} location
    */
   constructor(location) {
-    this._key = `__BANANASLUG_DEFAULT_SETTING.${location}`;
+    this._key = `_BANANASLUG_DEFAULT_SETTING.${location}`;
     this._enabled = undefined;
   }
 
