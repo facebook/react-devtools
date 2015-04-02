@@ -40,7 +40,7 @@ var MIN_MEASUREMENT_DURATION = 500;
 var _BananaSlugID = 1;
 var _measurementQueue = {};
 
-var KEY_BananaSlugID = '_BananaSlugID';
+var KEY_ID = '_BananaSlugID';
 var KEY_lastMeasuredInfo = '_BananaSlug_lastMeasuredInfo';
 var KEY_lastMeasuredTime = '_BananaSlug_lastMeasuredTime';
 var KEY_shouldUpdate = '_BananaSlug_shouldUpdate';
@@ -178,7 +178,7 @@ function getComponent(instance) {
  */
 function scheduleMeasurement(component, shouldUpdate) {
   component[KEY_shouldUpdate] = shouldUpdate;
-  _measurementQueue[component[KEY_BananaSlugID]] = component;
+  _measurementQueue[component[KEY_ID]] = component;
   requestAnimationFrame(performScheduledMeasurement);
 }
 
@@ -193,8 +193,8 @@ function componentWillUpdate() {
     return;
   }
 
-  if (!component[KEY_BananaSlugID]) {
-    component[KEY_BananaSlugID] = 'bs-' + _BananaSlugID++;
+  if (!component[KEY_ID]) {
+    component[KEY_ID] = 'bs-' + _BananaSlugID++;
     if (component.componentDidUpdate) {
       component[KEY_originalComponentDidUpdate] =
         component.componentDidUpdate;
@@ -241,7 +241,7 @@ function componentWillUnmount() {
   if (!component) {
     return;
   }
-  delete component[KEY_BananaSlugID];
+  delete component[KEY_ID];
   delete component[KEY_lastMeasuredInfo];
   delete component[KEY_lastMeasuredTime];
   delete component[KEY_shouldUpdate];
