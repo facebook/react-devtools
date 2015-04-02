@@ -2,6 +2,8 @@
  * The Presenter file.
  */
 
+var UserDefaultSetting = require('../share/UserDefaultSetting');
+
 var {
   document,
   requestAnimationFrame,
@@ -27,6 +29,38 @@ var LAST_COLOR = COLORS[COLORS.length - 1];
 var _canvas;
 var _queue = {};
 var _isPainting = false;
+var _enabled = UserDefaultSetting.isDefaultEnabled();
+
+/**
+ * @param {boolean} value
+ */
+function setEnabled(value) {
+  if (value === _enabled) {
+    return;
+  }
+
+  UserDefaultSetting.setDefaultEnabled(value);
+
+  _enabled = value;
+
+  if (!_canvas) {
+    return;
+  }
+
+  _queue = {};
+
+  if (_enabled) {
+    // paint the icon.
+    paintImmediate();
+  } else if (_canvas) {
+    _canvas.getContext('2d').clearRect(
+      0,
+      0,
+      _canvas.width,
+      _canvas.height
+    );
+  }
+}
 
 /**
  * @param {Object} ctx
@@ -90,7 +124,6 @@ function paintBorder(ctx, info, borderWidth, borderColor) {
   );
   ctx.strokeStyle = borderColor;
 
-
   if (info.should_update) {
     ctx.setLineDash([2]);
   } else {
@@ -145,6 +178,10 @@ function injectCanvas() {
 }
 
 function paintImmediate() {
+  if (!_enabled) {
+    return;
+  }
+
   if (!_canvas) {
     _canvas = injectCanvas();
   }
@@ -183,6 +220,9 @@ function paintImmediate() {
 }
 
 function paint() {
+  if (!_enabled) {
+    return;
+  }
   requestAnimationFrame(paintImmediate);
 }
 
@@ -190,6 +230,9 @@ function paint() {
  * @param {Object} batchedInfo
  */
 function batchUpdate(batchedInfo) {
+  if (!_enabled) {
+    return;
+  }
   for (var bid in batchedInfo) {
     if (batchedInfo.hasOwnProperty(bid)) {
       var info = batchedInfo[bid];
@@ -217,7 +260,8 @@ function batchUpdate(batchedInfo) {
 }
 
 var Presenter = {
-  batchUpdate: batchUpdate
+  batchUpdate: batchUpdate,
+  setEnabled: setEnabled,
 };
 
 module.exports = Presenter;

@@ -1,6 +1,8 @@
+var MessageType = require('../share/MessageType');
 var ReactComponentInjection = require('./ReactComponentInjection');
 var constants = require('../share/constants');
 var getReactInternals = require('./getReactInternals');
+var postDataToScriptInjector = require('./postDataToScriptInjector');
 
 /**
  * The following section contains the modified codes that are originally copied
@@ -102,7 +104,7 @@ function onReactInternalsReady(ReactInternals) {
  * @param {boolean} enabled
  */
 function bananaslugSetEnabled(enabled) {
-  console.log('>>>>' + enabled);
+  postDataToScriptInjector(MessageType.ENABLED_STATE_CHANGE, enabled);
 }
 
 function main() {

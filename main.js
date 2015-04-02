@@ -42,9 +42,10 @@ function createMainPanel() {
 }
 
 function createPluginPanels() {
+  // TODO(hedgerwang): make this API more extensible.
   chrome.devtools.panels.create(
     'Bananaslug',
-    'plugins/bananaslug/build/icon.png',
+    'plugins/bananaslug/build/icon16.png',
     'plugins/bananaslug/build/devpanel.html',
     function(panel) {
       // panel.onShown.addListener(mainPanelShown);

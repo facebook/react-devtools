@@ -7,8 +7,10 @@ echo 'build plugin "bananaslug"';
 # clean up old files
 rm build/*
 
-# copy html files
+# copy static files
 cp src/htmls/*.html build
+cp images/*.png build
+cp images/*.jpg build
 
 # build with webpack
 webpack --watch --config webpack.config.js;

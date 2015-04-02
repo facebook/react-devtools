@@ -16,6 +16,14 @@ function onReactComponentsUpdate(type, batchedInfo) {
   Presenter.batchUpdate(batchedInfo);
 }
 
+/**
+ * @paran {string} type
+ * @param {boolean} enabled
+ */
+function onEnabledStateChange(type, enabled) {
+  Presenter.setEnabled(enabled);
+}
+
 function main() {
   ScriptInjector.subscribe(
     MessageType.REACT_RUNERTIME_READY,
@@ -25,6 +33,11 @@ function main() {
   ScriptInjector.subscribe(
     MessageType.REACT_COMPONENTS_DID_UPDATE,
     onReactComponentsUpdate
+  );
+
+  ScriptInjector.subscribe(
+    MessageType.ENABLED_STATE_CHANGE,
+    onEnabledStateChange
   );
 
   ScriptInjector.inject('injected-prelude');

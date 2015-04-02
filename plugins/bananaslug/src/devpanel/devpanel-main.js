@@ -1,5 +1,6 @@
 // devpanels.
 
+var UserDefaultSetting = require('../share/UserDefaultSetting');
 var constants = require('../share/constants');
 
 var {
@@ -7,7 +8,7 @@ var {
   document,
 } = global;
 
-var _enabled = true;
+var _enabled = UserDefaultSetting.isDefaultEnabled();
 
 /**
  * @param {boolean} enabled
