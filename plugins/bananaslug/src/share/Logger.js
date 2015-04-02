@@ -32,6 +32,7 @@ class Logger {
         right: 0;
         top: 0;
         width: 300px;
+        z-index: 100000;
       `;
       document.body.appendChild(node);
       this._node = node;

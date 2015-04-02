@@ -111,7 +111,7 @@ function painIcon() {
 
   _ctx.fillStyle = '#444';
   _ctx.font = '12px Verdana';
-  _ctx.fillText('B', 7, 16);
+  _ctx.fillText('R', 7, 16);
 }
 
 /**

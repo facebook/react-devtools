@@ -15,7 +15,6 @@ function runtimeLoaded(error) {
   if (!error) {
     elements.onSelectionChanged.addListener(refreshSelection);
     createMainPanel();
-    createPluginPanels()
   } else {
     elements.onSelectionChanged.addListener(retryRuntime);
   }
@@ -37,18 +36,6 @@ function createMainPanel() {
   chrome.devtools.panels.create(
     'React', 'icon.png', 'views/devpanel.html', function(panel) {
       panel.onShown.addListener(mainPanelShown);
-    }
-  );
-}
-
-function createPluginPanels() {
-  // TODO(hedgerwang): make this API more extensible.
-  chrome.devtools.panels.create(
-    'Tracer',
-    'plugins/bananaslug/build/icon16.png',
-    'plugins/bananaslug/build/devpanel.html',
-    function(panel) {
-      // panel.onShown.addListener(mainPanelShown);
     }
   );
 }

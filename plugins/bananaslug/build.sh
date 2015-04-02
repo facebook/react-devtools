@@ -8,7 +8,6 @@ echo 'build plugin "bananaslug"';
 rm build/*
 
 # copy static files
-cp src/htmls/*.html build
 cp images/*.png build
 cp images/*.jpg build
 
