@@ -2,6 +2,12 @@
  * The Presenter file.
  */
 
+var {
+  document,
+  requestAnimationFrame,
+  window,
+} = global;
+
 var DURATION = 500;
 var OUTLINE_COLOR = '#f0f0f0';
 var COLORS = [
@@ -15,85 +21,12 @@ var COLORS = [
   // hottest
   '#ff0000'
 ];
+
 var LAST_COLOR = COLORS[COLORS.length - 1];
 
 var _canvas;
 var _queue = {};
 var _isPainting = false;
-
-/**
- * @param {Object} batchedInfo
- */
-function batchUpdate(batchedInfo) {
-  for (var bid in batchedInfo) {
-    if (batchedInfo.hasOwnProperty(bid)) {
-      var info = batchedInfo[bid];
-      var reactid = info.reactid;
-      var meta;
-      if (_queue.hasOwnProperty(reactid)) {
-        meta = _queue[reactid];
-      } else {
-        meta = {
-          update_count: 0
-        };
-      }
-
-      meta.update_count++;
-      meta.update_info = info;
-      meta.expire_time = Date.now() + DURATION;
-      _queue[reactid] = meta;
-    }
-  }
-
-  paint();
-
-  // Clean up expired rect.
-  setTimeout(paint, DURATION + 1);
-}
-
-function paint() {
-  requestAnimationFrame(paintImmediate);
-}
-
-function paintImmediate() {
-  if (!_canvas) {
-    _canvas = injectCanvas();
-  }
-
-  if (_isPainting) {
-    return;
-  }
-
-  _isPainting = true;
-
-  var ctx = _canvas.getContext('2d');
-  ctx.clearRect(
-    0,
-    0,
-    _canvas.width,
-    _canvas.height
-  );
-
-  var now = Date.now();
-  var meta;
-
-
-
-  for (var reactid in _queue) {
-    if (!_queue.hasOwnProperty(reactid)) {
-      return;
-    }
-    meta = _queue[reactid];
-    if (meta.expire_time > now) {
-      paintMeta(ctx,  meta);
-    } else {
-      delete _queue[reactid];
-    }
-  }
-
-  painIcon(ctx);
-  _isPainting = false;
-}
 
 /**
  * @param {Object} ctx
@@ -126,18 +59,8 @@ function painIcon(ctx) {
   );
 
   ctx.fillStyle = '#444';
-  ctx.font="12px Verdana";
-  ctx.fillText("B", 7, 16);
-}
-
-/**
- * @param {Object} ctx
- * @param {Object} meta
- */
-function paintMeta(ctx, meta) {
-  var info = meta.update_info;
-  var color = COLORS[meta.update_count - 1] || LAST_COLOR;
-  paintBorder(ctx, info, 2, color);
+  ctx.font = '12px Verdana';
+  ctx.fillText('B', 7, 16);
 }
 
 /**
@@ -150,7 +73,7 @@ function paintBorder(ctx, info, borderWidth, borderColor) {
   ctx.strokeStyle = OUTLINE_COLOR;
 
   ctx.strokeRect(
-    info.left- 1,
+    info.left - 1,
     info.top - 1,
     info.width + 2,
     info.height + 2
@@ -162,7 +85,7 @@ function paintBorder(ctx, info, borderWidth, borderColor) {
   ctx.strokeRect(
     info.left + borderWidth,
     info.top + borderWidth,
-    info.width - borderWidth ,
+    info.width - borderWidth,
     info.height - borderWidth
   );
   ctx.strokeStyle = borderColor;
@@ -184,6 +107,16 @@ function paintBorder(ctx, info, borderWidth, borderColor) {
   );
 
   ctx.setLineDash([0]);
+}
+
+/**
+ * @param {Object} ctx
+ * @param {Object} meta
+ */
+function paintMeta(ctx, meta) {
+  var info = meta.update_info;
+  var color = COLORS[meta.update_count - 1] || LAST_COLOR;
+  paintBorder(ctx, info, 2, color);
 }
 
 /**
@@ -211,9 +144,80 @@ function injectCanvas() {
   return node;
 }
 
+function paintImmediate() {
+  if (!_canvas) {
+    _canvas = injectCanvas();
+  }
+
+  if (_isPainting) {
+    return;
+  }
+
+  _isPainting = true;
+
+  var ctx = _canvas.getContext('2d');
+  ctx.clearRect(
+    0,
+    0,
+    _canvas.width,
+    _canvas.height
+  );
+
+  var now = Date.now();
+  var meta;
+
+  for (var reactid in _queue) {
+    if (!_queue.hasOwnProperty(reactid)) {
+      continue;
+    }
+    meta = _queue[reactid];
+    if (meta.expire_time > now) {
+      paintMeta(ctx, meta);
+    } else {
+      delete _queue[reactid];
+    }
+  }
+
+  painIcon(ctx);
+  _isPainting = false;
+}
+
+function paint() {
+  requestAnimationFrame(paintImmediate);
+}
+
+/**
+ * @param {Object} batchedInfo
+ */
+function batchUpdate(batchedInfo) {
+  for (var bid in batchedInfo) {
+    if (batchedInfo.hasOwnProperty(bid)) {
+      var info = batchedInfo[bid];
+      var reactid = info.reactid;
+      var meta;
+      if (_queue.hasOwnProperty(reactid)) {
+        meta = _queue[reactid];
+      } else {
+        meta = {
+          update_count: 0
+        };
+      }
+
+      meta.update_count++;
+      meta.update_info = info;
+      meta.expire_time = Date.now() + DURATION;
+      _queue[reactid] = meta;
+    }
+  }
+
+  paint();
+
+  // Clean up expired rect.
+  setTimeout(paint, DURATION + 1);
+}
+
 var Presenter = {
   batchUpdate: batchUpdate
 };
-
 
 module.exports = Presenter;

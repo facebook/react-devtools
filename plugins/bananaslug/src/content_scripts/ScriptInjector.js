@@ -6,10 +6,32 @@
 
 var Fetcher = require('./Fetcher');
 
-var _initialized = false;
+var {
+  chrome,
+  document,
+  window,
+} = global;
+
+var _callbacks = {};
 var _id = 0;
+var _initialized = false;
 var _accesstoken =
-  ('BS_' + Math.random() + '-' + chrome.runtime.id).replace(/[\.-]/g, '_');
+  ('_bs_' + Math.random() + '-' + chrome.runtime.id).replace(/[\.-]/g, '_');
+
+/**
+ * @param {*} str
+ * @return {?Object}
+ */
+function parseJSON(str) {
+  if (typeof str !== 'string') {
+    return null;
+  }
+  try {
+    return JSON.parse(str);
+  } catch (ex) {
+    return null;
+  }
+}
 
 /**
  * @param {string} code
@@ -60,23 +82,6 @@ function onInjectedMessage(event) {
     type = null;
   }
 }
-
-/**
- * @param {*} str
- * @return {?Object}
- */
-function parseJSON(str) {
-  if (typeof str !== 'string') {
-    return null
-  }
-  try {
-    return JSON.parse(str);
-  } catch (ex) {
-    return null;
-  }
-}
-
-var _callbacks = {};
 
 /**
  * @param {string} relPath

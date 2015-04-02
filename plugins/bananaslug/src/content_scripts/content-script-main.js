@@ -4,6 +4,18 @@ var MessageType = require('../share/MessageType');
 var Presenter = require('./Presenter');
 var ScriptInjector = require('./ScriptInjector');
 
+function onReactRuntimeReady() {
+  ScriptInjector.inject('injected_scripts_main');
+}
+
+/**
+ * @paran {string} type
+ * @param {Object} batchedInfo
+ */
+function onReactComponentsUpdate(type, batchedInfo) {
+  Presenter.batchUpdate(batchedInfo);
+}
+
 function onReactDevToolSuccess() {
   ScriptInjector.subscribe(
     MessageType.REACT_RUNERTIME_READY,
@@ -24,18 +36,6 @@ function onReactDevToolFail() {
     'extension can work properly. ' +
     'http://goo.gl/lOauXS'
   );
-}
-
-function onReactRuntimeReady() {
-  ScriptInjector.inject('injected_scripts_main');
-}
-
-/**
- * @paran {string} type
- * @param {Object} batchedInfo
- */
-function onReactComponentsUpdate(type, batchedInfo) {
-  Presenter.batchUpdate(batchedInfo);
 }
 
 function main() {

@@ -1,5 +1,7 @@
 // devpanels.
 
-document.getElementById('debug').textContent = '123';
+var {
+  document,
+} = global;
 
-module.exports = {};
+document.getElementById('debug').textContent = '123';

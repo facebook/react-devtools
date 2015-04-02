@@ -2,6 +2,11 @@
  * The Fetcher file.
  */
 
+var {
+  XMLHttpRequest,
+  chrome,
+} = global;
+
 /**
  * @type {object}
  */
@@ -13,7 +18,7 @@ var _cache = {};
  * @param {Function} errorback
  */
 function fetchInternal(uri, callback, errorback) {
-  var _callback = callback;
+  var xhr = new XMLHttpRequest();
 
   if (_cache[uri]) {
     callback(_cache[uri]);
@@ -42,7 +47,6 @@ function fetchInternal(uri, callback, errorback) {
     errorback(msg);
   };
 
-  var xhr = new XMLHttpRequest();
   xhr.onload = onload;
   xhr.onerror = onerror;
   xhr.open('GET', uri, true);
@@ -59,7 +63,7 @@ function fetch(name) {
 
   return new Promise(function(resolve, reject) {
     fetchInternal(uri, resolve, reject);
-  });;
+  });
 }
 
 /**
@@ -71,7 +75,7 @@ function fetchRemote(extensionID, relPath) {
   var uri = 'chrome-extension://' + extensionID + '/' + relPath;
   return new Promise((resolve, reject) => {
     fetchInternal(uri, resolve, reject);
-  });;
+  });
 }
 
 var Fetcher = {

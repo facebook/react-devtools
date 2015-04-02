@@ -51,18 +51,6 @@
 	var Presenter = __webpack_require__(3);
 	var ScriptInjector = __webpack_require__(4);
 
-	function onReactDevToolSuccess() {
-	  ScriptInjector.subscribe(MessageType.REACT_RUNERTIME_READY, onReactRuntimeReady);
-
-	  ScriptInjector.subscribe(MessageType.REACT_COMPONENTS_DID_UPDATE, onReactComponentsUpdate);
-
-	  ScriptInjector.inject("injected_scripts_prelude");
-	}
-
-	function onReactDevToolFail() {
-	  console.info("Please download \"React Developer Tools\" so that this Bunanaslug " + "extension can work properly. " + "http://goo.gl/lOauXS");
-	}
-
 	function onReactRuntimeReady() {
 	  ScriptInjector.inject("injected_scripts_main");
 	}
@@ -73,6 +61,18 @@
 	 */
 	function onReactComponentsUpdate(type, batchedInfo) {
 	  Presenter.batchUpdate(batchedInfo);
+	}
+
+	function onReactDevToolSuccess() {
+	  ScriptInjector.subscribe(MessageType.REACT_RUNERTIME_READY, onReactRuntimeReady);
+
+	  ScriptInjector.subscribe(MessageType.REACT_COMPONENTS_DID_UPDATE, onReactComponentsUpdate);
+
+	  ScriptInjector.inject("injected_scripts_prelude");
+	}
+
+	function onReactDevToolFail() {
+	  console.info("Please download \"React Developer Tools\" so that this Bunanaslug " + "extension can work properly. " + "http://goo.gl/lOauXS");
 	}
 
 	function main() {
@@ -88,15 +88,18 @@
 /* 1 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
+	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * The Fetcher file.
 	 */
+
+	"use strict";
+
+	var XMLHttpRequest = global.XMLHttpRequest;
+	var chrome = global.chrome;
 
 	/**
 	 * @type {object}
 	 */
-	"use strict";
-
 	var _cache = {};
 
 	/**
@@ -105,7 +108,7 @@
 	 * @param {Function} errorback
 	 */
 	function fetchInternal(uri, callback, errorback) {
-	  var _callback = callback;
+	  var xhr = new XMLHttpRequest();
 
 	  if (_cache[uri]) {
 	    callback(_cache[uri]);
@@ -134,7 +137,6 @@
 	    errorback(msg);
 	  };
 
-	  var xhr = new XMLHttpRequest();
 	  xhr.onload = onload;
 	  xhr.onerror = onerror;
 	  xhr.open("GET", uri, true);
@@ -150,7 +152,7 @@
 
 	  return new Promise(function (resolve, reject) {
 	    fetchInternal(uri, resolve, reject);
-	  });;
+	  });
 	}
 
 	/**
@@ -162,7 +164,7 @@
 	  var uri = "chrome-extension://" + extensionID + "/" + relPath;
 	  return new Promise(function (resolve, reject) {
 	    fetchInternal(uri, resolve, reject);
-	  });;
+	  });
 	}
 
 	var Fetcher = {
@@ -171,6 +173,7 @@
 	};
 
 	module.exports = Fetcher;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 2 */
@@ -188,11 +191,15 @@
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
+	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * The Presenter file.
 	 */
 
 	"use strict";
+
+	var document = global.document;
+	var requestAnimationFrame = global.requestAnimationFrame;
+	var window = global.window;
 
 	var DURATION = 500;
 	var OUTLINE_COLOR = "#f0f0f0";
@@ -201,78 +208,12 @@
 	"#55cef6", "#55f67b", "#a5f655", "#f4f655", "#f6a555", "#f66855",
 	// hottest
 	"#ff0000"];
+
 	var LAST_COLOR = COLORS[COLORS.length - 1];
 
 	var _canvas;
 	var _queue = {};
 	var _isPainting = false;
-
-	/**
-	 * @param {Object} batchedInfo
-	 */
-	function batchUpdate(batchedInfo) {
-	  for (var bid in batchedInfo) {
-	    if (batchedInfo.hasOwnProperty(bid)) {
-	      var info = batchedInfo[bid];
-	      var reactid = info.reactid;
-	      var meta;
-	      if (_queue.hasOwnProperty(reactid)) {
-	        meta = _queue[reactid];
-	      } else {
-	        meta = {
-	          update_count: 0
-	        };
-	      }
-
-	      meta.update_count++;
-	      meta.update_info = info;
-	      meta.expire_time = Date.now() + DURATION;
-	      _queue[reactid] = meta;
-	    }
-	  }
-
-	  paint();
-
-	  // Clean up expired rect.
-	  setTimeout(paint, DURATION + 1);
-	}
-
-	function paint() {
-	  requestAnimationFrame(paintImmediate);
-	}
-
-	function paintImmediate() {
-	  if (!_canvas) {
-	    _canvas = injectCanvas();
-	  }
-
-	  if (_isPainting) {
-	    return;
-	  }
-
-	  _isPainting = true;
-
-	  var ctx = _canvas.getContext("2d");
-	  ctx.clearRect(0, 0, _canvas.width, _canvas.height);
-
-	  var now = Date.now();
-	  var meta;
-
-	  for (var reactid in _queue) {
-	    if (!_queue.hasOwnProperty(reactid)) {
-	      return;
-	    }
-	    meta = _queue[reactid];
-	    if (meta.expire_time > now) {
-	      paintMeta(ctx, meta);
-	    } else {
-	      delete _queue[reactid];
-	    }
-	  }
-
-	  painIcon(ctx);
-	  _isPainting = false;
-	}
 
 	/**
 	 * @param {Object} ctx
@@ -297,16 +238,6 @@
 	  ctx.fillStyle = "#444";
 	  ctx.font = "12px Verdana";
 	  ctx.fillText("B", 7, 16);
-	}
-
-	/**
-	 * @param {Object} ctx
-	 * @param {Object} meta
-	 */
-	function paintMeta(ctx, meta) {
-	  var info = meta.update_info;
-	  var color = COLORS[meta.update_count - 1] || LAST_COLOR;
-	  paintBorder(ctx, info, 2, color);
 	}
 
 	/**
@@ -340,6 +271,16 @@
 	}
 
 	/**
+	 * @param {Object} ctx
+	 * @param {Object} meta
+	 */
+	function paintMeta(ctx, meta) {
+	  var info = meta.update_info;
+	  var color = COLORS[meta.update_count - 1] || LAST_COLOR;
+	  paintBorder(ctx, info, 2, color);
+	}
+
+	/**
 	 * @return {Element}
 	 */
 	function injectCanvas() {
@@ -354,17 +295,85 @@
 	  return node;
 	}
 
+	function paintImmediate() {
+	  if (!_canvas) {
+	    _canvas = injectCanvas();
+	  }
+
+	  if (_isPainting) {
+	    return;
+	  }
+
+	  _isPainting = true;
+
+	  var ctx = _canvas.getContext("2d");
+	  ctx.clearRect(0, 0, _canvas.width, _canvas.height);
+
+	  var now = Date.now();
+	  var meta;
+
+	  for (var reactid in _queue) {
+	    if (!_queue.hasOwnProperty(reactid)) {
+	      continue;
+	    }
+	    meta = _queue[reactid];
+	    if (meta.expire_time > now) {
+	      paintMeta(ctx, meta);
+	    } else {
+	      delete _queue[reactid];
+	    }
+	  }
+
+	  painIcon(ctx);
+	  _isPainting = false;
+	}
+
+	function paint() {
+	  requestAnimationFrame(paintImmediate);
+	}
+
+	/**
+	 * @param {Object} batchedInfo
+	 */
+	function batchUpdate(batchedInfo) {
+	  for (var bid in batchedInfo) {
+	    if (batchedInfo.hasOwnProperty(bid)) {
+	      var info = batchedInfo[bid];
+	      var reactid = info.reactid;
+	      var meta;
+	      if (_queue.hasOwnProperty(reactid)) {
+	        meta = _queue[reactid];
+	      } else {
+	        meta = {
+	          update_count: 0
+	        };
+	      }
+
+	      meta.update_count++;
+	      meta.update_info = info;
+	      meta.expire_time = Date.now() + DURATION;
+	      _queue[reactid] = meta;
+	    }
+	  }
+
+	  paint();
+
+	  // Clean up expired rect.
+	  setTimeout(paint, DURATION + 1);
+	}
+
 	var Presenter = {
 	  batchUpdate: batchUpdate
 	};
 
 	module.exports = Presenter;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ },
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
-	/**
+	/* WEBPACK VAR INJECTION */(function(global) {/**
 	 * @require ./Fetcher.js
 	 *
 	 * The Presenter file.
@@ -374,9 +383,29 @@
 
 	var Fetcher = __webpack_require__(1);
 
-	var _initialized = false;
+	var chrome = global.chrome;
+	var document = global.document;
+	var window = global.window;
+
+	var _callbacks = {};
 	var _id = 0;
-	var _accesstoken = ("BS_" + Math.random() + "-" + chrome.runtime.id).replace(/[\.-]/g, "_");
+	var _initialized = false;
+	var _accesstoken = ("_bs_" + Math.random() + "-" + chrome.runtime.id).replace(/[\.-]/g, "_");
+
+	/**
+	 * @param {*} str
+	 * @return {?Object}
+	 */
+	function parseJSON(str) {
+	  if (typeof str !== "string") {
+	    return null;
+	  }
+	  try {
+	    return JSON.parse(str);
+	  } catch (ex) {
+	    return null;
+	  }
+	}
 
 	/**
 	 * @param {string} code
@@ -426,23 +455,6 @@
 	}
 
 	/**
-	 * @param {*} str
-	 * @return {?Object}
-	 */
-	function parseJSON(str) {
-	  if (typeof str !== "string") {
-	    return null;
-	  }
-	  try {
-	    return JSON.parse(str);
-	  } catch (ex) {
-	    return null;
-	  }
-	}
-
-	var _callbacks = {};
-
-	/**
 	 * @param {string} relPath
 	 * @param {Function} callback
 	 */
@@ -459,6 +471,7 @@
 	  subscribe: subscribe };
 
 	module.exports = ScriptInjector;
+	/* WEBPACK VAR INJECTION */}.call(exports, (function() { return this; }())))
 
 /***/ }
 /******/ ]);

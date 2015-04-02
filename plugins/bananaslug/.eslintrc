@@ -1,0 +1,26 @@
+// 0 - turn the rule off
+// 1 - turn the rule on as a warning (doesn't affect exit code)
+// 2 - turn the rule on as an error (exit code is 1 when triggered)
+
+{
+  "env": {
+    "es6": true,
+  },
+  "globals": {
+    "clearTimeout": true,
+    "console": true,
+    "global": true,
+    "module": true,
+    "require": true,
+    "setTimeout": true,
+  },
+  "rules": {
+    "camelcase": 0,
+    "comma-dangle": 0,
+    "no-console": 0,
+    "no-debugger": 0,
+    "no-underscore-dangle": 0,
+    "quotes": "[2, single]",
+    "strict": 0,
+  }
+}
