@@ -2,34 +2,73 @@ var {
   localStorage,
 } = global;
 
-var KEY_ENABLED = '__bananaslug_is_default_enabled';
+class UserDefaultSettingClass {
+  /**
+   * @param {string} location
+   */
+  constructor(location) {
+    this._key = `__BANANASLUG_DEFAULT_SETTING.${location}`;
+    this._enabled = undefined;
+  }
 
-var UserDefaultSetting = {
+  /**
+   * @param {boolean} enabled
+   * @return {boolean}
+   */
   setDefaultEnabled(enabled) {
+    if (enabled === this._enabled) {
+      return true;
+    }
+
     if (enabled) {
       try {
-        localStorage.setItem(KEY_ENABLED, '1');
+        localStorage.setItem(this._key, '1');
       } catch (ex) {
         return false;
       }
     } else {
       try {
-        localStorage.setItem(KEY_ENABLED, '0');
+        localStorage.setItem(this._key, '0');
       } catch (ex) {
         return false;
       }
     }
-  },
+    this._enabled = enabled;
+    return true;
+  }
 
+  /**
+   * @return {boolean}
+   */
   isDefaultEnabled() {
     try {
-      return String(localStorage.getItem(KEY_ENABLED)) !== '0';
+      var value = String(localStorage.getItem(this._key));
+      if (value === '1') {
+        return true;
+      } else {
+        // default value is false;
+        this.setDefaultEnabled(false);
+        return false;
+      }
     } catch (ex) {
-      // default.
-      return true;
+      return false;
     }
-    return true;
-  },
-};
+  }
+}
 
+var _instances = {};
+
+var UserDefaultSetting = {
+  /**
+   * @param {string} location
+   * @return {UserDefaultSettingClass}
+   */
+  getInstance(location) {
+    if (!_instances.hasOwnProperty(location)) {
+      _instances[location] = new UserDefaultSettingClass(location);
+      return _instances[location];
+    }
+    return _instances[location];
+  }
+};
 module.exports = UserDefaultSetting;
