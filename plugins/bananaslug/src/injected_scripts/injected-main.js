@@ -9,23 +9,28 @@ var getReactInternals = require('./getReactInternals');
 
 function onReactInternalsReady(ReactInternals) {
   // Track which component the current breakpoint is in
-  var ReactCurrentOwner = ReactInternals.CurrentOwner;
+  // var ReactCurrentOwner = ReactInternals.CurrentOwner;
+
   // Get top level instances and extract IDs from real DOM nodes
   var ReactMount = ReactInternals.Mount;
+
   // Use instanceof check to see if this is plain text (can't duck check)
-  var ReactTextComponent = ReactInternals.TextComponent;
+  // var ReactTextComponent = ReactInternals.TextComponent;
+
   // Used to see if one instance is the ancestor of an instance or dom node
-  var ReactInstanceHandles = ReactInternals.InstanceHandles;
+  // var ReactInstanceHandles = ReactInternals.InstanceHandles;
 
   ReactComponentInjection.ReactMount = ReactMount;
 
   var {
-    componentDidUpdate,
     componentWillMount,
     componentWillUnmount,
     componentWillUpdate,
   } = ReactComponentInjection;
 
+  var originalMountComponent;
+  var originalUpdateComponent;
+  var originalUnmountComponent;
 
   // Monkey patch Components to track rerenders
   if (ReactInternals.Component) {
@@ -33,9 +38,9 @@ function onReactInternalsReady(ReactInternals) {
     // Monkey patched to track updates
     var ReactComponent = ReactInternals.Component;
     var ComponentMixin = ReactComponent.Mixin;
-    var originalMountComponent = ComponentMixin.mountComponent;
-    var originalUpdateComponent = ComponentMixin.updateComponent;
-    var originalUnmountComponent = ComponentMixin.unmountComponent;
+    originalMountComponent = ComponentMixin.mountComponent;
+    originalUpdateComponent = ComponentMixin.updateComponent;
+    originalUnmountComponent = ComponentMixin.unmountComponent;
 
     ComponentMixin.mountComponent = function() {
       var result = originalMountComponent.apply(this, arguments);
@@ -59,11 +64,12 @@ function onReactInternalsReady(ReactInternals) {
   } else if (ReactInternals.Reconciler) {
     // 0.13+
 
+    originalMountComponent = ReactReconciler.mountComponent;
+    originalUnmountComponent = ReactReconciler.unmountComponent;
+
     var ReactReconciler = ReactInternals.Reconciler;
-    var originalMountComponent = ReactReconciler.mountComponent;
     var originalPerformUpdateIfNecessary = ReactReconciler.performUpdateIfNecessary;
     var originalReceiveComponent = ReactReconciler.receiveComponent;
-    var originalUnmountComponent = ReactReconciler.unmountComponent;
 
     ReactReconciler.mountComponent = function(instance) {
       var result = originalMountComponent.apply(this, arguments);

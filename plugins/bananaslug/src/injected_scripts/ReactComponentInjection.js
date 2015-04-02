@@ -2,18 +2,13 @@ var MessageType = require('../share/MessageType');
 var postDataToScriptInjector = require('./postDataToScriptInjector');
 var shallowCompare = require('../share/shallowCompare');
 
+var {
+  requestAnimationFrame,
+} = global;
+
+var MIN_MEASUREMENT_DURATION = 500;
 var _BananaSlugID = 1;
 var _measurementQueue = {};
-
-/**
- * @param {Object} component
- * @param {boolean} shouldUpdate
- */
-function scheduleMeasurement(component, shouldUpdate) {
-  component._BananaSlug_shouldUpdate = shouldUpdate;
-  _measurementQueue[component._BananaSlugID] = component;
-  requestAnimationFrame(performScheduledMeasurement);
-}
 
 function performScheduledMeasurement() {
   var ii = 0;
@@ -39,19 +34,58 @@ function performScheduledMeasurement() {
 }
 
 /**
+ * @param {?Object} component
+ * @return {?Node}
+ */
+function hackReactFindDOMNode(component) {
+  // https://facebook.github.io/react/blog/2015/03/10/react-v0.13.html
+  // Workaround that mimics API `React.findDOMNod(component)` which
+  // internally does this:
+  try {
+    return (
+      ReactComponentInjection.ReactMount.getNodeFromInstance(component) ||
+      null
+    );
+  } catch (ex) {
+    return undefined;
+  }
+}
+
+/**
+ * @param {?Object} component
+ * @return {?Node}
+ */
+function getComponentNode(component) {
+  if (!component) {
+    return null;
+  }
+
+  var result = hackReactFindDOMNode(component);
+  if (result === undefined) {
+    if (component.isMounted && component.getDOMNode) {
+      return component.isMounted() ? component.getDOMNode() : null;
+    }
+  }
+  return result;
+}
+
+/**
  * @param {Object} component
  * @return {?Object}
  */
 function measureComponent(component) {
   var node = getComponentNode(component);
   if (!node || !node.getBoundingClientRect) {
-    return;
+    return null;
   }
+
   var reactid = node.getAttribute('data-reactid');
   var now = Date.now();
   var info = null;
 
-  if (now - (component._BananaSlug_lastMeasuredTime || 0) < 500) {
+  var duration = now - (component._BananaSlug_lastMeasuredTime || 0);
+
+  if (duration < MIN_MEASUREMENT_DURATION) {
     // Measuring is too expensive. Limit the rate.
     info = component._BananaSlug_lastMeasuredInfo;
     if (info.reactid !== reactid) {
@@ -79,8 +113,6 @@ function measureComponent(component) {
   }
 
   return info;
-  // DEV only.
-  // debugComponentUpdateWithNode(component, node);
 }
 
 
@@ -105,59 +137,13 @@ function getComponent(instance) {
 }
 
 /**
- * @param {?Object} component
- * @return {?Node}
- */
-function getComponentNode(component) {
-  if (!component) {
-    return null;
-  }
-
-  var result = hackReactFindDOMNode(component);
-  if (result === undefined) {
-    if (component.isMounted && component.getDOMNode) {
-      return component.isMounted() ? component.getDOMNode() : null;
-    }
-  }
-  return result
-}
-
-/**
- * @param {?Object} component
- * @return {?Node}
- */
-function hackReactFindDOMNode(component) {
-  // https://facebook.github.io/react/blog/2015/03/10/react-v0.13.html
-  // Workaround that mimics API `React.findDOMNod(component)` which
-  // internally does this:
-  try {
-    return (
-      ReactComponentInjection.ReactMount.getNodeFromInstance(component) ||
-      null
-    );
-  } catch (ex) {
-    return undefined;
-  }
-}
-
-/**
  * @param {Object} component
- * @return {Element} node
+ * @param {boolean} shouldUpdate
  */
-function debugComponentUpdateWithNode(component, node) {
-  component._BananaSlugIsBusy = true;
-  node.style.outline = 'solid 10px red';
-  node.style.outlineOffset = '-5px';
-  setTimeout(() => {
-    component._BananaSlugIsBusy = false;
-    if (component.isMounted()) {
-      node.style.background = '';
-      node.style.outline = '';
-      node.style.outlineOffset = '';
-    }
-    node = null;
-    component = null;
-  }, 500);
+function scheduleMeasurement(component, shouldUpdate) {
+  component._BananaSlug_shouldUpdate = shouldUpdate;
+  _measurementQueue[component._BananaSlugID] = component;
+  requestAnimationFrame(performScheduledMeasurement);
 }
 
 // export methods //////////////////////////////////////////////////////////////

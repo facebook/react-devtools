@@ -4,11 +4,13 @@ module.exports = {
   entry: {
     "content-script": "./content_scripts/content-script-main.js",
     "devpanel": "./devpanel/devpanel-main.js",
+    "injected-main": "./injected_scripts/injected-main.js",
+    "injected-prelude": "./injected_scripts/injected-prelude.js",
   },
 
   output: {
     path: __dirname + "/build",
-    filename: '[name].js',
+    filename: '[name].bundle.js',
   },
 
   module: {

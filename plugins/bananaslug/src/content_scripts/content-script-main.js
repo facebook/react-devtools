@@ -1,11 +1,11 @@
 
-var Fetcher = require('./Fetcher');
+// var Fetcher = require('./Fetcher');
 var MessageType = require('../share/MessageType');
 var Presenter = require('./Presenter');
 var ScriptInjector = require('./ScriptInjector');
 
 function onReactRuntimeReady() {
-  ScriptInjector.inject('injected_scripts_main');
+  ScriptInjector.inject('injected-main');
 }
 
 /**
@@ -16,7 +16,7 @@ function onReactComponentsUpdate(type, batchedInfo) {
   Presenter.batchUpdate(batchedInfo);
 }
 
-function onReactDevToolSuccess() {
+function main() {
   ScriptInjector.subscribe(
     MessageType.REACT_RUNERTIME_READY,
     onReactRuntimeReady
@@ -27,32 +27,7 @@ function onReactDevToolSuccess() {
     onReactComponentsUpdate
   );
 
-  ScriptInjector.inject('injected_scripts_prelude');
-}
-
-function onReactDevToolFail() {
-  console.info(
-    'Please download "React Developer Tools" so that this Bunanaslug ' +
-    'extension can work properly. ' +
-    'http://goo.gl/lOauXS'
-  );
-}
-
-function main() {
-  var REACT_DEV_TOOL_EXTENSION_ID = 'fmkadmapgofadopljbjfkapdkoienihi';
-  Fetcher
-    .fetchRemote(REACT_DEV_TOOL_EXTENSION_ID, 'views/devpanel.html')
-    .then(onReactDevToolSuccess)
-    .catch(onReactDevToolFail);
+  ScriptInjector.inject('injected-prelude');
 }
 
 main();
-
-module.exports = {};
-
-
-
-
-
-
-

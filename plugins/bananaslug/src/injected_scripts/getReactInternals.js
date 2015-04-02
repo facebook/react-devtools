@@ -3,7 +3,11 @@
  * This file is injected into thw native web page.
  */
 
-var  WAIT_LIMIT = 60 * 1000;
+var WAIT_LIMIT = 60 * 1000;
+
+var {
+  window,
+} = global;
 
 /**
  * @param {Object}

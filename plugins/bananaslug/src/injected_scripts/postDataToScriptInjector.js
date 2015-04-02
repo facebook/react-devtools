@@ -3,6 +3,10 @@
  * This file is injected into thw native web page.
  */
 
+var {
+  window,
+} = global;
+
 /**
  * @param {string} type
  * @param {*} data
@@ -16,7 +20,6 @@ function postDataToScriptInjector(type, data) {
     }),
     '*'
   );
-};
+}
 
 module.exports = postDataToScriptInjector;
-

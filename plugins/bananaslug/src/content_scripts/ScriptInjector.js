@@ -15,8 +15,7 @@ var {
 var _callbacks = {};
 var _id = 0;
 var _initialized = false;
-var _accesstoken =
-  ('_bs_' + Math.random() + '-' + chrome.runtime.id).replace(/[\.-]/g, '_');
+var _accesstoken = `_bs_${Date.now()}_${chrome.runtime.id}`.replace(/[\.-]/g, '_');
 
 /**
  * @param {*} str

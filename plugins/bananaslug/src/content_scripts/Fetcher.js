@@ -43,7 +43,7 @@ function fetchInternal(uri, callback, errorback) {
   };
 
   var onerror = () => {
-    var msg = 'Unable to inject script for "' + uri + '"';
+    var msg = `Unable to inject script for "${uri}"`;
     errorback(msg);
   };
 
@@ -58,29 +58,20 @@ function fetchInternal(uri, callback, errorback) {
  * @return {Object}
  */
 function fetch(name) {
-  var uri = 'chrome-extension://' +
-    chrome.runtime.id + '/js/' + name + '.bundle.js';
+  // to be safe, need to escape name.
+  name = name.replace(/[^a-zA-Z_0-9-]/g, '_INVALID_');
+
+  var id = chrome.runtime.id;
+  var uri =
+    `chrome-extension://${id}/plugins/bananaslug/build/${name}.bundle.js`;
 
   return new Promise(function(resolve, reject) {
     fetchInternal(uri, resolve, reject);
   });
 }
 
-/**
- * @param {string} extensionID
- * @param {string} relPath
- * @return {Object}
- */
-function fetchRemote(extensionID, relPath) {
-  var uri = 'chrome-extension://' + extensionID + '/' + relPath;
-  return new Promise((resolve, reject) => {
-    fetchInternal(uri, resolve, reject);
-  });
-}
-
 var Fetcher = {
   fetch: fetch,
-  fetchRemote: fetchRemote
 };
 
 module.exports = Fetcher;
