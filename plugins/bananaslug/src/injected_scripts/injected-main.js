@@ -1,4 +1,5 @@
 var ReactComponentInjection = require('./ReactComponentInjection');
+var constants = require('../share/constants');
 var getReactInternals = require('./getReactInternals');
 
 /**
@@ -97,8 +98,18 @@ function onReactInternalsReady(ReactInternals) {
   }
 }
 
+/**
+ * @param {boolean} enabled
+ */
+function bananaslugSetEnabled(enabled) {
+  console.log('>>>>' + enabled);
+}
+
 function main() {
-  getReactInternals().then(onReactInternalsReady);
+  getReactInternals().then(onReactInternalsReady).then(() => {
+    var method = constants.GLOBAL_INJECTED_METHOD_SET_ENABLED_NAME;
+    global[method] = bananaslugSetEnabled;
+  });
 }
 
 main();

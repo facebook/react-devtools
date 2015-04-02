@@ -1,7 +1,43 @@
 // devpanels.
 
+var constants = require('../share/constants');
+
 var {
+  chrome,
   document,
 } = global;
 
-document.getElementById('debug').textContent = '123';
+var _enabled = true;
+
+/**
+ * @param {boolean} enabled
+ */
+function notifyIsEnabled(enabled) {
+  _enabled = enabled;
+
+  var method = constants.GLOBAL_INJECTED_METHOD_SET_ENABLED_NAME;
+  var code = `
+    try {
+      window["${method}"](${enabled});
+    } catch (error) {
+      console.error(error);
+    }`;
+  chrome.devtools.inspectedWindow.eval(code);
+  return true;
+}
+
+function main() {
+  notifyIsEnabled(_enabled);
+
+  var checkbox = document.getElementById('checkbox');
+  checkbox.checked = _enabled;
+
+  checkbox.addEventListener(
+    'change',
+    () => notifyIsEnabled(checkbox.checked),
+    true
+  );
+}
+
+main();
+
