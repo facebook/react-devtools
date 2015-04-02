@@ -66,13 +66,12 @@ function onReactInternalsReady(ReactInternals) {
 
   } else if (ReactInternals.Reconciler) {
     // 0.13+
-
-    originalMountComponent = ReactReconciler.mountComponent;
-    originalUnmountComponent = ReactReconciler.unmountComponent;
-
     var ReactReconciler = ReactInternals.Reconciler;
     var originalPerformUpdateIfNecessary = ReactReconciler.performUpdateIfNecessary;
     var originalReceiveComponent = ReactReconciler.receiveComponent;
+
+    originalMountComponent = ReactReconciler.mountComponent;
+    originalUnmountComponent = ReactReconciler.unmountComponent;
 
     ReactReconciler.mountComponent = function(instance) {
       var result = originalMountComponent.apply(this, arguments);
