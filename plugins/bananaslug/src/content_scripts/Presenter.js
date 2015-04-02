@@ -69,7 +69,6 @@ function setEnabled(value) {
   _enabled = value;
 
   if (_enabled) {
-    // paint the icon.
     paintImmediate();
   } else {
     if (_canvas.parentNode) {
@@ -80,38 +79,6 @@ function setEnabled(value) {
   }
 
   _setting.setDefaultEnabled(_enabled);
-}
-
-function painIcon() {
-  var info = {
-    height: 20,
-    left: 2,
-    top: 2,
-    width: 20
-  };
-
-  _ctx.lineWidth = 1;
-  _ctx.strokeStyle = '#beb821';
-  _ctx.fillStyle = '#f6f055';
-
-  _ctx.fillRect(
-    info.left,
-    info.top,
-    info.width,
-    info.height
-  );
-
-  _ctx.strokeStyle = '#beb821';
-  _ctx.strokeRect(
-    info.left,
-    info.top,
-    info.width,
-    info.height
-  );
-
-  _ctx.fillStyle = '#444';
-  _ctx.font = '12px Verdana';
-  _ctx.fillText('R', 7, 16);
 }
 
 /**
@@ -202,7 +169,6 @@ function paintImmediate() {
     }
   }
 
-  painIcon();
   _isPainting = false;
 }
 
@@ -246,12 +212,6 @@ function batchUpdate(batchedInfo) {
   // Clean up expired rect.
   setTimeout(paint, DURATION + 1);
 }
-
-if (_enabled) {
-  // paint icon.
-  paint();
-}
-
 
 var Presenter = {
   batchUpdate: batchUpdate,

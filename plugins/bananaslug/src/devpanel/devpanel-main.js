@@ -46,7 +46,7 @@ function buildDOM() {
          type="checkbox"
          style="cursor: pointer;"
         />
-       trace teact components updates
+       trace components updates
      </label>
     </div>
   `;
