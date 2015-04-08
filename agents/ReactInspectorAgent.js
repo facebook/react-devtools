@@ -112,7 +112,7 @@ function loadRuntime() {
   fetchScript('_injectedScriptHost', '/injected/InjectedScriptHost.js');
   fetchScript('_injectedScript', '/blink/Source/core/inspector/InjectedScriptSource.js', ['_injectedScriptHost']);
   fetchScript('Runtime', '/injected/RuntimeHost.js', ['React', '_injectedScript']);
-  fetchScript('Overlay', '/injected/Overlay.js', []);
+  fetchScript('Overlay', '/injected/Overlay.js', ['React']);
   fetchScript('DOM', '/injected/DOMHost.js', ['React', 'Overlay', '_injectedScript']);
   fetchContents('__InspectorOverlayPage_html', '/blink/Source/core/inspector/InspectorOverlayPage.html');
 }
