@@ -183,7 +183,10 @@ var Overlay = {
       element = null;
     }
     if (element == null) {
-      DOMHost.hideHighlight();
+      try {
+        DOMHost.hideHighlight();
+      } catch(x) {
+      }
       return;
     }
 
@@ -220,7 +223,9 @@ var Overlay = {
   },
 
   hideHighlight: function() {
-    inspectorIframe.style.display = 'none';
+    if (inspectorIframe) {
+      inspectorIframe.style.display = 'none';
+    }
     inspectorIframeVisible = false;
   }
 
