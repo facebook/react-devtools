@@ -28,4 +28,4 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-var ReactInspectorVersion = '0_13_0';
+var ReactInspectorVersion = '0_13_1';
