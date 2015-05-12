@@ -38,6 +38,8 @@ var ReactInspectorAgent;
 
 (function() {
 
+var MISSING_RUNTIME =
+  'missingRuntime$' + Math.random().toString(36).slice(2);
 var RUNTIME_NAMESPACE = '__REACT_INSPECTOR_RUNTIME__' + ReactInspectorVersion;
 
 var queuedCallbacks = null;
@@ -163,9 +165,11 @@ ReactInspectorAgent = {
     }
 
     chrome.devtools.inspectedWindow.eval(
-      RUNTIME_NAMESPACE + '.' + methodSignature,
+      'typeof ' + RUNTIME_NAMESPACE + ' === "object" ? ' +
+        RUNTIME_NAMESPACE + '.' + methodSignature + ' : ' +
+        JSON.stringify(MISSING_RUNTIME),
       function(result, error) {
-        if (error && error.value.indexOf(RUNTIME_NAMESPACE) !== -1) {
+        if (result === MISSING_RUNTIME) {
           // Runtime is missing, let's reload it
           if (queuedCallbacks) {
             queuedCallbacks.push(retry);
