@@ -15,12 +15,19 @@
   "devtools_page": "main.html",
 
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "web_accessible_resources": [ "main.html", "views/devpanel.html" ],
+  "web_accessible_resources": [
+    "main.html",
+    "views/devpanel.html",
+    "plugins/bananaslug/build/*"
+  ],
 
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["injected/GlobalHook.js"],
+      "js": [
+        "injected/GlobalHook.js",
+        "plugins/bananaslug/build/content-script.bundle.js"
+      ],
       "run_at": "document_start"
     }
   ]

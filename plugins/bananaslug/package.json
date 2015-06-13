@@ -1,0 +1,18 @@
+{
+  "name": "bananaslug",
+  "version": "0.0.1",
+  "description": "dev-only version. ",
+  "main": "webpack.config.js",
+  "dependencies": {
+    "babel-core": "^4.7.16",
+    "babel-loader": "^4.3.0",
+    "eslint": "^0.18.0",
+    "eslint-loader": "^0.9.0",
+    "webpack": "^1.7.3"
+  },
+  "author": "hedgerwang",
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
