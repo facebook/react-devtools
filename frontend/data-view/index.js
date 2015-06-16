@@ -5,16 +5,21 @@ var Simple = require('./simple');
 class DataView extends React.Component {
   render() {
     if (!this.props.data) {
-      return <span>No data</span>;
+      return <div style={styles.missing}>null</div>;
     }
     var names = Object.keys(this.props.data);
     var path = this.props.path || [];
+    if (!names.length) {
+      return <span style={styles.empty}>Empty object</span>;
+    }
     return (
       <ul style={styles.container}>
         {names.map((name, i) => (
           <DataItem
             name={name}
             path={path}
+            key={name}
+            readOnly={this.props.readOnly}
             value={this.props.data[name]}
           />
         ))}
@@ -42,10 +47,20 @@ class DataItem extends React.Component {
     var complex = true;
     var preview;
     if (otype === 'number' || otype === 'string' || data === null || data === undefined || otype === 'boolean') {
-      preview = <Simple data={data} />;
+      preview = (
+        <Simple
+          readOnly={this.props.readOnly}
+          path={this.props.path.concat([this.props.name])}
+          data={data}
+        />
+      );
       complex = false;
     } else {
-      preview = 'Complex data';
+      if (Array.isArray(data)) {
+        preview = '[' + data.length + ']';
+      } else {
+        preview = '{...}';
+      }
     }
 
     var opener = null;
@@ -64,7 +79,10 @@ class DataItem extends React.Component {
       // TODO path
       children = (
         <div style={styles.children}>
-          <DataView data={this.props.value} />
+          <DataView
+            data={this.props.value}
+            readOnly={this.props.readOnly}
+          />
         </div>
       );
     }
@@ -97,9 +115,19 @@ var styles = {
   children: {
   },
 
-  preview: {
-    display: 'flex',
-    flex: 1,
+  empty: {
+    fontSize: 12,
+    marginLeft: 20,
+    padding: '2px 5px',
+    color: '#aaa',
+  },
+
+  missing: {
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 20,
+    padding: '2px 5px',
+    color: '#888',
   },
 
   opener: {
@@ -107,6 +135,7 @@ var styles = {
     cursor: 'pointer',
     position: 'absolute',
     right: '100%',
+    padding: '5px 0',
   },
 
   head: {
@@ -117,6 +146,12 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 5px',
+  },
+
+  preview: {
+    display: 'flex',
+    margin: '2px 5px',
+    flex: 1,
   },
 
   value: {

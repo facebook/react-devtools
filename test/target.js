@@ -18,22 +18,22 @@ class Target extends React.Component {
   }
 
   render() {
-    if (this.props.count === 1) {
-      return <div onClick={() => this.setState({awesome: true})}>
+    if (this.state.num === 1) {
+      return <div onClick={() => this.setState({awesome: !this.state.awesome})}>
         {'' + !!this.state.awesome}
       </div>
     }
-    var count = this.props.count || 5
+    var count = this.state.num;
     var children = []
     for (var i=0; i<count; i++) {
-      children.push(<Target key={i} count={count-1}/>);
+      children.push(<Target key={Math.random()} count={count-1}/>);
     }
     return <div style={{
       margin: 5,
       marginLeft: 10,
       border: '2px solid #ccc',
     }}>
-      {count}
+      {count} : {this.state.num}
       {children}
     </div>
   }

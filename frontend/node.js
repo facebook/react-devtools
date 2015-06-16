@@ -20,11 +20,11 @@ class Node extends React.Component {
     )
 
     if ('string' === typeof children) {
-      return <span style={leftPad}>{children}</span>;
+      return <div style={leftPad}>{children}</div>;
     }
 
     if (!children) {
-      return <span style={leftPad}>{node.get('name')}</span>;
+      return <div style={leftPad}>{node.get('name')}</div>;
     }
 
     var head = (
@@ -55,7 +55,7 @@ class Node extends React.Component {
       <div style={styles.container}>
         {head}
         <div style={styles.children}>
-          {children.map(id => <WrappedNode depth={this.props.depth + 1} id={id} />)}
+          {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
         <div style={tailStyles}>
           {'</' + node.get('name') + '>'}

@@ -4,6 +4,14 @@ var DataView = require('./data-view');
 var decorate = require('./decorate');
 
 class PropState extends React.Component {
+  getChildContext() {
+    return {
+      onChange: (path, val) => {
+        this.props.setState(path, val);
+      }
+    };
+  }
+
   render() {
     if (!this.props.node) {
       return <span>No selection</span>;
@@ -12,13 +20,17 @@ class PropState extends React.Component {
     return (
       <div style={styles.container}>
         <strong>Props</strong>
-        <DataView key={Math.random()} data={this.props.node.get('props')} />
+        <DataView readOnly={true} key={Math.random()} data={this.props.node.get('props')} />
         <br/>
         <strong>State</strong>
         <DataView key={Math.random()} data={this.props.node.get('state')} />
       </div>
     );
   }
+}
+
+PropState.childContextTypes = {
+  onChange: React.PropTypes.func,
 }
 
 var toStr = val => {

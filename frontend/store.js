@@ -24,6 +24,16 @@ class Store extends EventEmitter {
       this.data = this.data.set(data.id, Map(data));
       this.emit(data.id);
     });
+
+    this.bridge.on('update', (data) => {
+      this.data = this.data.set(data.id, Map(data));
+      this.emit(data.id);
+    });
+
+    this.bridge.on('unmount', id => {
+      // this.data = this.data.set(data.id, Map(data));
+      // this.emit(data.id);
+    });
   }
 
   get(id) {
@@ -37,6 +47,10 @@ class Store extends EventEmitter {
   toggleCollapse(id) {
     this.data = this.data.updateIn([id, 'collapsed'], c => !c);
     this.emit(id);
+  }
+
+  setState(id, path, value) {
+    this.bridge.send('setState', {id, path, value});
   }
 
   setHover(id, isHovered) {
