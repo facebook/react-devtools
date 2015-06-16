@@ -39,11 +39,13 @@ The extension is now installed.
 
 ### The React Tab Doesn't Show Up?
 
-The current version of React Developer Tools is not compatible with all build
-systems. It tries to load the React runtime by either detecting a global called
-`React`, or by calling `require('React')` or `require('react')` in the global
-scope. Your page needs to support this to be compatible with the Developer
-Tools.
+The "React" tab won't show up if React can't communicate with the
+devtools. When the page loads, the devtools sets a global named
+`__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that
+hook during initialization.
+
+(In React 0.11 and older, it was necessary to expose a global called `React`
+for the devtools to function.)
 
 You can test this on the [React website](http://facebook.github.io/react/)
 or by inspecting [Facebook](https://www.facebook.com/).
