@@ -21,6 +21,7 @@ class Container extends React.Component {
 var styles = {
   container: {
     display: 'flex',
+    fontFamily: 'sans-serif',
   },
 
   leftPane: {

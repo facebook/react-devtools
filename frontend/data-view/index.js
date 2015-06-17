@@ -12,6 +12,7 @@ class DataView extends React.Component {
     if (!names.length) {
       return <span style={styles.empty}>Empty object</span>;
     }
+
     return (
       <ul style={styles.container}>
         {names.map((name, i) => (
@@ -57,7 +58,7 @@ class DataItem extends React.Component {
       complex = false;
     } else {
       if (Array.isArray(data)) {
-        preview = '[' + data.length + ']';
+        preview = 'Array[' + data.length + ']';
       } else {
         preview = '{...}';
       }

@@ -17,7 +17,10 @@ function getData(element, context) {
   var updater = null;
   var name = null;
   var type = null;
+  var text = null;
+  var nodeType = 'Native';
   if (element._renderedComponent) {
+    nodeType = 'Wrapper';
     children = [element._renderedComponent];
     props = element._instance.props;
     state = element._instance.state;
@@ -36,9 +39,11 @@ function getData(element, context) {
     if ('string' === typeof type) {
       name = type;
     } else if (element.getName) {
+      nodeType = 'Custom';
       name = element.getName();
     } else if (element._stringText) {
-      name = element._stringText;
+      nodeType = 'Text';
+      text = element._stringText;
     }
   }
 
@@ -50,7 +55,7 @@ function getData(element, context) {
     }
   }
 
-  return {props, state, context, children, updater, type, name};
+  return {nodeType, props, state, context, children, updater, type, name, text};
 }
 
 if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__ && window.__REACT_DEVTOOLS_BACKEND__) {

@@ -19,6 +19,7 @@ class TreeView extends React.Component {
 var styles = {
   container: {
     border: '2px solid green',
+    fontFamily: 'monospace',
   },
 };
 

@@ -7,6 +7,7 @@ class Store extends EventEmitter {
     super()
     this.data = new Map();
     this.roots = new Set();
+    this.parents = new Map();
     this.bridge = bridge;
     this.hovered = null;
     this.selected = null;
@@ -22,15 +23,26 @@ class Store extends EventEmitter {
 
     this.bridge.on('mount', (data) => {
       this.data = this.data.set(data.id, Map(data));
+      if (data.children && data.children.forEach) {
+        data.children.forEach(cid => {
+          this.parents.set(cid, data.id);
+        });
+      }
       this.emit(data.id);
     });
 
     this.bridge.on('update', (data) => {
       this.data = this.data.set(data.id, Map(data));
+      if (data.children && data.children.forEach) {
+        data.children.forEach(cid => {
+          this.parents.set(cid, data.id);
+        });
+      }
       this.emit(data.id);
     });
 
     this.bridge.on('unmount', id => {
+      this.parents.delete(id);
       // this.data = this.data.set(data.id, Map(data));
       // this.emit(data.id);
     });
@@ -77,6 +89,8 @@ class Store extends EventEmitter {
     }
     this.emit(id);
     this.emit('selected');
+    window.$selid = id;
+    window.$sel = this.get(id);
   }
 
   addRoot(id) {

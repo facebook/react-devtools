@@ -4,7 +4,11 @@ require('../backend/compat');
 
 class Wrap extends React.Component {
   render() {
-    return <Target count={4}/>
+    return <div>
+      <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
+      <div>&lt;</div>
+      <Target count={3}/>
+    </div>
   }
 }
 
@@ -33,7 +37,7 @@ class Target extends React.Component {
       marginLeft: 10,
       border: '2px solid #ccc',
     }}>
-      {count} : {this.state.num}
+      {count} : {this.state.num} / {'' + !!this.state.awesome}
       {children}
     </div>
   }

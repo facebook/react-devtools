@@ -17,13 +17,24 @@ class PropState extends React.Component {
       return <span>No selection</span>;
     }
 
+    var nodeType = this.props.node.get('nodeType');
+    if (nodeType === 'Text') {
+      return (
+        <div style={styles.container}>
+          Text node (no props/state)
+        </div>
+      );
+    }
+
     return (
       <div style={styles.container}>
         <strong>Props</strong>
         <DataView readOnly={true} key={Math.random()} data={this.props.node.get('props')} />
-        <br/>
-        <strong>State</strong>
-        <DataView key={Math.random()} data={this.props.node.get('state')} />
+        {this.props.node.get('nodeType') === 'Custom' &&
+          <div>
+            <strong>State</strong>
+            <DataView key={Math.random()} data={this.props.node.get('state')} />
+          </div>}
       </div>
     );
   }
@@ -41,9 +52,10 @@ var toStr = val => {
 }
 
 var WrappedPropState = decorate({
-  listeners() {
-    return ['selected'];
+  listeners(props, store) {
+    return ['selected', store.selected];
   },
+
   props(store) {
     return {
       node: store.selected ? store.get(store.selected) : null,
