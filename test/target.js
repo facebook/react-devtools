@@ -5,11 +5,11 @@ require('../backend/compat');
 class Wrap extends React.Component {
   render() {
     return <div>
+      <Target count={1}/>
       <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
       <span val={null}/>
       <span val={undefined}/>
       <div>&lt;</div>
-      <Target count={3}/>
     </div>
   }
 }

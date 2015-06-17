@@ -68,6 +68,8 @@ class Backend extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
+    delete send.type;
+    delete send.updater;
     this.bridge.send('mount', send);
   }
 
@@ -80,6 +82,8 @@ class Backend extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
+    delete send.type;
+    delete send.updater;
     this.bridge.send('update', send)
   }
 

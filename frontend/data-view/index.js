@@ -1,6 +1,7 @@
 
 var React = require('react');
 var Simple = require('./simple');
+var consts = require('../../backend/consts');
 
 class DataView extends React.Component {
   render() {
@@ -59,6 +60,12 @@ class DataItem extends React.Component {
     } else {
       if (Array.isArray(data)) {
         preview = 'Array[' + data.length + ']';
+      } else if (data[consts.type]) {
+        if (data[consts.preview]) {
+          preview = data[consts.preview]
+        } else {
+          preview = data[consts.name]
+        }
       } else {
         preview = '{...}';
       }

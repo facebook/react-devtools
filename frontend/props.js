@@ -1,8 +1,6 @@
 
 var React = require('react');
-
-// TODO this will be used for the pending props stuff
-var consts = {PENDING: {}};
+var consts = require('../backend/consts');
 
 class Props extends React.Component {
   render() {
@@ -68,7 +66,13 @@ function previewProp(val, nested) {
   if ('object' !== typeof val) {
     return '...';
   }
-  if (nested || val.$$pending === consts.PENDING) {
+  if (val[consts.type]) {
+    var type = val[consts.type];
+    if (type === 'function') {
+      return (val[consts.name] || 'fn') + '()';
+    }
+  }
+  if (nested) {
     return '{...}';
   }
   var names = Object.keys(val);

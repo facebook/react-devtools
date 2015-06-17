@@ -3,7 +3,7 @@ var React = require('react');
 var assign = require('object-assign');
 
 // using an empty function for ease of debugging;
-var BAD_INPUT = function BAD_INPUT(){};
+var BAD_INPUT = Symbol('bad input');
 
 function textToValue(txt) {
   if (!txt.length) {
@@ -61,6 +61,7 @@ class Simple extends React.Component {
     var value = textToValue(this.state.text);
     if (value === BAD_INPUT) {
       this.setState({
+        text: valueToText(this.props.data),
         editing: editing,
       });
       return;
@@ -141,6 +142,7 @@ var styles = {
   simple: {
     display: 'flex',
     flex: 1,
+    whiteSpace: 'pre-wrap',
   },
 
   previewNumber: {

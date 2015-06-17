@@ -6,14 +6,12 @@ var compatInject = require('../backend/compat-inject');
 var Store = require('./store');
 var Bridge = require('../backend/bridge');
 var makeWall = require('./wall');
+var makeIframeWall = require('./iframe-wall');
 
 class Harness extends React.Component {
   componentWillMount() {
-    var wall = makeWall();
-    this.backend = new Backend(new Bridge(wall.left))
-    this.store = new Store(new Bridge(wall.right));
-    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
-    window.backend = this.backend
+    this.storeBridge = new Bridge();
+    this.store = new Store(this.storeBridge);
   }
 
   getChildContext() {
@@ -24,6 +22,17 @@ class Harness extends React.Component {
 
   componentDidMount() {
     var iframe = React.findDOMNode(this.iframe)
+
+    var wall = makeIframeWall(window, iframe);
+    this.storeBridge.attach(wall.parent);
+
+    var backBridge = new Bridge();
+    backBridge.attach(wall.child);
+    this.backend = new Backend(backBridge);
+
+    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
+    window.backend = this.backend
+
     var win = iframe.contentWindow
     var doc = iframe.contentDocument
     inject(this.backend, win, true);
@@ -31,13 +40,15 @@ class Harness extends React.Component {
     var script = doc.createElement('script');
     script.src = this.props.targetSrc
     doc.head.appendChild(script);
+
+
   }
 
   render() {
     var backend = this.backend
     return <div style={styles.harness}>
       <div style={styles.leftSide}>
-        {React.addons.cloneWithProps(this.props.children, {backend})}
+        {React.addons.cloneWithProps(this.props.children)}
       </div>
       <div style={styles.rightSide}>
         <iframe style={styles.iframe} ref={n => this.iframe = n} />

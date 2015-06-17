@@ -3,7 +3,7 @@ module.exports = function () {
   var lefter = null
   var righter = null
   return {
-    left: {
+    parent: {
       listen(fn) {
         lefter = fn;
       },
@@ -12,7 +12,7 @@ module.exports = function () {
       },
     },
 
-    right: {
+    child: {
       listen(fn) {
         righter = fn;
       },
