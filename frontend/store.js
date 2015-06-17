@@ -25,7 +25,6 @@ class Store extends EventEmitter {
     this.selected = null;
     this.selBottom = false;
     this.bridge.on('root', id => {
-      console.log('got rot');
       this.roots = this.roots.add(id);
       if (!this.selected) {
         this.selected = id;
@@ -67,6 +66,9 @@ class Store extends EventEmitter {
   }
 
   onKeyDown(e) {
+    if (window.document.activeElement !== document.body) {
+      return
+    }
     var dir = keyCodes[e.keyCode];
     if (!dir) {
       return;
@@ -153,7 +155,6 @@ class Store extends EventEmitter {
   }
 
   getMove(dest) {
-    console.log('move', dest)
     var id = this.selected;
     var bottom = this.selBottom;
     var node = this.get(id);

@@ -9,11 +9,21 @@ function textToValue(txt) {
   if (!txt.length) {
     return BAD_INPUT;
   }
+  if (txt === 'undefined') {
+    return undefined;
+  }
   try {
     return JSON.parse(txt);
   } catch (e) {
     return BAD_INPUT;
   }
+}
+
+function valueToText(value) {
+  if (value === undefined) {
+    return 'undefined';
+  }
+  return JSON.stringify(value);
 }
 
 class Simple extends React.Component {
@@ -32,27 +42,32 @@ class Simple extends React.Component {
 
   onKeyDown(e) {
     if (e.key === 'Enter') {
-      this.onSubmit();
+      this.onSubmit(true);
+    }
+    if (e.key === 'Escape') {
+      this.setState({
+        editing: false
+      });
     }
   }
 
-  onSubmit() {
-    if (this.state.text === JSON.stringify(this.props.data)) {
+  onSubmit(editing) {
+    if (this.state.text === valueToText(this.props.data)) {
       this.setState({
-        editing: false,
+        editing: editing,
       });
       return;
     }
     var value = textToValue(this.state.text);
     if (value === BAD_INPUT) {
       this.setState({
-        editing: false,
+        editing: editing,
       });
       return;
     }
     this.context.onChange(this.props.path, value);
     this.setState({
-      editing: false,
+      editing: editing,
     });
   }
 
@@ -62,8 +77,20 @@ class Simple extends React.Component {
     }
     this.setState({
       editing: true,
-      text: JSON.stringify(this.props.data),
+      text: valueToText(this.props.data),
     });
+  }
+
+  selectAll() {
+    var node = React.findDOMNode(this.input);
+    node.selectionStart = 0
+    node.selectionEnd = node.value.length
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.state.editing && !prevState.editing) {
+      this.selectAll();
+    }
   }
 
   render() {
@@ -71,6 +98,7 @@ class Simple extends React.Component {
       return (
         <input
           autoFocus={true}
+          ref={i => this.input = i}
           style={styles.input}
           onChange={e => this.onChange(e)}
           onBlur={() => this.onSubmit()}
@@ -81,14 +109,25 @@ class Simple extends React.Component {
     }
 
     var style = styles.simple
+    var typeStyle;
+    if (!this.props.data) {
+      typeStyle = styles.previewNull;
+    }
+    if ('string' === typeof this.props.data) {
+      typeStyle = styles.previewString;
+    }
+    if ('number' === typeof this.props.data) {
+      typeStyle = styles.previewNumber;
+    }
+    style = assign({}, style, typeStyle);
     if (!this.props.readOnly) {
-      style = assign({}, style, styles.editable);
+      assign(style, styles.editable);
     }
     return (
       <div
         onClick={this.startEditing.bind(this)}
         style={style}>
-        {JSON.stringify(this.props.data)}
+        {valueToText(this.props.data)}
       </div>
     );
   }
@@ -104,6 +143,18 @@ var styles = {
     flex: 1,
   },
 
+  previewNumber: {
+    color: 'blue',
+  },
+
+  previewString: {
+    color: 'red',
+  },
+
+  previewNull: {
+    color: '#999',
+  },
+
   editable: {
     cursor: 'pointer',
   },
@@ -112,6 +163,12 @@ var styles = {
     flex: 1,
     minWidth: 50,
     boxSizing: 'border-box',
+    border: 'none',
+    padding: 0,
+    outline: 'none',
+    boxShadow: '0 0 3px #ccc',
+    fontFamily: 'monospace',
+    fontSize: 'inherit',
   },
 };
 

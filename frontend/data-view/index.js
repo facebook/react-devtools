@@ -93,7 +93,7 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div style={styles.name}>
-            {this.props.name}
+            {this.props.name}:
           </div>
           <div style={styles.preview}>
             {preview}
@@ -132,7 +132,7 @@ var styles = {
   },
 
   opener: {
-    fontSize: 10,
+    fontSize: 8,
     cursor: 'pointer',
     position: 'absolute',
     right: '100%',
@@ -146,12 +146,12 @@ var styles = {
 
   name: {
     color: '#666',
-    margin: '2px 5px',
+    margin: '2px 3px',
   },
 
   preview: {
     display: 'flex',
-    margin: '2px 5px',
+    margin: '2px 3px',
     flex: 1,
   },
 
