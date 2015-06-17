@@ -3,41 +3,9 @@ var React = require('react');
 var assign = require('object-assign');
 
 var decorate = require('./decorate');
-
-function previewProp(name) {
-}
+var Props = require('./props');
 
 class Node {
-  renderProps() {
-    var node = this.props.node;
-    var props = node.get('props');
-    if (!props || 'object' !== typeof props) {
-      return null;
-    }
-
-    var names = Object.keys(props).filter(name => {
-      if (name[0] === '_') return false;
-      if (name === 'children') return false;
-      return true;
-    });
-
-    var items = [];
-    names.slice(0, 3).forEach(name => {
-      items.push((
-        <span key={name} style={styles.prop}>
-          <span style={styles.propName}>{name}</span>
-          =
-          {previewProp(props[name])}
-        </span>
-      ));
-    });
-
-    if (names.length > 3) {
-      items.push('...');
-    }
-    return items;
-  }
-
   render() {
     var node = this.props.node;
     var children = node.get('children');
@@ -53,7 +21,7 @@ class Node {
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      this.props.selected && styles.headSelect,
+      this.props.selected && (!this.props.selBottom || node.get('collapsed')) && styles.headSelect,
       leftPad
     );
 
@@ -72,7 +40,7 @@ class Node {
           <span style={styles.openTag}>
             <span style={styles.angle}>&lt;</span>
             <span style={styles.tagName}>{name}</span>
-            {this.renderProps()}
+            {node.get('props') && <Props props={node.get('props')}/>}
             {!content && '/'}
             <span style={styles.angle}>&gt;</span>
           </span>
@@ -118,7 +86,7 @@ class Node {
         <span style={styles.openTag}>
           <span style={styles.angle}>&lt;</span>
           <span style={styles.tagName}>{node.get('name')}</span>
-          {this.renderProps()}
+          {node.get('props') && <Props props={node.get('props')}/>}
           <span style={styles.angle}>&gt;</span>
         </span>
         {collapsed && '...'}
@@ -138,6 +106,7 @@ class Node {
       {},
       styles.tail,
       this.props.hovered && styles.headHover,
+      this.props.selected && this.props.selBottom && styles.headSelect,
       leftPad
     );
 
@@ -147,23 +116,12 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div style={tailStyles} {...tagEvents}>
+        <div style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
           {closeTag}
         </div>
       </div>
     );
   }
-}
-
-function shouldElide(node, store) {
-  if ('string' !== typeof node.type) {
-    return false;
-  }
-  if (!node.children || node.children.length !== 1) {
-    return false;
-  }
-  var child = store.get(node.children[0]);
-  return child && 'string' === typeof child.type;
 }
 
 var WrappedNode = decorate({
@@ -174,8 +132,8 @@ var WrappedNode = decorate({
     var node = store.get(props.id)
     return {
       node,
-      elide: shouldElide(node, store),
       selected: store.selected === props.id,
+      selBottom: store.selBottom,
       hovered: store.hovered === props.id,
       onToggleCollapse: e => {
         e.preventDefault();
@@ -184,7 +142,11 @@ var WrappedNode = decorate({
       onHover: isHovered => store.setHover(props.id, isHovered),
       onSelect: e => {
         e.preventDefault();
-        store.select(props.id);
+        store.selectTop(props.id);
+      },
+      onSelectBottom: e => {
+        e.preventDefault();
+        store.selectBottom(props.id);
       },
     };
   },
@@ -218,14 +180,6 @@ var styles = {
 
   openTag: {
     // 
-  },
-
-  prop: {
-    paddingLeft: 5,
-  },
-
-  propName: {
-    color: 'rgb(165, 103, 42)',
   },
 
   headSelect: {

@@ -6,6 +6,8 @@ class Wrap extends React.Component {
   render() {
     return <div>
       <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
+      <span val={null}/>
+      <span val={undefined}/>
       <div>&lt;</div>
       <Target count={3}/>
     </div>
@@ -45,5 +47,5 @@ class Target extends React.Component {
 
 var node = document.createElement('div');
 document.body.appendChild(node)
-React.render(<Wrap awesome={1}/>, node);
+React.render(<Wrap more={['a',2,'c',4]} str="thing" awesome={1}/>, node);
 

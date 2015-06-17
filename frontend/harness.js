@@ -12,6 +12,7 @@ class Harness extends React.Component {
     var wall = makeWall();
     this.backend = new Backend(new Bridge(wall.left))
     this.store = new Store(new Bridge(wall.right));
+    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
     window.backend = this.backend
   }
 
