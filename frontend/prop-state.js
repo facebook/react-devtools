@@ -26,14 +26,16 @@ class PropState extends React.Component {
       );
     }
 
+    var state = this.props.node.get('state');
+
     return (
       <div style={styles.container}>
         <strong>Props</strong>
         <DataView readOnly={true} key={Math.random()} data={this.props.node.get('props')} />
-        {this.props.node.get('nodeType') === 'Custom' &&
+        {state &&
           <div>
             <strong>State</strong>
-            <DataView key={Math.random()} data={this.props.node.get('state')} />
+            <DataView key={Math.random()} data={state} />
           </div>}
       </div>
     );
@@ -69,6 +71,7 @@ var WrappedPropState = decorate({
 var styles = {
   container: {
     border: '2px solid green',
+    width: 300,
   },
 };
 

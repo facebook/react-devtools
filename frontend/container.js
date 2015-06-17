@@ -22,6 +22,7 @@ var styles = {
   container: {
     display: 'flex',
     fontFamily: 'sans-serif',
+    flex: 1,
   },
 
   leftPane: {

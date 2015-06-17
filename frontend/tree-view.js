@@ -20,6 +20,8 @@ var styles = {
   container: {
     border: '2px solid green',
     fontFamily: 'monospace',
+    fontSize: '12px',
+    flex: 1,
   },
 };
 

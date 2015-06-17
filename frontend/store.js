@@ -35,7 +35,11 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('mount', (data) => {
-      this.data = this.data.set(data.id, Map(data));
+      var map = Map(data)
+      if (data.nodeType === 'Custom') {
+        map = map.set('collapsed', true);
+      }
+      this.data = this.data.set(data.id, map);
       if (data.children && data.children.forEach) {
         data.children.forEach(cid => {
           this.parents.set(cid, data.id);
@@ -45,7 +49,7 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('update', (data) => {
-      this.data = this.data.set(data.id, Map(data));
+      this.data = this.data.mergeIn([data.id], Map(data));
       if (data.children && data.children.forEach) {
         data.children.forEach(cid => {
           this.parents.set(cid, data.id);
@@ -56,6 +60,7 @@ class Store extends EventEmitter {
 
     this.bridge.on('unmount', id => {
       this.parents.delete(id);
+      this.data = this.data.delete(id)
       // this.data = this.data.set(data.id, Map(data));
       // this.emit(data.id);
     });
@@ -137,7 +142,11 @@ class Store extends EventEmitter {
         return 'uncollapse';
       }
       if (hasChildren) {
-        return 'firstChild';
+        if (bottom) {
+          return 'lastChild';
+        } else {
+          return 'firstChild';
+        }
       }
       return null;
     }

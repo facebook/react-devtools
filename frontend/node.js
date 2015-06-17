@@ -21,7 +21,7 @@ class Node {
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      this.props.selected && (!this.props.selBottom || node.get('collapsed')) && styles.headSelect,
+      this.props.selected && !this.props.selBottom && styles.headSelect,
       leftPad
     );
 
