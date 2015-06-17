@@ -93,6 +93,7 @@ class Backend extends EventEmitter {
     this.roots.delete(id);
     // this.emit('update', component);
     this.bridge.send('unmount', id);
+    this.bridge.forget(id);
     // this.bridge.forgetComplex(id);
     this.ids.delete(component);
   }

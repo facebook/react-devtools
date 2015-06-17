@@ -254,6 +254,10 @@ class Store extends EventEmitter {
     this.bridge.send('setState', {id, path, value});
   }
 
+  inspcet(id, path, cb) {
+    this.bridge.inspect(id, path, cb)
+  }
+
   setHover(id, isHovered) {
     if (isHovered) {
       var old = this.hovered;

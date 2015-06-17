@@ -23,7 +23,7 @@ class Harness extends React.Component {
   componentDidMount() {
     var iframe = React.findDOMNode(this.iframe)
 
-    var wall = makeIframeWall(window, iframe);
+    var wall = makeIframeWall(window, iframe.contentWindow);
     this.storeBridge.attach(wall.parent);
 
     var backBridge = new Bridge();

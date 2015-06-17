@@ -2,9 +2,19 @@
 var React = require('react');
 require('../backend/compat');
 
+class Something {
+  doot() {
+    return 10;
+  }
+} 
+
+var someVal = new Something();
+someVal.awesome = 2;
+
 class Wrap extends React.Component {
   render() {
     return <div>
+      <span thing={someVal}/>
       <Target count={1}/>
       <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
       <span val={null}/>

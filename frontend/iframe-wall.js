@@ -17,7 +17,7 @@ module.exports = function (parent, child) {
         child.addEventListener('message', evt => fn(evt.data));
       },
       send(data) {
-        child.contentWindow.parent.postMessage(data, '*');
+        child.parent.postMessage(data, '*');
       },
     },
   }

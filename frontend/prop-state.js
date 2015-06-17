@@ -31,11 +31,22 @@ class PropState extends React.Component {
     return (
       <div style={styles.container}>
         <strong>Props</strong>
-        <DataView readOnly={true} key={this.props.id + '-props'} data={this.props.node.get('props')} />
+        <DataView
+          readOnly={true}
+          path={['props']}
+          inspect={this.props.inspect}
+          key={this.props.id + '-props'}
+          data={this.props.node.get('props')}
+        />
         {state &&
           <div>
             <strong>State</strong>
-            <DataView key={this.props.id + '-state'} data={state} />
+            <DataView
+              data={state}
+              path={['state']}
+              inspect={this.props.inspect}
+              key={this.props.id + '-state'}
+            />
           </div>}
       </div>
     );
@@ -65,6 +76,7 @@ var WrappedPropState = decorate({
       setState(path, val) {
         store.setState(store.selected, path, val);
       },
+      inspect: store.inspcet.bind(store, store.selected),
     };
   }
 }, PropState);

@@ -2,6 +2,7 @@
 var React = require('react');
 var Simple = require('./simple');
 var consts = require('../../backend/consts');
+var assign = require('object-assign');
 
 class DataView extends React.Component {
   render() {
@@ -9,7 +10,7 @@ class DataView extends React.Component {
       return <div style={styles.missing}>null</div>;
     }
     var names = Object.keys(this.props.data);
-    var path = this.props.path || [];
+    var path = this.props.path;
     if (!names.length) {
       return <span style={styles.empty}>Empty object</span>;
     }
@@ -19,8 +20,9 @@ class DataView extends React.Component {
         {names.map((name, i) => (
           <DataItem
             name={name}
-            path={path}
+            path={path.concat([name])}
             key={name}
+            inspect={this.props.inspect}
             readOnly={this.props.readOnly}
             value={this.props.data[name]}
           />
@@ -33,10 +35,23 @@ class DataView extends React.Component {
 class DataItem extends React.Component {
   constructor(props) {
     super(props)
-    this.state = {open: false};
+    this.state = {open: false, loading: false};
   }
 
   toggleOpen() {
+    if (this.state.loading) {
+      return;
+    }
+    if (this.props.value && this.props.value[consts.inspected] === false) {
+      this.props.inspect(this.props.path, value => {
+        assign(this.props.value, value);
+        this.props.value[consts.inspected] = true;
+        this.setState({loading: false});
+      });
+      this.setState({loading: true, open: true});
+      return;
+    }
+
     this.setState({
       open: !this.state.open,
     });
@@ -89,6 +104,8 @@ class DataItem extends React.Component {
         <div style={styles.children}>
           <DataView
             data={this.props.value}
+            path={this.props.path}
+            inspect={this.props.inspect}
             readOnly={this.props.readOnly}
           />
         </div>

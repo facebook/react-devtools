@@ -2,41 +2,11 @@
 var weakCereal = require('./weak-cereal');
 var consts = require('./consts');
 
-function sanitize(data, path, cleaned) {
-  if ('function' === typeof data) {
-    cleaned.push(path);
-    return {
-      name: data.name,
-      type: 'function',
-      preview: data + '',
-    };
-  }
-  if (!data || 'object' !== typeof data) {
-    return data;
-  }
-  if (Array.isArray(data)) {
-    return data.map((item, i) => sanitize(item, path.concat([i]), cleaned));
-  }
-  // TODO when this is in the iframe window, we can just use Object
-  if (data.constructor && data.constructor.name !== 'Object') {
-    cleaned.push(path);
-    return {
-      name: data.constructor.name,
-      type: 'object',
-    };
-  }
-  var res = {};
-  for (var name in data) {
-    res[name] = sanitize(data[name], path.concat([name]), cleaned);
-  }
-  return res;
-}
-
 class Bridge {
   constructor() {
-    this.data = new Map();
     this.cbs = new Map();
     this.listeners = {};
+    this.inspectables = new Map();
     this.cid = 0;
   }
 
@@ -47,40 +17,34 @@ class Bridge {
 
   inspect(id, path, cb) {
     var cid = this.cid++;
-    this.cbs.set(cid, cb);
+    this.cbs.set(cid, (data, cleaned) => {
+      if (cleaned.length) {
+        hydrate(data, cleaned);
+      }
+      cb(data);
+    });
+
     this.wall.send({
       type: 'inspect',
       callback: cid,
       path,
-    });
-  }
-
-  send(evt, data) {
-    try {
-      this.wall.send({type: 'event', evt, data});
-    } catch (e) {
-      var cleaned = [];
-      var san = sanitize(data, [], cleaned)
-      console.log('san', san, cleaned)
-      this.wall.send({type: 'event', evt, data: san, cleaned});
-    }
-  }
-
-  /*
-  sendComplex(evt, id, data, complex) {
-    this.data.set(id, data);
-    this.wall.send({
-      data: weakCereal(data, 2)
-      type: 'complex',
-      evt,
       id,
     });
   }
 
-  forgetComplex(id) {
-    this.data.delete(id);
+  send(evt, data) {
+    var cleaned = [];
+    var san = sanitize(data, [], cleaned)
+    // console.log('san', san, cleaned)
+    if (cleaned.length) {
+      this.inspectables.set(data.id, data);
+    }
+    this.wall.send({type: 'event', evt, data: san, cleaned});
   }
-  */
+
+  forget(id) {
+    this.inspectables.delete(id);
+  }
 
   on(evt, fn) {
     if (!this.listeners[evt]) {
@@ -115,7 +79,7 @@ class Bridge {
 
     if (type === 'event') {
       if (payload.cleaned) {
-        hydrate(payload.data, payload.cleaned, consts.PENDING);
+        hydrate(payload.data, payload.cleaned);
       }
       var fns = this.listeners[payload.evt]
       if (fns) {
@@ -124,19 +88,35 @@ class Bridge {
     }
   }
 
-  /*
   _inspectResponse(id, path, callback) {
+    var val = getIn(this.inspectables.get(id), path);
+    var result = {};
+    var cleaned = [];
+    if (val && val.constructor && 'function' === typeof val.constructor) {
+      result.constructor = {}
+      Object.getOwnPropertyNames(val.constructor).forEach(name => {
+        if (['caller', 'callee', 'arguments'].indexOf(name) != -1) {
+          return;
+        }
+        result.constructor[name] = sanitize(val.constructor[name], ['constructor', name], cleaned);
+      });
+    }
+    if (val && 'object' === typeof val) {
+      Object.getOwnPropertyNames(val).forEach(name => {
+        if (name === 'constructor') return;
+        result[name] = sanitize(val[name], [name], cleaned);
+      });
+    }
     this.wall.send({
       type: 'callback',
-      id: payload.callback,
-      args: [weakCereal(getIn(this.data.get(id), path))],
+      id: callback,
+      args: [result, cleaned],
     });
   }
-  */
 
 }
 
-function hydrate(data, cleaned, pending) {
+function hydrate(data, cleaned) {
   cleaned.forEach(path => {
     var last = path.pop();
     var obj = path.reduce((obj, attr) => obj ? obj[attr] : null, data);
@@ -144,8 +124,45 @@ function hydrate(data, cleaned, pending) {
     replace[consts.name] = obj[last].name;
     replace[consts.type] = obj[last].type;
     replace[consts.preview] = obj[last].preview;
+    replace[consts.inspected] = false;
     obj[last] = replace;
   });
+}
+
+function sanitize(data, path, cleaned) {
+  if ('function' === typeof data) {
+    cleaned.push(path);
+    return {
+      name: data.name,
+      type: 'function',
+      preview: data + '',
+    };
+  }
+  if (!data || 'object' !== typeof data) {
+    return data;
+  }
+  if (Array.isArray(data)) {
+    return data.map((item, i) => sanitize(item, path.concat([i]), cleaned));
+  }
+  // TODO when this is in the iframe window, we can just use Object
+  if (data.constructor && 'function' === typeof data.constructor && data.constructor.name !== 'Object') {
+    cleaned.push(path);
+    return {
+      name: data.constructor.name,
+      type: 'object',
+    };
+  }
+  var res = {};
+  for (var name in data) {
+    res[name] = sanitize(data[name], path.concat([name]), cleaned);
+  }
+  return res;
+}
+
+function getIn(obj, path) {
+  return path.reduce((obj, attr) => {
+    return obj ? obj[attr] : null;
+  }, obj);
 }
 
 /*
@@ -165,11 +182,6 @@ function hydrate(data, level) {
   return result;
 }
 
-function getIn(obj, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, obj);
-}
 */
 
 module.exports = Bridge;
