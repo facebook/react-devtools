@@ -106,7 +106,7 @@ class Store extends EventEmitter {
     var node = this.get(id);
     var collapsed = node.get('collapsed');
     var children = node.get('children');
-    var hasChildren = children && children.length;
+    var hasChildren = children && 'string' !== typeof children && children.length;
     var pid = this.parents.get(id);
     if (dir === 'down') {
       if (bottom || collapsed || !hasChildren) {
