@@ -3,6 +3,7 @@ var React = require('react');
 var Simple = require('./simple');
 var consts = require('../../backend/consts');
 var assign = require('object-assign');
+var valueStyles = require('../value-styles');
 
 class DataView extends React.Component {
   render() {
@@ -78,23 +79,13 @@ class DataItem extends React.Component {
       preview = (
         <Simple
           readOnly={this.props.readOnly}
-          path={this.props.path.concat([this.props.name])}
+          path={this.props.path}
           data={data}
         />
       );
       complex = false;
     } else {
-      if (Array.isArray(data)) {
-        preview = 'Array[' + data.length + ']';
-      } else if (data[consts.type]) {
-        if (data[consts.preview]) {
-          preview = data[consts.preview]
-        } else {
-          preview = data[consts.name]
-        }
-      } else {
-        preview = '{...}';
-      }
+      preview = previewComplex(data);
     }
 
     var opener = null;
@@ -140,6 +131,35 @@ class DataItem extends React.Component {
   }
 }
 
+function previewComplex(data) {
+  if (Array.isArray(data)) {
+    return (
+      <span style={valueStyles.array}>
+        Array[{data.length}]
+      </span>
+    );
+  }
+
+  if (!data[consts.type]) {
+    return '{...}';
+  }
+
+  var type = data[consts.type];
+  if (type === 'function') {
+    return (
+      <span style={valueStyles.func}>
+        {data[consts.name] || 'fn'}()
+      </span>
+    );
+  } else if (type === 'object') {
+    return (
+      <span style={valueStyles.object}>
+        {data[consts.name] + '{}'}
+      </span>
+    );
+  }
+}
+
 var styles = {
   container: {
     listStyle: 'none',
@@ -150,6 +170,7 @@ var styles = {
 
   children: {
   },
+
 
   empty: {
     fontSize: 12,
@@ -187,6 +208,7 @@ var styles = {
   preview: {
     display: 'flex',
     margin: '2px 3px',
+    whiteSpace: 'pre',
     flex: 1,
   },
 

@@ -112,9 +112,14 @@ class Bridge {
         }
         result[name] = sanitize(val[name], [name], cleaned);
       });
+
       if (!protod && val.__proto__) {
         proto = {};
+        var pIsFn = typeof val.__proto__ === 'function'
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
+          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
+            return;
+          }
           proto[name] = sanitize(val.__proto__[name], [name], protoclean);
         });
       }
@@ -148,7 +153,7 @@ function sanitize(data, path, cleaned) {
     return {
       name: data.name,
       type: 'function',
-      preview: data + '',
+      preview: (data.name || 'fn') + '()'
     };
   }
   if (!data || 'object' !== typeof data) {

@@ -1,6 +1,7 @@
 
 var React = require('react');
 var consts = require('../backend/consts');
+var valueStyles = require('./value-styles');
 
 class Props extends React.Component {
   render() {
@@ -35,14 +36,17 @@ class Props extends React.Component {
 
 function previewProp(val, nested) {
   if ('number' === typeof val) {
-    return <span style={styles.previewNumber}>{val}</span>
+    return <span style={valueStyles.number}>{val}</span>
   }
   if ('string' === typeof val) {
-    return <span style={styles.previewString}>"{val}"</span>
+    return <span style={valueStyles.string}>"{val}"</span>
+  }
+  if ('boolean' === typeof val) {
+    return <span style={valueStyles.bool}>{'' + val}</span>
   }
   if (Array.isArray(val)) {
     if (nested) {
-      return <span style={styles.previewArray}>[({val.length})]</span>;
+      return <span style={valueStyles.array}>[({val.length})]</span>;
     }
     var items = [];
     val.slice(0, 3).forEach(item => {
@@ -55,13 +59,13 @@ function previewProp(val, nested) {
       items.pop();
     }
     return (
-      <span style={styles.previewArray}>
+      <span style={valueStyles.array}>
         [{items}]
       </span>
     );
   }
   if (!val) {
-    return <span style={styles.previewNull}>{'' + val}</span>;
+    return <span style={valueStyles.empty}>{'' + val}</span>;
   }
   if ('object' !== typeof val) {
     return '...';
@@ -69,7 +73,11 @@ function previewProp(val, nested) {
   if (val[consts.type]) {
     var type = val[consts.type];
     if (type === 'function') {
-      return (val[consts.name] || 'fn') + '()';
+      return (
+        <span style={valueStyles.func}>
+          {val[consts.name] || 'fn'}()
+        </span>
+      );
     }
     if (type === 'object') {
       return val[consts.name] + '{}';
@@ -81,7 +89,7 @@ function previewProp(val, nested) {
   var names = Object.keys(val);
   var items = [];
   names.slice(0, 3).forEach(name => {
-    items.push(<span style={styles.previewAttr}>{name}</span>);
+    items.push(<span style={valueStyles.attr}>{name}</span>);
     items.push(': ');
     items.push(previewProp(val[name], true));
     items.push(', ');
@@ -92,7 +100,7 @@ function previewProp(val, nested) {
     items.pop();
   }
   return (
-    <span style={styles.previewObject}>
+    <span style={valueStyles.object}>
       {'{'}{items}{'}'}
     </span>
   );

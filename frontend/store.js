@@ -251,7 +251,7 @@ class Store extends EventEmitter {
   }
 
   setState(id, path, value) {
-    this.bridge.send('setState', {id, path, value});
+    this.bridge.send('setState', {id, path: path.slice(1), value});
   }
 
   inspcet(id, path, cb) {

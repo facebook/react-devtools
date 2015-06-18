@@ -1,6 +1,7 @@
 
 var React = require('react');
 var assign = require('object-assign');
+var valueStyles = require('../value-styles');
 
 // using an empty function for ease of debugging;
 var BAD_INPUT = Symbol('bad input');
@@ -111,14 +112,16 @@ class Simple extends React.Component {
 
     var style = styles.simple
     var typeStyle;
-    if (!this.props.data) {
-      typeStyle = styles.previewNull;
+    if ('boolean' === typeof this.props.data) {
+      typeStyle = valueStyles.bool;
+    } else if (!this.props.data) {
+      typeStyle = valueStyles.empty;
     }
     if ('string' === typeof this.props.data) {
-      typeStyle = styles.previewString;
+      typeStyle = valueStyles.string;
     }
     if ('number' === typeof this.props.data) {
-      typeStyle = styles.previewNumber;
+      typeStyle = valueStyles.number;
     }
     style = assign({}, style, typeStyle);
     if (!this.props.readOnly) {
@@ -143,18 +146,6 @@ var styles = {
     display: 'flex',
     flex: 1,
     whiteSpace: 'pre-wrap',
-  },
-
-  previewNumber: {
-    color: 'blue',
-  },
-
-  previewString: {
-    color: 'red',
-  },
-
-  previewNull: {
-    color: '#999',
   },
 
   editable: {
