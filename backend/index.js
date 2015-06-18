@@ -25,17 +25,18 @@ class Backend extends EventEmitter {
     this.ids = new WeakMap();
     this.comps = new Map();
     this.bridge = bridge
-    this.bridge.on('setState', ({id, path, value}) => {
-      var data = this.nodes.get(id);
-      setIn(data.state, path, value);
-      var comp = this.comps.get(id);
-      if (comp._instance) {
-        comp._instance.forceUpdate();
-      } else {
-        debugger
-      }
+    this.bridge.on('setState', this._setState.bind(this));
+  }
+
+  _setState({id, path, value}) {
+    var data = this.nodes.get(id);
+    setIn(data.state, path, value);
+    if (data.updater && data.updater.forceUpdate) {
+      data.updater.forceUpdate();
       this.onUpdated(this.comps.get(id), data);
-    });
+    } else {
+      console.warn("trying to set state on a component that doesn't support it");
+    }
   }
 
   setEnabled(val) {

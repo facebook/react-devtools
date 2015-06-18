@@ -50,8 +50,10 @@ function getData(element, context) {
   if (element._instance) {
     var inst = element._instance
     updater = {
-      setState: inst.setState && inst.setState.bind(inst),
       //setProps: inst.setProps && inst.setProps.bind(inst),
+      setState: inst.setState && inst.setState.bind(inst),
+      forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
+      publicInstance: inst,
     }
   }
 
