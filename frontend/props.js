@@ -1,5 +1,5 @@
 
-var React = require('react');
+var React = require('react/addons');
 var consts = require('../backend/consts');
 var valueStyles = require('./value-styles');
 
@@ -34,6 +34,45 @@ class Props extends React.Component {
   }
 }
 
+function previewArray(val) {
+  var items = {};
+  val.slice(0, 3).forEach((item, i) => {
+    items['n' + i] = previewProp(item, true);
+    items['c' + i] = ',';
+  });
+  if (val.length > 3) {
+    items['last'] = '...';
+  } else {
+    delete items['c2'];
+  }
+  return (
+    <span style={valueStyles.array}>
+      [{React.addons.createFragment(items)}]
+    </span>
+  );
+}
+
+function previewObject(val) {
+  var names = Object.keys(val);
+  var items = {};
+  names.slice(0, 3).forEach((name, i) => {
+    items['k' + i] = <span style={valueStyles.attr}>{name}</span>;
+    items['c' + i] = ': ';
+    items['v' + i] = previewProp(val[name], true);
+    items['m' + i] = ', ';
+  });
+  if (names.lenght > 3) {
+    items['rest'] = '...';
+  } else {
+    delete items['m2'];
+  }
+  return (
+    <span style={valueStyles.object}>
+      {'{'}{React.addons.createFragment(items)}{'}'}
+    </span>
+  );
+}
+
 function previewProp(val, nested) {
   if ('number' === typeof val) {
     return <span style={valueStyles.number}>{val}</span>
@@ -48,21 +87,7 @@ function previewProp(val, nested) {
     if (nested) {
       return <span style={valueStyles.array}>[({val.length})]</span>;
     }
-    var items = [];
-    val.slice(0, 3).forEach(item => {
-      items.push(previewProp(item, true));
-      items.push(',');
-    });
-    if (val.length > 3) {
-      items.push('...');
-    } else {
-      items.pop();
-    }
-    return (
-      <span style={valueStyles.array}>
-        [{items}]
-      </span>
-    );
+    return previewArray(val);
   }
   if (!val) {
     return <span style={valueStyles.empty}>{'' + val}</span>;
@@ -86,24 +111,7 @@ function previewProp(val, nested) {
   if (nested) {
     return '{...}';
   }
-  var names = Object.keys(val);
-  var items = [];
-  names.slice(0, 3).forEach(name => {
-    items.push(<span style={valueStyles.attr}>{name}</span>);
-    items.push(': ');
-    items.push(previewProp(val[name], true));
-    items.push(', ');
-  });
-  if (names.lenght > 3) {
-    items.push('...');
-  } else {
-    items.pop();
-  }
-  return (
-    <span style={valueStyles.object}>
-      {'{'}{items}{'}'}
-    </span>
-  );
+  return previewObject(val);
 }
 
 var styles = {

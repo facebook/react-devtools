@@ -67,7 +67,10 @@ class Store extends EventEmitter {
 
   onKeyDown(e) {
     if (window.document.activeElement !== document.body) {
-      return
+      return;
+    }
+    if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
+      return;
     }
     var dir = keyCodes[e.keyCode];
     if (!dir) {
@@ -254,8 +257,12 @@ class Store extends EventEmitter {
     this.bridge.send('setState', {id, path: path.slice(1), value});
   }
 
-  inspcet(id, path, cb) {
+  inspect(id, path, cb) {
     this.bridge.inspect(id, path, cb)
+  }
+
+  makeGlobal(id, path) {
+    this.bridge.send('makeGlobal', {id, path});
   }
 
   setHover(id, isHovered) {

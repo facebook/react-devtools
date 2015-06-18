@@ -28,7 +28,7 @@ class Harness extends React.Component {
 
     var backBridge = new Bridge();
     backBridge.attach(wall.child);
-    this.backend = new Backend(backBridge);
+    this.backend = new Backend(backBridge, iframe.contentWindow);
 
     window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
     window.backend = this.backend
@@ -40,8 +40,6 @@ class Harness extends React.Component {
     var script = doc.createElement('script');
     script.src = this.props.targetSrc
     doc.head.appendChild(script);
-
-
   }
 
   render() {
@@ -51,6 +49,7 @@ class Harness extends React.Component {
         {React.addons.cloneWithProps(this.props.children)}
       </div>
       <div style={styles.rightSide}>
+        <h1 style={styles.iframeTitle}>Inspection target (in iframe)</h1>
         <iframe style={styles.iframe} ref={n => this.iframe = n} />
       </div>
     </div>
@@ -75,12 +74,19 @@ var styles = {
 
   rightSide: {
     flex: 1,
+    flexDirection: 'column',
     display: 'flex',
   },
 
   iframe: {
-    border: 'none',
+    border: '5px solid magenta',
     flex: 1,
+  },
+
+  iframeTitle: {
+    margin: 0,
+    textAlign: 'center',
+    fontFamily: 'sans-serif',
   },
 }
 

@@ -17,15 +17,23 @@ function setIn(obj, path, value) {
   return true;
 }
 
+function getIn(obj, path) {
+  return path.reduce((obj, attr) => {
+    return obj ? obj[attr] : null;
+  }, obj);
+}
+
 class Backend extends EventEmitter {
-  constructor(bridge) {
-    super()
+  constructor(bridge, global) {
+    super();
+    this.global = global;
     this.nodes = new Map();
     this.roots = new Set();
     this.ids = new WeakMap();
     this.comps = new Map();
     this.bridge = bridge
     this.bridge.on('setState', this._setState.bind(this));
+    this.bridge.on('makeGlobal', this._makeGlobal.bind(this));
   }
 
   _setState({id, path, value}) {
@@ -37,6 +45,18 @@ class Backend extends EventEmitter {
     } else {
       console.warn("trying to set state on a component that doesn't support it");
     }
+  }
+
+  _makeGlobal({id, path}) {
+    var data = this.nodes.get(id);
+    var value;
+    if (path === 'instance') {
+      value = data.updater.publicInstance;
+    } else {
+      value = getIn(data, path);
+    }
+    this.global.$inspect = value;
+    console.log('$inspect =', value);
   }
 
   setEnabled(val) {

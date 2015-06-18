@@ -30,11 +30,21 @@ class PropState extends React.Component {
 
     return (
       <div style={styles.container}>
+        <div style={styles.header}>
+          <div style={styles.headerName}>
+            &lt;{this.props.node.get('name')}&gt;
+          </div>
+          {nodeType === 'Custom' &&
+            <button style={styles.globalButton} onClick={() => this.props.makeGlobal('instance')}>
+              Store as Global Variable
+            </button>}
+        </div>
         <strong>Props</strong>
         <DataView
           readOnly={true}
           path={['props']}
           inspect={this.props.inspect}
+          makeGlobal={this.props.makeGlobal}
           key={this.props.id + '-props'}
           data={this.props.node.get('props')}
         />
@@ -45,6 +55,7 @@ class PropState extends React.Component {
               data={state}
               path={['state']}
               inspect={this.props.inspect}
+              makeGlobal={this.props.makeGlobal}
               key={this.props.id + '-state'}
             />
           </div>}
@@ -76,7 +87,10 @@ var WrappedPropState = decorate({
       setState(path, val) {
         store.setState(store.selected, path, val);
       },
-      inspect: store.inspcet.bind(store, store.selected),
+      makeGlobal(path) {
+        store.makeGlobal(store.selected, path);
+      },
+      inspect: store.inspect.bind(store, store.selected),
     };
   }
 }, PropState);
@@ -87,6 +101,17 @@ var styles = {
     fontSize: '12px',
     fontFamily: 'monospace',
     width: 300,
+  },
+  header: {
+    display: 'flex',
+  },
+  headerName: {
+    flex: 1,
+    fontSize: 16,
+    color: 'rgb(184, 0, 161)',
+  },
+  globalButton: {
+    cursor: 'pointer',
   },
 };
 

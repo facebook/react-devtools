@@ -25,6 +25,7 @@ class DataView extends React.Component {
             path={path.concat(['__proto__'])}
             key={'__proto__'}
             inspect={this.props.inspect}
+            makeGlobal={this.props.makeGlobal}
             readOnly={this.props.readOnly}
             value={this.props.data[consts.proto]}
           />}
@@ -35,6 +36,7 @@ class DataView extends React.Component {
             path={path.concat([name])}
             key={name}
             inspect={this.props.inspect}
+            makeGlobal={this.props.makeGlobal}
             readOnly={this.props.readOnly}
             value={this.props.data[name]}
           />
@@ -108,6 +110,7 @@ class DataItem extends React.Component {
             data={this.props.value}
             path={this.props.path}
             inspect={this.props.inspect}
+            makeGlobal={this.props.makeGlobal}
             readOnly={this.props.readOnly}
           />
         </div>
@@ -118,7 +121,7 @@ class DataItem extends React.Component {
       <li style={styles.item}>
         <div style={styles.head}>
           {opener}
-          <div style={styles.name}>
+          <div onClick={() => this.props.makeGlobal(this.props.path)} style={styles.name}>
             {this.props.name}:
           </div>
           <div style={styles.preview}>
@@ -203,6 +206,7 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 3px',
+    cursor: 'pointer',
   },
 
   preview: {
