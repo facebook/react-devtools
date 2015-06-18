@@ -1,7 +1,4 @@
 
-var ReactDOMTextComponent = require('react/lib/ReactDOMTextComponent');
-var ReactDOMComponent = require('react/lib/ReactDOMComponent');
-
 function childrenList(children) {
   var res = [];
   for (var name in children) {

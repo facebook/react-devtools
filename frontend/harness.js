@@ -45,12 +45,11 @@ class Harness extends React.Component {
   render() {
     var backend = this.backend
     return <div style={styles.harness}>
+      <div style={styles.rightSide}>
+        <iframe style={styles.iframe} ref={n => this.iframe = n} />
+      </div>
       <div style={styles.leftSide}>
         {React.addons.cloneWithProps(this.props.children)}
-      </div>
-      <div style={styles.rightSide}>
-        <h1 style={styles.iframeTitle}>Inspection target (in iframe)</h1>
-        <iframe style={styles.iframe} ref={n => this.iframe = n} />
       </div>
     </div>
   }
@@ -63,8 +62,7 @@ Harness.childContextTypes = {
 var styles = {
   harness: {
     display: 'flex',
-    flexDirection: 'row',
-    height: '700px',
+    flexDirection: 'column',
   },
 
   leftSide: {
@@ -80,6 +78,7 @@ var styles = {
 
   iframe: {
     border: '5px solid magenta',
+    height: '400px',
     flex: 1,
   },
 

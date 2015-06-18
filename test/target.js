@@ -1,6 +1,239 @@
 
 var React = require('react');
+var assign = require('object-assign');
 require('../backend/compat');
+
+
+
+class Todos extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      todos: [
+        {title: 'Inspect all the things', completed: true},
+        {title: 'Profit!!', completed: false},
+      ],
+      filter: 'All',
+    };
+  }
+
+  onAdd(text) {
+    if (!text.trim().length) {
+      return;
+    }
+    this.setState({
+      todos: this.state.todos.concat([{
+        title: text,
+        completed: false,
+      }]),
+    });
+  }
+
+  toggleComplete(i, complete) {
+    this.state.todos[i].completed = complete;
+    this.setState({todos: this.state.todos});
+  }
+
+  changeFilter(val) {
+    this.setState({
+      filter: val
+    });
+  }
+
+  render() {
+    return (
+      <div style={styles.container}>
+        <h1 style={styles.title}>Things to do</h1>
+        <NewTodo onAdd={this.onAdd.bind(this)} />
+        <TodoItems
+          todos={this.state.todos}
+          filter={this.state.filter}
+          onToggleComplete={this.toggleComplete.bind(this)}
+        />
+        <Filter onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
+      </div>
+    );
+  }
+}
+
+class NewTodo extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {text: ''};
+  }
+
+  checkEnter(e) {
+    if (e.key === 'Enter') {
+      this.submit();
+    }
+  }
+
+  submit() {
+    this.props.onAdd(this.state.text);
+    this.setState({text: ''});
+  }
+
+  render() {
+    return (
+      <div style={styles.newContainer}>
+        <input
+          style={styles.newInput}
+          value={this.state.text}
+          placeholder="Add new item"
+          onKeyDown={e => this.checkEnter(e)}
+          onChange={e => this.setState({text: e.target.value})}
+        />
+        <button onClick={this.submit.bind(this)} style={styles.addButton}>
+          +
+        </button>
+      </div>
+    );
+  }
+}
+
+class TodoItems {
+  render() {
+    var filterFn = {
+      All: () => true,
+      Completed: item => item.completed,
+      Remaining: item => !item.completed,
+    }[this.props.filter];
+    return (
+      <ul style={styles.todos}>
+        {this.props.todos.filter(filterFn).map((item, i) => (
+          <TodoItem
+            item={item}
+            onToggle={() => this.props.onToggleComplete(i, !item.completed)}
+          />
+        ))}
+      </ul>
+    );
+  }
+}
+
+class TodoItem {
+  render() {
+    return (
+      <li onClick={this.props.onToggle}>
+        <HoverHighlight style={styles.todo}>
+          <input
+            type="checkbox"
+            style={styles.checkbox}
+            checked={this.props.item.completed}
+          />
+          {this.props.item.title}
+        </HoverHighlight>
+      </li>
+    );
+  }
+}
+
+class HoverHighlight extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {hover: false};
+  }
+
+  render() {
+    return (
+      <div
+        onMouseOver={() => this.setState({hover: true})}
+        onMouseOut={() => this.setState({hover: false})}
+        style={assign({}, this.props.style, {
+          backgroundColor: this.state.hover ? '#eee' : 'transparent',
+        })}>
+        {this.props.children}
+      </div>
+    );
+  }
+}
+
+class Filter {
+  render() {
+    var options = ['All', 'Completed', 'Remaining'];
+    return (
+      <div style={styles.filter}>
+        {options.map(text => (
+          <button
+            style={assign({}, styles.filterButton, text === this.props.filter && styles.filterButtonActive)}
+            onClick={this.props.onFilter.bind(null, text)}
+          >{text}</button>
+        ))}
+      </div>
+    );
+  }
+}
+
+var styles = {
+  container: {
+    fontSize: 20,
+    fontFamily: 'sans-serif',
+    padding: 30,
+    boxShadow: '0 2px 5px #ccc',
+    width: 300,
+    textAlign: 'center',
+    margin: '50px auto',
+  },
+
+  filterButton: {
+    padding: '5px 10px',
+    border: '1px solid #eee',
+    outline: 'none',
+    margin: '0 5px',
+    backgroundColor: 'transparent',
+  },
+
+  filterButtonActive: {
+    backgroundColor: 'eef',
+  },
+
+  title: {
+    margin: 0,
+    fontSize: 25,
+    marginBottom: 10,
+  },
+  newInput: {
+    padding: '5px 10px',
+    fontSize: 16,
+  },
+  addButton: {
+    padding: '0px 8px 5px 7px',
+    backgroundColor: 'transparent',
+    border: 'none',
+    borderRadius: 10,
+    fontSize: 25,
+    fontWeight: 'bold',
+    marginLeft: 6,
+    lineHeight: '24px',
+    boxShadow: '0 0 4px #aaa',
+    cursor: 'pointer',
+  },
+
+  checkbox: {
+    marginRight: 20,
+    position: 'relative',
+    cursor: 'pointer',
+    top: -2,
+  },
+  todos: {
+    listStyle: 'none',
+    textAlign: 'left',
+    margin: 0,
+    padding: 10,
+  },
+  todo: {
+    padding: '10px 20px',
+    cursor: 'pointer',
+  },
+}
+
+
+
+
+
+
+
+
 
 class Something {
   doot() {
@@ -14,12 +247,13 @@ someVal.awesome = 2;
 class Wrap extends React.Component {
   render() {
     return <div>
-      <span thing={someVal}/>
+      <Todos/>
+      {/*<span thing={someVal}/>
       <Target count={1}/>
       <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
       <span val={null}/>
       <span val={undefined}/>
-      <div>&lt;</div>
+      <div>&lt;</div>*/}
     </div>
   }
 }

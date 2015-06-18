@@ -64,7 +64,7 @@ function previewObject(val) {
   if (names.lenght > 3) {
     items['rest'] = '...';
   } else {
-    delete items['m2'];
+    delete items['m' + (names.length - 1)];
   }
   return (
     <span style={valueStyles.object}>
