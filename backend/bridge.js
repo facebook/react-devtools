@@ -41,7 +41,6 @@ class Bridge {
   send(evt, data) {
     var cleaned = [];
     var san = sanitize(data, [], cleaned)
-    // console.log('san', san, cleaned)
     if (cleaned.length) {
       this.inspectables.set(data.id, data);
     }
@@ -72,16 +71,6 @@ class Bridge {
       this._inspectResponse(payload.id, payload.path, payload.callback);
       return;
     }
-
-    /*
-    if (type === 'complex') {
-      var fns = this.listeners[payload.evt];
-      var data = hydrate(payload.data, 2);
-      if (fns) {
-        fns.forEach(fn => fn(payload.id, data));
-      }
-    }
-    */
 
     if (type === 'event') {
       if (payload.cleaned) {
@@ -141,7 +130,6 @@ function hydrate(data, cleaned) {
     var replace = {};
     replace[consts.name] = obj[last].name;
     replace[consts.type] = obj[last].type;
-    replace[consts.preview] = obj[last].preview;
     replace[consts.inspected] = false;
     obj[last] = replace;
   });
@@ -153,7 +141,6 @@ function sanitize(data, path, cleaned) {
     return {
       name: data.name,
       type: 'function',
-      preview: (data.name || 'fn') + '()'
     };
   }
   if (!data || 'object' !== typeof data) {
@@ -182,24 +169,5 @@ function getIn(obj, path) {
     return obj ? obj[attr] : null;
   }, obj);
 }
-
-/*
-function hydrate(data, level) {
-  var result = {}
-  for (var name in data) {
-    if ('object' === typeof data[name]) {
-      if (level > 1) {
-        result[name] = hydrate(data[name], level - 1);
-      } else {
-        result[name] = Bridge.PENDING;
-      }
-    } else {
-      result[name] = data[name];
-    }
-  }
-  return result;
-}
-
-*/
 
 module.exports = Bridge;
