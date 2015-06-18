@@ -5,5 +5,6 @@ module.exports = {
   type: Symbol('type'),
   preview: Symbol('preview'),
   inspected: Symbol('inspected'),
+  proto: Symbol('proto'),
 }
 

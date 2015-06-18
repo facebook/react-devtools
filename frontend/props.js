@@ -71,6 +71,9 @@ function previewProp(val, nested) {
     if (type === 'function') {
       return (val[consts.name] || 'fn') + '()';
     }
+    if (type === 'object') {
+      return val[consts.name] + '{}';
+    }
   }
   if (nested) {
     return '{...}';

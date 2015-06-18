@@ -17,9 +17,15 @@ class Bridge {
 
   inspect(id, path, cb) {
     var cid = this.cid++;
-    this.cbs.set(cid, (data, cleaned) => {
+    this.cbs.set(cid, (data, cleaned, proto, protoclean) => {
       if (cleaned.length) {
         hydrate(data, cleaned);
+      }
+      if (proto && protoclean.length) {
+        hydrate(proto, protoclean);
+      }
+      if (proto) {
+        data[consts.proto] = proto
       }
       cb(data);
     });
@@ -92,25 +98,32 @@ class Bridge {
     var val = getIn(this.inspectables.get(id), path);
     var result = {};
     var cleaned = [];
-    if (val && val.constructor && 'function' === typeof val.constructor) {
-      result.constructor = {}
-      Object.getOwnPropertyNames(val.constructor).forEach(name => {
-        if (['caller', 'callee', 'arguments'].indexOf(name) != -1) {
+    var proto = null;
+    var protoclean = [];
+    if (val) {
+      var protod = false
+      var isFn = typeof val === 'function'
+      Object.getOwnPropertyNames(val).forEach(name => {
+        if (name === '__proto__') {
+          protod = true;
+        }
+        if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        result.constructor[name] = sanitize(val.constructor[name], ['constructor', name], cleaned);
-      });
-    }
-    if (val && 'object' === typeof val) {
-      Object.getOwnPropertyNames(val).forEach(name => {
-        if (name === 'constructor') return;
         result[name] = sanitize(val[name], [name], cleaned);
       });
+      if (!protod && val.__proto__) {
+        proto = {};
+        Object.getOwnPropertyNames(val.__proto__).forEach(name => {
+          proto[name] = sanitize(val.__proto__[name], [name], protoclean);
+        });
+      }
     }
+
     this.wall.send({
       type: 'callback',
       id: callback,
-      args: [result, cleaned],
+      args: [result, cleaned, proto, protoclean],
     });
   }
 

@@ -6,10 +6,11 @@ var assign = require('object-assign');
 
 class DataView extends React.Component {
   render() {
-    if (!this.props.data) {
+    var data = this.props.data;
+    if (!data) {
       return <div style={styles.missing}>null</div>;
     }
-    var names = Object.keys(this.props.data);
+    var names = Object.keys(data);
     var path = this.props.path;
     if (!names.length) {
       return <span style={styles.empty}>Empty object</span>;
@@ -17,6 +18,16 @@ class DataView extends React.Component {
 
     return (
       <ul style={styles.container}>
+        {data[consts.proto] &&
+          <DataItem
+            name={'__proto__'}
+            path={path.concat(['__proto__'])}
+            key={'__proto__'}
+            inspect={this.props.inspect}
+            readOnly={this.props.readOnly}
+            value={this.props.data[consts.proto]}
+          />}
+
         {names.map((name, i) => (
           <DataItem
             name={name}
