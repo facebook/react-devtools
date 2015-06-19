@@ -1,6 +1,7 @@
 
 var React = require('react');
 var assign = require('object-assign');
+var flash = require('../flash');
 var valueStyles = require('../value-styles');
 
 // using an empty function for ease of debugging;
@@ -92,6 +93,9 @@ class Simple extends React.Component {
   componentDidUpdate(prevProps, prevState) {
     if (this.state.editing && !prevState.editing) {
       this.selectAll();
+    }
+    if (!this.state.editing && this.props.data !== prevProps.data) {
+      flash(React.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
     }
   }
 

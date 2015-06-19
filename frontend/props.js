@@ -2,6 +2,7 @@
 var React = require('react/addons');
 var consts = require('../backend/consts');
 var valueStyles = require('./value-styles');
+var flash = require('./flash');
 
 class Props extends React.Component {
   render() {
@@ -43,12 +44,7 @@ class PropVal extends React.Component {
       return;
     }
     var node = React.findDOMNode(this);
-    node.style.transition = 'none';
-    node.style.backgroundColor = 'rgba(0,255,0,1)';
-    // force recalc
-    node.offsetTop
-    node.style.transition = 'background-color 1s ease';
-    node.style.backgroundColor = 'transparent';
+    flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
   }
   render() {
     return previewProp(this.props.val, this.props.nested);

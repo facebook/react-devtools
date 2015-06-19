@@ -4,6 +4,7 @@ var assign = require('object-assign');
 
 var decorate = require('./decorate');
 var Props = require('./props');
+var flash = require('./flash');
 
 class Node {
   componentDidUpdate(prevProps) {
@@ -18,12 +19,7 @@ class Node {
       return;
     }
     var node = React.findDOMNode(ref);
-    node.style.transition = 'none';
-    node.style.backgroundColor = 'rgba(255,0,0,.1)';
-    // force recalc
-    node.offsetTop
-    node.style.transition = 'background-color .5s ease';
-    node.style.backgroundColor = 'white';
+    flash(node, 'rgba(255, 0, 0, .1)', 'white', .1);
   }
 
   render() {
