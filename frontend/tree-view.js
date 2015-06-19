@@ -19,6 +19,7 @@ class TreeView extends React.Component {
 var styles = {
   container: {
     padding: 10,
+    overflow: 'auto',
     fontFamily: 'monospace',
     fontSize: '12px',
     flex: 1,

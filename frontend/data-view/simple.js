@@ -110,17 +110,22 @@ class Simple extends React.Component {
       );
     }
 
+    var data = this.props.data;
+    var type = typeof data;
     var style = styles.simple
     var typeStyle;
-    if ('boolean' === typeof this.props.data) {
+    if ('boolean' === type) {
       typeStyle = valueStyles.bool;
     } else if (!this.props.data) {
       typeStyle = valueStyles.empty;
     }
-    if ('string' === typeof this.props.data) {
+    if ('string' === type) {
       typeStyle = valueStyles.string;
+      if (data.length > 200) {
+        data = data.slice(0, 200) + '…';
+      }
     }
-    if ('number' === typeof this.props.data) {
+    if ('number' === type) {
       typeStyle = valueStyles.number;
     }
     style = assign({}, style, typeStyle);
@@ -131,7 +136,7 @@ class Simple extends React.Component {
       <div
         onClick={this.startEditing.bind(this)}
         style={style}>
-        {valueToText(this.props.data)}
+        {valueToText(data)}
       </div>
     );
   }

@@ -25,6 +25,10 @@ var styles = {
     flex: 1,
   },
 
+  rightPane: {
+    display: 'flex',
+  },
+
   leftPane: {
     display: 'flex',
     flex: 1,

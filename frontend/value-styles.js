@@ -5,27 +5,28 @@ module.exports = {
   },
 
   object: {
-    color: 'rgb(28, 113, 195)',
+    color: 'rgb(232, 98, 0)',
   },
 
   array: {
-    color: 'rgb(139, 139, 35)',
+    color: 'rgb(0, 154, 190)',
   },
 
   number: {
-    color: 'blue',
+    color: 'rgb(255, 0, 252)',
   },
 
   string: {
-    color: 'red',
+    color: 'rgb(0, 49, 205)',
+    wordBreak: 'break-word',
   },
 
   bool: {
-    color: 'orange',
+    color: 'rgb(0, 187, 255)',
   },
 
   empty: {
-    color: '#999',
+    color: '#777',
   },
 
 }

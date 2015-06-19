@@ -117,6 +117,11 @@ class DataItem extends React.Component {
       );
     }
 
+    var name = this.props.name;
+    if (name.length > 50) {
+      name = name.slice(0, 50) + '…';
+    }
+
     return (
       <li style={styles.item}>
         <div style={styles.head}>
@@ -144,7 +149,7 @@ function previewComplex(data) {
   }
 
   if (!data[consts.type]) {
-    return '{...}';
+    return '{…}';
   }
 
   var type = data[consts.type];
@@ -213,6 +218,7 @@ var styles = {
     display: 'flex',
     margin: '2px 3px',
     whiteSpace: 'pre',
+    wordBreak: 'break-word',
     flex: 1,
   },
 

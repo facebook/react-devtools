@@ -8,10 +8,11 @@ require('../backend/compat');
 class Todos extends React.Component {
   constructor(props) {
     super(props);
+    this._nextid = 12;
     this.state = {
       todos: [
-        {title: 'Inspect all the things', completed: true},
-        {title: 'Profit!!', completed: false},
+        {title: 'Inspect all the things', completed: true, id: 10},
+        {title: 'Profit!!', completed: false, id: 11},
       ],
       filter: 'All',
     };
@@ -25,13 +26,29 @@ class Todos extends React.Component {
       todos: this.state.todos.concat([{
         title: text,
         completed: false,
+        id: this._nextid++,
       }]),
     });
   }
 
-  toggleComplete(i, complete) {
-    this.state.todos[i].completed = complete;
-    this.setState({todos: this.state.todos});
+  toggleComplete(id, completed) {
+    var todos = this.state.todos.slice();
+    todos.some(item => {
+      if (item.id === id) {
+        item.completed = completed;
+        return true;
+      }
+    });
+    this.setState({todos});
+  }
+
+  sort() {
+    var todos = this.state.todos.slice();
+    todos.sort((a, b) => {
+      if (a.title === b.title) return 0;
+      return a.title > b.title ? 1 : -1;
+    });
+    this.setState({todos});
   }
 
   changeFilter(val) {
@@ -50,7 +67,7 @@ class Todos extends React.Component {
           filter={this.state.filter}
           onToggleComplete={this.toggleComplete.bind(this)}
         />
-        <Filter onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
+        <Filter onSort={this.sort.bind(this)} onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
       </div>
     );
   }
@@ -100,10 +117,11 @@ class TodoItems {
     }[this.props.filter];
     return (
       <ul style={styles.todos}>
-        {this.props.todos.filter(filterFn).map((item, i) => (
+        {this.props.todos.filter(filterFn).map(item => (
           <TodoItem
             item={item}
-            onToggle={() => this.props.onToggleComplete(i, !item.completed)}
+            key={item.id}
+            onToggle={() => this.props.onToggleComplete(item.id, !item.completed)}
           />
         ))}
       </ul>
@@ -119,6 +137,7 @@ class TodoItem {
           <input
             type="checkbox"
             style={styles.checkbox}
+            readOnly={true}
             checked={this.props.item.completed}
           />
           {this.props.item.title}
@@ -155,10 +174,12 @@ class Filter {
       <div style={styles.filter}>
         {options.map(text => (
           <button
+            key={text}
             style={assign({}, styles.filterButton, text === this.props.filter && styles.filterButtonActive)}
             onClick={this.props.onFilter.bind(null, text)}
           >{text}</button>
         ))}
+        <button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>
       </div>
     );
   }
@@ -180,6 +201,7 @@ var styles = {
     border: '1px solid #eee',
     outline: 'none',
     margin: '0 5px',
+    cursor: 'pointer',
     backgroundColor: 'transparent',
   },
 
@@ -205,7 +227,6 @@ var styles = {
     fontWeight: 'bold',
     marginLeft: 6,
     lineHeight: '24px',
-    boxShadow: '0 0 4px #aaa',
     cursor: 'pointer',
   },
 
@@ -224,6 +245,16 @@ var styles = {
   todo: {
     padding: '10px 20px',
     cursor: 'pointer',
+  },
+
+  iframeWatermark: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    fontSize: 25,
+    color: '#ccc',
+    fontFamily: 'sans-serif',
+    fontWeight: 'bold',
   },
 }
 
@@ -247,6 +278,9 @@ someVal.awesome = 2;
 class Wrap extends React.Component {
   render() {
     return <div>
+      <div style={styles.iframeWatermark}>
+        this is an iframe
+      </div>
       <Todos/>
       {/*<span thing={someVal}/>
       <Target count={1}/>

@@ -28,7 +28,7 @@ class Props extends React.Component {
     });
 
     if (names.length > 3) {
-      items.push('...');
+      items.push('…');
     }
     return <span>{items}</span>
   }
@@ -41,9 +41,9 @@ function previewArray(val) {
     items['c' + i] = ',';
   });
   if (val.length > 3) {
-    items['last'] = '...';
+    items['last'] = '…';
   } else {
-    delete items['c2'];
+    delete items['c' + (val.length - 1)];
   }
   return (
     <span style={valueStyles.array}>
@@ -61,8 +61,8 @@ function previewObject(val) {
     items['v' + i] = previewProp(val[name], true);
     items['m' + i] = ', ';
   });
-  if (names.lenght > 3) {
-    items['rest'] = '...';
+  if (names.length > 3) {
+    items['rest'] = '…';
   } else {
     delete items['m' + (names.length - 1)];
   }
@@ -78,6 +78,9 @@ function previewProp(val, nested) {
     return <span style={valueStyles.number}>{val}</span>
   }
   if ('string' === typeof val) {
+    if (val.length > 50) {
+      val = val.slice(0, 50) + '…';
+    }
     return <span style={valueStyles.string}>"{val}"</span>
   }
   if ('boolean' === typeof val) {
@@ -93,7 +96,7 @@ function previewProp(val, nested) {
     return <span style={valueStyles.empty}>{'' + val}</span>;
   }
   if ('object' !== typeof val) {
-    return '...';
+    return '…';
   }
   if (val[consts.type]) {
     var type = val[consts.type];
@@ -109,7 +112,7 @@ function previewProp(val, nested) {
     }
   }
   if (nested) {
-    return '{...}';
+    return '{…}';
   }
   return previewObject(val);
 }

@@ -100,6 +100,7 @@ var styles = {
     padding: 10,
     fontSize: '12px',
     fontFamily: 'monospace',
+    overflow: 'auto',
     width: 300,
   },
   header: {

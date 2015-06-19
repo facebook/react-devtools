@@ -45,10 +45,10 @@ class Harness extends React.Component {
   render() {
     var backend = this.backend
     return <div style={styles.harness}>
-      <div style={styles.rightSide}>
+      <div style={styles.top}>
         <iframe style={styles.iframe} ref={n => this.iframe = n} />
       </div>
-      <div style={styles.leftSide}>
+      <div style={styles.bottom}>
         {React.addons.cloneWithProps(this.props.children)}
       </div>
     </div>
@@ -63,14 +63,19 @@ var styles = {
   harness: {
     display: 'flex',
     flexDirection: 'column',
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
   },
 
-  leftSide: {
-    flex: 1,
+  bottom: {
+    height: 400,
     display: 'flex',
   },
 
-  rightSide: {
+  top: {
     flex: 1,
     flexDirection: 'column',
     display: 'flex',

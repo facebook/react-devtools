@@ -15,7 +15,7 @@ class Node {
     }
 
     var leftPad = {
-      paddingLeft: (this.props.depth + 1) * 15,
+      paddingLeft: (this.props.depth + 1) * 10,
     };
     var headStyles = assign(
       {},
@@ -32,7 +32,7 @@ class Node {
       onMouseDown: this.props.onSelect,
     };
 
-    if (!children || 'string' === typeof children) {
+    if (!children || 'string' === typeof children || !children.length) {
       var name = node.get('name') || 'span';
       var content = children || node.get('text');
       return (
@@ -75,7 +75,7 @@ class Node {
     var collapserStyle = assign(
       {},
       styles.collapser,
-      {left: leftPad.paddingLeft - 15}
+      {left: leftPad.paddingLeft - 12}
     );
 
     var head = (
@@ -89,7 +89,7 @@ class Node {
           {node.get('props') && <Props props={node.get('props')}/>}
           <span style={styles.angle}>&gt;</span>
         </span>
-        {collapsed && '...'}
+        {collapsed && '…'}
         {collapsed && closeTag}
       </div>
     );
@@ -156,6 +156,7 @@ var WrappedNode = decorate({
 }, Node);
 
 var tagColor = 'rgb(184, 0, 161)';
+tagColor = 'rgb(176, 0, 182)';
 
 var styles = {
   container: {
@@ -187,9 +188,9 @@ var styles = {
   },
 
   collapser: {
-    fontSize: 10,
+    fontSize: 9,
     color: '#555',
-    marginRight: 5,
+    marginRight: 3,
     position: 'absolute',
     padding: 2,
   },
