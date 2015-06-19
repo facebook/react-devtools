@@ -6,6 +6,26 @@ var decorate = require('./decorate');
 var Props = require('./props');
 
 class Node {
+  componentDidUpdate(prevProps) {
+    if (prevProps.node && prevProps.node.get('renders') < this.props.node.get('renders')) {
+      this.flash(this.head);
+      this.flash(this.tail);
+    }
+  }
+
+  flash(ref) {
+    if (!ref) {
+      return;
+    }
+    var node = React.findDOMNode(ref);
+    node.style.transition = 'none';
+    node.style.backgroundColor = 'rgba(255,0,0,.1)';
+    // force recalc
+    node.offsetTop
+    node.style.transition = 'background-color .5s ease';
+    node.style.backgroundColor = 'white';
+  }
+
   render() {
     var node = this.props.node;
     var children = node.get('children');
@@ -36,22 +56,24 @@ class Node {
       var name = node.get('name') || 'span';
       var content = children || node.get('text');
       return (
-        <div style={headStyles} {...tagEvents}>
-          <span style={styles.openTag}>
-            <span style={styles.angle}>&lt;</span>
-            <span style={styles.tagName}>{name}</span>
-            {node.get('props') && <Props props={node.get('props')}/>}
-            {!content && '/'}
-            <span style={styles.angle}>&gt;</span>
-          </span>
-          {content && [
-            <span key='content' style={styles.textContent}>{content}</span>,
-            <span key='close' style={styles.closeTag}>
-              <span style={styles.angle}>&lt;/</span>
+        <div style={styles.container}>
+          <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
+            <span style={styles.openTag}>
+              <span style={styles.angle}>&lt;</span>
               <span style={styles.tagName}>{name}</span>
+              {node.get('props') && <Props props={node.get('props')}/>}
+              {!content && '/'}
               <span style={styles.angle}>&gt;</span>
             </span>
-          ]}
+            {content && [
+              <span key='content' style={styles.textContent}>{content}</span>,
+              <span key='close' style={styles.closeTag}>
+                <span style={styles.angle}>&lt;/</span>
+                <span style={styles.tagName}>{name}</span>
+                <span style={styles.angle}>&gt;</span>
+              </span>
+            ]}
+          </div>
         </div>
       );
     }
@@ -79,7 +101,7 @@ class Node {
     );
 
     var head = (
-      <div style={headStyles} {...tagEvents}>
+      <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
         <span onClick={this.props.onToggleCollapse} style={collapserStyle}>
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
@@ -91,6 +113,9 @@ class Node {
         </span>
         {collapsed && '…'}
         {collapsed && closeTag}
+        <span style={styles.renderCount}>
+          {node.get('renders')}
+        </span>
       </div>
     );
 
@@ -116,7 +141,7 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
+        <div ref={t => this.tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
           {closeTag}
         </div>
       </div>
@@ -165,6 +190,12 @@ var styles = {
   head: {
     cursor: 'pointer',
     position: 'relative',
+    display: 'flex',
+  },
+
+  renderCount: {
+    flex: 1,
+    textAlign: 'right',
   },
 
   tail: {

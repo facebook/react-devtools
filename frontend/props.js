@@ -22,7 +22,7 @@ class Props extends React.Component {
         <span key={name} style={styles.prop}>
           <span style={styles.propName}>{name}</span>
           =
-          {previewProp(props[name])}
+          <PropVal val={props[name]}/>
         </span>
       ));
     });
@@ -34,10 +34,31 @@ class Props extends React.Component {
   }
 }
 
+class PropVal extends React.Component {
+  componentDidUpdate(prevProps) {
+    if (this.props.val === prevProps.val) {
+      return;
+    }
+    if (this.props.val && prevProps.val && 'object' === typeof this.props.val && 'object' === typeof prevProps.val) {
+      return;
+    }
+    var node = React.findDOMNode(this);
+    node.style.transition = 'none';
+    node.style.backgroundColor = 'rgba(0,255,0,1)';
+    // force recalc
+    node.offsetTop
+    node.style.transition = 'background-color 1s ease';
+    node.style.backgroundColor = 'transparent';
+  }
+  render() {
+    return previewProp(this.props.val, this.props.nested);
+  }
+}
+
 function previewArray(val) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = previewProp(item, true);
+    items['n' + i] = <PropVal val={item} nested={true} />;
     items['c' + i] = ',';
   });
   if (val.length > 3) {
@@ -58,7 +79,7 @@ function previewObject(val) {
   names.slice(0, 3).forEach((name, i) => {
     items['k' + i] = <span style={valueStyles.attr}>{name}</span>;
     items['c' + i] = ': ';
-    items['v' + i] = previewProp(val[name], true);
+    items['v' + i] = <PropVal val={val[name]} nested={true} />;
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
@@ -96,7 +117,7 @@ function previewProp(val, nested) {
     return <span style={valueStyles.empty}>{'' + val}</span>;
   }
   if ('object' !== typeof val) {
-    return '…';
+    return <span>…</span>;
   }
   if (val[consts.type]) {
     var type = val[consts.type];
@@ -108,11 +129,11 @@ function previewProp(val, nested) {
       );
     }
     if (type === 'object') {
-      return val[consts.name] + '{}';
+      return <span>{val[consts.name] + '{}'}</span>;
     }
   }
   if (nested) {
-    return '{…}';
+    return <span>{'{…}'}</span>;
   }
   return previewObject(val);
 }

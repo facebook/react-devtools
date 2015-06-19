@@ -34,7 +34,7 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('mount', (data) => {
-      var map = Map(data)
+      var map = Map(data).set('renders', 1);
       if (data.nodeType === 'Custom') {
         map = map.set('collapsed', true);
       }
@@ -48,6 +48,7 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('update', (data) => {
+      data.renders = this.get(data.id).get('renders') + 1;
       this.data = this.data.mergeIn([data.id], Map(data));
       if (data.children && data.children.forEach) {
         data.children.forEach(cid => {

@@ -3,7 +3,7 @@ var React = require('react');
 var assign = require('object-assign');
 require('../backend/compat');
 
-
+var {Map} = require('immutable');
 
 class Todos extends React.Component {
   constructor(props) {
@@ -11,11 +11,20 @@ class Todos extends React.Component {
     this._nextid = 12;
     this.state = {
       todos: [
+        Map({title: 'Inspect all the things', completed: true, id: 10}),
+        Map({title: 'Profit!!', completed: false, id: 11}),
+      ],
+      filter: 'All',
+    };
+    /*
+    this.state = {
+      todos: [
         {title: 'Inspect all the things', completed: true, id: 10},
         {title: 'Profit!!', completed: false, id: 11},
       ],
       filter: 'All',
     };
+    */
   }
 
   onAdd(text) {
@@ -23,15 +32,16 @@ class Todos extends React.Component {
       return;
     }
     this.setState({
-      todos: this.state.todos.concat([{
+      todos: this.state.todos.concat([Map({
         title: text,
         completed: false,
         id: this._nextid++,
-      }]),
+      })]),
     });
   }
 
   toggleComplete(id, completed) {
+    /*
     var todos = this.state.todos.slice();
     todos.some(item => {
       if (item.id === id) {
@@ -39,14 +49,27 @@ class Todos extends React.Component {
         return true;
       }
     });
+    */
+    var todos = this.state.todos.map(item => {
+      if (item.get('id') === id) {
+        return item.set('completed', completed);
+      }
+      return item;
+    });
     this.setState({todos});
   }
 
   sort() {
+    /*
     var todos = this.state.todos.slice();
     todos.sort((a, b) => {
       if (a.title === b.title) return 0;
       return a.title > b.title ? 1 : -1;
+    });
+    */
+    var todos = this.state.todos.sort((a, b) => {
+      if (a.get('title') === b.get('title')) return 0;
+      return a.get('title') > b.get('title') ? 1 : -1;
     });
     this.setState({todos});
   }
@@ -90,6 +113,10 @@ class NewTodo extends React.Component {
     this.setState({text: ''});
   }
 
+  shouldComponentUpdate(prevProps, prevState) {
+    return this.state !== prevState;
+  }
+
   render() {
     return (
       <div style={styles.newContainer}>
@@ -112,16 +139,16 @@ class TodoItems {
   render() {
     var filterFn = {
       All: () => true,
-      Completed: item => item.completed,
-      Remaining: item => !item.completed,
+      Completed: item => item.get('completed'),
+      Remaining: item => !item.get('completed'),
     }[this.props.filter];
     return (
       <ul style={styles.todos}>
         {this.props.todos.filter(filterFn).map(item => (
           <TodoItem
             item={item}
-            key={item.id}
-            onToggle={() => this.props.onToggleComplete(item.id, !item.completed)}
+            key={item.get('id')}
+            onToggle={() => this.props.onToggleComplete(item.get('id'), !item.get('completed'))}
           />
         ))}
       </ul>
@@ -130,6 +157,9 @@ class TodoItems {
 }
 
 class TodoItem {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.item !== this.props.item
+  }
   render() {
     return (
       <li onClick={this.props.onToggle}>
@@ -138,9 +168,9 @@ class TodoItem {
             type="checkbox"
             style={styles.checkbox}
             readOnly={true}
-            checked={this.props.item.completed}
+            checked={this.props.item.get('completed')}
           />
-          {this.props.item.title}
+          {this.props.item.get('title')}
         </HoverHighlight>
       </li>
     );
