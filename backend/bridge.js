@@ -2,7 +2,42 @@
 var weakCereal = require('./weak-cereal');
 var consts = require('./consts');
 
+type AnyFn = (...x: any) => any;
+/*
+type PayloadType = {
+  type: 'inspect',
+  id: string,
+  path: ?Array<string>,
+  callback: ?number,
+  args: ?Array<any>,
+  cleaned: ?Array<string>,
+  evt: ?string,
+  data: ?any,
+};
+*/
+type PayloadType = {
+  type: 'inspect',
+  id: string,
+  path: Array<string>,
+  callback: number,
+} & {
+  type: 'callback',
+  id: string,
+  args: Array<any>,
+} & {
+  type: 'event',
+  cleaned: ?Array<Array<string>>,
+  evt: string,
+  data: any,
+};
+
 class Bridge {
+  inspectables: Map;
+  cid: number;
+  cbs: Map;
+  listeners: Object;
+  wall: Object;
+
   constructor() {
     this.cbs = new Map();
     this.listeners = {};
@@ -10,12 +45,12 @@ class Bridge {
     this.cid = 0;
   }
 
-  attach(wall) {
+  attach(wall: Object) {
     this.wall = wall
     this.wall.listen(this._handleMessage.bind(this));
   }
 
-  inspect(id, path, cb) {
+  inspect(id: string, path: Array<string>, cb: (val: any) => any) {
     var cid = this.cid++;
     this.cbs.set(cid, (data, cleaned, proto, protoclean) => {
       if (cleaned.length) {
@@ -38,7 +73,7 @@ class Bridge {
     });
   }
 
-  send(evt, data) {
+  send(evt: string, data: any) {
     var cleaned = [];
     var san = sanitize(data, [], cleaned)
     if (cleaned.length) {
@@ -47,11 +82,11 @@ class Bridge {
     this.wall.send({type: 'event', evt, data: san, cleaned});
   }
 
-  forget(id) {
+  forget(id: string) {
     this.inspectables.delete(id);
   }
 
-  on(evt, fn) {
+  on(evt: string, fn: AnyFn) {
     if (!this.listeners[evt]) {
       this.listeners[evt] = [fn];
     } else {
@@ -59,20 +94,20 @@ class Bridge {
     }
   }
 
-  _handleMessage(payload) {
+  _handleMessage(payload: PayloadType) {
     var type = payload.type;
-    if (type === 'callback') {
-      this.cbs.get(payload.id).apply(null, payload.args);
+    if (payload.type === 'callback') {
+      this.cbs.get(payload.id)(...payload.args);
       this.cbs.delete(payload.id);
       return;
     }
 
-    if (type === 'inspect') {
+    if (payload.type === 'inspect') {
       this._inspectResponse(payload.id, payload.path, payload.callback);
       return;
     }
 
-    if (type === 'event') {
+    if (payload.type === 'event') {
       if (payload.cleaned) {
         hydrate(payload.data, payload.cleaned);
       }
@@ -83,11 +118,11 @@ class Bridge {
     }
   }
 
-  _inspectResponse(id, path, callback) {
+  _inspectResponse(id: string, path: Array<string>, callback: number) {
     var val = getIn(this.inspectables.get(id), path);
     var result = {};
     var cleaned = [];
-    var proto = null;
+    var proto = {};
     var protoclean = [];
     if (val) {
       var protod = false
@@ -127,6 +162,9 @@ function hydrate(data, cleaned) {
   cleaned.forEach(path => {
     var last = path.pop();
     var obj = path.reduce((obj, attr) => obj ? obj[attr] : null, data);
+    if (!obj) {
+      return;
+    }
     var replace = {};
     replace[consts.name] = obj[last].name;
     replace[consts.type] = obj[last].type;

@@ -35,9 +35,7 @@ class PropState extends React.Component {
             &lt;{this.props.node.get('name')}&gt;
           </div>
           {nodeType === 'Custom' &&
-            <button style={styles.globalButton} onClick={() => this.props.makeGlobal('instance')}>
-              Store as Global Variable
-            </button>}
+            <span>(access as `$r` in the console)</span>}
         </div>
         <strong>Props</strong>
         <DataView

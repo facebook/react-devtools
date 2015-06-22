@@ -47,6 +47,19 @@ class Store extends EventEmitter {
       this.emit(data.id);
     });
 
+    this.bridge.on('select', id => {
+      var node = this.get(id);
+      var pid = this.parents.get(id);
+      while (pid) {
+        node = this.get(pid);
+        if (node.get('collapsed')) {
+          this.toggleCollapse(pid);
+        }
+        pid = this.parents.get(pid);
+      }
+      this.selectTop(this.skipWrapper(id));
+    });
+
     this.bridge.on('update', (data) => {
       data.renders = this.get(data.id).get('renders') + 1;
       this.data = this.data.mergeIn([data.id], Map(data));
@@ -275,10 +288,12 @@ class Store extends EventEmitter {
       }
       this.emit(id);
       this.emit('hover');
+      this.bridge.send('highlight', id);
     } else if (this.hovered === id) {
       this.hovered = null;
       this.emit(id);
       this.emit('hover');
+      this.bridge.send('hideHighlight');
     }
   }
 
@@ -302,6 +317,7 @@ class Store extends EventEmitter {
     this.emit('selected');
     window.$selid = id;
     window.$sel = this.get(id);
+    this.bridge.send('selected', id);
   }
 
   addRoot(id) {

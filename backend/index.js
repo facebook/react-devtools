@@ -1,6 +1,26 @@
+/** @flow **/
 
-import EventEmitter from 'events'
+import {EventEmitter} from 'events'
 import assign from 'object-assign'
+import type * as Bridge from './bridge'
+
+type Component = {};
+type DataType = {
+  type: string | Object,
+  state: Object,
+  props: Object,
+  updater: {
+    setState: (state: Object) => void,
+    forceUpdate: () => void,
+    publicInstance: Object,
+  },
+};
+
+type Bridge = {
+  send: (evt: string, data: any) => void,
+  on: (evt: string, fn: (data: any) => void) => void,
+  forget: (id: string) => void,
+};
 
 function randid() {
   return Math.random().toString(0x0f).slice(10, 20)
@@ -23,20 +43,80 @@ function getIn(obj, path) {
   }, obj);
 }
 
+/**
+ * Events from React:
+ * - root (got a root)
+ * - mount (a component mounted)
+ * - update (a component updated)
+ * - unmount (a component mounted)
+ */
 class Backend extends EventEmitter {
-  constructor(bridge, global) {
+  comps: Map;
+  global: Object;
+  ids: WeakMap;
+  nodes: Map;
+  roots: Set;
+
+  constructor(global: Object) {
     super();
     this.global = global;
+    this.comps = new Map();
+    this.ids = new WeakMap();
     this.nodes = new Map();
     this.roots = new Set();
-    this.ids = new WeakMap();
-    this.comps = new Map();
-    this.bridge = bridge
-    this.bridge.on('setState', this._setState.bind(this));
-    this.bridge.on('makeGlobal', this._makeGlobal.bind(this));
+    this.rootIDs = new Map();
+    this.on('selected', id => {
+      var data = this.nodes.get(id);
+      if (data.updater) {
+        this.global.$r = data.updater.publicInstance;
+      }
+    });
   }
 
-  _setState({id, path, value}) {
+  addBridge(bridge: Bridge) {
+    bridge.on('setState', this._setState.bind(this));
+    bridge.on('makeGlobal', this._makeGlobal.bind(this));
+    bridge.on('highlight', id => {
+      var node = this.getNodeForID(id);
+      if (node) {
+        this.emit('highlight', node);
+      }
+    });
+    bridge.on('hideHighlight', () => this.emit('hideHighlight'));
+    bridge.on('selected', id => this.emit('selected', id));
+    this.on('root', id => bridge.send('root', id))
+    this.on('mount', data => bridge.send('mount', data))
+    this.on('update', data => bridge.send('update', data));
+    this.on('unmount', id => {
+      bridge.send('unmount', id)
+      bridge.forget(id);
+    });
+    this.on('setSelection', id => bridge.send('select', id));
+  }
+
+  getNodeForID(id: string): ?Object {
+    var component = this.comps.get(id);
+    return this.reactFindDOMNode(component);
+  }
+
+  selectFromDOMNode(node: Object) {
+    var id = this.getIDForNode(node);
+    if (!id) {
+      return;
+    }
+    this.emit('setSelection', id);
+  }
+
+  getIDForNode(node: Object): ?string {
+    var reactID = this.reactIDFromDOM(node);
+    return this.rootIDs.get(reactID);
+  }
+
+  setEnabled(val: boolean): Object {
+    throw new Error("React hasn't injected... what's up?");
+  }
+
+  _setState({id, path, value}: {id: string, path: Array<string>, value: any}) {
     var data = this.nodes.get(id);
     setIn(data.state, path, value);
     if (data.updater && data.updater.forceUpdate) {
@@ -47,7 +127,7 @@ class Backend extends EventEmitter {
     }
   }
 
-  _makeGlobal({id, path}) {
+  _makeGlobal({id, path}: {id: string, path: Array<string>}) {
     var data = this.nodes.get(id);
     var value;
     if (path === 'instance') {
@@ -59,11 +139,7 @@ class Backend extends EventEmitter {
     console.log('$inspect =', value);
   }
 
-  setEnabled(val) {
-    throw new Error("React hasn't injected... what's up?");
-  }
-
-  getId(element) {
+  getId(element: Component): string {
     if ('object' !== typeof element) {
       return element;
     }
@@ -74,13 +150,29 @@ class Backend extends EventEmitter {
     return this.ids.get(element);
   }
 
-  addRoot(element) {
+  addRoot(element: Component) {
     var id = this.getId(element);
     this.roots.add(id);
-    this.bridge.send('root', id);
+    this.emit('root', id);
   }
 
-  onMounted(component, data) {
+  onMounted(component: Component, data: DataType) {
+    var id = this.getId(component);
+    this.nodes.set(id, data);
+
+    this.rootIDs.set(component._rootNodeID, id);
+
+    var send = assign({}, data);
+    if (send.children && send.children.map) {
+      send.children = send.children.map(c => this.getId(c));
+    }
+    send.id = id;
+    delete send.type;
+    delete send.updater;
+    this.emit('mount', send);
+  }
+
+  onUpdated(component: Component, data: DataType) {
     var id = this.getId(component);
     this.nodes.set(id, data);
 
@@ -91,29 +183,14 @@ class Backend extends EventEmitter {
     send.id = id;
     delete send.type;
     delete send.updater;
-    this.bridge.send('mount', send);
+    this.emit('update', send)
   }
 
-  onUpdated(component, data) {
-    var id = this.getId(component);
-    this.nodes.set(id, data);
-
-    var send = assign({}, data);
-    if (send.children && send.children.map) {
-      send.children = send.children.map(c => this.getId(c));
-    }
-    send.id = id;
-    delete send.type;
-    delete send.updater;
-    this.bridge.send('update', send)
-  }
-
-  onUnmounted(component) {
+  onUnmounted(component: Component) {
     var id = this.getId(component);
     this.nodes.delete(id);
     this.roots.delete(id);
-    this.bridge.send('unmount', id);
-    this.bridge.forget(id);
+    this.emit('unmount', id);
     this.ids.delete(component);
   }
 }

@@ -1,10 +1,11 @@
+/** @flow **/
 
 var React = require('react');
 var TreeView = require('./tree-view');
 var PropState = require('./prop-state');
 
 class Container extends React.Component {
-  render() {
+  render(): ReactElement {
     return (
       <div style={styles.container}>
         <div style={styles.leftPane}>

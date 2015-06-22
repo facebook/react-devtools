@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react');
 var Simple = require('./simple');
@@ -5,8 +6,9 @@ var consts = require('../../backend/consts');
 var assign = require('object-assign');
 var valueStyles = require('../value-styles');
 
+
 class DataView extends React.Component {
-  render() {
+  render(): ReactElement {
     var data = this.props.data;
     if (!data) {
       return <div style={styles.missing}>null</div>;
@@ -123,7 +125,7 @@ class DataItem extends React.Component {
     }
 
     return (
-      <li style={styles.item}>
+      <li>
         <div style={styles.head}>
           {opener}
           <div onClick={() => this.props.makeGlobal(this.props.path)} style={styles.name}>

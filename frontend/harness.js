@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react/addons');
 var Backend = require('../backend');
@@ -7,6 +8,7 @@ var Store = require('./store');
 var Bridge = require('../backend/bridge');
 var makeWall = require('./wall');
 var makeIframeWall = require('./iframe-wall');
+var Highlighter = require('./highlighter');
 
 class Harness extends React.Component {
   componentWillMount() {
@@ -14,7 +16,7 @@ class Harness extends React.Component {
     this.store = new Store(this.storeBridge);
   }
 
-  getChildContext() {
+  getChildContext(): Object {
     return {
       store: this.store,
     };
@@ -28,7 +30,8 @@ class Harness extends React.Component {
 
     var backBridge = new Bridge();
     backBridge.attach(wall.child);
-    this.backend = new Backend(backBridge, iframe.contentWindow);
+    this.backend = new Backend(iframe.contentWindow);
+    this.backend.addBridge(backBridge);
 
     window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
     window.backend = this.backend
@@ -40,9 +43,15 @@ class Harness extends React.Component {
     var script = doc.createElement('script');
     script.src = this.props.targetSrc
     doc.head.appendChild(script);
+    var hl = new Highlighter(iframe.contentWindow, node => {
+      this.backend.selectFromDOMNode(node);
+    });
+    hl.inject();
+    this.backend.on('highlight', node => hl.highlight(node));
+    this.backend.on('hideHighlight', () => hl.hideHighlight());
   }
 
-  render() {
+  render(): ReactElement {
     var backend = this.backend
     return <div style={styles.harness}>
       <div style={styles.top}>
@@ -71,7 +80,7 @@ var styles = {
   },
 
   bottom: {
-    height: 400,
+    height: 500,
     display: 'flex',
   },
 

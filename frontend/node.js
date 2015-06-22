@@ -19,7 +19,7 @@ class Node {
       return;
     }
     var node = React.findDOMNode(ref);
-    flash(node, 'rgba(255, 0, 0, .1)', 'white', .1);
+    flash(node, 'rgba(255, 0, 0, .1)', node.style.backgroundColor || 'white', .3);
   }
 
   render() {

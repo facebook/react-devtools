@@ -64,6 +64,25 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__ && window.__REACT_DEVTOOLS_BACKEND__) 
   var backhooks = __REACT_DEVTOOLS_BACKEND__;
   var oldHandlers = {};
 
+  backhooks._backend.reactFindDOMNode = function (component) {
+    if (component._instance) {
+      return __REACT_DEVTOOLS_GLOBAL_HOOK__.React.findDOMNode(component._instance);
+    }
+    var Mount = reactMount;
+    try {
+      return reactMount.getNode(component._rootNodeID);
+    } catch (e) {
+    }
+  }
+  backhooks._backend.reactIDFromDOM = function (node) {
+    var id = reactMount.getID(node);
+    while (node.parentNode && !id) {
+      node = node.parentNode;
+      id = reactMount.getID(node);
+    }
+    return id;
+  }
+
   backhooks.setEnabled = val => {
     if (!val) {
       if (!oldHandlers) {
