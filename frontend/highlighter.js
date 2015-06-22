@@ -29,10 +29,11 @@ class Highlighter {
       this.win.document.body.appendChild(this.hover);
     }
     this.inspected = node;
-    this.hover.style.top = node.offsetTop + 'px';
+    var pos = nodePos(node);
+    this.hover.style.top = pos.top + 'px';
     this.hover.style.width = node.offsetWidth + 'px';
     this.hover.style.height = node.offsetHeight + 'px';
-    this.hover.style.left = node.offsetLeft + 'px';
+    this.hover.style.left = pos.left + 'px';
   }
 
   hideHighlight() {
@@ -79,7 +80,11 @@ class Highlighter {
     var doc = this.win.document;
     var b = doc.createElement('button');
     b.onclick = this.startInspecting.bind(this);
-    b.innerHTML = 'Inspect';
+    b.innerHTML = '&#128269;';
+    b.style.backgroundColor = 'transparent';
+    b.style.border = 'none';
+    b.style.outline = 'none';
+    b.style.cursor = 'pointer';
     b.style.position = 'fixed';
     b.style.bottom = '10px';
     b.style.right = '10px';
@@ -89,5 +94,17 @@ class Highlighter {
   }
 }
 
-module.exports = Highlighter;
+function nodePos(node) {
+  var left = 0;
+  var top = 0;
+  while (node) {
+    left += node.offsetLeft;
+    top += node.offsetTop;
+    left -= node.scrollLeft;
+    top -= node.scrollTop;
+    node = node.offsetParent;
+  }
+  return {left, top};
+}
 
+module.exports = Highlighter;

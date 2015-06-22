@@ -18,8 +18,16 @@ type DataType = {
 
 type Bridge = {
   send: (evt: string, data: any) => void,
-  on: (evt: string, fn: (data: any) => void) => void,
+  on: (evt: string, fn: (data: any) => any) => void,
   forget: (id: string) => void,
+};
+
+type Handle = {};
+
+type InternalsObject = {
+  getReactHandleFromElement: (el: Component) => Handle,
+  getReactHandleFromNative: (node: Object) => Handle,
+  getNativeFromHandle: (h: Handle) => Object,
 };
 
 function randid() {
@@ -56,6 +64,8 @@ class Backend extends EventEmitter {
   ids: WeakMap;
   nodes: Map;
   roots: Set;
+  rootIDs: Map;
+  reactInternals: InternalsObject; // injected
 
   constructor(global: Object) {
     super();
@@ -96,7 +106,8 @@ class Backend extends EventEmitter {
 
   getNodeForID(id: string): ?Object {
     var component = this.comps.get(id);
-    return this.reactFindDOMNode(component);
+    var handle = this.reactInternals.getReactHandleFromElement(component);
+    return this.reactInternals.getNativeFromHandle(handle);
   }
 
   selectFromDOMNode(node: Object) {
@@ -108,7 +119,7 @@ class Backend extends EventEmitter {
   }
 
   getIDForNode(node: Object): ?string {
-    var reactID = this.reactIDFromDOM(node);
+    var reactID = this.reactInternals.getReactHandleFromNative(node);
     return this.rootIDs.get(reactID);
   }
 
@@ -160,7 +171,7 @@ class Backend extends EventEmitter {
     var id = this.getId(component);
     this.nodes.set(id, data);
 
-    this.rootIDs.set(component._rootNodeID, id);
+    this.rootIDs.set(this.reactInternals.getReactHandleFromElement(component), id);
 
     var send = assign({}, data);
     if (send.children && send.children.map) {

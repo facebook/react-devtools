@@ -1,17 +1,27 @@
 
 var React = require('react');
 var assign = require('object-assign');
-__REACT_DEVTOOLS_GLOBAL_HOOK__.React = React;
-require('../backend/compat');
 
 class Todos extends React.Component {
   constructor(props) {
     super(props);
-    this._nextid = 12;
+    this._nextid = 50;
     this.state = {
       todos: [
         {title: 'Inspect all the things', completed: true, id: 10},
         {title: 'Profit!!', completed: false, id: 11},
+        {title: 'Profit!!', completed: false, id: 12},
+        /*
+        {title: 'Profit!!', completed: false, id: 13},
+        {title: 'Profit!!', completed: false, id: 14},
+        {title: 'Profit!!', completed: false, id: 15},
+        {title: 'Profit!!', completed: false, id: 16},
+        {title: 'Profit!!', completed: false, id: 17},
+        {title: 'Profit!!', completed: false, id: 18},
+        {title: 'Profit!!', completed: false, id: 19},
+        {title: 'Profit!!', completed: false, id: 21},
+        {title: 'Profit!!', completed: false, id: 41},
+        */
       ],
       filter: 'All',
     };

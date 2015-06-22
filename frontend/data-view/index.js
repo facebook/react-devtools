@@ -175,12 +175,11 @@ var styles = {
     listStyle: 'none',
     margin: 0,
     padding: 0,
-    marginLeft: 20,
+    marginLeft: 10,
   },
 
   children: {
   },
-
 
   empty: {
     fontSize: 12,

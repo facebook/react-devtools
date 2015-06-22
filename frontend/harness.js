@@ -1,19 +1,14 @@
 /** @flow **/
 
 var React = require('react/addons');
-var Backend = require('../backend');
-var inject = require('../backend/inject');
 var compatInject = require('../backend/compat-inject');
 var Store = require('./store');
 var Bridge = require('../backend/bridge');
-var makeWall = require('./wall');
-var makeIframeWall = require('./iframe-wall');
-var Highlighter = require('./highlighter');
 
 class Harness extends React.Component {
-  componentWillMount() {
-    this.storeBridge = new Bridge();
-    this.store = new Store(this.storeBridge);
+  constructor(props: Object) {
+    super(props)
+    this.state = {loading: true}
   }
 
   getChildContext(): Object {
@@ -22,8 +17,44 @@ class Harness extends React.Component {
     };
   }
 
-  componentDidMount() {
-    var iframe = React.findDOMNode(this.iframe)
+  injectBackend(win) {
+    if (!win.__REACT_DEVTOOLS_BACKEND__.injectDevTools && !win.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime) {
+      return console.warn("Looks like React wasn't loaded");
+    }
+
+    var wall = {
+      listen(fn) {
+        win.parent.addEventListener('message', evt => fn(evt.data));
+      },
+      send(data) {
+        win.postMessage(data, '*');
+      },
+    };
+
+    var bridge = new Bridge();
+    bridge.attach(wall);
+
+    this.store = new Store(bridge);
+    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
+
+    // inject the backend part
+    var script = win.document.createElement('script');
+    script.src = this.props.backendSrc
+
+    script.onload = () => {
+      console.log('loaded backend!');
+      this.setState({loading: false});
+    }
+
+    win.document.head.appendChild(script);
+
+
+
+
+    /*
+
+    this.storeBridge = new Bridge();
+    this.store = new Store(this.storeBridge);
 
     var wall = makeIframeWall(window, iframe.contentWindow);
     this.storeBridge.attach(wall.parent);
@@ -33,32 +64,42 @@ class Harness extends React.Component {
     this.backend = new Backend(iframe.contentWindow);
     this.backend.addBridge(backBridge);
 
-    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
     window.backend = this.backend
 
-    var win = iframe.contentWindow
-    var doc = iframe.contentDocument
     inject(this.backend, win, true);
     compatInject(win);
     var script = doc.createElement('script');
     script.src = this.props.targetSrc
     doc.head.appendChild(script);
-    var hl = new Highlighter(iframe.contentWindow, node => {
-      this.backend.selectFromDOMNode(node);
-    });
-    hl.inject();
-    this.backend.on('highlight', node => hl.highlight(node));
-    this.backend.on('hideHighlight', () => hl.hideHighlight());
+    */
+  }
+
+  componentDidMount() {
+    var iframe = React.findDOMNode(this.iframe)
+
+    var win = iframe.contentWindow
+    var doc = iframe.contentDocument
+
+    compatInject(win);
+
+    var script = doc.createElement('script');
+    script.src = this.props.targetSrc
+
+    script.onload = () => {
+      console.log('loaded child!');
+      this.injectBackend(win);
+    }
+
+    doc.head.appendChild(script);
   }
 
   render(): ReactElement {
-    var backend = this.backend
     return <div style={styles.harness}>
       <div style={styles.top}>
         <iframe style={styles.iframe} ref={n => this.iframe = n} />
       </div>
       <div style={styles.bottom}>
-        {React.addons.cloneWithProps(this.props.children)}
+        {this.state.loading ? 'Loading...' : React.addons.cloneWithProps(this.props.children)}
       </div>
     </div>
   }
@@ -66,6 +107,11 @@ class Harness extends React.Component {
 
 Harness.childContextTypes = {
   store: React.PropTypes.object,
+};
+
+Harness.propTypes = {
+  backendSrc: React.PropTypes.string,
+  targetSrc: React.PropTypes.string,
 };
 
 var styles = {

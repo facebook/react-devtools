@@ -1,20 +1,7 @@
 
-var weakCereal = require('./weak-cereal');
 var consts = require('./consts');
 
 type AnyFn = (...x: any) => any;
-/*
-type PayloadType = {
-  type: 'inspect',
-  id: string,
-  path: ?Array<string>,
-  callback: ?number,
-  args: ?Array<any>,
-  cleaned: ?Array<string>,
-  evt: ?string,
-  data: ?any,
-};
-*/
 type PayloadType = {
   type: 'inspect',
   id: string,

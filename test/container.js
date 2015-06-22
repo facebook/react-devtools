@@ -8,7 +8,7 @@ window.React = React;
 var node = document.createElement('div')
 document.body.appendChild(node)
 React.render(
-  <Harness targetSrc="./build/target.js">
+  <Harness backendSrc="./build/backend.js" targetSrc="./build/target.js">
     <Container/>
   </Harness>,
   node

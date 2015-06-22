@@ -32,6 +32,7 @@ class Store extends EventEmitter {
       }
       this.emit('roots');
     });
+    window.store = this;
 
     this.bridge.on('mount', (data) => {
       var map = Map(data).set('renders', 1);

@@ -7,21 +7,6 @@ var Props = require('./props');
 var flash = require('./flash');
 
 class Node {
-  componentDidUpdate(prevProps) {
-    if (prevProps.node && prevProps.node.get('renders') < this.props.node.get('renders')) {
-      this.flash(this.head);
-      this.flash(this.tail);
-    }
-  }
-
-  flash(ref) {
-    if (!ref) {
-      return;
-    }
-    var node = React.findDOMNode(ref);
-    flash(node, 'rgba(255, 0, 0, .1)', node.style.backgroundColor || 'white', .3);
-  }
-
   render() {
     var node = this.props.node;
     var children = node.get('children');
@@ -53,7 +38,7 @@ class Node {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
-          <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
+          <div style={headStyles} {...tagEvents}>
             <span style={styles.openTag}>
               <span style={styles.angle}>&lt;</span>
               <span style={styles.tagName}>{name}</span>
@@ -97,7 +82,7 @@ class Node {
     );
 
     var head = (
-      <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
+      <div style={headStyles} {...tagEvents}>
         <span onClick={this.props.onToggleCollapse} style={collapserStyle}>
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
@@ -137,7 +122,7 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div ref={t => this.tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
+        <div style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
           {closeTag}
         </div>
       </div>

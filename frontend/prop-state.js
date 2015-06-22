@@ -35,7 +35,7 @@ class PropState extends React.Component {
             &lt;{this.props.node.get('name')}&gt;
           </div>
           {nodeType === 'Custom' &&
-            <span>(access as `$r` in the console)</span>}
+            <span>(`$r` in the console)</span>}
         </div>
         <strong>Props</strong>
         <DataView
