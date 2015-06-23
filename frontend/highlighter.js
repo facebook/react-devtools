@@ -18,6 +18,12 @@ class Highlighter {
 
   stopInspecting() {
     this.win.removeEventListener('mouseover', this._cb);
+    this.win.removeEventListener('mousedown', this._mdown);
+    this.win.removeEventListener('click', this._click);
+    this.hideHighlight();
+    if (this._button && this._button.parentNode) {
+      this._button.parentNode.removeChild(this._button);
+    }
   }
 
   highlight(node) {
@@ -91,6 +97,7 @@ class Highlighter {
     b.style.fontSize = '30px';
     b.style.zIndex = 10000;
     doc.body.appendChild(b);
+    this._button = b;
   }
 }
 

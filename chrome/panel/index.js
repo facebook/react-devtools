@@ -6,7 +6,6 @@ var Container = require('../../frontend/container');
 var check = require('./check');
 var Store = require('../../frontend/store');
 var Bridge = require('../../backend/bridge');
-var makeWall = require('./wall');
 
 class Panel extends React.Component {
   constructor(props: Object) {

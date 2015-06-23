@@ -1,11 +1,11 @@
 
 module.exports = function (scriptName, reporter, done) {
   var src = `
-  var script = document.createElement('script');
+  var script = document.constructor.prototype.createElement.call(document, 'script');
   script.src = "${scriptName}";
   document.documentElement.appendChild(script);
   script.parentNode.removeChild(script);
-  var frame = document.createElement('iframe');
+  var frame = document.constructor.prototype.createElement.call(document, 'iframe');
   frame.className = 'react-devtools-reporter';
   frame.src = "${reporter}";
   document.head.appendChild(frame);

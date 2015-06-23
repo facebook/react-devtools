@@ -25,14 +25,18 @@ function welcome(evt) {
 
   var reporter = findReporter();
 
+  var listeners = [];
+
   var wall = {
     listen(fn) {
-      window.addEventListener('message', evt => {
-        if (evt.data.source !== 'react-devtools-reporter') {
+      var listener = evt => {
+        if (evt.data.source !== 'react-devtools-reporter' || !evt.data.payload) {
           return;
         }
         fn(evt.data.payload)
-      });
+      };
+      listeners.push(listener);
+      window.addEventListener('message', listener);
     },
     send(data) {
       reporter.contentWindow.postMessage(data, '*');
@@ -43,13 +47,31 @@ function welcome(evt) {
   bridge.attach(wall);
   var backend = new Backend(window);
   backend.addBridge(bridge);
+  
+  var hl;
 
   inject(window, backend);
 
-  var hl = new Highlighter(window, node => {
-    backend.selectFromDOMNode(node);
+  backend.on('shutdown', () => {
+    listeners.forEach(fn => {
+      window.removeEventListener('message', fn);
+    });
+    listeners = [];
+    if (reporter && reporter.parentNode) {
+      // remove the iframe
+      reporter.parentNode.removeChild(reporter);
+    }
+    if (hl) {
+      hl.stopInspecting();
+    }
   });
-  // hl.inject();
-  backend.on('highlight', node => hl.highlight(node));
-  backend.on('hideHighlight', () => hl.hideHighlight());
+
+  if (window.document && window.document.createElement) {
+    hl = new Highlighter(window, node => {
+      backend.selectFromDOMNode(node);
+    });
+    // hl.inject();
+    backend.on('highlight', node => hl.highlight(node));
+    backend.on('hideHighlight', () => hl.hideHighlight());
+  }
 }

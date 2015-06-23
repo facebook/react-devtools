@@ -17,18 +17,26 @@ chrome.runtime.onConnect.addListener(function (port) {
   ports[tab][name] = port;
 
   if (ports[tab]['devtools'] && ports[tab]['reporter']) {
-    pipe(ports[tab]['devtools'], ports[tab]['reporter']);
-    pipe(ports[tab]['reporter'], ports[tab]['devtools']);
+    doublePipe(ports[tab]['devtools'], ports[tab]['reporter']);
   }
 });
 
-function pipe(source, sink) {
-  sink.onDisconnect.addListener(function () {
-    source.onMessage.removeListener(listener);
-  });
-  source.onMessage.addListener(listener);
-  function listener (message) {
-    sink.postMessage(message);
+function doublePipe(one, two) {
+  one.onMessage.addListener(lOne);
+  function lOne(message) {
+    two.postMessage(message);
   }
+  two.onMessage.addListener(lTwo);
+  function lTwo(message) {
+    one.postMessage(message);
+  }
+  function shutdown() {
+    one.onMessage.removeListener(lOne);
+    two.onMessage.removeListener(lTwo);
+    one.disconnect();
+    two.disconnect();
+  }
+  one.onDisconnect.addListener(shutdown);
+  two.onDisconnect.addListener(shutdown);
 }
 

@@ -21,3 +21,15 @@ window.parent.postMessage({
   source: 'react-devtools-reporter'
 }, '*');
 
+port.onDisconnect.addListener(function () {
+  window.parent.postMessage({
+    source: 'react-devtools-reporter',
+    payload: {
+      type: 'event',
+      evt: 'shutdown',
+    },
+  }, '*');
+});
+
+
+

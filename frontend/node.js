@@ -38,7 +38,7 @@ class Node {
     };
 
     if (!children || 'string' === typeof children || !children.length) {
-      var name = node.get('name') || 'span';
+      var name = '' + node.get('name') || 'span';
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
@@ -73,7 +73,7 @@ class Node {
       <span style={styles.closeTag}>
         <span style={styles.angle}>&lt;/</span>
         <span style={styles.tagName}>
-          {node.get('name')}
+          {'' + node.get('name')}
         </span>
         <span style={styles.angle}>&gt;</span>
       </span>
@@ -92,7 +92,7 @@ class Node {
         </span>
         <span style={styles.openTag}>
           <span style={styles.angle}>&lt;</span>
-          <span style={styles.tagName}>{node.get('name')}</span>
+          <span style={styles.tagName}>{'' + node.get('name')}</span>
           {node.get('props') && <Props props={node.get('props')}/>}
           <span style={styles.angle}>&gt;</span>
         </span>

@@ -30,27 +30,6 @@ type InternalsObject = {
   getNativeFromHandle: (h: Handle) => Object,
 };
 
-function randid() {
-  return Math.random().toString(0x0f).slice(10, 20)
-}
-
-function setIn(obj, path, value) {
-  path = path.slice();
-  var name = path.pop();
-  var child = path.reduce((obj, attr) => obj ? obj[attr] : null, obj);
-  if (child === null) {
-    return false;
-  }
-  child[name] = value;
-  return true;
-}
-
-function getIn(obj, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, obj);
-}
-
 /**
  * Events from React:
  * - root (got a root)
@@ -77,7 +56,7 @@ class Backend extends EventEmitter {
     this.rootIDs = new Map();
     this.on('selected', id => {
       var data = this.nodes.get(id);
-      if (data.updater) {
+      if (data && data.updater) {
         this.global.$r = data.updater.publicInstance;
       }
     });
@@ -94,6 +73,12 @@ class Backend extends EventEmitter {
     });
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('shutdown', () => {
+      this.emit('shutdown');
+      if (this.reactInternals.removeDevtools) {
+        this.reactInternals.removeDevtools();
+      }
+    });
     this.on('root', id => bridge.send('root', id))
     this.on('mount', data => bridge.send('mount', data))
     this.on('update', data => bridge.send('update', data));
@@ -204,6 +189,27 @@ class Backend extends EventEmitter {
     this.emit('unmount', id);
     this.ids.delete(component);
   }
+}
+
+function randid() {
+  return Math.random().toString(0x0f).slice(10, 20)
+}
+
+function setIn(obj, path, value) {
+  path = path.slice();
+  var name = path.pop();
+  var child = path.reduce((obj, attr) => obj ? obj[attr] : null, obj);
+  if (child === null) {
+    return false;
+  }
+  child[name] = value;
+  return true;
+}
+
+function getIn(obj, path) {
+  return path.reduce((obj, attr) => {
+    return obj ? obj[attr] : null;
+  }, obj);
 }
 
 module.exports = Backend

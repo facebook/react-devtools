@@ -62,7 +62,11 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('update', (data) => {
-      data.renders = this.get(data.id).get('renders') + 1;
+      var node = this.get(data.id)
+      if (!node) {
+        return;
+      }
+      data.renders = node.get('renders') + 1;
       this.data = this.data.mergeIn([data.id], Map(data));
       if (data.children && data.children.forEach) {
         data.children.forEach(cid => {
@@ -75,8 +79,6 @@ class Store extends EventEmitter {
     this.bridge.on('unmount', id => {
       this.parents.delete(id);
       this.data = this.data.delete(id)
-      // this.data = this.data.set(data.id, Map(data));
-      // this.emit(data.id);
     });
   }
 
