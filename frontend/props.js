@@ -5,6 +5,13 @@ var valueStyles = require('./value-styles');
 var flash = require('./flash');
 
 class Props extends React.Component {
+  shouldComponentUpdate(nextProps) {
+    if (nextProps === this.props) {
+      return false;
+    }
+    return true;
+  }
+
   render() {
     var props = this.props.props;
     if (!props || 'object' !== typeof props) {

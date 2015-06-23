@@ -7,6 +7,10 @@ var Props = require('./props');
 var flash = require('./flash');
 
 class Node {
+  shouldComponentUpdate(nextProps) {
+    return nextProps !== this.props
+  }
+
   render() {
     var node = this.props.node;
     var children = node.get('children');
@@ -163,6 +167,7 @@ var WrappedNode = decorate({
 
 var tagColor = 'rgb(184, 0, 161)';
 tagColor = 'rgb(176, 0, 182)';
+tagColor = 'rgb(136, 18, 128)';
 
 var styles = {
   container: {

@@ -30,6 +30,9 @@ class Bridge {
     this.listeners = {};
     this.inspectables = new Map();
     this.cid = 0;
+    this._buffer = [];
+    this._waiting = false;
+    this._lastTime = 5;
   }
 
   attach(wall: Object) {
@@ -60,13 +63,44 @@ class Bridge {
     });
   }
 
-  send(evt: string, data: any) {
+  sendOne(evt: string, data: any) {
     var cleaned = [];
+    var start = performance.now();
     var san = sanitize(data, [], cleaned)
     if (cleaned.length) {
       this.inspectables.set(data.id, data);
     }
     this.wall.send({type: 'event', evt, data: san, cleaned});
+    console.log('took', performance.now() - start);
+  }
+
+  send(evt: string, data: any) {
+    if (!this._waiting) {
+      this._buffer = [];
+      this._waiting = 1
+      this._waiting = setTimeout(() => {
+        this.flush();
+        this._waiting = null;
+      }, this._lastTime * 5);
+    }
+    this._buffer.push({evt, data});
+  }
+
+  flush() {
+    var start = performance.now();
+    var events = this._buffer.map(({evt, data}) => {
+      var cleaned = [];
+      var san = sanitize(data, [], cleaned)
+      if (cleaned.length) {
+        this.inspectables.set(data.id, data);
+      }
+      return {type: 'event', evt, data: san, cleaned};
+    });
+    this.wall.send({type: 'many-events', events});
+    this._buffer = [];
+    this._waiting = null;
+    this._lastTime = performance.now() - start
+    console.log('took', this._lastTime, events.length);
   }
 
   forget(id: string) {
@@ -102,6 +136,18 @@ class Bridge {
       if (fns) {
         fns.forEach(fn => fn(payload.data));
       }
+    }
+
+    if (payload.type === 'many-events') {
+      payload.events.forEach(payload => {
+        if (payload.cleaned) {
+          hydrate(payload.data, payload.cleaned);
+        }
+        var fns = this.listeners[payload.evt]
+        if (fns) {
+          fns.forEach(fn => fn(payload.data));
+        }
+      });
     }
   }
 
@@ -149,7 +195,7 @@ function hydrate(data, cleaned) {
   cleaned.forEach(path => {
     var last = path.pop();
     var obj = path.reduce((obj, attr) => obj ? obj[attr] : null, data);
-    if (!obj) {
+    if (!obj || !obj[last]) {
       return;
     }
     var replace = {};
@@ -160,7 +206,8 @@ function hydrate(data, cleaned) {
   });
 }
 
-function sanitize(data, path, cleaned) {
+function sanitize(data, path, cleaned, level) {
+  level = level || 0;
   if ('function' === typeof data) {
     cleaned.push(path);
     return {
@@ -169,10 +216,24 @@ function sanitize(data, path, cleaned) {
     };
   }
   if (!data || 'object' !== typeof data) {
+    if ('string' === typeof data && data.length > 500) {
+      return data.slice(0, 500) + '...';
+    }
     return data;
   }
+  if (data._reactFragment) {
+    return 'A react fragment';
+  }
+  if (level > 2) {
+    cleaned.push(path);
+    return {
+      type: Array.isArray(data) ? 'array' : 'object',
+      name: data.constructor.name,
+      length: data.length,
+    }
+  }
   if (Array.isArray(data)) {
-    return data.map((item, i) => sanitize(item, path.concat([i]), cleaned));
+    return data.map((item, i) => sanitize(item, path.concat([i]), cleaned, level + 1));
   }
   // TODO when this is in the iframe window, we can just use Object
   if (data.constructor && 'function' === typeof data.constructor && data.constructor.name !== 'Object') {
@@ -184,7 +245,7 @@ function sanitize(data, path, cleaned) {
   }
   var res = {};
   for (var name in data) {
-    res[name] = sanitize(data[name], path.concat([name]), cleaned);
+    res[name] = sanitize(data[name], path.concat([name]), cleaned, level + 1);
   }
   return res;
 }

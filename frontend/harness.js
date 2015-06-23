@@ -47,31 +47,6 @@ class Harness extends React.Component {
     }
 
     win.document.head.appendChild(script);
-
-
-
-
-    /*
-
-    this.storeBridge = new Bridge();
-    this.store = new Store(this.storeBridge);
-
-    var wall = makeIframeWall(window, iframe.contentWindow);
-    this.storeBridge.attach(wall.parent);
-
-    var backBridge = new Bridge();
-    backBridge.attach(wall.child);
-    this.backend = new Backend(iframe.contentWindow);
-    this.backend.addBridge(backBridge);
-
-    window.backend = this.backend
-
-    inject(this.backend, win, true);
-    compatInject(win);
-    var script = doc.createElement('script');
-    script.src = this.props.targetSrc
-    doc.head.appendChild(script);
-    */
   }
 
   componentDidMount() {

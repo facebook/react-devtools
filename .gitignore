@@ -1,3 +1,4 @@
 /test/build
 /node_modules
 *.swp
+/chrome/build

@@ -319,6 +319,7 @@ class Store extends EventEmitter {
     window.$selid = id;
     window.$sel = this.get(id);
     this.bridge.send('selected', id);
+    this.bridge.send('highlight', id);
   }
 
   addRoot(id) {
