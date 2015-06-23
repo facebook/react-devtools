@@ -7,7 +7,7 @@ class PropState extends React.Component {
   getChildContext() {
     return {
       onChange: (path, val) => {
-        this.props.setState(path, val);
+        this.props.onChange(path, val);
       }
     };
   }
@@ -28,6 +28,7 @@ class PropState extends React.Component {
 
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
+    var isCustom = this.props.node.get('nodeType') === 'Custom'
 
     return (
       <div style={styles.container}>
@@ -38,17 +39,19 @@ class PropState extends React.Component {
           {nodeType === 'Custom' &&
             <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
-        <strong>Props</strong>
-        <DataView
-          readOnly={true}
-          path={['props']}
-          inspect={this.props.inspect}
-          makeGlobal={this.props.makeGlobal}
-          key={this.props.id + '-props'}
-          data={this.props.node.get('props')}
-        />
+        <div style={styles.section}>
+          <strong>Props</strong>
+          <DataView
+            path={['props']}
+            readOnly={!isCustom}
+            inspect={this.props.inspect}
+            makeGlobal={this.props.makeGlobal}
+            key={this.props.id + '-props'}
+            data={this.props.node.get('props')}
+          />
+        </div>
         {state &&
-          <div>
+          <div style={styles.section}>
             <strong>State</strong>
             <DataView
               data={state}
@@ -59,7 +62,7 @@ class PropState extends React.Component {
             />
           </div>}
         {context &&
-          <div>
+          <div style={styles.section}>
             <strong>Context</strong>
             <DataView
               data={context}
@@ -94,8 +97,12 @@ var WrappedPropState = decorate({
     return {
       id: store.selected,
       node: store.selected ? store.get(store.selected) : null,
-      setState(path, val) {
-        store.setState(store.selected, path, val);
+      onChange(path, val) {
+        if (path[0] === 'props') {
+          store.setProps(store.selected, path.slice(1), val);
+        } else if (path[0] === 'state') {
+          store.setState(store.selected, path.slice(1), val);
+        }
       },
       makeGlobal(path) {
         store.makeGlobal(store.selected, path);
@@ -111,7 +118,12 @@ var styles = {
     fontSize: '12px',
     fontFamily: 'monospace',
     overflow: 'auto',
-    width: 300,
+    flex: 1,
+
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    MsUserSelect: 'none',
+    userSelect: 'none',
   },
   header: {
   },
@@ -119,6 +131,9 @@ var styles = {
     flex: 1,
     fontSize: 16,
     color: 'rgb(184, 0, 161)',
+  },
+  section: {
+    marginBottom: 10,
   },
   globalButton: {
     cursor: 'pointer',

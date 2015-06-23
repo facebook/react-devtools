@@ -9,6 +9,7 @@ type DataType = {
   type: string | Object,
   state: Object,
   props: Object,
+  context: Object,
   updater: {
     setState: (state: Object) => void,
     forceUpdate: () => void,
@@ -65,6 +66,7 @@ class Backend extends EventEmitter {
 
   addBridge(bridge: Bridge) {
     bridge.on('setState', this._setState.bind(this));
+    bridge.on('setProps', this._setProps.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
     bridge.on('highlight', id => {
       var node = this.getNodeForID(id);
@@ -118,6 +120,17 @@ class Backend extends EventEmitter {
 
   setEnabled(val: boolean): Object {
     throw new Error("React hasn't injected... what's up?");
+  }
+
+  _setProps({id, path, value}: {id: string, path: Array<string>, value: any}) {
+    var data = this.nodes.get(id);
+    setIn(data.props, path, value);
+    if (data.updater && data.updater.forceUpdate) {
+      data.updater.forceUpdate();
+      this.onUpdated(this.comps.get(id), data);
+    } else {
+      console.warn("trying to set props on a component that doesn't support it");
+    }
   }
 
   _setState({id, path, value}: {id: string, path: Array<string>, value: any}) {

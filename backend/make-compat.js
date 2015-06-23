@@ -126,10 +126,11 @@ function childrenList(children) {
   return res;
 }
 
-function getData(element, context) {
+function getData(element, parentContext) {
   var children = null;
   var props = null;
   var state = null;
+  var context = null;
   var updater = null;
   var name = null;
   var type = null;
@@ -140,6 +141,10 @@ function getData(element, context) {
     children = [element._renderedComponent];
     props = element._instance.props;
     state = element._instance.state;
+    context = element._instance.context;
+    if (context && Object.keys(context).length === 0) {
+      context = null;
+    }
   } else if (element._renderedChildren) {
     children = childrenList(element._renderedChildren);
   } else if (element._currentElement.props) {

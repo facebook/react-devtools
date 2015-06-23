@@ -107,7 +107,7 @@ class Node {
       </span>
     );
 
-    var hasState = !!node.get('state');
+    var hasState = !!node.get('state') || !!node.get('context');
 
     var collapserStyle = assign(
       {},

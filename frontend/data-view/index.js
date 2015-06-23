@@ -54,6 +54,12 @@ class DataItem extends React.Component {
     this.state = {open: false, loading: false};
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (this.state.open && nextProps.value && nextProps.value[consts.inspected] === false) {
+      this.setState({open: false});
+    }
+  }
+
   toggleOpen() {
     if (this.state.loading) {
       return;
@@ -92,19 +98,21 @@ class DataItem extends React.Component {
       preview = previewComplex(data);
     }
 
+    var open = this.state.open && (!data || data[consts.inspected] !== false);
+
     var opener = null;
     if (complex) {
       opener = (
         <div
           onClick={this.toggleOpen.bind(this)}
           style={styles.opener}>
-          {this.state.open ? <span>&#9660;</span> : <span>&#9654;</span>}
+          {open ? <span>&#9660;</span> : <span>&#9654;</span>}
         </div>
       );
     }
 
     var children = null;
-    if (complex && this.state.open) {
+    if (complex && open) {
       // TODO path
       children = (
         <div style={styles.children}>
