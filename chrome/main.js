@@ -6,7 +6,10 @@ chrome.devtools.inspectedWindow.eval(`!!(
   if (!res) {
     return;
   }
-  chrome.devtools.panels.create('NReact', '', 'panel.html', function () {
+  chrome.devtools.panels.create('NReact', '', 'panel.html', function (panel) {
+    panel.onShown.addListener(function (window) {
+      window.panel.getNewSelection();
+    });
   });
 });
 

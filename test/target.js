@@ -269,6 +269,17 @@ var styles = {
     fontFamily: 'sans-serif',
     fontWeight: 'bold',
   },
+
+  longStyle: {
+    fontSize: 30,
+    width: 200,
+    whiteSpace: 'wrap',
+    wordBreak: 'break-word',
+    wordWrap: 'wrap',
+    backgroundColor: 'rgba(100, 100, 200, .3)',
+    height: 300,
+    overflow: 'auto',
+  }
 }
 
 
@@ -294,6 +305,7 @@ class Wrap extends React.Component {
       <div style={styles.iframeWatermark}>
         this is an iframe
       </div>
+      {long(long(long()))}
       <Todos/>
       {/*<span thing={someVal}/>
       <Target count={1}/>
@@ -303,6 +315,25 @@ class Wrap extends React.Component {
       <div>&lt;</div>*/}
     </div>
   }
+}
+
+function long(children) {
+  return <div style={styles.longStyle}>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    <span>Hello</span>
+    {children}
+  </div>
 }
 
 class Target extends React.Component {

@@ -60,6 +60,7 @@ class Backend extends EventEmitter {
         this.global.$r = data.updater.publicInstance;
       }
     });
+    this._prevSelected = null;
   }
 
   addBridge(bridge: Bridge) {
@@ -78,6 +79,16 @@ class Backend extends EventEmitter {
       if (this.reactInternals.removeDevtools) {
         this.reactInternals.removeDevtools();
       }
+    });
+    bridge.on('checkSelection', () => {
+      var newSelected = window.__REACT_DEVTOOLS_BACKEND__.$0;
+      console.log('new selected', newSelected);
+      if (newSelected !== this._prevSelected) {
+        this._prevSelected = newSelected;
+        this.selectFromDOMNode(newSelected);
+        // bridge.send(select, this.selectFrom
+      }
+      // console.log('selected', window.__REACT_DEVTOOLS_BACKEND__.$0);
     });
     this.on('root', id => bridge.send('root', id))
     this.on('mount', data => bridge.send('mount', data))

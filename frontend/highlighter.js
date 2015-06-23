@@ -102,16 +102,42 @@ class Highlighter {
 }
 
 function nodePos(node) {
-  var left = 0;
-  var top = 0;
-  while (node) {
-    left += node.offsetLeft;
-    top += node.offsetTop;
-    left -= node.scrollLeft;
-    top -= node.scrollTop;
-    node = node.offsetParent;
+  var left = node.offsetLeft;
+  var top = node.offsetTop;
+  while (node && node !== document.body) {
+    var oP = node.offsetParent;
+    var p = node.parentNode;
+    while (p !== oP) {
+      left -= p.scrollLeft;
+      top -= p.scrollTop;
+      p = p.parentNode;
+    }
+    left += oP.offsetLeft;
+    top += oP.offsetTop;
+    left -= oP.scrollLeft;
+    top -= oP.scrollTop;
+    node = oP;
   }
   return {left, top};
+}
+
+function getElementDimensions(element) {
+  var calculatedStyle = window.getComputedStyle(element);
+
+  return {
+    borderLeft: +calculatedStyle.borderLeftWidth.match(/[0-9]*/)[0],
+    borderRight: +calculatedStyle.borderRightWidth.match(/[0-9]*/)[0],
+    borderTop: +calculatedStyle.borderTopWidth.match(/[0-9]*/)[0],
+    borderBottom: +calculatedStyle.borderBottomWidth.match(/[0-9]*/)[0],
+    marginLeft: +calculatedStyle.marginLeft.match(/[0-9]*/)[0],
+    marginRight: +calculatedStyle.marginRight.match(/[0-9]*/)[0],
+    marginTop: +calculatedStyle.marginTop.match(/[0-9]*/)[0],
+    marginBottom: +calculatedStyle.marginBottom.match(/[0-9]*/)[0],
+    paddingLeft: +calculatedStyle.paddingLeft.match(/[0-9]*/)[0],
+    paddingRight: +calculatedStyle.paddingRight.match(/[0-9]*/)[0],
+    paddingTop: +calculatedStyle.paddingTop.match(/[0-9]*/)[0],
+    paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0]
+  };
 }
 
 module.exports = Highlighter;

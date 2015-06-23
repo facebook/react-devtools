@@ -48,18 +48,15 @@ class Node {
           <div style={headStyles} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
-                <span style={styles.angle}>&lt;</span>
-                <span style={styles.tagName}>{name}</span>
+                <span style={styles.tagName}>&lt;{name}</span>
                 {node.get('props') && <Props props={node.get('props')}/>}
                 {!content && '/'}
-                <span style={styles.angle}>&gt;</span>
+                <span style={styles.tagName}>&gt;</span>
               </span>
               {content && [
                 <span key='content' style={styles.textContent}>{content}</span>,
                 <span key='close' style={styles.closeTag}>
-                  <span style={styles.angle}>&lt;/</span>
-                  <span style={styles.tagName}>{name}</span>
-                  <span style={styles.angle}>&gt;</span>
+                  <span style={styles.tagName}>&lt;/{name}&gt;</span>
                 </span>
               ]}
             </span>
@@ -79,11 +76,9 @@ class Node {
 
     var closeTag = (
       <span style={styles.closeTag}>
-        <span style={styles.angle}>&lt;/</span>
         <span style={styles.tagName}>
-          {'' + node.get('name')}
+          &lt;/{'' + node.get('name')}&gt;
         </span>
-        <span style={styles.angle}>&gt;</span>
       </span>
     );
 
@@ -103,10 +98,9 @@ class Node {
         </span>
         <span style={styles.tagText}>
           <span style={styles.openTag}>
-            <span style={styles.angle}>&lt;</span>
-            <span style={styles.tagName}>{'' + node.get('name')}</span>
+            <span style={styles.tagName}>&lt;{'' + node.get('name')}</span>
             {node.get('props') && <Props props={node.get('props')}/>}
-            <span style={styles.angle}>&gt;</span>
+            <span style={styles.tagName}>&gt;</span>
           </span>
           {collapsed && '…'}
           {collapsed && closeTag}
@@ -198,10 +192,6 @@ var styles = {
 
   tail: {
     cursor: 'pointer',
-  },
-
-  angle: {
-    color: tagColor,
   },
 
   tagName: {

@@ -11,6 +11,7 @@ class Panel extends React.Component {
   constructor(props: Object) {
     super(props)
     this.state = {loading: true, isReact: true};
+    window.panel = this;
   }
 
   getChildContext(): Object {
@@ -21,6 +22,13 @@ class Panel extends React.Component {
 
   componentDidMount() {
     this.inject();
+
+    /*
+    chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
+      console.log('selection changed!');
+      chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
+    });
+    */
 
     chrome.devtools.network.onNavigated.addListener(() => {
       this.teardown();
@@ -35,6 +43,11 @@ class Panel extends React.Component {
     });
   }
 
+  getNewSelection() {
+    chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
+    this.bridge.send('checkSelection');
+  }
+
   teardown() {
     if (this._keyListener) {
       window.removeEventListener('keydown', this._keyListener);
@@ -44,6 +57,7 @@ class Panel extends React.Component {
       this._port.disconnect();
       this._port = null;
     }
+    this.bridge = null;
   }
 
   inject() {
@@ -63,10 +77,10 @@ class Panel extends React.Component {
         },
       };
 
-      var bridge = new Bridge();
-      bridge.attach(wall);
+      this.bridge = new Bridge();
+      this.bridge.attach(wall);
 
-      this.store = new Store(bridge);
+      this.store = new Store(this.bridge);
       this._keyListener = this.store.onKeyDown.bind(this.store)
       window.addEventListener('keydown', this._keyListener);
 
