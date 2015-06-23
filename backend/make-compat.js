@@ -42,7 +42,7 @@ function compatify(oldHook, newHook) {
 
   newHook.getReactHandleFromNative = function (node) {
     var id = runtime.Mount.getID(node);
-    while (node.parentNode && !id) {
+    while (node && node.parentNode && !id) {
       node = node.parentNode;
       id = runtime.Mount.getID(node);
     }

@@ -43,7 +43,7 @@ function welcome(evt) {
   bridge.attach(wall);
   var backend = new Backend(window);
   backend.addBridge(bridge);
-  
+
   var hl;
 
   inject(window, backend);

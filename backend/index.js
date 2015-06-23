@@ -82,13 +82,10 @@ class Backend extends EventEmitter {
     });
     bridge.on('checkSelection', () => {
       var newSelected = window.__REACT_DEVTOOLS_BACKEND__.$0;
-      console.log('new selected', newSelected);
       if (newSelected !== this._prevSelected) {
         this._prevSelected = newSelected;
         this.selectFromDOMNode(newSelected);
-        // bridge.send(select, this.selectFrom
       }
-      // console.log('selected', window.__REACT_DEVTOOLS_BACKEND__.$0);
     });
     this.on('root', id => bridge.send('root', id))
     this.on('mount', data => bridge.send('mount', data))

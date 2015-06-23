@@ -71,7 +71,6 @@ class Bridge {
       this.inspectables.set(data.id, data);
     }
     this.wall.send({type: 'event', evt, data: san, cleaned});
-    // console.log('took', performance.now() - start);
   }
 
   send(evt: string, data: any) {
@@ -100,7 +99,7 @@ class Bridge {
     this._buffer = [];
     this._waiting = null;
     this._lastTime = performance.now() - start
-    console.log('took', this._lastTime, events.length);
+    // console.log('took', this._lastTime, events.length);
   }
 
   forget(id: string) {

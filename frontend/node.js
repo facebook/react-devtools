@@ -41,7 +41,27 @@ class Node {
     };
 
     if (!children || 'string' === typeof children || !children.length) {
-      var name = '' + node.get('name') || 'span';
+      var name = node.get('name');
+      if (name === null) {
+        return (
+          <div style={styles.container}>
+            <div style={headStyles} {...tagEvents}>
+              <span style={styles.tagText}>
+                <span style={styles.openTag}>
+                  "
+                </span>
+                <span style={styles.textContent}>{content}</span>,
+                <span style={styles.closeTag}>
+                  "
+                </span>
+              </span>
+              <span style={styles.renderCount}>
+                {node.get('renders')}
+              </span>
+            </div>
+          </div>
+        );
+      }
       var content = children || node.get('text');
       return (
         <div style={styles.container}>

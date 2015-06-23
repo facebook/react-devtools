@@ -211,7 +211,7 @@ var styles = {
 
   filterButton: {
     padding: '5px 10px',
-    border: '1px solid #eee',
+    border: '10px solid #fff',
     outline: 'none',
     margin: '0 5px',
     cursor: 'pointer',
@@ -282,14 +282,6 @@ var styles = {
   }
 }
 
-
-
-
-
-
-
-
-
 class Something {
   doot() {
     return 10;
@@ -305,7 +297,8 @@ class Wrap extends React.Component {
       <div style={styles.iframeWatermark}>
         this is an iframe
       </div>
-      {long(long(long()))}
+      {/* for testing highlighing in the presence of multiple scrolls
+        long(long(long()))*/}
       <Todos/>
       {/*<span thing={someVal}/>
       <Target count={1}/>

@@ -23,13 +23,6 @@ class Panel extends React.Component {
   componentDidMount() {
     this.inject();
 
-    /*
-    chrome.devtools.panels.elements.onSelectionChanged.addListener(() => {
-      console.log('selection changed!');
-      chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
-    });
-    */
-
     chrome.devtools.network.onNavigated.addListener(() => {
       this.teardown();
       this.setState({loading: true});
