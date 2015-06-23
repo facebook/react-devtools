@@ -5,24 +5,26 @@ var port = chrome.runtime.connect({
 });
 
 window.addEventListener('message', function (evt) {
-  // console.log('from page', evt.data);
-  port.postMessage(evt.data);
+  if (evt.data && evt.data.source === 'react-devtools-bridge') {
+    port.postMessage(evt.data.payload);
+  }
 });
 
 port.onMessage.addListener(function (message) {
   // console.log('from background', message);
-  window.parent.postMessage({
+  window.postMessage({
     source: 'react-devtools-reporter',
     payload: message
   }, '*');
 });
 
 window.parent.postMessage({
-  source: 'react-devtools-reporter'
+  source: 'react-devtools-reporter',
+  hello: true,
 }, '*');
 
 port.onDisconnect.addListener(function () {
-  window.parent.postMessage({
+  window.postMessage({
     source: 'react-devtools-reporter',
     payload: {
       type: 'event',
@@ -30,6 +32,4 @@ port.onDisconnect.addListener(function () {
     },
   }, '*');
 });
-
-
 

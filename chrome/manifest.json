@@ -9,12 +9,18 @@
   "devtools_page": "main.html",
 
   "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'",
-  "web_accessible_resources": [ "main.html", "panel.html", "build/backend.js", "reporter.html", "reporter.js" ],
+  "web_accessible_resources": [ "main.html", "panel.html", "build/backend.js", "reporter.html" ],
 
   "background": {
     "scripts": [ "background.js" ],
     "persistent": false
   },
+
+  "permissions": [
+    "http://*/",
+    "https://*/*",
+    "file://*"
+  ],
 
   "content_scripts": [
     {

@@ -6,16 +6,6 @@ var Highlighter = require('../frontend/highlighter');
 
 window.addEventListener('message', welcome);
 
-function findReporter() {
-  var found = null;
-  [].forEach.call(document.head.childNodes, node => {
-    if (node.nodeName === 'IFRAME' && node.className === 'react-devtools-reporter') {
-      found = node;
-    }
-  });
-  return found;
-}
-
 function welcome(evt) {
   if (evt.data.source !== 'react-devtools-reporter') {
     return;
@@ -23,7 +13,7 @@ function welcome(evt) {
 
   window.removeEventListener('message', welcome);
 
-  var reporter = findReporter();
+  // var reporter = findReporter();
 
   var listeners = [];
 
@@ -39,7 +29,11 @@ function welcome(evt) {
       window.addEventListener('message', listener);
     },
     send(data) {
-      reporter.contentWindow.postMessage(data, '*');
+      window.postMessage({
+        source: 'react-devtools-bridge',
+        payload: data,
+      }, '*');
+      // reporter.contentWindow.postMessage(data, '*');
     },
   };
 
@@ -57,10 +51,12 @@ function welcome(evt) {
       window.removeEventListener('message', fn);
     });
     listeners = [];
+    /*
     if (reporter && reporter.parentNode) {
       // remove the iframe
       reporter.parentNode.removeChild(reporter);
     }
+    */
     if (hl) {
       hl.stopInspecting();
     }

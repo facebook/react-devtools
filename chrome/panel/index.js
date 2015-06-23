@@ -47,29 +47,31 @@ class Panel extends React.Component {
   }
 
   inject() {
-    var port = this._port = chrome.runtime.connect({
-      name: '' + chrome.devtools.inspectedWindow.tabId,
-    });
+    inject(chrome.runtime.getURL('build/backend.js'), () => {
+      // , chrome.runtime.getURL('reporter.html')
 
-    var wall = {
-      listen(fn) {
-        port.onMessage.addListener(message => fn(message));
-      },
-      send(data) {
-        port.postMessage(data);
-      },
-    };
+      var port = this._port = chrome.runtime.connect({
+        name: '' + chrome.devtools.inspectedWindow.tabId,
+      });
 
-    var bridge = new Bridge();
-    bridge.attach(wall);
+      var wall = {
+        listen(fn) {
+          port.onMessage.addListener(message => fn(message));
+        },
+        send(data) {
+          port.postMessage(data);
+        },
+      };
 
-    this.store = new Store(bridge);
+      var bridge = new Bridge();
+      bridge.attach(wall);
 
-    inject(chrome.runtime.getURL('build/backend.js'), chrome.runtime.getURL('reporter.html'), () => {
+      this.store = new Store(bridge);
+      this._keyListener = this.store.onKeyDown.bind(this.store)
+      window.addEventListener('keydown', this._keyListener);
+
       this.setState({loading: false});
     });
-    this._keyListener = this.store.onKeyDown.bind(this.store)
-    window.addEventListener('keydown', this._keyListener);
   }
 
   render(): ReactElement {

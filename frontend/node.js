@@ -82,7 +82,10 @@ class Node {
     var collapserStyle = assign(
       {},
       styles.collapser,
-      {left: leftPad.paddingLeft - 12}
+      {left: leftPad.paddingLeft - 12},
+      node.get('state') && {
+        color: 'red',
+      },
     );
 
     var head = (

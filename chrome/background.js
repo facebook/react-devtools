@@ -7,6 +7,7 @@ chrome.runtime.onConnect.addListener(function (port) {
   if (+port.name + '' === port.name) {
     tab = port.name;
     name = 'devtools';
+    installReporter(+port.name);
   } else {
     tab = port.sender.tab.id;
     name = port.name;
@@ -20,6 +21,12 @@ chrome.runtime.onConnect.addListener(function (port) {
     doublePipe(ports[tab]['devtools'], ports[tab]['reporter']);
   }
 });
+
+function installReporter(tabId) {
+  chrome.tabs.executeScript(tabId, {file: 'reporter.js'}, function () {
+    debugger;
+  });
+}
 
 function doublePipe(one, two) {
   one.onMessage.addListener(lOne);

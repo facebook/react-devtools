@@ -62,6 +62,9 @@ function compatify(oldHook, newHook) {
         var data = getData(element, context)
         backend.onMounted(element, data);
       },
+      performUpdateIfNecessary(element, nextChild, transaction, context) {
+        backend.onUpdated(element, getData(element, context));
+      },
       receiveComponent(element, nextChild, transaction, context) {
         backend.onUpdated(element, getData(element, context));
       },
