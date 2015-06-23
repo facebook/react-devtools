@@ -50,22 +50,24 @@ class Harness extends React.Component {
   }
 
   componentDidMount() {
-    var iframe = React.findDOMNode(this.iframe)
+    // firefox needs a slight delay
+    setTimeout(() => {
+      var iframe = React.findDOMNode(this.iframe)
 
-    var win = iframe.contentWindow
-    var doc = iframe.contentDocument
+      var win = iframe.contentWindow
+      var doc = win.document;
 
-    compatInject(win);
+      compatInject(win);
 
-    var script = doc.createElement('script');
-    script.src = this.props.targetSrc
+      var script = doc.createElement('script');
+      doc.head.appendChild(script);
 
-    script.onload = () => {
-      console.log('loaded child!');
-      this.injectBackend(win);
-    }
-
-    doc.head.appendChild(script);
+      script.onload = () => {
+        console.log('loaded child!');
+        this.injectBackend(win);
+      }
+      script.src = this.props.targetSrc
+    }, 100);
   }
 
   render(): ReactElement {
