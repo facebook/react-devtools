@@ -13,6 +13,9 @@ class Node {
 
   render() {
     var node = this.props.node;
+    if (!node) {
+      return <span>Node deleted</span>;
+    }
     var children = node.get('children');
 
     if (node.get('nodeType') === 'Wrapper') {
@@ -43,21 +46,26 @@ class Node {
       return (
         <div style={styles.container}>
           <div style={headStyles} {...tagEvents}>
-            <span style={styles.openTag}>
-              <span style={styles.angle}>&lt;</span>
-              <span style={styles.tagName}>{name}</span>
-              {node.get('props') && <Props props={node.get('props')}/>}
-              {!content && '/'}
-              <span style={styles.angle}>&gt;</span>
-            </span>
-            {content && [
-              <span key='content' style={styles.textContent}>{content}</span>,
-              <span key='close' style={styles.closeTag}>
-                <span style={styles.angle}>&lt;/</span>
+            <span style={styles.tagText}>
+              <span style={styles.openTag}>
+                <span style={styles.angle}>&lt;</span>
                 <span style={styles.tagName}>{name}</span>
+                {node.get('props') && <Props props={node.get('props')}/>}
+                {!content && '/'}
                 <span style={styles.angle}>&gt;</span>
               </span>
-            ]}
+              {content && [
+                <span key='content' style={styles.textContent}>{content}</span>,
+                <span key='close' style={styles.closeTag}>
+                  <span style={styles.angle}>&lt;/</span>
+                  <span style={styles.tagName}>{name}</span>
+                  <span style={styles.angle}>&gt;</span>
+                </span>
+              ]}
+            </span>
+            <span style={styles.renderCount}>
+              {node.get('renders')}
+            </span>
           </div>
         </div>
       );
@@ -93,14 +101,16 @@ class Node {
         <span onClick={this.props.onToggleCollapse} style={collapserStyle}>
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
-        <span style={styles.openTag}>
-          <span style={styles.angle}>&lt;</span>
-          <span style={styles.tagName}>{'' + node.get('name')}</span>
-          {node.get('props') && <Props props={node.get('props')}/>}
-          <span style={styles.angle}>&gt;</span>
+        <span style={styles.tagText}>
+          <span style={styles.openTag}>
+            <span style={styles.angle}>&lt;</span>
+            <span style={styles.tagName}>{'' + node.get('name')}</span>
+            {node.get('props') && <Props props={node.get('props')}/>}
+            <span style={styles.angle}>&gt;</span>
+          </span>
+          {collapsed && '…'}
+          {collapsed && closeTag}
         </span>
-        {collapsed && '…'}
-        {collapsed && closeTag}
         <span style={styles.renderCount}>
           {node.get('renders')}
         </span>
@@ -183,7 +193,6 @@ var styles = {
   },
 
   renderCount: {
-    flex: 1,
     textAlign: 'right',
   },
 
@@ -200,7 +209,11 @@ var styles = {
   },
 
   openTag: {
-    // 
+  },
+
+  tagText: {
+    flex: 1,
+    wordWrap: 'break-word',
   },
 
   headSelect: {

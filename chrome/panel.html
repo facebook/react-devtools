@@ -11,11 +11,19 @@
                 right: 0;
                 bottom: 0;
             }
+            body {
+                margin: 0;
+                padding: 0;
+            }
+            #container {
+                display: flex;
+                flex: 1;
+            }
         </style>
     </head>
     <body style="flex: 1; display: flex">
         <!-- main react mount point -->
-        <div id="container" style="display: flex; flex: 1">No react found on the page.</div>
+        <div id="container">No react found on the page.</div>
         <script src="./build/panel.js"></script>
     </body>
 </html>

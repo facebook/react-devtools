@@ -31,11 +31,11 @@ class PropState extends React.Component {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <div style={styles.headerName}>
+          <span style={styles.headerName}>
             &lt;{this.props.node.get('name')}&gt;
-          </div>
+          </span>
           {nodeType === 'Custom' &&
-            <span>(`$r` in the console)</span>}
+            <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
         <strong>Props</strong>
         <DataView
@@ -95,14 +95,13 @@ var WrappedPropState = decorate({
 
 var styles = {
   container: {
-    padding: 10,
+    padding: 3,
     fontSize: '12px',
     fontFamily: 'monospace',
     overflow: 'auto',
     width: 300,
   },
   header: {
-    display: 'flex',
   },
   headerName: {
     flex: 1,
@@ -111,6 +110,10 @@ var styles = {
   },
   globalButton: {
     cursor: 'pointer',
+  },
+  consoleHint: {
+    float: 'right',
+    fontSize: 11,
   },
 };
 

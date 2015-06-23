@@ -6,14 +6,17 @@ var Highlighter = require('../frontend/highlighter');
 
 window.addEventListener('message', welcome);
 
+// TODO: check to see if we're in RN before doing this?
+setInterval(function () {
+  // this is needed to force refresh on react native
+}, 100);
+
 function welcome(evt) {
   if (evt.data.source !== 'react-devtools-reporter') {
     return;
   }
 
   window.removeEventListener('message', welcome);
-
-  // var reporter = findReporter();
 
   var listeners = [];
 
@@ -33,7 +36,6 @@ function welcome(evt) {
         source: 'react-devtools-bridge',
         payload: data,
       }, '*');
-      // reporter.contentWindow.postMessage(data, '*');
     },
   };
 
@@ -51,12 +53,6 @@ function welcome(evt) {
       window.removeEventListener('message', fn);
     });
     listeners = [];
-    /*
-    if (reporter && reporter.parentNode) {
-      // remove the iframe
-      reporter.parentNode.removeChild(reporter);
-    }
-    */
     if (hl) {
       hl.stopInspecting();
     }

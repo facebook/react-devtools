@@ -77,8 +77,15 @@ class Store extends EventEmitter {
     });
 
     this.bridge.on('unmount', id => {
+      var pid = this.parents.get(id);
       this.parents.delete(id);
       this.data = this.data.delete(id)
+      if (pid) {
+        this.emit(pid);
+      } else {
+        this.roots = this.roots.delete(id);
+        this.emit('roots');
+      }
     });
   }
 

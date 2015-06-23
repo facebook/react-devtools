@@ -51,11 +51,18 @@ function compatify(oldHook, newHook) {
 
   var oldMethods;
   var oldRenderNode;
+  var oldRenderComponent;
 
   newHook.injectDevTools = function (backend) {
-    oldRenderNode = decorateResult(runtime.Mount, '_renderNewRootComponent', element => {
-      backend.addRoot(element);
-    });
+    if (runtime.Mount._renderNewRootComponent) {
+      oldRenderNode = decorateResult(runtime.Mount, '_renderNewRootComponent', element => {
+        backend.addRoot(element);
+      });
+    } else if (runtime.Mount.renderComponent) { // React Native
+      oldRenderComponent = decorateResult(runtime.Mount, 'renderComponent', element => {
+        backend.addRoot(element._reactInternalInstance);
+      });
+    }
 
     oldMethods = decorateMany(runtime.Reconciler, {
       mountComponent(element, rootID, transaction, context) {
@@ -85,8 +92,12 @@ function compatify(oldHook, newHook) {
     if (oldRenderNode) {
       runtime.Mount._renderNewRootComponent = oldRenderNode;
     }
+    if (oldRenderComponent) {
+      runtime.Mount.renderComponent = oldRenderComponent;
+    }
     oldMethods = null;
     oldRenderNode = null;
+    oldRenderComponent = null;
   }
 
   return true;
