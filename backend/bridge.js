@@ -154,7 +154,7 @@ class Bridge {
     var val = getIn(this.inspectables.get(id), path);
     var result = {};
     var cleaned = [];
-    var proto = {};
+    var proto = null;
     var protoclean = [];
     if (val) {
       var protod = false
@@ -169,7 +169,7 @@ class Bridge {
         result[name] = sanitize(val[name], [name], cleaned);
       });
 
-      if (!protod && val.__proto__) {
+      if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
         proto = {};
         var pIsFn = typeof val.__proto__ === 'function'
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
@@ -200,6 +200,7 @@ function hydrate(data, cleaned) {
     var replace = {};
     replace[consts.name] = obj[last].name;
     replace[consts.type] = obj[last].type;
+    replace[consts.meta] = obj[last].meta;
     replace[consts.inspected] = false;
     obj[last] = replace;
   });
@@ -228,7 +229,9 @@ function sanitize(data, path, cleaned, level) {
     return {
       type: Array.isArray(data) ? 'array' : 'object',
       name: 'Object' === data.constructor.name ? '' : data.constructor.name,
-      length: data.length,
+      meta: {
+        length: data.length,
+      },
     }
   }
   if (Array.isArray(data)) {

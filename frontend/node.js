@@ -223,7 +223,6 @@ var styles = {
   },
 
   customTagName: {
-    // color: 'rgb(22, 103, 0)', //'rgb(120, 18, 200)',
     color: 'rgb(136, 18, 128)',
   },
 

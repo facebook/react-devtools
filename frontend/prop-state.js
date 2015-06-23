@@ -27,6 +27,7 @@ class PropState extends React.Component {
     }
 
     var state = this.props.node.get('state');
+    var context = this.props.node.get('context');
 
     return (
       <div style={styles.container}>
@@ -55,6 +56,17 @@ class PropState extends React.Component {
               inspect={this.props.inspect}
               makeGlobal={this.props.makeGlobal}
               key={this.props.id + '-state'}
+            />
+          </div>}
+        {context &&
+          <div>
+            <strong>Context</strong>
+            <DataView
+              data={context}
+              path={['context']}
+              inspect={this.props.inspect}
+              makeGlobal={this.props.makeGlobal}
+              key={this.props.id + '-context'}
             />
           </div>}
       </div>

@@ -134,6 +134,9 @@ function previewProp(val, nested) {
     if (type === 'object') {
       return <span>{val[consts.name] + '{}'}</span>;
     }
+    if (type === 'array') {
+      return <span>Array[{val[consts.meta].length}]</span>
+    }
   }
   if (nested) {
     return <span>{'{…}'}</span>;

@@ -62,7 +62,6 @@ function welcome(evt) {
     hl = new Highlighter(window, node => {
       backend.selectFromDOMNode(node);
     });
-    // hl.inject();
     backend.on('highlight', node => hl.highlight(node));
     backend.on('hideHighlight', () => hl.hideHighlight());
   }
