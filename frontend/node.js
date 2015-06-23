@@ -40,43 +40,50 @@ class Node {
       onMouseDown: this.props.onSelect,
     };
 
-    if (!children || 'string' === typeof children || !children.length) {
-      var name = node.get('name');
-      if (name === null) {
-        return (
-          <div style={styles.container}>
-            <div style={headStyles} {...tagEvents}>
-              <span style={styles.tagText}>
-                <span style={styles.openTag}>
-                  "
-                </span>
-                <span style={styles.textContent}>{content}</span>,
-                <span style={styles.closeTag}>
-                  "
-                </span>
-              </span>
-              <span style={styles.renderCount}>
-                {node.get('renders')}
-              </span>
-            </div>
-          </div>
-        );
-      }
+    if (null === node.get('name')) {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
           <div style={headStyles} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
-                <span style={styles.tagName}>&lt;{name}</span>
+                "
+              </span>
+              <span style={styles.textContent}>{content}</span>
+              <span style={styles.closeTag}>
+                "
+              </span>
+            </span>
+            <span style={styles.renderCount}>
+              {node.get('renders')}
+            </span>
+          </div>
+        </div>
+      );
+    }
+
+    var collapsed = node.get('collapsed');
+    var isCustom = node.get('nodeType') === 'Custom';
+
+    var tagStyle = isCustom ? styles.customTagName : styles.tagName;
+
+    if (!children || 'string' === typeof children || !children.length) {
+      var name = node.get('name');
+      var content = children || node.get('text');
+      return (
+        <div style={styles.container}>
+          <div style={headStyles} {...tagEvents}>
+            <span style={styles.tagText}>
+              <span style={styles.openTag}>
+                <span style={tagStyle}>&lt;{name}</span>
                 {node.get('props') && <Props props={node.get('props')}/>}
                 {!content && '/'}
-                <span style={styles.tagName}>&gt;</span>
+                <span style={tagStyle}>&gt;</span>
               </span>
               {content && [
                 <span key='content' style={styles.textContent}>{content}</span>,
                 <span key='close' style={styles.closeTag}>
-                  <span style={styles.tagName}>&lt;/{name}&gt;</span>
+                  <span style={tagStyle}>&lt;/{name}&gt;</span>
                 </span>
               ]}
             </span>
@@ -92,35 +99,36 @@ class Node {
       return <div style={leftPad}>{children}</div>;
     }
 
-    var collapsed = node.get('collapsed');
-
     var closeTag = (
       <span style={styles.closeTag}>
-        <span style={styles.tagName}>
+        <span style={tagStyle}>
           &lt;/{'' + node.get('name')}&gt;
         </span>
       </span>
     );
 
+    var hasState = !!node.get('state');
+
     var collapserStyle = assign(
       {},
       styles.collapser,
       {left: leftPad.paddingLeft - 12},
-      node.get('state') && {
+      isCustom && styles.customCollapser,
+      hasState && {
         color: 'red',
       },
     );
 
     var head = (
       <div style={headStyles} {...tagEvents}>
-        <span onClick={this.props.onToggleCollapse} style={collapserStyle}>
+        <span title={hasState && 'This component has state'} onClick={this.props.onToggleCollapse} style={collapserStyle}>
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
         <span style={styles.tagText}>
           <span style={styles.openTag}>
-            <span style={styles.tagName}>&lt;{'' + node.get('name')}</span>
+            <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
             {node.get('props') && <Props props={node.get('props')}/>}
-            <span style={styles.tagName}>&gt;</span>
+            <span style={tagStyle}>&gt;</span>
           </span>
           {collapsed && '…'}
           {collapsed && closeTag}
@@ -178,11 +186,11 @@ var WrappedNode = decorate({
       },
       onHover: isHovered => store.setHover(props.id, isHovered),
       onSelect: e => {
-        e.preventDefault();
+        // e.preventDefault();
         store.selectTop(props.id);
       },
       onSelectBottom: e => {
-        e.preventDefault();
+        // e.preventDefault();
         store.selectBottom(props.id);
       },
     };
@@ -191,10 +199,6 @@ var WrappedNode = decorate({
     return nextProps.id !== prevProps.id;
   },
 }, Node);
-
-var tagColor = 'rgb(184, 0, 161)';
-tagColor = 'rgb(176, 0, 182)';
-tagColor = 'rgb(136, 18, 128)';
 
 var styles = {
   container: {
@@ -215,7 +219,12 @@ var styles = {
   },
 
   tagName: {
-    color: tagColor,
+    color: 'rgb(120, 120, 120)',
+  },
+
+  customTagName: {
+    // color: 'rgb(22, 103, 0)', //'rgb(120, 18, 200)',
+    color: 'rgb(136, 18, 128)',
   },
 
   openTag: {
@@ -231,11 +240,16 @@ var styles = {
   },
 
   collapser: {
-    fontSize: 9,
-    color: '#555',
+    fontSize: 7,
+    color: '#aaa',
     marginRight: 3,
     position: 'absolute',
     padding: 2,
+  },
+
+  customCollapser: {
+    color: '#555',
+    fontSize: 9,
   },
 
   headHover: {

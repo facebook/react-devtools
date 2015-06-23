@@ -227,7 +227,7 @@ function sanitize(data, path, cleaned, level) {
     cleaned.push(path);
     return {
       type: Array.isArray(data) ? 'array' : 'object',
-      name: data.constructor.name,
+      name: 'Object' === data.constructor.name ? '' : data.constructor.name,
       length: data.length,
     }
   }

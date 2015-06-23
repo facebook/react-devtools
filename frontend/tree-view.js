@@ -23,6 +23,10 @@ var styles = {
     fontFamily: 'monospace',
     fontSize: '12px',
     flex: 1,
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    MsUserSelect: 'none',
+    userSelect: 'none',
   },
 };
 
