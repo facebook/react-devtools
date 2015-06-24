@@ -25,14 +25,11 @@ class Panel extends React.Component {
 
     chrome.devtools.network.onNavigated.addListener(() => {
       this.teardown();
-      this.setState({loading: true});
-      check(isReact => {
-        if (isReact) {
-          this.inject();
-        } else {
-          this.setState({isReact: false});
-        }
-      });
+      // this.props.reload();
+      this.setState({loading: true}, this.props.reload);
+      /*
+       * this.lookForReact();
+       */
     });
   }
 
@@ -84,12 +81,34 @@ class Panel extends React.Component {
     });
   }
 
+  componentDidUpdate() {
+    if (!this.state.isReact) {
+      if (!this._checkTimeout) {
+        this._checkTimeout = setTimeout(() => {
+          this._checkTimeout = null;
+          this.lookForReact();
+        }, 200);
+      }
+    }
+  }
+
+  lookForReact() {
+    check(isReact => {
+      if (isReact) {
+        this.setState({isReact: true});
+        this.inject();
+      } else {
+        this.setState({isReact: false, loading: false});
+      }
+    });
+  }
+
   render(): ReactElement {
     if (this.state.loading) {
-      return <span>Loading...</span>
+      return <span>Loading...</span>;
     }
     if (!this.state.isReact) {
-      return <span>React not found on this page</span>
+      return <span>Looking for react...</span>;
     }
     return <Container />;
   }

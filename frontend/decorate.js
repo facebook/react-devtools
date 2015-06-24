@@ -30,8 +30,8 @@ function arrayDiff(array, oldArray) {
 
 module.exports = (options, Component) => {
   class Wrapper extends React.Component {
-    constructor() {
-      super()
+    constructor(props) {
+      super(props)
       this.state = {}
     }
 

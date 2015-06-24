@@ -24,7 +24,6 @@ chrome.runtime.onConnect.addListener(function (port) {
 
 function installReporter(tabId) {
   chrome.tabs.executeScript(tabId, {file: 'reporter.js'}, function () {
-    debugger;
   });
 }
 

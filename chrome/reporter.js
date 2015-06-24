@@ -6,6 +6,7 @@ var port = chrome.runtime.connect({
 
 var fromPage = function (evt) {
   if (evt.data && evt.data.source === 'react-devtools-bridge') {
+    // console.log('from page', evt.data.payload);
     port.postMessage(evt.data.payload);
   }
 }
@@ -13,14 +14,14 @@ var fromPage = function (evt) {
 window.addEventListener('message', fromPage);
 
 port.onMessage.addListener(function (message) {
-  // console.log('from background', message);
+  // console.log('from devtools', message);
   window.postMessage({
     source: 'react-devtools-reporter',
     payload: message
   }, '*');
 });
 
-window.parent.postMessage({
+window.postMessage({
   source: 'react-devtools-reporter',
   hello: true,
 }, '*');

@@ -8,6 +8,8 @@ class TreeView extends React.Component {
   render() {
     return (
       <div style={styles.container}>
+        {!this.props.roots.count() &&
+          <span>Waiting for roots to load...</span>}
         {this.props.roots.map(id => (
           <Node key={id} id={id} depth={0} />
         ))}
