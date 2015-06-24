@@ -102,6 +102,9 @@ class Backend extends EventEmitter {
 
   getNodeForID(id: string): ?Object {
     var component = this.comps.get(id);
+    if (!component) {
+      return null;
+    }
     var handle = this.reactInternals.getReactHandleFromElement(component);
     return this.reactInternals.getNativeFromHandle(handle);
   }

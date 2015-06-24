@@ -39,20 +39,6 @@ class Store extends EventEmitter {
     });
     window.store = this;
 
-    this.bridge.on('mount', (data) => {
-      var map = Map(data).set('renders', 1);
-      if (data.nodeType === 'Custom') {
-        map = map.set('collapsed', true);
-      }
-      this.data = this.data.set(data.id, map);
-      if (data.children && data.children.forEach) {
-        data.children.forEach(cid => {
-          this.parents.set(cid, data.id);
-        });
-      }
-      this.emit(data.id);
-    });
-
     this.bridge.on('select', id => {
       var node = this.get(id);
       var pid = this.parents.get(id);
@@ -66,32 +52,9 @@ class Store extends EventEmitter {
       this.selectTop(this.skipWrapper(id));
     });
 
-    this.bridge.on('update', (data) => {
-      var node = this.get(data.id)
-      if (!node) {
-        return;
-      }
-      data.renders = node.get('renders') + 1;
-      this.data = this.data.mergeIn([data.id], Map(data));
-      if (data.children && data.children.forEach) {
-        data.children.forEach(cid => {
-          this.parents.set(cid, data.id);
-        });
-      }
-      this.emit(data.id);
-    });
-
-    this.bridge.on('unmount', id => {
-      var pid = this.parents.get(id);
-      this.parents.delete(id);
-      this.data = this.data.delete(id)
-      if (pid) {
-        this.emit(pid);
-      } else {
-        this.roots = this.roots.delete(this.roots.indexOf(id));
-        this.emit('roots');
-      }
-    });
+    this.bridge.on('mount', (data) => this.mountComponent(data));
+    this.bridge.on('update', (data) => this.updateComponent(data));
+    this.bridge.on('unmount', id => this.unmountComponenent(id));
   }
 
   onKeyDown(e) {
@@ -328,28 +291,50 @@ class Store extends EventEmitter {
     this.bridge.send('highlight', id);
   }
 
-  addRoot(id) {
-    if (this.roots.contains(id)) {
+  mountComponent(data) {
+    var map = Map(data).set('renders', 1);
+    if (data.nodeType === 'Custom') {
+      map = map.set('collapsed', true);
+    }
+    this.data = this.data.set(data.id, map);
+    if (data.children && data.children.forEach) {
+      data.children.forEach(cid => {
+        this.parents.set(cid, data.id);
+      });
+    }
+    this.emit(data.id);
+  }
+
+  updateComponent(data) {
+    var node = this.get(data.id)
+    if (!node) {
       return;
     }
-    this.roots = this.roots.push(id);
-    this.emit('roots');
+    data.renders = node.get('renders') + 1;
+    this.data = this.data.mergeIn([data.id], Map(data));
+    if (data.children && data.children.forEach) {
+      data.children.forEach(cid => {
+        this.parents.set(cid, data.id);
+      });
+    }
+    this.emit(data.id);
   }
 
-  addComponent(id, data) {
-    this.data = this.data.set(id, data);
+  unmountComponenent(id) {
+    var pid = this.parents.get(id);
+    this.parents.delete(id);
+    this.data = this.data.delete(id)
+    if (pid) {
+      this.emit(pid);
+    } else {
+      var ix = this.roots.indexOf(id);
+      if (ix !== -1) {
+        this.roots = this.roots.delete(ix);
+        this.emit('roots');
+      }
+    }
   }
 
-  updateComponent(id, data) {
-    this.data = this.data.set(id, data);
-    this.emit(id);
-  }
-
-  removeComponent(id) {
-    var parent = this.data.getIn([id, 'parent']);
-    this.data = this.data.delete(id);
-    this.emit(parent || 'roots');
-  }
 }
 
 module.exports = Store;

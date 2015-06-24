@@ -4,11 +4,13 @@ var port = chrome.runtime.connect({
   name: 'reporter',
 });
 
-window.addEventListener('message', function (evt) {
+var fromPage = function (evt) {
   if (evt.data && evt.data.source === 'react-devtools-bridge') {
     port.postMessage(evt.data.payload);
   }
-});
+}
+
+window.addEventListener('message', fromPage);
 
 port.onMessage.addListener(function (message) {
   // console.log('from background', message);
@@ -24,6 +26,7 @@ window.parent.postMessage({
 }, '*');
 
 port.onDisconnect.addListener(function () {
+  window.removeEventListener('message', fromPage);
   window.postMessage({
     source: 'react-devtools-reporter',
     payload: {
