@@ -25,11 +25,7 @@ class Panel extends React.Component {
 
     chrome.devtools.network.onNavigated.addListener(() => {
       this.teardown();
-      // this.props.reload();
       this.setState({loading: true}, this.props.reload);
-      /*
-       * this.lookForReact();
-       */
     });
   }
 

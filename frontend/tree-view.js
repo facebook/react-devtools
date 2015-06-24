@@ -5,6 +5,24 @@ var Node = require('./node');
 var decorate = require('./decorate');
 
 class TreeView extends React.Component {
+  getChildContext() {
+    return {
+      scrollTo: this.scrollTo.bind(this),
+    };
+  }
+
+  scrollTo(val, height) {
+    var node = React.findDOMNode(this);
+    var top = node.scrollTop;
+    var rel = val - node.offsetTop;
+    var margin = 40;
+    if (top > rel - margin) {
+      node.scrollTop = rel - margin;
+    } else if (top + node.offsetHeight < rel + height + margin) {
+      node.scrollTop = rel - node.offsetHeight + height + margin;
+    }
+  }
+
   render() {
     return (
       <div style={styles.container}>
@@ -16,6 +34,10 @@ class TreeView extends React.Component {
       </div>
     );
   }
+}
+
+TreeView.childContextTypes = {
+  scrollTo: React.PropTypes.func,
 }
 
 var styles = {

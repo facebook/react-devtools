@@ -11,6 +11,27 @@ class Node {
     return nextProps !== this.props
   }
 
+  componentDidMount() {
+    if (this.props.selected) {
+      this.ensureInView();
+    }
+  }
+
+  componentDidUpdate() {
+    if (this.props.selected) {
+      this.ensureInView();
+    }
+  }
+
+  ensureInView() {
+    var node = this.props.selBottom ? this.tail : this.head;
+    if (!node) {
+      return;
+    }
+    var domnode = React.findDOMNode(node)
+    this.context.scrollTo(domnode.offsetTop, domnode.offsetHeight);
+  }
+
   render() {
     var node = this.props.node;
     if (!node) {
@@ -46,7 +67,7 @@ class Node {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
-          <div style={headStyles} {...tagEvents}>
+          <div style={headStyles} ref={h => this.head = h} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 "
@@ -73,7 +94,7 @@ class Node {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
-          <div style={headStyles} {...tagEvents}>
+          <div style={headStyles} ref={h => this.head = h} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 <span style={tagStyle}>&lt;{name}</span>
@@ -121,7 +142,7 @@ class Node {
     );
 
     var head = (
-      <div style={headStyles} {...tagEvents}>
+      <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
         <span title={hasState && 'This component has state'} onClick={this.props.onToggleCollapse} style={collapserStyle}>
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
@@ -162,13 +183,17 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
+        <div ref={t => this.tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
           {closeTag}
         </div>
       </div>
     );
   }
 }
+
+Node.contextTypes = {
+  scrollTo: React.PropTypes.func,
+};
 
 var WrappedNode = decorate({
   listeners(props) {
