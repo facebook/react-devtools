@@ -143,7 +143,10 @@ class Node {
 
     var head = (
       <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
-        <span title={hasState && 'This component has state'} onClick={this.props.onToggleCollapse} style={collapserStyle}>
+        <span
+          title={hasState && 'This component has state'}
+          onClick={this.props.onToggleCollapse} style={collapserStyle}
+        >
           {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
         </span>
         <span style={styles.tagText}>

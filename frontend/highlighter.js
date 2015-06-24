@@ -26,12 +26,12 @@ class Highlighter {
     }
   }
 
-  highlight(node) {
+  highlight(node, name) {
     if (!this.hover) {
       this.hover = new Overlay(this.win);
     }
     this.inspected = node;
-    this.hover.inspect(node);
+    this.hover.inspect(node, name);
   }
 
   hideHighlight() {
@@ -122,6 +122,7 @@ function boxWrap(dims, what, node) {
 class Overlay {
   constructor(window) {
     var doc = window.document;
+    this.win = window;
     this.container = doc.createElement('div');
     this.node = doc.createElement('div');
     this.border = doc.createElement('div');
@@ -138,18 +139,42 @@ class Overlay {
       position: 'fixed',
     });
 
-   this.container.appendChild(this.node);
-   this.node.appendChild(this.border);
-   this.border.appendChild(this.padding);
-   this.padding.appendChild(this.content);
-   doc.body.appendChild(this.container);
+    this.tip = doc.createElement('div');
+    setStyle(this.tip, {
+      border: '1px solid #aaa',
+      backgroundColor: 'rgb(255, 255, 178)',
+      fontFamily: 'sans-serif',
+      color: 'orange',
+      padding: '3px 5px',
+      position: 'fixed',
+      fontSize: '10px',
+    });
+
+    this.nameSpan = doc.createElement('span');
+    this.tip.appendChild(this.nameSpan);
+    setStyle(this.nameSpan, {
+      color:   'rgb(136, 18, 128)',
+      marginRight: '5px',
+    });
+    this.dimSpan = doc.createElement('span');
+    this.tip.appendChild(this.dimSpan);
+    setStyle(this.dimSpan, {
+      color: '#888',
+    });
+
+    this.container.appendChild(this.node);
+    this.container.appendChild(this.tip);
+    this.node.appendChild(this.border);
+    this.border.appendChild(this.padding);
+    this.padding.appendChild(this.content);
+    doc.body.appendChild(this.container);
   }
 
   remove() {
-    this.node.parentNode.removeChild(this.node);
+    this.container.parentNode.removeChild(this.container);
   }
 
-  inspect(node) {
+  inspect(node, name) {
     var pos = nodePos(node);
     var dims = getElementDimensions(node);
 
@@ -157,18 +182,79 @@ class Overlay {
     boxWrap(dims, 'border', this.border);
     boxWrap(dims, 'padding', this.padding);
 
+    var height = node.offsetHeight - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom;
+    var width = node.offsetWidth - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight;
+
     setStyle(this.content, {
-      width: node.offsetWidth - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight,
-      height: node.offsetHeight - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom,
+      height,
+      width,
     });
 
     setStyle(this.node, {
       top: pos.top - dims.marginTop,
       left: pos.left - dims.marginLeft,
     });
+
+    this.nameSpan.innerText = (name || node.nodeName.toLowerCase());
+    this.dimSpan.innerText = node.offsetWidth + 'px × ' + node.offsetHeight + 'px'
+
+    var tipPos = findTipPos({
+      top: pos.top - dims.marginTop,
+      left: pos.left - dims.marginLeft,
+      height: node.offsetHeight + dims.marginTop + dims.marginBottom,
+      width: node.offsetWidth + dims.marginLeft + dims.marginRight,
+    }, this.win);
+
+    setStyle(this.tip, tipPos);
   }
 }
 
+function findTipPos(dims, win) {
+  var tipHeight = 20;
+  var margin = 5;
+  var top;
+  if (dims.top + dims.height + tipHeight <= win.innerHeight) {
+    if (dims.top + dims.height < 0) {
+      top = margin;
+    } else {
+      top = dims.top + dims.height + margin;
+    }
+  } else if (dims.top - tipHeight <= win.innerHeight) {
+    if (dims.top - tipHeight - margin < margin) {
+      top = margin;
+    } else {
+      top = dims.top - tipHeight - margin;
+    }
+  } else {
+    top = win.innerHeight - tipHeight - margin;
+  }
+
+  top += 'px';
+
+  if (dims.left < 0) {
+    return {top, left: 0};
+  }
+  if (dims.left + 200 > win.innerWidth) {
+    return {top, right: 0};
+  }
+  return {top, left: dims.left + margin + 'px'};
+}
+
+/*
+function findTipPos(dims, win) {
+  var left = dims.left;
+  var top = dims.top;
+  if (left < 0) left = 0;
+  if (left > win.innerWidth - 50) {
+    left = win.innerWidth - 50;
+  }
+  if (top < 0) top = 0;
+  if (top > win.innerHeight - 20) {
+    top = win.innerHeight - 20;
+  }
+  return {top,left}
+}
+*/
 
 function nodePos(node) {
   var left = node.offsetLeft;

@@ -70,9 +70,10 @@ class Backend extends EventEmitter {
     bridge.on('setContext', this._setContext.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
     bridge.on('highlight', id => {
+      var data = this.nodes.get(id);
       var node = this.getNodeForID(id);
       if (node) {
-        this.emit('highlight', node);
+        this.emit('highlight', {node, name: data.name});
       }
     });
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
