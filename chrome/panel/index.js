@@ -37,6 +37,9 @@ class Panel extends React.Component {
   }
 
   getNewSelection() {
+    if (!this.bridge) {
+      return;
+    }
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
     this.bridge.send('checkSelection');
   }

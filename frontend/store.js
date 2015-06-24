@@ -27,6 +27,9 @@ class Store extends EventEmitter {
     this.selected = null;
     this.selBottom = false;
     this.bridge.on('root', id => {
+      if (this.roots.contains(id)) {
+        return;
+      }
       this.roots = this.roots.push(id);
       if (!this.selected) {
         this.selected = id;
@@ -326,6 +329,9 @@ class Store extends EventEmitter {
   }
 
   addRoot(id) {
+    if (this.roots.contains(id)) {
+      return;
+    }
     this.roots = this.roots.push(id);
     this.emit('roots');
   }
