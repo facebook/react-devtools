@@ -182,17 +182,14 @@ class Overlay {
     boxWrap(dims, 'border', this.border);
     boxWrap(dims, 'padding', this.padding);
 
-    var height = node.offsetHeight - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom;
-    var width = node.offsetWidth - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight;
-
     setStyle(this.content, {
-      height,
-      width,
+      height: node.offsetHeight - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
+      width: node.offsetWidth - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
     });
 
     setStyle(this.node, {
-      top: pos.top - dims.marginTop,
-      left: pos.left - dims.marginLeft,
+      top: pos.top - dims.marginTop + 'px',
+      left: pos.left - dims.marginLeft + 'px',
     });
 
     this.nameSpan.innerText = (name || node.nodeName.toLowerCase());
