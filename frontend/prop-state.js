@@ -102,6 +102,8 @@ var WrappedPropState = decorate({
           store.setProps(store.selected, path.slice(1), val);
         } else if (path[0] === 'state') {
           store.setState(store.selected, path.slice(1), val);
+        } else if (path[0] === 'context') {
+          store.setContext(store.selected, path.slice(1), val);
         }
       },
       makeGlobal(path) {

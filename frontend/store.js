@@ -1,6 +1,8 @@
 
 import EventEmitter from 'events'
-import {Map, Set} from 'immutable'
+import {Map, Set, List} from 'immutable'
+
+import dirToDest from './dir-to-dest';
 
 var keyCodes = {
   72: 'left',  // 'h',
@@ -18,14 +20,14 @@ class Store extends EventEmitter {
   constructor(bridge) {
     super()
     this.data = new Map();
-    this.roots = new Set();
+    this.roots = new List();
     this.parents = new window.Map();
     this.bridge = bridge;
     this.hovered = null;
     this.selected = null;
     this.selBottom = false;
     this.bridge.on('root', id => {
-      this.roots = this.roots.add(id);
+      this.roots = this.roots.push(id);
       if (!this.selected) {
         this.selected = id;
         this.emit('selected');
@@ -83,7 +85,7 @@ class Store extends EventEmitter {
       if (pid) {
         this.emit(pid);
       } else {
-        this.roots = this.roots.delete(id);
+        this.roots = this.roots.delete(this.roots.indexOf(id));
         this.emit('roots');
       }
     });
@@ -142,43 +144,8 @@ class Store extends EventEmitter {
     var children = node.get('children');
     var hasChildren = children && 'string' !== typeof children && children.length;
     var pid = this.parents.get(id);
-    if (dir === 'down') {
-      if (bottom || collapsed || !hasChildren) {
-        return 'nextSibling';
-      }
-      return 'firstChild';
-    }
 
-    if (dir === 'up') {
-      if (!bottom || collapsed || !hasChildren) {
-        return 'prevSibling';
-      }
-      return 'lastChild';
-    }
-
-    if (dir === 'left') {
-      if (!collapsed && hasChildren) {
-        if (bottom) {
-          return 'top';
-        }
-        return 'collapse';
-      }
-      return 'parent';
-    }
-
-    if (dir === 'right') {
-      if (collapsed && hasChildren) {
-        return 'uncollapse';
-      }
-      if (hasChildren) {
-        if (bottom) {
-          return 'lastChild';
-        } else {
-          return 'firstChild';
-        }
-      }
-      return null;
-    }
+    return dirToDest(dir, bottom, collapsed, hasChildren);
   }
 
   getMove(dest) {
@@ -203,6 +170,7 @@ class Store extends EventEmitter {
       this.toggleCollapse(id);
       return;
     }
+
     if (dest === 'bottom') {
       this.selBottom = true;
       this.emit(this.selected);
@@ -235,6 +203,15 @@ class Store extends EventEmitter {
     }
 
     if (!pid) {
+      var ix = this.roots.indexOf(id);
+      if (ix === -1) {
+        ix = this.roots.indexOf(this.parents.get(id));
+      }
+      if (dest === 'prevSibling') { // prev root
+        return ix > 0 ? this.skipWrapper(this.roots.get(ix - 1)) : null;
+      } else if (dest === 'nextSibling') {
+        return ix < this.roots.size - 1 ? this.skipWrapper(this.roots.get(ix + 1)) : null;
+      }
       return null;
     }
 
@@ -283,6 +260,10 @@ class Store extends EventEmitter {
 
   setState(id, path, value) {
     this.bridge.send('setState', {id, path, value});
+  }
+
+  setContext(id, path, value) {
+    this.bridge.send('setContext', {id, path, value});
   }
 
   inspect(id, path, cb) {
@@ -336,7 +317,7 @@ class Store extends EventEmitter {
   }
 
   addRoot(id) {
-    this.roots = this.roots.add(id);
+    this.roots = this.roots.push(id);
     this.emit('roots');
   }
 

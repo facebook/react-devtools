@@ -67,6 +67,7 @@ class Backend extends EventEmitter {
   addBridge(bridge: Bridge) {
     bridge.on('setState', this._setState.bind(this));
     bridge.on('setProps', this._setProps.bind(this));
+    bridge.on('setContext', this._setContext.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
     bridge.on('highlight', id => {
       var node = this.getNodeForID(id);
@@ -136,6 +137,17 @@ class Backend extends EventEmitter {
   _setState({id, path, value}: {id: string, path: Array<string>, value: any}) {
     var data = this.nodes.get(id);
     setIn(data.state, path, value);
+    if (data.updater && data.updater.forceUpdate) {
+      data.updater.forceUpdate();
+      this.onUpdated(this.comps.get(id), data);
+    } else {
+      console.warn("trying to set state on a component that doesn't support it");
+    }
+  }
+
+  _setContext({id, path, value}: {id: string, path: Array<string>, value: any}) {
+    var data = this.nodes.get(id);
+    setIn(data.context, path, value);
     if (data.updater && data.updater.forceUpdate) {
       data.updater.forceUpdate();
       this.onUpdated(this.comps.get(id), data);

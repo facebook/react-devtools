@@ -92,7 +92,7 @@ function makeMagnifier() {
   button.style.bottom = '10px';
   button.style.right = '10px';
   button.style.fontSize = '30px';
-  button.style.zIndex = 10000;
+  button.style.zIndex = 10000000;
   return button;
 }
 
