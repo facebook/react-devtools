@@ -208,9 +208,18 @@ class Store extends EventEmitter {
         ix = this.roots.indexOf(this.parents.get(id));
       }
       if (dest === 'prevSibling') { // prev root
-        return ix > 0 ? this.skipWrapper(this.roots.get(ix - 1)) : null;
+        if (ix === 0) {
+          return null;
+        }
+        var prev = this.skipWrapper(this.roots.get(ix - 1));
+        this.selBottom = this.hasBottom(prev);
+        return prev;
       } else if (dest === 'nextSibling') {
-        return ix < this.roots.size - 1 ? this.skipWrapper(this.roots.get(ix + 1)) : null;
+        if (ix >= this.roots.size - 1) {
+          return null;
+        }
+        this.selBottom = false;
+        return this.skipWrapper(this.roots.get(ix + 1));
       }
       return null;
     }

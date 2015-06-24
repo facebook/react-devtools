@@ -22,6 +22,8 @@ class Node {
       return <WrappedNode id={children[0]} depth={this.props.depth} />;
     }
 
+    var collapsed = node.get('collapsed');
+
     var leftPad = {
       paddingLeft: (this.props.depth + 1) * 10,
     };
@@ -29,7 +31,7 @@ class Node {
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      this.props.selected && !this.props.selBottom && styles.headSelect,
+      this.props.selected && (collapsed || !this.props.selBottom) && styles.headSelect,
       leftPad
     );
 
@@ -62,7 +64,6 @@ class Node {
       );
     }
 
-    var collapsed = node.get('collapsed');
     var isCustom = node.get('nodeType') === 'Custom';
 
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
