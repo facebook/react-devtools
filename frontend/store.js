@@ -1,6 +1,7 @@
 
 import EventEmitter from 'events'
 import {Map, Set, List} from 'immutable'
+import assign from 'object-assign'
 
 import dirToDest from './dir-to-dest';
 
@@ -27,6 +28,9 @@ class Store extends EventEmitter {
     this.selected = null;
     this.selBottom = false;
     this.searchText = '';
+    this.capabilities = {
+      scroll: true,
+    };
     this.bridge.on('root', id => {
       if (this.roots.contains(id)) {
         return;
@@ -57,6 +61,14 @@ class Store extends EventEmitter {
     this.bridge.on('mount', (data) => this.mountComponent(data));
     this.bridge.on('update', (data) => this.updateComponent(data));
     this.bridge.on('unmount', id => this.unmountComponenent(id));
+    this.bridge.on('capabilities', capabilities => {
+      this.capabilities = assign(this.capabilities, capabilities);
+    });
+    this.bridge.send('requestCapabilities');
+  }
+
+  scrollToNode(id) {
+    this.bridge.send('scrollToNode', id);
   }
 
   onChangeSearch(text) {

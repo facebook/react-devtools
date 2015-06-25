@@ -6,6 +6,7 @@ var Container = require('../../frontend/container');
 var check = require('./check');
 var Store = require('../../frontend/store');
 var Bridge = require('../../backend/bridge');
+var consts = require('../../backend/consts');
 
 class Panel extends React.Component {
   constructor(props: Object) {
@@ -37,16 +38,19 @@ class Panel extends React.Component {
     this.bridge.send('checkSelection');
   }
 
-  sendSelection() {
-    this.bridge.send('putSelectedNode', this.store.selected);
+  sendSelection(id) {
+    id = id || this.store.selected;
+    this.bridge.send('putSelectedNode', id);
     setTimeout(() => {
       chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_BACKEND__.$node)');
     }, 100);
   }
 
-  inspectComponent() {
-    var code = "Object.getOwnPropertyDescriptor(window.$r.__proto__.__proto__, 'isMounted').value ?\
-        inspect(window.$r.render) : inspect(window.$r.constructor)";
+  inspectComponent(vbl) {
+    vbl = vbl || '$r';
+    var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
+      Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted').value ?
+        inspect(window.${vbl}.render) : inspect(window.${vbl}.constructor)`;
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
         debugger;
@@ -54,9 +58,26 @@ class Panel extends React.Component {
     });
   }
 
-  inspectValue(path) {
+  viewSource(id) {
+    this.bridge.send('putSelectedInstance', id);
+    setTimeout(() => {
+      this.inspectComponent('__REACT_DEVTOOLS_BACKEND__.$inst');
+    }, 100);
+  }
+
+  viewAttrSource(path) {
     var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
     var code = 'inspect(window.$r' + attrs + ')';
+    chrome.devtools.inspectedWindow.eval(code, (res, err) => {
+      if (err) {
+        debugger;
+      }
+    });
+  }
+
+  executeFn(path) {
+    var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
+    var code = 'window.$r' + attrs + '()';
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
         debugger;
@@ -133,30 +154,33 @@ class Panel extends React.Component {
     if (!this.state.isReact) {
       return <span>Looking for react...</span>;
     }
-    var extraPanes = [
-      node => (
-        <ChromePane
-          node={node}
-          sendSelection={this.sendSelection.bind(this)}
-          inspectComponent={this.inspectComponent.bind(this)}
-        />
-      )
-    ];
-    return <Container extraPanes={extraPanes} />;
-  }
-}
-
-class ChromePane {
-  render() {
-    var node = this.props.node;
     return (
-      <div style={styles.chromePane}>
-        <div style={styles.stretch} />
-        <button onClick={this.props.sendSelection}>Inspect node</button>
-        {node.get('nodeType') === 'Custom' &&
-          <button onClick={this.props.inspectComponent}>View source</button>}
-      </div>
-    )
+      <Container
+        menuItems={{
+          attr: (id, node, val, path, name) => {
+            if (!val || node.get('nodeType') !== 'Custom' || val[consts.type] !== 'function') {
+              return;
+            }
+            return [{
+              title: 'Show Source',
+              action: () => this.viewAttrSource(path),
+            }, {
+              title: 'Execute function',
+              action: () => this.executeFn(path),
+            }];
+          },
+          tree: (id, node) => {
+            return [node.get('nodeType') === 'Custom' && {
+              title: 'Show Source',
+              action: () => this.viewSource(id),
+            }, {
+              title: 'Show in Elements Pane',
+              action: () => this.sendSelection(id),
+            }];
+          },
+        }}
+      />
+    );
   }
 }
 

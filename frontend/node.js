@@ -222,7 +222,7 @@ var WrappedNode = decorate({
         store.selectBottom(props.id);
       },
       onContextMenu: e => {
-        store.showContextMenu('tree', e, props.id);
+        store.showContextMenu('tree', e, props.id, node);
       },
     };
   },

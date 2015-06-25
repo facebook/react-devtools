@@ -162,6 +162,9 @@ class Overlay {
       color: '#888',
     });
 
+    this.container.style.zIndex = 10000000;
+    this.node.style.zIndex = 10000000;
+    this.tip.style.zIndex = 10000000;
     this.container.appendChild(this.node);
     this.container.appendChild(this.tip);
     this.node.appendChild(this.border);

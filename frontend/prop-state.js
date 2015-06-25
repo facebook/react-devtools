@@ -99,9 +99,10 @@ var WrappedPropState = decorate({
   },
 
   props(store) {
+    var node = store.selected ? store.get(store.selected) : null;
     return {
       id: store.selected,
-      node: store.selected ? store.get(store.selected) : null,
+      node,
       onChange(path, val) {
         if (path[0] === 'props') {
           store.setProps(store.selected, path.slice(1), val);
@@ -114,8 +115,8 @@ var WrappedPropState = decorate({
       makeGlobal(path) {
         store.makeGlobal(store.selected, path);
       },
-      showMenu(e, name, path) {
-        store.showContextMenu('attr', e, store.selected, path, name);
+      showMenu(e, val, path, name) {
+        store.showContextMenu('attr', e, store.selected, node, val, path, name);
       },
       inspect: store.inspect.bind(store, store.selected),
     };

@@ -140,7 +140,7 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            onContextMenu={e => this.props.showMenu(e, this.props.name, this.props.path)} 
+            onContextMenu={e => this.props.showMenu(e, this.props.value, this.props.path, this.props.name)} 
             onClick={() => this.props.makeGlobal(this.props.path)}
             style={styles.name}
           >

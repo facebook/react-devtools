@@ -18,6 +18,7 @@ module.exports = function (window, backend) {
     removeDevtools: hook.removeDevtools,
   };
   hook.injectDevTools(backend);
+  hook.backend = backend;
   return true;
 }
 

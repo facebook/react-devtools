@@ -8,6 +8,22 @@ var ContextMenu = require('./context-menu');
 
 class Container extends React.Component {
   render(): ReactElement {
+    var defaultItems = {
+      tree: (id, node, store) => {
+        var items = [];
+        /*
+        if (store.capabilities.scroll) {
+          items.push({
+            title: 'Scroll to node',
+            action: () => store.scrollToNode(id),
+          });
+        }
+        */
+        return items;
+      },
+      attr: (id, node, path, store) => {
+      },
+    };
     return (
       <div style={styles.container}>
         <SplitPane
@@ -15,7 +31,7 @@ class Container extends React.Component {
           left={() => <SearchPane />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
         />
-        <ContextMenu />
+        <ContextMenu itemSources={[defaultItems, this.props.menuItems]} />
       </div>
     );
   }

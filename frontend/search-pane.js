@@ -60,7 +60,7 @@ class SearchPane extends React.Component {
             onKeyDown={e => this.onKey(e.key)}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
-          {this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+          {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
             &times;
           </div>}
         </div>

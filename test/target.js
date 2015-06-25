@@ -306,14 +306,14 @@ class Wrap extends React.Component {
       <span val={null}/>
       <span val={undefined}/>
       <div>&lt;</div>*/}
-     <Man/>
+     <OldStyle/>
     </div>
   }
 }
 
-var Man = React.createClass({
+var OldStyle = React.createClass({
   render() {
-    return <span>Man</span>
+    return <span>OldStyle</span>
   }
 });
 

@@ -87,6 +87,14 @@ class Backend extends EventEmitter {
     bridge.on('putSelectedNode', id => {
       window.__REACT_DEVTOOLS_BACKEND__.$node = this.getNodeForID(id);
     });
+    bridge.on('putSelectedInstance', id => {
+      var node = this.nodes.get(id);
+      if (node.updater && node.updater.publicInstance) {
+        window.__REACT_DEVTOOLS_BACKEND__.$inst = node.updater.publicInstance;
+      } else {
+        window.__REACT_DEVTOOLS_BACKEND__.$inst = null;
+      }
+    });
     bridge.on('checkSelection', () => {
       var newSelected = window.__REACT_DEVTOOLS_BACKEND__.$0;
       if (newSelected !== this._prevSelected) {
@@ -94,6 +102,12 @@ class Backend extends EventEmitter {
         this.selectFromDOMNode(newSelected);
       }
     });
+    bridge.on('requestCapabilities', () => {
+      bridge.send('capabilities', {
+        scroll: 'function' === typeof window.document.createElement,
+      });
+    });
+    bridge.on('scrollToNode', id => this.scrollToNode(id));
     this.on('root', id => bridge.send('root', id))
     this.on('mount', data => bridge.send('mount', data))
     this.on('update', data => bridge.send('update', data));
@@ -102,6 +116,15 @@ class Backend extends EventEmitter {
       bridge.forget(id);
     });
     this.on('setSelection', id => bridge.send('select', id));
+  }
+
+  scrollToNode(id: string): void {
+    var node = this.getNodeForID(id);
+    if (!node) {
+      console.warn('unable to get the node for scrolling');
+      return;
+    }
+    console.log('TOOD scroll', node);
   }
 
   getNodeForID(id: string): ?Object {
