@@ -28,6 +28,7 @@ class DataView extends React.Component {
             key={'__proto__'}
             inspect={this.props.inspect}
             makeGlobal={this.props.makeGlobal}
+            showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
             value={this.props.data[consts.proto]}
           />}
@@ -39,6 +40,7 @@ class DataView extends React.Component {
             key={name}
             inspect={this.props.inspect}
             makeGlobal={this.props.makeGlobal}
+            showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
             value={this.props.data[name]}
           />
@@ -121,6 +123,7 @@ class DataItem extends React.Component {
             path={this.props.path}
             inspect={this.props.inspect}
             makeGlobal={this.props.makeGlobal}
+            showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
           />
         </div>
@@ -136,7 +139,11 @@ class DataItem extends React.Component {
       <li>
         <div style={styles.head}>
           {opener}
-          <div onClick={() => this.props.makeGlobal(this.props.path)} style={styles.name}>
+          <div
+            onContextMenu={e => this.props.showMenu(e, this.props.name, this.props.path)} 
+            onClick={() => this.props.makeGlobal(this.props.path)}
+            style={styles.name}
+          >
             {this.props.name}:
           </div>
           <div style={styles.preview}>

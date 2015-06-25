@@ -59,6 +59,7 @@ class Node {
     var tagEvents = {
       onMouseOver: () => this.props.onHover(true),
       onMouseOut: () => this.props.onHover(false),
+      onContextMenu: this.props.onContextMenu,
       onDoubleClick: this.props.onToggleCollapse,
       onMouseDown: this.props.onSelect,
     };
@@ -219,6 +220,9 @@ var WrappedNode = decorate({
       },
       onSelectBottom: e => {
         store.selectBottom(props.id);
+      },
+      onContextMenu: e => {
+        store.showContextMenu('tree', e, props.id);
       },
     };
   },

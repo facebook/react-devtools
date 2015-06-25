@@ -13,13 +13,15 @@ var js = (
   "}" +
 
   // 0.14+
-  "Object.defineProperty(window, '__REACT_DEVTOOLS_BACKEND__', {" +
-    "value: {" +
-      "getReactHandleFromNative: null," +
-      "getNativeFromHandle: null," +
-      "injectDevTools: null," +
-    "}," +
-  "});"
+  "if (!window.__REACT_DEVTOOLS_BACKEND__) {" +
+    "Object.defineProperty(window, '__REACT_DEVTOOLS_BACKEND__', {" +
+      "value: {" +
+        "getReactHandleFromNative: null," +
+        "getNativeFromHandle: null," +
+        "injectDevTools: null," +
+      "}," +
+    "});" +
+  "}"
 );
 
 // This script runs before the <head> element is created, so we add the script

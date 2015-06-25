@@ -100,6 +100,18 @@ class Store extends EventEmitter {
     }
   }
 
+  showContextMenu(type, evt, ...args) {
+    evt.preventDefault();
+    console.log('menu', type, args);
+    this.contextMenu = {type, x: evt.pageX, y: evt.pageY, args};
+    this.emit('contextMenu');
+  }
+
+  hideContextMenu() {
+    this.contextMenu = null;
+    this.emit('contextMenu');
+  }
+
   selectFirstNode() {
     this.select(this.searchRoots.get(0), true);
   }

@@ -43,9 +43,10 @@ class PropState extends React.Component {
           <strong>Props</strong>
           <DataView
             path={['props']}
-            readOnly={!isCustom}
+            readOnly={!state}
             inspect={this.props.inspect}
             makeGlobal={this.props.makeGlobal}
+            showMenu={this.props.showMenu}
             key={this.props.id + '-props'}
             data={this.props.node.get('props')}
           />
@@ -58,6 +59,7 @@ class PropState extends React.Component {
               path={['state']}
               inspect={this.props.inspect}
               makeGlobal={this.props.makeGlobal}
+              showMenu={this.props.showMenu}
               key={this.props.id + '-state'}
             />
           </div>}
@@ -69,6 +71,7 @@ class PropState extends React.Component {
               path={['context']}
               inspect={this.props.inspect}
               makeGlobal={this.props.makeGlobal}
+              showMenu={this.props.showMenu}
               key={this.props.id + '-context'}
             />
           </div>}
@@ -110,6 +113,9 @@ var WrappedPropState = decorate({
       },
       makeGlobal(path) {
         store.makeGlobal(store.selected, path);
+      },
+      showMenu(e, name, path) {
+        store.showContextMenu('attr', e, store.selected, path, name);
       },
       inspect: store.inspect.bind(store, store.selected),
     };
