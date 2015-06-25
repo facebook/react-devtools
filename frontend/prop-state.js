@@ -123,8 +123,6 @@ var styles = {
     fontFamily: 'monospace',
     overflow: 'auto',
     flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',

@@ -148,7 +148,6 @@ class ChromePane {
 
 var styles = {
   chromePane: {
-    flex: 1,
     display: 'flex',
     flexDirection: 'column',
   },
