@@ -122,16 +122,17 @@ class Store extends EventEmitter {
     if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
       return;
     }
-    var dir = keyCodes[e.keyCode];
-    if (!dir) {
+
+    var direction = keyCodes[e.keyCode];
+    if (!direction) {
       return;
     }
     e.preventDefault();
-    var dest = this.getDest(dir);
+    var dest = this.getDest(direction);
     if (!dest) {
       return;
     }
-    var move = this.getMove(dest);
+    var move = this.getNewSelection(dest);
     if (move && move !== this.selected) {
       this.select(move);
     }
@@ -176,7 +177,7 @@ class Store extends EventEmitter {
     return dirToDest(dir, bottom, collapsed, hasChildren);
   }
 
-  getMove(dest) {
+  getNewSelection(dest) {
     var id = this.selected;
     var bottom = this.selBottom;
     var node = this.get(id);
@@ -217,7 +218,7 @@ class Store extends EventEmitter {
     if (dest === 'firstChild') {
       var children = node.get('children')
       if ('string' === typeof children) {
-        return this.getMove('nextSibling');
+        return this.getNewSelection('nextSibling');
       }
       this.selBottom = false;
       return this.skipWrapper(children[0]);
@@ -225,7 +226,7 @@ class Store extends EventEmitter {
     if (dest === 'lastChild') {
       var children = node.get('children');
       if ('string' === typeof children) {
-        return this.getMove('prevSibling');
+        return this.getNewSelection('prevSibling');
       }
       var cid = this.skipWrapper(children[children.length - 1]);
       if (!this.hasBottom(cid)) {
@@ -265,7 +266,7 @@ class Store extends EventEmitter {
     }
     if (dest === 'prevSibling') {
       if (pix === 0) {
-        return this.getMove('parent');
+        return this.getNewSelection('parent');
       }
       var cid = this.skipWrapper(pchildren[pix - 1]);
       if (this.hasBottom(cid)) {
@@ -275,7 +276,7 @@ class Store extends EventEmitter {
     }
     if (dest === 'nextSibling') {
       if (pix === pchildren.length - 1) {
-        return this.getMove('parentBottom');
+        return this.getNewSelection('parentBottom');
       }
       this.selBottom = false;
       return this.skipWrapper(pchildren[pix + 1]);
