@@ -83,6 +83,11 @@ class Store extends EventEmitter {
           ))
           .map(([key, val]) => key);
       }
+      this.searchRoots.forEach(id => {
+        if (this.hasBottom(id)) {
+          this.data = this.data.setIn([id, 'collapsed'], true);
+        }
+      });
     }
     this.searchText = text;
     this.emit('searchText');
@@ -99,10 +104,6 @@ class Store extends EventEmitter {
       return;
     }
     if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
-      return;
-    }
-    if (e.keyCode === 191) { // forward slash
-      this.emit('searchText');
       return;
     }
     var dir = keyCodes[e.keyCode];
