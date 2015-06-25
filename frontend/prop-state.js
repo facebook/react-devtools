@@ -72,6 +72,8 @@ class PropState extends React.Component {
               key={this.props.id + '-context'}
             />
           </div>}
+        {this.props.extraPanes &&
+          this.props.extraPanes.map(fn => fn(this.props.node))}
       </div>
     );
   }
@@ -121,6 +123,8 @@ var styles = {
     fontFamily: 'monospace',
     overflow: 'auto',
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',

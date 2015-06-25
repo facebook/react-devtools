@@ -215,11 +215,9 @@ var WrappedNode = decorate({
       },
       onHover: isHovered => store.setHover(props.id, isHovered),
       onSelect: e => {
-        // e.preventDefault();
         store.selectTop(props.id);
       },
       onSelectBottom: e => {
-        // e.preventDefault();
         store.selectBottom(props.id);
       },
     };

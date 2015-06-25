@@ -11,7 +11,7 @@ class Container extends React.Component {
       <SplitPane
         initialWidth={300}
         left={() => <TreeView ref={t => window.treeV = t} />}
-        right={() => <PropState />}
+        right={() => <PropState extraPanes={this.props.extraPanes} />}
       />
     );
   }

@@ -34,6 +34,7 @@ class Store extends EventEmitter {
       if (!this.selected) {
         this.selected = id;
         this.emit('selected');
+        this.bridge.send('selected', id);
       }
       this.emit('roots');
     });

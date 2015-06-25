@@ -211,7 +211,7 @@ var styles = {
 
   filterButton: {
     padding: '5px 10px',
-    border: '10px solid #fff',
+    border: '3px solid #fff',
     outline: 'none',
     margin: '0 5px',
     cursor: 'pointer',
@@ -219,7 +219,7 @@ var styles = {
   },
 
   filterButtonActive: {
-    backgroundColor: 'eef',
+    backgroundColor: '#eef',
   },
 
   title: {
@@ -306,9 +306,16 @@ class Wrap extends React.Component {
       <span val={null}/>
       <span val={undefined}/>
       <div>&lt;</div>*/}
+     <Man/>
     </div>
   }
 }
+
+var Man = React.createClass({
+  render() {
+    return <span>Man</span>
+  }
+});
 
 function long(children) {
   return <div style={styles.longStyle}>

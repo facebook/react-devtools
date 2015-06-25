@@ -84,6 +84,9 @@ class Backend extends EventEmitter {
         this.reactInternals.removeDevtools();
       }
     });
+    bridge.on('putSelectedNode', id => {
+      window.__REACT_DEVTOOLS_BACKEND__.$node = this.getNodeForID(id);
+    });
     bridge.on('checkSelection', () => {
       var newSelected = window.__REACT_DEVTOOLS_BACKEND__.$0;
       if (newSelected !== this._prevSelected) {

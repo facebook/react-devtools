@@ -37,6 +37,19 @@ class Panel extends React.Component {
     this.bridge.send('checkSelection');
   }
 
+  sendSelection() {
+    this.bridge.send('putSelectedNode', this.store.selected);
+    setTimeout(() => {
+      chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_BACKEND__.$node)');
+    }, 100);
+  }
+
+  inspectComponent() {
+    var code = "window.$r.constructor.name === 'Constructor' ? \
+      inspect(window.$r.render) : inspect(window.$r.constructor)";
+    chrome.devtools.inspectedWindow.eval(code);
+  }
+
   teardown() {
     if (this._keyListener) {
       window.removeEventListener('keydown', this._keyListener);
@@ -51,8 +64,6 @@ class Panel extends React.Component {
 
   inject() {
     inject(chrome.runtime.getURL('build/backend.js'), () => {
-      // , chrome.runtime.getURL('reporter.html')
-
       var port = this._port = chrome.runtime.connect({
         name: '' + chrome.devtools.inspectedWindow.tabId,
       });
@@ -74,6 +85,8 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this.setState({loading: false});
+
+      this.getNewSelection();
     });
   }
 
@@ -106,8 +119,42 @@ class Panel extends React.Component {
     if (!this.state.isReact) {
       return <span>Looking for react...</span>;
     }
-    return <Container />;
+    var extraPanes = [
+      node => (
+        <ChromePane
+          node={node}
+          sendSelection={this.sendSelection.bind(this)}
+          inspectComponent={this.inspectComponent.bind(this)}
+        />
+      )
+    ];
+    return <Container extraPanes={extraPanes} />;
   }
+}
+
+class ChromePane {
+  render() {
+    var node = this.props.node;
+    return (
+      <div style={styles.chromePane}>
+        <div style={styles.stretch} />
+        <button onClick={this.props.sendSelection}>Inspect node</button>
+        {node.get('nodeType') === 'Custom' &&
+          <button onClick={this.props.inspectComponent}>View source</button>}
+      </div>
+    )
+  }
+}
+
+var styles = {
+  chromePane: {
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+  },
+  stretch: {
+    flex: 1,
+  },
 }
 
 Panel.childContextTypes = {

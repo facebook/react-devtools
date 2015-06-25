@@ -134,7 +134,7 @@ class Overlay {
     this.content.style.backgroundColor = overlayStyles.background;
 
     setStyle(this.node, {
-      borderColor: overlayStyles.border,
+      borderColor: overlayStyles.margin,
       pointerEvents: 'none',
       position: 'fixed',
     });
