@@ -4,6 +4,8 @@ var Node = require('./node');
 
 var decorate = require('./decorate');
 
+var MAX_ROOTS = 200;
+
 class TreeView extends React.Component {
   getChildContext() {
     return {
@@ -28,9 +30,11 @@ class TreeView extends React.Component {
       <div style={styles.container}>
         {!this.props.roots.count() &&
           <span>Waiting for roots to load...</span>}
-        {this.props.roots.slice(0, 100).map(id => (
+        {this.props.roots.slice(0, MAX_ROOTS).map(id => (
           <Node key={id} id={id} depth={0} />
         )).toJS()}
+        {this.props.roots.count() > MAX_ROOTS &&
+          <span>Some results not shown. Narrow your search criteria to find them</span>}
       </div>
     );
   }

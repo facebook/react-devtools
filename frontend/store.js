@@ -92,10 +92,22 @@ class Store extends EventEmitter {
     this.searchText = text;
     this.emit('searchText');
     this.emit('searchRoots');
-    if (this.searchRoots) {
-      this.select(this.searchRoots.get(0));
-    } else {
-      this.select(this.roots.get(0));
+    if (this.searchRoots && !this.searchRoots.contains(this.selected)) {
+      this.select(this.searchRoots.get(0), true);
+    } else if (!this.searchRoots) {
+      this.revealDeep(this.selected);
+      // this.select(this.roots.get(0), true);
+    }
+  }
+
+  revealDeep(id) {
+    var pid = this.parents.get(id);
+    while (pid) {
+      if (this.data.getIn([pid, 'collapsed'])) {
+        this.data = this.data.setIn([pid, 'collapsed'], false);
+        this.emit(pid);
+      }
+      pid = this.parents.get(pid);
     }
   }
 
@@ -328,7 +340,7 @@ class Store extends EventEmitter {
     this.select(id);
   }
 
-  select(id) {
+  select(id, noHighlight) {
     var oldSel = this.selected;
     this.selected = id;
     if (oldSel) {
@@ -339,7 +351,9 @@ class Store extends EventEmitter {
     window.$selid = id;
     window.$sel = this.get(id);
     this.bridge.send('selected', id);
-    this.bridge.send('highlight', id);
+    if (!noHighlight) {
+      this.bridge.send('highlight', id);
+    }
   }
 
   mountComponent(data) {

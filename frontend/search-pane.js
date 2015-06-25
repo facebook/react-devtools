@@ -34,13 +34,17 @@ class SearchPane extends React.Component {
       if (document.activeElement !== this.input.getDOMNode()) {
         return;
       }
-      this.props.onChangeSearch('');
-      setTimeout(() => {
-        this.input.getDOMNode().blur();
-      }, 100)
       e.stopPropagation();
       e.preventDefault();
+      this.cancel();
     }
+  }
+
+  cancel() {
+    this.props.onChangeSearch('');
+    setTimeout(() => {
+      this.input.getDOMNode().blur();
+    }, 100)
   }
 
   render() {
@@ -55,6 +59,9 @@ class SearchPane extends React.Component {
             onKeyDown={e => this.onKey(e.key)}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
+          {this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+            &times;
+          </div>}
         </div>
       </div>
     );
@@ -71,6 +78,19 @@ var styles = {
   searchBox: {
     display: 'flex',
     flexShrink: 0,
+    position: 'relative',
+  },
+
+  cancelButton: {
+    fontSize: '13px',
+    padding: '0 4px',
+    boxShadow: '0 0 3px #ccc',
+    borderRadius: '10px',
+    height: '17px',
+    position: 'absolute',
+    cursor: 'pointer',
+    right: '2px',
+    top: '4px',
   },
 
   input: {
