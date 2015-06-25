@@ -7,12 +7,6 @@ var decorate = require('./decorate');
 
 class SearchPane extends React.Component {
   onKey(key) {
-    if (key === 'Escape') {
-      this.props.onChangeSearch('');
-      setTimeout(() => {
-        this.input.getDOMNode().blur();
-      }, 100)
-    }
     if (key === 'Enter') {
       this.input.getDOMNode().blur();
     }
@@ -20,16 +14,31 @@ class SearchPane extends React.Component {
 
   componentWillMount() {
     this._key = this.onKeyDown.bind(this);
-    window.addEventListener('keydown', this._key);
+    window.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this._key);
+    window.removeEventListener('keydown', this._key, true);
   }
 
   onKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
+      if (document.activeElement === this.input.getDOMNode()) {
+        return;
+      }
       this.input.getDOMNode().focus();
+      e.preventDefault();
+    }
+    // it has to be here to prevevnt devtool console from flipping
+    if (e.keyCode === 27) { // escape
+      if (document.activeElement !== this.input.getDOMNode()) {
+        return;
+      }
+      this.props.onChangeSearch('');
+      setTimeout(() => {
+        this.input.getDOMNode().blur();
+      }, 100)
+      e.stopPropagation();
       e.preventDefault();
     }
   }
