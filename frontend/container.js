@@ -1,7 +1,7 @@
 /** @flow **/
 
 var React = require('react');
-var TreeView = require('./tree-view');
+var SearchPane = require('./search-pane');
 var PropState = require('./prop-state');
 var SplitPane = require('./split-pane');
 
@@ -10,7 +10,7 @@ class Container extends React.Component {
     return (
       <SplitPane
         initialWidth={300}
-        left={() => <TreeView ref={t => window.treeV = t} />}
+        left={() => <SearchPane />}
         right={() => <PropState extraPanes={this.props.extraPanes} />}
       />
     );

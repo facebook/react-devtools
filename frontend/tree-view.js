@@ -28,9 +28,9 @@ class TreeView extends React.Component {
       <div style={styles.container}>
         {!this.props.roots.count() &&
           <span>Waiting for roots to load...</span>}
-        {this.props.roots.map(id => (
+        {this.props.roots.slice(0, 100).map(id => (
           <Node key={id} id={id} depth={0} />
-        ))}
+        )).toJS()}
       </div>
     );
   }
@@ -57,11 +57,11 @@ var styles = {
 
 var WrappedTreeView = decorate({
   listeners(props) {
-    return ['roots'];
+    return ['searchRoots', 'roots'];
   },
   props(store, props) {
     return {
-      roots: store.roots,
+      roots: store.searchRoots || store.roots,
     };
   },
 }, TreeView);

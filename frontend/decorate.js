@@ -46,6 +46,9 @@ module.exports = (options, Component) => {
     }
 
     componentWillUpdate(nextProps, nextState) {
+      if (!this.context.store) {
+        return console.warn('no store on context...');
+      }
       var listeners = options.listeners(this.props, this.context.store);
       var diff = arrayDiff(listeners, this._listeners);
       diff.missing.forEach(name => {
@@ -58,6 +61,9 @@ module.exports = (options, Component) => {
     }
 
     componentWillMount() {
+      if (!this.context.store) {
+        return console.warn('no store on context...');
+      }
       this._update = () => this.forceUpdate();
       this._listeners = options.listeners(this.props, this.context.store);
       this._listeners.forEach(evt => {
@@ -66,6 +72,9 @@ module.exports = (options, Component) => {
     }
 
     componentWillUnmount() {
+      if (!this.context.store) {
+        return console.warn('no store on context...');
+      }
       this._listeners.forEach(evt => {
         this.context.store.off(evt, this._update);
       });
@@ -73,7 +82,7 @@ module.exports = (options, Component) => {
 
     render() {
       var store = this.context.store;
-      var props = options.props(store, this.props);
+      var props = store && options.props(store, this.props);
       return <Component {...props} {...this.props} />;
     }
   }
@@ -81,6 +90,8 @@ module.exports = (options, Component) => {
   Wrapper.contextTypes = {
     store: React.PropTypes.object,
   };
+
+  Wrapper.displayName = 'Wrapper(' + Component.name + ')';
 
   return Wrapper;
 };

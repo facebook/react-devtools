@@ -26,6 +26,7 @@ class Store extends EventEmitter {
     this.hovered = null;
     this.selected = null;
     this.selBottom = false;
+    this.searchText = '';
     this.bridge.on('root', id => {
       if (this.roots.contains(id)) {
         return;
@@ -58,11 +59,50 @@ class Store extends EventEmitter {
     this.bridge.on('unmount', id => this.unmountComponenent(id));
   }
 
+  onChangeSearch(text) {
+    var needle = text.toLowerCase();
+    if (needle === this.searchText.toLowerCase()) {
+      return;
+    }
+    if (!text) {
+      this.searchRoots = null;
+    } else {
+      var base;
+      // TODO: this could be sped up by forming an index ahead of time of
+      // elements w/ the same name. ... but we'll wait to complicate things
+      // until there are perf reasons.
+      if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
+        this.searchRoots = this.searchRoots
+          .filter(item => this.get(item).get('name').toLowerCase().indexOf(needle) !== -1);
+      } else {
+        this.searchRoots = this.data.entrySeq()
+          .filter(([key, val]) => (
+            val.get('name') &&
+            val.get('nodeType') !== 'Wrapper' &&
+            val.get('name').toLowerCase().indexOf(needle) !== -1
+          ))
+          .map(([key, val]) => key);
+      }
+    }
+    this.searchText = text;
+    this.emit('searchText');
+    this.emit('searchRoots');
+    if (this.searchRoots) {
+      this.select(this.searchRoots.get(0));
+    } else {
+      this.select(this.roots.get(0));
+    }
+  }
+
   onKeyDown(e) {
     if (window.document.activeElement !== document.body) {
       return;
     }
     if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
+      return;
+    }
+    if (e.keyCode === 191) { // forward slash
+      this.emit('searchText');
       return;
     }
     var dir = keyCodes[e.keyCode];
@@ -112,6 +152,10 @@ class Store extends EventEmitter {
     var hasChildren = children && 'string' !== typeof children && children.length;
     var pid = this.parents.get(id);
 
+    if (this.searchRoots && this.searchRoots.contains(id)) {
+      pid = null;
+    }
+
     return dirToDest(dir, bottom, collapsed, hasChildren);
   }
 
@@ -120,6 +164,10 @@ class Store extends EventEmitter {
     var bottom = this.selBottom;
     var node = this.get(id);
     var pid = this.skipWrapper(this.parents.get(id), true);
+
+    if (this.searchRoots && this.searchRoots.contains(id)) {
+      pid = null;
+    }
 
     if (dest === 'parent') {
       return pid;
@@ -170,23 +218,24 @@ class Store extends EventEmitter {
     }
 
     if (!pid) {
-      var ix = this.roots.indexOf(id);
+      var roots = this.searchRoots || this.roots;
+      var ix = roots.indexOf(id);
       if (ix === -1) {
-        ix = this.roots.indexOf(this.parents.get(id));
+        ix = roots.indexOf(this.parents.get(id));
       }
       if (dest === 'prevSibling') { // prev root
         if (ix === 0) {
           return null;
         }
-        var prev = this.skipWrapper(this.roots.get(ix - 1));
+        var prev = this.skipWrapper(roots.get(ix - 1));
         this.selBottom = this.hasBottom(prev);
         return prev;
       } else if (dest === 'nextSibling') {
-        if (ix >= this.roots.size - 1) {
+        if (ix >= roots.size - 1) {
           return null;
         }
         this.selBottom = false;
-        return this.skipWrapper(this.roots.get(ix + 1));
+        return this.skipWrapper(roots.get(ix + 1));
       }
       return null;
     }
