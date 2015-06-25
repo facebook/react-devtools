@@ -45,9 +45,23 @@ class Panel extends React.Component {
   }
 
   inspectComponent() {
-    var code = "window.$r.constructor.name === 'Constructor' ? \
-      inspect(window.$r.render) : inspect(window.$r.constructor)";
-    chrome.devtools.inspectedWindow.eval(code);
+    var code = "Object.getOwnPropertyDescriptor(window.$r.__proto__.__proto__, 'isMounted').value ?\
+        inspect(window.$r.render) : inspect(window.$r.constructor)";
+    chrome.devtools.inspectedWindow.eval(code, (res, err) => {
+      if (err) {
+        debugger;
+      }
+    });
+  }
+
+  inspectValue(path) {
+    var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
+    var code = 'inspect(window.$r' + attrs + ')';
+    chrome.devtools.inspectedWindow.eval(code, (res, err) => {
+      if (err) {
+        debugger;
+      }
+    });
   }
 
   teardown() {

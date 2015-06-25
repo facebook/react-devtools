@@ -93,11 +93,15 @@ class Store extends EventEmitter {
     this.emit('searchText');
     this.emit('searchRoots');
     if (this.searchRoots && !this.searchRoots.contains(this.selected)) {
-      this.select(this.searchRoots.get(0), true);
+      this.select(null, true);
+      // this.select(this.searchRoots.get(0), true);
     } else if (!this.searchRoots) {
       this.revealDeep(this.selected);
-      // this.select(this.roots.get(0), true);
     }
+  }
+
+  selectFirstNode() {
+    this.select(this.searchRoots.get(0), true);
   }
 
   revealDeep(id) {
@@ -346,10 +350,10 @@ class Store extends EventEmitter {
     if (oldSel) {
       this.emit(oldSel);
     }
-    this.emit(id);
+    if (id) {
+      this.emit(id);
+    }
     this.emit('selected');
-    window.$selid = id;
-    window.$sel = this.get(id);
     this.bridge.send('selected', id);
     if (!noHighlight) {
       this.bridge.send('highlight', id);

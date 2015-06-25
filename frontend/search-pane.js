@@ -9,6 +9,7 @@ class SearchPane extends React.Component {
   onKey(key) {
     if (key === 'Enter') {
       this.input.getDOMNode().blur();
+      this.props.selectFirstNode();
     }
   }
 
@@ -111,6 +112,7 @@ var Wrapped = decorate({
     return {
       searchText: store.searchText,
       onChangeSearch: text => store.onChangeSearch(text),
+      selectFirstNode: store.selectFirstNode.bind(store),
     };
   },
 }, SearchPane);
