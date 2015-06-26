@@ -12,9 +12,11 @@ module.exports = function (window, backend) {
   }
 
   backend.reactInternals = {
-    getReactHandleFromNative: hook.getReactHandleFromNative,
-    getReactHandleFromElement: hook.getReactHandleFromElement,
-    getNativeFromHandle: hook.getNativeFromHandle,
+    // getReactHandleFromNative: hook.getReactHandleFromNative,
+    // getReactHandleFromElement: hook.getReactHandleFromElement,
+    // getNativeFromHandle: hook.getNativeFromHandle,
+    getNativeFromReactElement: hook.getNativeFromReactElement,
+    getReactElementFromNative: hook.getReactElementFromNative,
     removeDevtools: hook.removeDevtools,
   };
   hook.injectDevTools(backend);
@@ -30,27 +32,35 @@ function compatify(oldHook, newHook) {
   var runtime = oldHook._reactRuntime;
   var reconciler = runtime.Reconciler;
   var reactMount = runtime.Mount;
+  var rootNodeIDMap = new Map();
 
-  newHook.getNativeFromHandle = function (rootNodeID) {
-    try {
-      return runtime.Mount.getNode(rootNodeID);
-    } catch (e) { }
-  }
+  // RN to React differences
+  if (runtime.Mount.findNodeHandle && runtime.Mount.nativeTagToRootNodeID) {
+    newHook.getNativeFromReactElement = function (component) {
+      return runtime.Mount.findNodeHandle(component);
+    };
 
-  newHook.getReactHandleFromElement = function (component) {
-    return component._rootNodeID
-  }
-
-  newHook.getReactHandleFromNative = function (node) {
-    if (!runtime.Mount.getID) {
-      return null;
+    newHook.getReactElementFromNative = function (nativeTag) {
+      var id = runtime.Mount.nativeTagToRootNodeID(nativeTag);
+      return rootNodeIDMap.get(id);
     }
-    var id = runtime.Mount.getID(node);
-    while (node && node.parentNode && !id) {
-      node = node.parentNode;
-      id = runtime.Mount.getID(node);
+  } else if (runtime.Mount.getID && runtime.Mount.getNode) {
+    newHook.getNativeFromReactElement = function (component) {
+      try {
+        return runtime.Mount.getNode(component._rootNodeID);
+      } catch (e) {}
+    };
+
+    newHook.getReactElementFromNative = function (node) {
+      var id = runtime.Mount.getID(node);
+      while (node && node.parentNode && !id) {
+        node = node.parentNode;
+        id = runtime.Mount.getID(node);
+      }
+      return rootNodeIDMap.get(id);
     }
-    return id;
+  } else {
+    console.warn('Unknown react version (does not have getID), probably an unshimmed React Native');
   }
 
   var oldMethods;
@@ -59,7 +69,7 @@ function compatify(oldHook, newHook) {
 
   newHook.injectDevTools = function (backend) {
     if (runtime.Mount._renderNewRootComponent) {
-      oldRenderNode = decorateResult(runtime.Mount, '_renderNewRootComponent', element => {
+      oldRenderNode = decorateResult(runtime.Mount, '_renderNewRootComponent', (element) => {
         backend.addRoot(element);
       });
     } else if (runtime.Mount.renderComponent) { // React Native
@@ -71,6 +81,7 @@ function compatify(oldHook, newHook) {
     oldMethods = decorateMany(runtime.Reconciler, {
       mountComponent(element, rootID, transaction, context) {
         var data = getData(element, context)
+        rootNodeIDMap.set(component._rootNodeID, component);
         backend.onMounted(element, data);
       },
       performUpdateIfNecessary(element, nextChild, transaction, context) {
@@ -84,7 +95,10 @@ function compatify(oldHook, newHook) {
       }
     });
 
-    var onMount = backend.onMounted.bind(backend);
+    var onMount = (component, data) => {
+      rootNodeIDMap.set(component._rootNodeID, component);
+      backend.onMounted(component, data);
+    };
     var onRoot = backend.addRoot.bind(backend);
     walkRoots(runtime.Mount._instancesByReactRootID || runtime.Mount._instancesByContainerID, onMount, onRoot);
   }

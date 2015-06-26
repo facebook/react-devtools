@@ -132,8 +132,7 @@ class Backend extends EventEmitter {
     if (!component) {
       return null;
     }
-    var handle = this.reactInternals.getReactHandleFromElement(component);
-    return this.reactInternals.getNativeFromHandle(handle);
+    return this.reactInternals.getNativeFromReactElement(component);
   }
 
   selectFromDOMNode(node: Object) {
@@ -145,8 +144,10 @@ class Backend extends EventEmitter {
   }
 
   getIDForNode(node: Object): ?string {
-    var reactID = this.reactInternals.getReactHandleFromNative(node);
-    return this.rootIDs.get(reactID);
+    var component = this.reactInternals.getReactElementFromNative(node);
+    if (component) {
+      return this.getId(component);
+    }
   }
 
   setEnabled(val: boolean): Object {
@@ -219,7 +220,7 @@ class Backend extends EventEmitter {
     var id = this.getId(component);
     this.nodes.set(id, data);
 
-    this.rootIDs.set(this.reactInternals.getReactHandleFromElement(component), id);
+    // no longer needed this.rootIDs.set(this.reactInternals.getReactHandleFromElement(component), id);
 
     var send = assign({}, data);
     if (send.children && send.children.map) {
