@@ -277,7 +277,7 @@ var styles = {
     wordBreak: 'break-word',
     wordWrap: 'wrap',
     backgroundColor: 'rgba(100, 100, 200, .3)',
-    height: 300,
+    height: 200,
     overflow: 'auto',
   }
 }
@@ -297,8 +297,8 @@ class Wrap extends React.Component {
       <div style={styles.iframeWatermark}>
         this is an iframe
       </div>
-      {/* for testing highlighing in the presence of multiple scrolls
-        long(long(long()))*/}
+      {/* for testing highlighing in the presence of multiple scrolls */}
+      {long(long(long()))} {/* */}
       <Todos/>
       {/*<span thing={someVal}/>
       <Target count={1}/>
@@ -319,19 +319,24 @@ var OldStyle = React.createClass({
 
 function long(children) {
   return <div style={styles.longStyle}>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
-    <span>Hello</span>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
+    <div>Hello</div>
     {children}
   </div>
 }

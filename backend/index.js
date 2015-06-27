@@ -90,13 +90,7 @@ class Backend extends EventEmitter {
     bridge.on('setProps', this._setProps.bind(this));
     bridge.on('setContext', this._setContext.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
-    bridge.on('highlight', id => {
-      var data = this.nodes.get(id);
-      var node = this.getNodeForID(id);
-      if (node) {
-        this.emit('highlight', {node, name: data.name, props: data.props});
-      }
-    });
+    bridge.on('highlight', id => this.highlight(id));
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
     bridge.on('selected', id => this.emit('selected', id));
     bridge.on('shutdown', () => {
@@ -147,7 +141,16 @@ class Backend extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    console.log('TOOD scroll', node);
+    node.scrollIntoViewIfNeeded();
+    this.highlight(id);
+  }
+
+  highlight(id) {
+    var data = this.nodes.get(id);
+    var node = this.getNodeForID(id);
+    if (node) {
+      this.emit('highlight', {node, name: data.name, props: data.props});
+    }
   }
 
   getNodeForID(id: string): ?Object {

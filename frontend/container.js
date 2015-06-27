@@ -11,14 +11,12 @@ class Container extends React.Component {
     var defaultItems = {
       tree: (id, node, store) => {
         var items = [];
-        /*
         if (store.capabilities.scroll) {
           items.push({
             title: 'Scroll to node',
             action: () => store.scrollToNode(id),
           });
         }
-        */
         return items;
       },
       attr: (id, node, path, store) => {
