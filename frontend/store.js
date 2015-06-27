@@ -124,13 +124,17 @@ class Store extends EventEmitter {
       // until there are perf reasons.
       if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
         this.searchRoots = this.searchRoots
-          .filter(item => this.get(item).get('name').toLowerCase().indexOf(needle) !== -1);
+          .filter(item => {
+            var node = this.get(item)
+            return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) || (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1);
+          });
       } else {
         this.searchRoots = this.data.entrySeq()
           .filter(([key, val]) => (
-            val.get('name') &&
+            (val.get('name') &&
             val.get('nodeType') !== 'Wrapper' &&
-            val.get('name').toLowerCase().indexOf(needle) !== -1
+            val.get('name').toLowerCase().indexOf(needle) !== -1) ||
+            (val.get('text') && val.get('text').toLowerCase().indexOf(needle) !== -1)
           ))
           .map(([key, val]) => key)
           .toList();
