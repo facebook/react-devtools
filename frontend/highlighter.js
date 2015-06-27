@@ -1,15 +1,34 @@
+/* @ xx flow
+ * Broken:
+ * - not recognizing assignment to cancel out the "possibly null value"
+ * - not understanding document.createElement
+ * */
+
+import type {DOMNode, DOMEvent} from './types'
+
+function subscribeCapture(obj, evt, cb) {
+  obj.addEventListener(evt, cb, true);
+  return () => obj.removeEventListener(evt, cb, true);
+}
 
 class Highlighter {
-  constructor(win, onSelect) {
+  overlay: ?Overlay;
+  win: Object;
+  onSelect: () => void;
+  inspecting: boolean;
+  inspected: DOMNode;
+  _subs: Array<() => void>;
+  _button: DOMNode;
+
+  constructor(win: Object, onSelect: () => void) {
     this.win = win;
     this.onSelect = onSelect;
-    this._cb = this.onHover.bind(this);
-    this._click = this.onClick.bind(this);
-    this._mdown = this.onMouseDown.bind(this);
-    this.hover = null;
-    this.win.addEventListener('mouseover', this._cb, true);
-    this.win.addEventListener('mousedown', this._mdown, true);
-    this.win.addEventListener('click', this._click, true);
+    this.overlay = null;
+    this._subs = [
+      subscribeCapture(this.win, 'mouseover', this.onHover.bind(this)),
+      subscribeCapture(this.win, 'mousedown', this.onMouseDown.bind(this)),
+      subscribeCapture(this.win, 'click', this.onClick.bind(this)),
+    ];
   }
 
   startInspecting() {
@@ -17,33 +36,31 @@ class Highlighter {
   }
 
   stopInspecting() {
-    this.win.removeEventListener('mouseover', this._cb);
-    this.win.removeEventListener('mousedown', this._mdown);
-    this.win.removeEventListener('click', this._click);
+    this._subs.forEach(unsub => unsub());
     this.hideHighlight();
     if (this._button && this._button.parentNode) {
       this._button.parentNode.removeChild(this._button);
     }
   }
 
-  highlight(node, name) {
-    if (!this.hover) {
-      this.hover = new Overlay(this.win);
+  highlight(node: DOMNode, name?: string) {
+    if (!this.overlay) {
+      this.overlay = new Overlay(this.win);
     }
     this.inspected = node;
-    this.hover.inspect(node, name);
+    this.overlay.inspect(node, name);
   }
 
   hideHighlight() {
     this.inspecting = false;
-    if (!this.hover) {
+    if (!this.overlay) {
       return;
     }
-    this.hover.remove();
-    this.hover = null;
+    this.overlay.remove();
+    this.overlay = null;
   }
 
-  onMouseDown(evt) {
+  onMouseDown(evt: DOMEvent) {
     if (!this.inspecting) {
       return;
     }
@@ -54,7 +71,7 @@ class Highlighter {
     return;
   }
 
-  onClick(evt) {
+  onClick(evt: DOMEvent) {
     if (!this.inspecting) {
       return;
     }
@@ -64,7 +81,7 @@ class Highlighter {
     this.hideHighlight();
   }
 
-  onHover(evt) {
+  onHover(evt: DOMEvent) {
     if (!this.inspecting) {
       return;
     }
@@ -120,6 +137,16 @@ function boxWrap(dims, what, node) {
 }
 
 class Overlay {
+  win: Object;
+  container: DOMNode;
+  node: DOMNode;
+  border: DOMNode;
+  padding: DOMNode;
+  content: DOMNode;
+  tip: DOMNode;
+  nameSpan: DOMNode;
+  dimSpan: DOMNode;
+
   constructor(window) {
     var doc = window.document;
     this.win = window;
@@ -174,7 +201,9 @@ class Overlay {
   }
 
   remove() {
-    this.container.parentNode.removeChild(this.container);
+    if (this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
   }
 
   inspect(node, name) {

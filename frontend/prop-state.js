@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react');
 var DataView = require('./data-view');

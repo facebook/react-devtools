@@ -1,7 +1,11 @@
+/** @flow **/
 
 module.exports = {
   func: {
     color: 'rgb(37, 153, 37)',
+  },
+
+  attr: {
   },
 
   object: {

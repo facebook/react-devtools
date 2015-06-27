@@ -1,8 +1,9 @@
+/** @flow **/
 
 var React = require('react');
 
 class Simple extends React.Component {
-  constructor(props) {
+  constructor(props: Object) {
     super(props)
     this.state = {}
   }
@@ -11,9 +12,9 @@ class Simple extends React.Component {
     this.props.backend.on('root', () => this.setState());
   }
 
-  render() {
+  render(): ReactElement {
     var roots = [];
-    for (let root of this.props.backend.roots) {
+    for (var root of this.props.backend.roots) {
       roots.push(
         <Tag map={this.props.backend.awesome} node={this.props.backend.awesome.get(root)}/>
       );

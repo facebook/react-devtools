@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react/addons');
 var consts = require('../backend/consts');
@@ -5,14 +6,14 @@ var valueStyles = require('./value-styles');
 var flash = require('./flash');
 
 class Props extends React.Component {
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps: Object): boolean {
     if (nextProps === this.props) {
       return false;
     }
     return true;
   }
 
-  render() {
+  render(): ReactElement {
     var props = this.props.props;
     if (!props || 'object' !== typeof props) {
       return <span/>;;

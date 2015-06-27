@@ -1,10 +1,12 @@
+/** @flow **/
 
 var React = require('react');
 var assign = require('object-assign');
 var flash = require('../flash');
 var valueStyles = require('../value-styles');
 
-// using an empty function for ease of debugging;
+import type {DOMEvent} from '../types';
+
 var BAD_INPUT = Symbol('bad input');
 
 function textToValue(txt) {
@@ -29,20 +31,20 @@ function valueToText(value) {
 }
 
 class Simple extends React.Component {
-  constructor(props) {
+  constructor(props: Object) {
     super(props)
     this.state = {
       editing: false,
     }
   }
 
-  onChange(e) {
+  onChange(e: DOMEvent) {
     this.setState({
       text: e.target.value,
     });
   }
 
-  onKeyDown(e) {
+  onKeyDown(e: DOMEvent) {
     if (e.key === 'Enter') {
       this.onSubmit(true);
     }
@@ -53,7 +55,7 @@ class Simple extends React.Component {
     }
   }
 
-  onSubmit(editing) {
+  onSubmit(editing?: boolean) {
     if (this.state.text === valueToText(this.props.data)) {
       this.setState({
         editing: editing,
@@ -90,7 +92,7 @@ class Simple extends React.Component {
     node.selectionEnd = node.value.length
   }
 
-  componentDidUpdate(prevProps, prevState) {
+  componentDidUpdate(prevProps: Object, prevState: Object) {
     if (this.state.editing && !prevState.editing) {
       this.selectAll();
     }
@@ -99,7 +101,7 @@ class Simple extends React.Component {
     }
   }
 
-  render() {
+  render(): ReactElement {
     if (this.state.editing) {
       return (
         <input

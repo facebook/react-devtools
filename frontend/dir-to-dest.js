@@ -1,5 +1,6 @@
+/* @flow */
 
-module.exports = function (dir, bottom, collapsed, hasChildren) {
+module.exports = function (dir: string, bottom: boolean, collapsed: boolean, hasChildren: boolean): ?string {
   if (dir === 'down') {
     if (bottom || collapsed || !hasChildren) {
       return 'nextSibling';

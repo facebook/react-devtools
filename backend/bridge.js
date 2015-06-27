@@ -1,3 +1,8 @@
+/** @ xx flow
+ *
+ * "possibly null value" on a val that has been assigned
+ * unknown "performance"
+ * */
 
 var consts = require('./consts');
 
@@ -8,9 +13,12 @@ type PayloadType = {
   path: Array<string>,
   callback: number,
 } & {
+  type: 'many-events',
+  events: Array<Object>,
+} & {
   type: 'callback',
   id: string,
-  args: Array<any>,
+  args: [Object, Object, Object, Object], // Array<Object>,
 } & {
   type: 'event',
   cleaned: ?Array<Array<string>>,
@@ -24,6 +32,9 @@ class Bridge {
   cbs: Map;
   listeners: Object;
   wall: Object;
+  _buffer: Array<Object>;
+  _waiting: ?number;
+  _lastTime: number;
 
   constructor() {
     this.cbs = new Map();
@@ -31,7 +42,7 @@ class Bridge {
     this.inspectables = new Map();
     this.cid = 0;
     this._buffer = [];
-    this._waiting = false;
+    this._waiting = null;
     this._lastTime = 5;
   }
 
@@ -74,9 +85,9 @@ class Bridge {
   }
 
   send(evt: string, data: any) {
+    console.log('[bridge->]', evt);
     if (!this._waiting) {
       this._buffer = [];
-      this._waiting = 1
       this._waiting = setTimeout(() => {
         this.flush();
         this._waiting = null;
@@ -117,7 +128,8 @@ class Bridge {
   _handleMessage(payload: PayloadType) {
     var type = payload.type;
     if (payload.type === 'callback') {
-      this.cbs.get(payload.id)(...payload.args);
+      var [data, cleaned, proto, protoclean] = payload.args;
+      this.cbs.get(payload.id)(data, cleaned, proto, protoclean);
       this.cbs.delete(payload.id);
       return;
     }
@@ -128,6 +140,7 @@ class Bridge {
     }
 
     if (payload.type === 'event') {
+      console.log('[bridge<-]', payload.evt);
       if (payload.cleaned) {
         hydrate(payload.data, payload.cleaned);
       }
@@ -139,6 +152,7 @@ class Bridge {
 
     if (payload.type === 'many-events') {
       payload.events.forEach(payload => {
+        console.log('[bridge<-]', payload.evt);
         if (payload.cleaned) {
           hydrate(payload.data, payload.cleaned);
         }
@@ -206,7 +220,7 @@ function hydrate(data, cleaned) {
   });
 }
 
-function sanitize(data, path, cleaned, level) {
+function sanitize(data: Object, path: Array<string>, cleaned: Array<Array<string>>, level?: number) {
   level = level || 0;
   if ('function' === typeof data) {
     cleaned.push(path);

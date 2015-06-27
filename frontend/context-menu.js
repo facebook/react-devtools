@@ -6,6 +6,8 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class ContextMenu extends React.Component {
+  _clickout: (evt: Object) => void;
+
   constructor(props) {
     super(props);
     this._clickout = this.onMouseDown.bind(this);

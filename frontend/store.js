@@ -1,24 +1,39 @@
+/** @ xx flow
+ *
+ * Store incompatible with "events"
+ * Cannot find immutable's package.json
+ * clearInterval doesn't accept undefined...
+* **/
 
 import EventEmitter from 'events'
 import {Map, Set, List} from 'immutable'
 import assign from 'object-assign'
 
+import type Bridge from '../backend/bridge'
+import type {DOMNode, DOMEvent} from './types'
+
 import dirToDest from './dir-to-dest';
 
 var keyCodes = {
-  72: 'left',  // 'h',
-  74: 'down',  // 'j',
-  75: 'up',    // 'k',
-  76: 'right', // 'l',
+  '72': 'left',  // 'h',
+  '74': 'down',  // 'j',
+  '75': 'up',    // 'k',
+  '76': 'right', // 'l',
 
-  37: 'left',
-  38: 'up',
-  39: 'right',
-  40: 'down',
+  '37': 'left',
+  '38': 'up',
+  '39': 'right',
+  '40': 'down',
 }
 
+type ElementID = string;
+
+type ListenerFunction = () => void;
+type DataType = Map;
+
+
 class Store extends EventEmitter {
-  constructor(bridge) {
+  constructor(bridge: Bridge) {
     super()
     this.data = new Map();
     this.roots = new List();
@@ -61,17 +76,41 @@ class Store extends EventEmitter {
     this.bridge.on('mount', (data) => this.mountComponent(data));
     this.bridge.on('update', (data) => this.updateComponent(data));
     this.bridge.on('unmount', id => this.unmountComponenent(id));
-    this.bridge.on('capabilities', capabilities => {
-      this.capabilities = assign(this.capabilities, capabilities);
-    });
-    this.bridge.send('requestCapabilities');
+
+    this.establishConnection();
   }
 
-  scrollToNode(id) {
+  establishConnection() {
+    var tries = 0;
+    var requestInt;
+    var done = false;
+    this.bridge.on('capabilities', capabilities => {
+      if (done) {
+        return;
+      }
+      this.capabilities = assign(this.capabilities, capabilities);
+      this.emit('connected');
+      clearInterval(requestInt);
+      done = true;
+    });
+    this.bridge.send('requestCapabilities');
+    requestInt = setInterval(() => {
+      tries += 1;
+      if (tries > 100) {
+        console.error('failed to connect');
+        clearInterval(requestInt);
+        this.emit('connection failed');
+        return;
+      }
+      this.bridge.send('requestCapabilities');
+    }, 100);
+  }
+
+  scrollToNode(id: ElementID): void {
     this.bridge.send('scrollToNode', id);
   }
 
-  onChangeSearch(text) {
+  onChangeSearch(text: string): void {
     var needle = text.toLowerCase();
     if (needle === this.searchText.toLowerCase()) {
       return;
@@ -93,7 +132,8 @@ class Store extends EventEmitter {
             val.get('nodeType') !== 'Wrapper' &&
             val.get('name').toLowerCase().indexOf(needle) !== -1
           ))
-          .map(([key, val]) => key);
+          .map(([key, val]) => key)
+          .toList();
       }
       this.searchRoots.forEach(id => {
         if (this.hasBottom(id)) {
@@ -112,9 +152,9 @@ class Store extends EventEmitter {
     }
   }
 
-  showContextMenu(type, evt, ...args) {
+  showContextMenu(type: string, evt: DOMEvent, ...args: Array<any>) {
     evt.preventDefault();
-    console.log('menu', type, args);
+    // console.log('menu', type, args);
     this.contextMenu = {type, x: evt.pageX, y: evt.pageY, args};
     this.emit('contextMenu');
   }
@@ -128,7 +168,7 @@ class Store extends EventEmitter {
     this.select(this.searchRoots.get(0), true);
   }
 
-  revealDeep(id) {
+  revealDeep(id: ElementID) {
     var pid = this.parents.get(id);
     while (pid) {
       if (this.data.getIn([pid, 'collapsed'])) {
@@ -139,7 +179,7 @@ class Store extends EventEmitter {
     }
   }
 
-  onKeyDown(e) {
+  onKeyDown(e: DOMEvent) {
     if (window.document.activeElement !== document.body) {
       return;
     }
@@ -162,7 +202,7 @@ class Store extends EventEmitter {
     }
   }
 
-  skipWrapper(id, up) {
+  skipWrapper(id: ElementID, up?: boolean): ?ElementID {
     if (!id) {
       return;
     }
@@ -176,7 +216,7 @@ class Store extends EventEmitter {
     return node.get('children')[0];
   }
 
-  hasBottom(id) {
+  hasBottom(id: ElementID): boolean {
     var node = this.get(id);
     var children = node.get('children');
     if ('string' === typeof children || !children || !children.length || node.get('collapsed')) {
@@ -185,7 +225,7 @@ class Store extends EventEmitter {
     return true;
   }
 
-  getDest(dir) {
+  getDest(dir: string): ?string {
     var id = this.selected;
     var bottom = this.selBottom;
     var node = this.get(id);
@@ -201,7 +241,7 @@ class Store extends EventEmitter {
     return dirToDest(dir, bottom, collapsed, hasChildren);
   }
 
-  getNewSelection(dest) {
+  getNewSelection(dest: string): ?ElementID {
     var id = this.selected;
     var bottom = this.selBottom;
     var node = this.get(id);
@@ -253,7 +293,7 @@ class Store extends EventEmitter {
         return this.getNewSelection('prevSibling');
       }
       var cid = this.skipWrapper(children[children.length - 1]);
-      if (!this.hasBottom(cid)) {
+      if (cid && !this.hasBottom(cid)) {
         this.selBottom = false;
       }
       return cid;
@@ -270,7 +310,7 @@ class Store extends EventEmitter {
           return null;
         }
         var prev = this.skipWrapper(roots.get(ix - 1));
-        this.selBottom = this.hasBottom(prev);
+        this.selBottom = prev && this.hasBottom(prev);
         return prev;
       } else if (dest === 'nextSibling') {
         if (ix >= roots.size - 1) {
@@ -293,7 +333,7 @@ class Store extends EventEmitter {
         return this.getNewSelection('parent');
       }
       var cid = this.skipWrapper(pchildren[pix - 1]);
-      if (this.hasBottom(cid)) {
+      if (cid && this.hasBottom(cid)) {
         this.selBottom = true;
       }
       return cid;
@@ -308,40 +348,40 @@ class Store extends EventEmitter {
     return null;
   }
 
-  get(id) {
+  get(id: ElementID): DataType {
     return this.data.get(id);
   }
 
-  off(evt, fn) {
+  off(evt: DOMEvent, fn: ListenerFunction): void {
     this.removeListener(evt, fn);
   }
 
-  toggleCollapse(id) {
+  toggleCollapse(id: ElementID) {
     this.data = this.data.updateIn([id, 'collapsed'], c => !c);
     this.emit(id);
   }
 
-  setProps(id, path, value) {
+  setProps(id: ElementID, path: Array<string>, value: any) {
     this.bridge.send('setProps', {id, path, value});
   }
 
-  setState(id, path, value) {
+  setState(id: ElementID, path: Array<string>, value: any) {
     this.bridge.send('setState', {id, path, value});
   }
 
-  setContext(id, path, value) {
+  setContext(id: ElementID, path: Array<string>, value: any) {
     this.bridge.send('setContext', {id, path, value});
   }
 
-  inspect(id, path, cb) {
+  inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
     this.bridge.inspect(id, path, cb)
   }
 
-  makeGlobal(id, path) {
+  makeGlobal(id: ElementID, path: Array<string>) {
     this.bridge.send('makeGlobal', {id, path});
   }
 
-  setHover(id, isHovered) {
+  setHover(id: ElementID, isHovered: boolean) {
     if (isHovered) {
       var old = this.hovered;
       this.hovered = id;
@@ -359,17 +399,17 @@ class Store extends EventEmitter {
     }
   }
 
-  selectBottom(id) {
+  selectBottom(id: ElementID) {
     this.selBottom = true;
     this.select(id);
   }
 
-  selectTop(id) {
+  selectTop(id: ?ElementID) {
     this.selBottom = false;
     this.select(id);
   }
 
-  select(id, noHighlight) {
+  select(id: ?ElementID, noHighlight?: boolean) {
     var oldSel = this.selected;
     this.selected = id;
     if (oldSel) {
@@ -385,7 +425,7 @@ class Store extends EventEmitter {
     }
   }
 
-  mountComponent(data) {
+  mountComponent(data: DataType) {
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Custom') {
       map = map.set('collapsed', true);
@@ -399,7 +439,7 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
-  updateComponent(data) {
+  updateComponent(data: DataType) {
     var node = this.get(data.id)
     if (!node) {
       return;
@@ -414,7 +454,7 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
-  unmountComponenent(id) {
+  unmountComponenent(id: ElementID) {
     var pid = this.parents.get(id);
     this.parents.delete(id);
     this.data = this.data.delete(id)
@@ -431,4 +471,4 @@ class Store extends EventEmitter {
 
 }
 
-module.exports = Store;
+export default Store;

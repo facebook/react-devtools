@@ -1,9 +1,15 @@
+/** @flow **/
 
 var React = require('react');
 var assign = require('object-assign');
 
+import type {DOMNode, DOMEvent} from './types'
+
 class SplitPane extends React.Component {
-  constructor(props) {
+  _onMove: (evt: DOMEvent) => void;
+  _onUp: (evt: DOMEvent) => void;
+
+  constructor(props: Object) {
     super(props);
     this.state = {
       width: props.initialWidth,
@@ -12,14 +18,14 @@ class SplitPane extends React.Component {
     this._onUp = this.onUp.bind(this);
   }
 
-  _startDragging(evt) {
+  _startDragging(evt: DOMEvent) {
     evt.preventDefault();
     window.addEventListener('mousemove', this._onMove);
     window.addEventListener('mouseup', this._onUp);
     this.setState({moving: true});
   }
 
-  onMove(evt) {
+  onMove(evt: DOMEvent) {
     evt.preventDefault();
     var node = React.findDOMNode(this);
     this.setState({
@@ -27,14 +33,14 @@ class SplitPane extends React.Component {
     });
   }
 
-  onUp(evt) {
+  onUp(evt: DOMEvent) {
     evt.preventDefault();
     window.removeEventListener('mousemove', this._onMove);
     window.removeEventListener('mouseup', this._onUp);
     this.setState({moving: false});
   }
 
-  render() {
+  render(): ReactElement {
     var dragStyle = styles.dragger;
     if (this.state.moving) {
       dragStyle = assign({}, dragStyle, styles.draggerMoving);

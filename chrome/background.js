@@ -30,10 +30,12 @@ function installReporter(tabId) {
 function doublePipe(one, two) {
   one.onMessage.addListener(lOne);
   function lOne(message) {
+    // console.log('dv -> rep', message);
     two.postMessage(message);
   }
   two.onMessage.addListener(lTwo);
   function lTwo(message) {
+    // console.log('rep -> dv', message);
     one.postMessage(message);
   }
   function shutdown() {

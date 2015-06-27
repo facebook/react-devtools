@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react');
 var Node = require('./node');
@@ -26,10 +27,30 @@ class TreeView extends React.Component {
   }
 
   render() {
+    if (!this.props.roots.count()) {
+      if (this.props.searching) {
+        return (
+          <div style={styles.container}>
+            <span>No search results</span>
+          </div>
+        );
+      } else {
+        return (
+          <div style={styles.container}>
+            <span>
+              Waiting for roots to load...
+              {this.props.reload &&
+                <span>
+                  to reload the inspector <button onClick={this.props.reload}> click here</button>
+                </span>}
+            </span>
+          </div>
+        );
+      }
+    }
+
     return (
       <div style={styles.container}>
-        {!this.props.roots.count() &&
-          <span>Waiting for roots to load...</span>}
         {this.props.roots.slice(0, MAX_ROOTS).map(id => (
           <Node key={id} id={id} depth={0} />
         )).toJS()}
@@ -66,6 +87,7 @@ var WrappedTreeView = decorate({
   props(store, props) {
     return {
       roots: store.searchRoots || store.roots,
+      searching: !!store.searchRoots,
     };
   },
 }, TreeView);

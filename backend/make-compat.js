@@ -1,5 +1,8 @@
+/* @flow */
 
-module.exports = function (window, backend) {
+import type * as Backend from './'
+
+module.exports = function (window: Object, backend: Backend): boolean {
   var hook = window.__REACT_DEVTOOLS_BACKEND__;
   if (!hook) {
     return false;
@@ -11,14 +14,14 @@ module.exports = function (window, backend) {
     }
   }
 
-  backend.reactInternals = {
+  backend.setReactInternals({
     // getReactHandleFromNative: hook.getReactHandleFromNative,
     // getReactHandleFromElement: hook.getReactHandleFromElement,
     // getNativeFromHandle: hook.getNativeFromHandle,
     getNativeFromReactElement: hook.getNativeFromReactElement,
     getReactElementFromNative: hook.getReactElementFromNative,
     removeDevtools: hook.removeDevtools,
-  };
+  });
   hook.injectDevTools(backend);
   hook.backend = backend;
   return true;
@@ -81,7 +84,7 @@ function compatify(oldHook, newHook) {
     oldMethods = decorateMany(runtime.Reconciler, {
       mountComponent(element, rootID, transaction, context) {
         var data = getData(element, context)
-        rootNodeIDMap.set(component._rootNodeID, component);
+        rootNodeIDMap.set(element._rootNodeID, element);
         backend.onMounted(element, data);
       },
       performUpdateIfNecessary(element, nextChild, transaction, context) {
@@ -144,7 +147,7 @@ function childrenList(children) {
   return res;
 }
 
-function getData(element, parentContext) {
+function getData(element) {
   var children = null;
   var props = null;
   var state = null;
@@ -201,6 +204,9 @@ function getData(element, parentContext) {
 
   return {nodeType, props, state, context, children, updater, type, name, text};
 }
+
+type NodeLike = {
+};
 
 function decorateResult(obj, attr, fn) {
   var old = obj[attr];

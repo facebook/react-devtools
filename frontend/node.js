@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react');
 var assign = require('object-assign');
@@ -7,6 +8,12 @@ var Props = require('./props');
 var flash = require('./flash');
 
 class Node {
+  props: Object;
+  head: Object;
+  tail: Object;
+  context: Object;
+  static contextTypes: Object;
+
   shouldComponentUpdate(nextProps) {
     return nextProps !== this.props
   }
@@ -233,6 +240,15 @@ var WrappedNode = decorate({
 
 var styles = {
   container: {
+  },
+
+  children: {
+  },
+
+  textContent: {
+  },
+
+  closeTag: {
   },
 
   head: {

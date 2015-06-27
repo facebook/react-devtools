@@ -1,3 +1,6 @@
+/** @ xx flow
+ * "called on a possibly undefined value" hl
+ * **/
 
 var Backend = require('../backend');
 var Bridge = require('../backend/bridge');
@@ -46,7 +49,9 @@ function welcome(evt) {
 
   var hl;
 
-  inject(window, backend);
+  backend.once('connected', () => {
+    inject(window, backend);
+  });
 
   backend.on('shutdown', () => {
     listeners.forEach(fn => {

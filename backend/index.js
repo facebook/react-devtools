@@ -6,6 +6,7 @@ import type * as Bridge from './bridge'
 
 type Component = {};
 type DataType = {
+  name: string,
   type: string | Object,
   state: Object,
   props: Object,
@@ -18,7 +19,7 @@ type DataType = {
 };
 
 type Bridge = {
-  send: (evt: string, data: any) => void,
+  send: (evt: string, data?: any) => void,
   on: (evt: string, fn: (data: any) => any) => void,
   forget: (id: string) => void,
 };
@@ -26,10 +27,14 @@ type Bridge = {
 type Handle = {};
 
 type InternalsObject = {
-  getReactHandleFromElement: (el: Component) => Handle,
-  getReactHandleFromNative: (node: Object) => Handle,
-  getNativeFromHandle: (h: Handle) => Object,
+  getNativeFromReactElement: (el: Component) => Handle,
+  getReactElementFromNative: (node: any) => Handle,
+  removeDevtools: () => void,
 };
+
+// console.log('injected');
+
+setInterval(() => {}, 100);
 
 /**
  * Events from React:
@@ -46,6 +51,7 @@ class Backend extends EventEmitter {
   roots: Set;
   rootIDs: Map;
   reactInternals: InternalsObject; // injected
+  _prevSelected: any;
 
   constructor(global: Object) {
     super();
@@ -64,6 +70,21 @@ class Backend extends EventEmitter {
     this._prevSelected = null;
   }
 
+  setReactInternals(reactInternals: InternalsObject) {
+    this.reactInternals = reactInternals;
+  }
+
+  /*
+  once(evt, fn) {
+    var back = this;
+    var ll = function () {
+      fn.apply(this, arguments);
+      back.off(evt, ll);
+    }
+    back.on(evt, ll);
+  }
+  */
+
   addBridge(bridge: Bridge) {
     bridge.on('setState', this._setState.bind(this));
     bridge.on('setProps', this._setProps.bind(this));
@@ -73,14 +94,14 @@ class Backend extends EventEmitter {
       var data = this.nodes.get(id);
       var node = this.getNodeForID(id);
       if (node) {
-        this.emit('highlight', {node, name: data.name});
+        this.emit('highlight', {node, name: data.name, props: data.props});
       }
     });
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
     bridge.on('selected', id => this.emit('selected', id));
     bridge.on('shutdown', () => {
       this.emit('shutdown');
-      if (this.reactInternals.removeDevtools) {
+      if (this.reactInternals && this.reactInternals.removeDevtools) {
         this.reactInternals.removeDevtools();
       }
     });
@@ -105,7 +126,9 @@ class Backend extends EventEmitter {
     bridge.on('requestCapabilities', () => {
       bridge.send('capabilities', {
         scroll: 'function' === typeof window.document.createElement,
+        dom: 'function' === typeof window.document.createElement,
       });
+      this.emit('connected');
     });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
     this.on('root', id => bridge.send('root', id))
@@ -132,6 +155,9 @@ class Backend extends EventEmitter {
     if (!component) {
       return null;
     }
+    if (!this.reactInternals) {
+      return null;
+    }
     return this.reactInternals.getNativeFromReactElement(component);
   }
 
@@ -144,6 +170,9 @@ class Backend extends EventEmitter {
   }
 
   getIDForNode(node: Object): ?string {
+    if (!this.reactInternals) {
+      return null;
+    }
     var component = this.reactInternals.getReactElementFromNative(node);
     if (component) {
       return this.getId(component);
@@ -211,6 +240,7 @@ class Backend extends EventEmitter {
   }
 
   addRoot(element: Component) {
+    // console.log('rooted');
     var id = this.getId(element);
     this.roots.add(id);
     this.emit('root', id);
@@ -219,8 +249,6 @@ class Backend extends EventEmitter {
   onMounted(component: Component, data: DataType) {
     var id = this.getId(component);
     this.nodes.set(id, data);
-
-    // no longer needed this.rootIDs.set(this.reactInternals.getReactHandleFromElement(component), id);
 
     var send = assign({}, data);
     if (send.children && send.children.map) {

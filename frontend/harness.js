@@ -1,4 +1,7 @@
-/** @flow **/
+/** @flow
+ *
+ * cannot call method "exports" of store..
+ * **/
 
 var React = require('react/addons');
 var compatInject = require('../backend/compat-inject');

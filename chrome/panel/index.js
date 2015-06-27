@@ -1,3 +1,4 @@
+/** @flow **/
 
 var React = require('react');
 
@@ -8,7 +9,37 @@ var Store = require('../../frontend/store');
 var Bridge = require('../../backend/bridge');
 var consts = require('../../backend/consts');
 
+type Port = {
+  disconnect: () => void,
+  onMessage: {
+    addListener: (fn: (message: Object) => void) => void,
+  },
+  postMessage: (data: Object) => void,
+};
+
+declare var chrome: {
+  devtools: {
+    network: {
+      onNavigated: {
+        addListener: (fn: () => void) => void,
+      },
+    },
+    inspectedWindow: {
+      eval: (code: string, cb?: (res: any, err: ?Object) => any) => void,
+      tabId: number,
+    },
+  },
+  runtime: {
+    getURL: (path: string) => string,
+    connect: (config: Object) => Port,
+  },
+};
+
 class Panel extends React.Component {
+  _port: ?Port;
+  _keyListener: ?() => void;
+  _checkTimeout: ?number;
+
   constructor(props: Object) {
     super(props)
     this.state = {loading: true, isReact: true};
@@ -25,9 +56,14 @@ class Panel extends React.Component {
     this.inject();
 
     chrome.devtools.network.onNavigated.addListener(() => {
-      this.teardown();
-      this.setState({loading: true}, this.props.reload);
+      console.log('navigated');
+      this.reload();
     });
+  }
+
+  reload() {
+    this.teardown();
+    this.setState({loading: true}, this.props.reload);
   }
 
   getNewSelection() {
@@ -38,7 +74,7 @@ class Panel extends React.Component {
     this.bridge.send('checkSelection');
   }
 
-  sendSelection(id) {
+  sendSelection(id: string) {
     id = id || this.store.selected;
     this.bridge.send('putSelectedNode', id);
     setTimeout(() => {
@@ -46,7 +82,7 @@ class Panel extends React.Component {
     }, 100);
   }
 
-  inspectComponent(vbl) {
+  inspectComponent(vbl: string) {
     vbl = vbl || '$r';
     var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
       Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted').value ?
@@ -58,14 +94,14 @@ class Panel extends React.Component {
     });
   }
 
-  viewSource(id) {
+  viewSource(id: string) {
     this.bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       this.inspectComponent('__REACT_DEVTOOLS_BACKEND__.$inst');
     }, 100);
   }
 
-  viewAttrSource(path) {
+  viewAttrSource(path: Array<string>) {
     var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
     var code = 'inspect(window.$r' + attrs + ')';
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
@@ -75,7 +111,7 @@ class Panel extends React.Component {
     });
   }
 
-  executeFn(path) {
+  executeFn(path: Array<string>) {
     var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
     var code = 'window.$r' + attrs + '()';
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
@@ -90,6 +126,7 @@ class Panel extends React.Component {
       window.removeEventListener('keydown', this._keyListener);
       this._keyListener = null;
     }
+    this.bridge.send('shutdown');
     if (this._port) {
       this._port.disconnect();
       this._port = null;
@@ -119,9 +156,11 @@ class Panel extends React.Component {
       this._keyListener = this.store.onKeyDown.bind(this.store)
       window.addEventListener('keydown', this._keyListener);
 
-      this.setState({loading: false});
+      this.store.on('connected', () => {
+        this.setState({loading: false});
+        this.getNewSelection();
+      });
 
-      this.getNewSelection();
     });
   }
 
@@ -142,6 +181,7 @@ class Panel extends React.Component {
         this.setState({isReact: true});
         this.inject();
       } else {
+        console.log('still looking...');
         this.setState({isReact: false, loading: false});
       }
     });
@@ -149,13 +189,20 @@ class Panel extends React.Component {
 
   render(): ReactElement {
     if (this.state.loading) {
-      return <span>Loading...</span>;
+      return (
+        <span>
+          Connecting to react...
+          <br/>
+          If this is React Native, you need to interact with the app (just tap the screen) in order to establish the bridge.
+        </span>
+      );
     }
     if (!this.state.isReact) {
       return <span>Looking for react...</span>;
     }
     return (
       <Container
+        reload={this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path, name) => {
             if (!val || node.get('nodeType') !== 'Custom' || val[consts.type] !== 'function') {
@@ -173,7 +220,7 @@ class Panel extends React.Component {
             return [node.get('nodeType') === 'Custom' && {
               title: 'Show Source',
               action: () => this.viewSource(id),
-            }, {
+            }, this.store.capabilities.dom && {
               title: 'Show in Elements Pane',
               action: () => this.sendSelection(id),
             }];

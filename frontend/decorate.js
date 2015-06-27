@@ -1,3 +1,4 @@
+/* @flow */
 
 var React = require('react');
 
@@ -28,8 +29,17 @@ function arrayDiff(array, oldArray) {
   }
 }
 
-module.exports = (options, Component) => {
+type Options = {
+  shouldUpdate?: (nextProps: Object, props: Object) => boolean,
+  listeners: (props: Object, store: Object) => Array<string>,
+  props: (store: Object, props: Object) => Object,
+};
+
+module.exports = function (options: Options, Component: any): any {
   class Wrapper extends React.Component {
+    _listeners: Array<string>;
+    _update: () => void;
+
     constructor(props) {
       super(props)
       this.state = {}

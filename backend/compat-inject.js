@@ -1,5 +1,6 @@
+/** @flow **/
 
-module.exports = function compatInject(window) {
+module.exports = function compatInject(window: Object) {
   // 0.13
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: {

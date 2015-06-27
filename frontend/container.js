@@ -28,7 +28,7 @@ class Container extends React.Component {
       <div style={styles.container}>
         <SplitPane
           initialWidth={300}
-          left={() => <SearchPane />}
+          left={() => <SearchPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
         />
         <ContextMenu itemSources={[defaultItems, this.props.menuItems]} />

@@ -1,5 +1,11 @@
+/* @flow */
 
-function flash(node, flashColor, baseColor, duration) {
+type DOMElement = {
+  style: Object,
+  offsetTop: number;
+};
+
+function flash(node: DOMElement, flashColor: string, baseColor: string, duration: number) {
   node.style.transition = 'none';
   node.style.backgroundColor = flashColor;
   // force recalc
