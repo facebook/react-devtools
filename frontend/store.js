@@ -126,7 +126,9 @@ class Store extends EventEmitter {
         this.searchRoots = this.searchRoots
           .filter(item => {
             var node = this.get(item)
-            return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) || (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1);
+            return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) ||
+              (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
+              ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1);
           });
       } else {
         this.searchRoots = this.data.entrySeq()
@@ -134,7 +136,8 @@ class Store extends EventEmitter {
             (val.get('name') &&
             val.get('nodeType') !== 'Wrapper' &&
             val.get('name').toLowerCase().indexOf(needle) !== -1) ||
-            (val.get('text') && val.get('text').toLowerCase().indexOf(needle) !== -1)
+            (val.get('text') && val.get('text').toLowerCase().indexOf(needle) !== -1) ||
+            ('string' === typeof val.get('children') && val.get('children').toLowerCase().indexOf(needle) !== -1)
           ))
           .map(([key, val]) => key)
           .toList();
