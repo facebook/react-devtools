@@ -114,7 +114,10 @@ class Backend extends EventEmitter {
       var newSelected = window.__REACT_DEVTOOLS_BACKEND__.$0;
       if (newSelected !== this._prevSelected) {
         this._prevSelected = newSelected;
-        this.selectFromDOMNode(newSelected);
+        var sentSelected = window.__REACT_DEVTOOLS_BACKEND__.$node;
+        if (newSelected !== sentSelected) {
+          this.selectFromDOMNode(newSelected);
+        }
       }
     });
     bridge.on('requestCapabilities', () => {
@@ -145,7 +148,7 @@ class Backend extends EventEmitter {
     this.highlight(id);
   }
 
-  highlight(id) {
+  highlight(id: string) {
     var data = this.nodes.get(id);
     var node = this.getNodeForID(id);
     if (node) {

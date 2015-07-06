@@ -39,10 +39,13 @@ class Panel extends React.Component {
   _port: ?Port;
   _keyListener: ?() => void;
   _checkTimeout: ?number;
+  _unMounted: boolean;
+  bridge: ?Bridge;
 
   constructor(props: Object) {
     super(props)
     this.state = {loading: true, isReact: true};
+    this._unMounted = false;
     window.panel = this;
   }
 
@@ -56,14 +59,19 @@ class Panel extends React.Component {
     this.inject();
 
     chrome.devtools.network.onNavigated.addListener(() => {
-      console.log('navigated');
       this.reload();
     });
   }
 
+  componentWillUnmount() {
+    this._unMounted = true;
+  }
+
   reload() {
     this.teardown();
-    this.setState({loading: true}, this.props.reload);
+    if (!this._unMounted) {
+      this.setState({loading: true}, this.props.reload);
+    }
   }
 
   getNewSelection() {
@@ -75,6 +83,9 @@ class Panel extends React.Component {
   }
 
   sendSelection(id: string) {
+    if (!this.bridge) {
+      return;
+    }
     id = id || this.store.selected;
     this.bridge.send('putSelectedNode', id);
     setTimeout(() => {
@@ -95,6 +106,9 @@ class Panel extends React.Component {
   }
 
   viewSource(id: string) {
+    if (!this.bridge) {
+      return;
+    }
     this.bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       this.inspectComponent('__REACT_DEVTOOLS_BACKEND__.$inst');
@@ -126,7 +140,9 @@ class Panel extends React.Component {
       window.removeEventListener('keydown', this._keyListener);
       this._keyListener = null;
     }
-    this.bridge.send('shutdown');
+    if (this.bridge) {
+      this.bridge.send('shutdown');
+    }
     if (this._port) {
       this._port.disconnect();
       this._port = null;
@@ -139,15 +155,23 @@ class Panel extends React.Component {
       var port = this._port = chrome.runtime.connect({
         name: '' + chrome.devtools.inspectedWindow.tabId,
       });
+      var disconnected = false;
 
       var wall = {
         listen(fn) {
           port.onMessage.addListener(message => fn(message));
         },
         send(data) {
+          if (disconnected) {
+            return;
+          }
           port.postMessage(data);
         },
       };
+
+      port.onDisconnect.addListener(() => {
+        disconnected = true;
+      });
 
       this.bridge = new Bridge();
       this.bridge.attach(wall);

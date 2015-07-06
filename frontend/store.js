@@ -61,15 +61,7 @@ class Store extends EventEmitter {
     window.store = this;
 
     this.bridge.on('select', id => {
-      var node = this.get(id);
-      var pid = this.parents.get(id);
-      while (pid) {
-        node = this.get(pid);
-        if (node.get('collapsed')) {
-          this.toggleCollapse(pid);
-        }
-        pid = this.parents.get(pid);
-      }
+      this.revealDeep(id);
       this.selectTop(this.skipWrapper(id));
     });
 
@@ -155,7 +147,11 @@ class Store extends EventEmitter {
       this.select(null, true);
       // this.select(this.searchRoots.get(0), true);
     } else if (!this.searchRoots) {
-      this.revealDeep(this.selected);
+      if (this.selected) {
+        this.revealDeep(this.selected);
+      } else {
+        this.select(this.roots.get(0));
+      }
     }
   }
 
@@ -176,11 +172,17 @@ class Store extends EventEmitter {
   }
 
   revealDeep(id: ElementID) {
+    if (this.searchRoots && this.searchRoots.contains(id)) {
+      return;
+    }
     var pid = this.parents.get(id);
     while (pid) {
       if (this.data.getIn([pid, 'collapsed'])) {
         this.data = this.data.setIn([pid, 'collapsed'], false);
         this.emit(pid);
+      }
+      if (this.searchRoots && this.searchRoots.contains(pid)) {
+        return;
       }
       pid = this.parents.get(pid);
     }

@@ -85,7 +85,7 @@ class Bridge {
   }
 
   send(evt: string, data: any) {
-    console.log('[bridge->]', evt);
+    // console.log('[bridge->]', evt);
     if (!this._waiting) {
       this._buffer = [];
       this._waiting = setTimeout(() => {
@@ -140,7 +140,7 @@ class Bridge {
     }
 
     if (payload.type === 'event') {
-      console.log('[bridge<-]', payload.evt);
+      // console.log('[bridge<-]', payload.evt);
       if (payload.cleaned) {
         hydrate(payload.data, payload.cleaned);
       }
@@ -152,7 +152,7 @@ class Bridge {
 
     if (payload.type === 'many-events') {
       payload.events.forEach(payload => {
-        console.log('[bridge<-]', payload.evt);
+        // console.log('[bridge<-]', payload.evt);
         if (payload.cleaned) {
           hydrate(payload.data, payload.cleaned);
         }
