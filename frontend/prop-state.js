@@ -46,7 +46,6 @@ class PropState extends React.Component {
             path={['props']}
             readOnly={!state}
             inspect={this.props.inspect}
-            makeGlobal={this.props.makeGlobal}
             showMenu={this.props.showMenu}
             key={this.props.id + '-props'}
             data={this.props.node.get('props')}
@@ -59,7 +58,6 @@ class PropState extends React.Component {
               data={state}
               path={['state']}
               inspect={this.props.inspect}
-              makeGlobal={this.props.makeGlobal}
               showMenu={this.props.showMenu}
               key={this.props.id + '-state'}
             />
@@ -71,7 +69,6 @@ class PropState extends React.Component {
               data={context}
               path={['context']}
               inspect={this.props.inspect}
-              makeGlobal={this.props.makeGlobal}
               showMenu={this.props.showMenu}
               key={this.props.id + '-context'}
             />
@@ -112,9 +109,6 @@ var WrappedPropState = decorate({
         } else if (path[0] === 'context') {
           store.setContext(store.selected, path.slice(1), val);
         }
-      },
-      makeGlobal(path) {
-        store.makeGlobal(store.selected, path);
       },
       showMenu(e, val, path, name) {
         store.showContextMenu('attr', e, store.selected, node, val, path, name);

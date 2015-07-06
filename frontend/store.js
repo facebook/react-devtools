@@ -1,13 +1,13 @@
-/** @ xx flow
+/** @xxflow
  *
- * Store incompatible with "events"
- * Cannot find immutable's package.json
- * clearInterval doesn't accept undefined...
-* **/
+ * flow disabled because of the following bug:
+ * possibly undefined value
+ * https://github.com/facebook/flow/issues/603
+**/
 
-import EventEmitter from 'events'
-import {Map, Set, List} from 'immutable'
-import assign from 'object-assign'
+import {EventEmitter} from 'events';
+import {Map, Set, List} from './imm';
+import assign from 'object-assign';
 
 import type Bridge from '../backend/bridge'
 import type {DOMNode, DOMEvent} from './types'
@@ -30,9 +30,28 @@ type ElementID = string;
 
 type ListenerFunction = () => void;
 type DataType = Map;
+type ContextMenu = {
+  type: string,
+  x: number,
+  y: number,
+  args: Array<any>,
+};
 
 
 class Store extends EventEmitter {
+  contextMenu: ?ContextMenu;
+  bridge: Bridge;
+  searchRoots: ?Map;
+  data: Map;
+  roots: List;
+  parents: window.Map;
+  hovered: ?ElementID;
+  selected: ?ElementID;
+  selBottom: boolean;
+  searchText: string;
+  capabilities: Object;
+
+
   constructor(bridge: Bridge) {
     super()
     this.data = new Map();
@@ -168,7 +187,9 @@ class Store extends EventEmitter {
   }
 
   selectFirstNode() {
-    this.select(this.searchRoots.get(0), true);
+    if (this.searchRoots) {
+      this.select(this.searchRoots.get(0), true);
+    }
   }
 
   revealDeep(id: ElementID) {
@@ -236,6 +257,9 @@ class Store extends EventEmitter {
 
   getDest(dir: string): ?string {
     var id = this.selected;
+    if (!id) {
+      return;
+    }
     var bottom = this.selBottom;
     var node = this.get(id);
     var collapsed = node.get('collapsed');
@@ -252,6 +276,9 @@ class Store extends EventEmitter {
 
   getNewSelection(dest: string): ?ElementID {
     var id = this.selected;
+    if (!id) {
+      return;
+    }
     var bottom = this.selBottom;
     var node = this.get(id);
     var pid = this.skipWrapper(this.parents.get(id), true);
@@ -319,7 +346,7 @@ class Store extends EventEmitter {
           return null;
         }
         var prev = this.skipWrapper(roots.get(ix - 1));
-        this.selBottom = prev && this.hasBottom(prev);
+        this.selBottom = prev ? this.hasBottom(prev) : false; // flowtype requires the ternary
         return prev;
       } else if (dest === 'nextSibling') {
         if (ix >= roots.size - 1) {
@@ -480,4 +507,4 @@ class Store extends EventEmitter {
 
 }
 
-export default Store;
+module.exports = Store;

@@ -32,10 +32,6 @@ type InternalsObject = {
   removeDevtools: () => void,
 };
 
-// console.log('injected');
-
-setInterval(() => {}, 100);
-
 /**
  * Events from React:
  * - root (got a root)
@@ -230,8 +226,8 @@ class Backend extends EventEmitter {
     } else {
       value = getIn(data, path);
     }
-    this.global.$inspect = value;
-    console.log('$inspect =', value);
+    this.global.$tmp = value;
+    console.log('$tmp =', value);
   }
 
   getId(element: Component): string {

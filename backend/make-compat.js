@@ -182,20 +182,23 @@ function getData(element) {
       name = type;
     } else if (element.getName) {
       nodeType = 'Custom';
-      name = element.getName();
+      name = element.getName() || 'Unknown';
     } else if (element._stringText) {
       nodeType = 'Text';
       text = element._stringText;
     } else {
-      name = type.displayName || type.name;
+      name = type.displayName || type.name || 'Unknown';
     }
+  }
+
+  if (name === null) {
+    debugger
   }
 
 
   if (element._instance) {
     var inst = element._instance
     updater = {
-      //setProps: inst.setProps && inst.setProps.bind(inst),
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
       publicInstance: inst,

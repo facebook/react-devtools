@@ -5,6 +5,7 @@ var SearchPane = require('./search-pane');
 var PropState = require('./prop-state');
 var SplitPane = require('./split-pane');
 var ContextMenu = require('./context-menu');
+var consts = require('../backend/consts');
 
 class Container extends React.Component {
   render(): ReactElement {
@@ -19,7 +20,17 @@ class Container extends React.Component {
         }
         return items;
       },
-      attr: (id, node, path, store) => {
+      attr: (id, node, val, path, name, store) => {
+        var items = [{
+          title: 'Store as global variable',
+          action: () => store.makeGlobal(id, path),
+        }];
+        if (val && val[consts.type] === 'function') {
+          items.push({
+            title: 'Call function',
+            action: () => store.callFunction(id, path),
+          });
+        }
       },
     };
     return (

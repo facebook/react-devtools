@@ -1,4 +1,4 @@
-/** @flow **/
+/** @xxflow **/
 
 var React = require('react');
 
@@ -9,11 +9,14 @@ var Store = require('../../frontend/store');
 var Bridge = require('../../backend/bridge');
 var consts = require('../../backend/consts');
 
+type Listenable = {
+  addListener: (fn: (message: Object) => void) => void,
+}
+
 type Port = {
   disconnect: () => void,
-  onMessage: {
-    addListener: (fn: (message: Object) => void) => void,
-  },
+  onMessage: Listenable,
+  onDisconnect: Listenable,
   postMessage: (data: Object) => void,
 };
 

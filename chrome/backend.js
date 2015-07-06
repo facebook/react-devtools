@@ -1,5 +1,6 @@
 /** @ xx flow
  * "called on a possibly undefined value" hl
+ * https://github.com/facebook/flow/issues/603
  * **/
 
 var Backend = require('../backend');
