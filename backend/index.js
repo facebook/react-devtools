@@ -257,6 +257,7 @@ class Backend extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
+    send.canUpdate = send.updater && !!send.updater.forceUpdate;
     delete send.type;
     delete send.updater;
     this.emit('mount', send);
@@ -271,6 +272,7 @@ class Backend extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
+    send.canUpdate = send.updater && !!send.updater.forceUpdate;
     delete send.type;
     delete send.updater;
     this.emit('update', send)

@@ -29,7 +29,8 @@ class PropState extends React.Component {
 
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
-    var isCustom = this.props.node.get('nodeType') === 'Custom'
+    var isCustom = this.props.node.get('nodeType') === 'Custom';
+    var propsReadOnly = !this.props.node.get('canUpdate');
 
     return (
       <div style={styles.container}>
@@ -41,10 +42,10 @@ class PropState extends React.Component {
             <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
         <div style={styles.section}>
-          <strong>Props</strong>
+          <strong>Props</strong> {propsReadOnly && <em> read-only</em>}
           <DataView
             path={['props']}
-            readOnly={!state}
+            readOnly={propsReadOnly}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             key={this.props.id + '-props'}

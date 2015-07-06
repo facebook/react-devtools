@@ -191,11 +191,6 @@ function getData(element) {
     }
   }
 
-  if (name === null) {
-    debugger
-  }
-
-
   if (element._instance) {
     var inst = element._instance
     updater = {
