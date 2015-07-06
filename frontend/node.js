@@ -259,6 +259,10 @@ var styles = {
 
   renderCount: {
     textAlign: 'right',
+    position: 'absolute',
+    right: -3,
+    padding: 2,
+    backgroundColor: 'white',
   },
 
   tail: {
@@ -278,7 +282,7 @@ var styles = {
 
   tagText: {
     flex: 1,
-    wordWrap: 'break-word',
+    whiteSpace: 'nowrap',
   },
 
   headSelect: {
