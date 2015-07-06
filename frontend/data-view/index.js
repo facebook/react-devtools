@@ -56,8 +56,17 @@ class DataItem extends React.Component {
 
   componentWillReceiveProps(nextProps) {
     if (this.state.open && nextProps.value && nextProps.value[consts.inspected] === false) {
-      this.setState({open: false});
+      this.inspect();
     }
+  }
+
+  inspect() {
+    this.props.inspect(this.props.path, value => {
+      assign(this.props.value, value);
+      this.props.value[consts.inspected] = true;
+      this.setState({loading: false});
+    });
+    this.setState({loading: true, open: true});
   }
 
   toggleOpen() {
@@ -65,12 +74,7 @@ class DataItem extends React.Component {
       return;
     }
     if (this.props.value && this.props.value[consts.inspected] === false) {
-      this.props.inspect(this.props.path, value => {
-        assign(this.props.value, value);
-        this.props.value[consts.inspected] = true;
-        this.setState({loading: false});
-      });
-      this.setState({loading: true, open: true});
+      this.inspect();
       return;
     }
 

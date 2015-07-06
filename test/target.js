@@ -297,7 +297,7 @@ class Wrap extends React.Component {
       <div style={styles.iframeWatermark}>
         this is an iframe
       </div>
-      {/* for testing highlighing in the presence of multiple scrolls */}
+      {/* for testing highlighing in the presence of multiple scrolls
       {long(long(long()))} {/* */}
       <Todos/>
       {/*<span thing={someVal}/>
