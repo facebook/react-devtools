@@ -7,7 +7,13 @@ var SplitPane = require('./split-pane');
 var ContextMenu = require('./context-menu');
 var consts = require('../backend/consts');
 
-class Container extends React.Component {
+class Container {
+  props: {
+    reload: () => void,
+    extraPanes: Array<Object>,
+    menuItems: Object,
+  };
+
   render(): ReactElement {
     var defaultItems = {
       tree: (id, node, store) => {

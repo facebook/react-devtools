@@ -5,11 +5,19 @@ var assign = require('object-assign');
 
 var decorate = require('./decorate');
 
-class ContextMenu extends React.Component {
+class ContextMenu {
   _clickout: (evt: Object) => void;
 
-  constructor(props) {
-    super(props);
+  props: {
+    hideContextMenu: () => void,
+    items: Array<{title: string, action: () => void}>,
+    pos: {
+      x: number,
+      y: number,
+    }
+  };
+
+  componentWillMount() {
     this._clickout = this.onMouseDown.bind(this);
   }
 
@@ -90,33 +98,6 @@ class HighlightHover extends React.Component {
   }
 }
 
-var styles = {
-  hidden: {
-    display: 'none',
-  },
-
-  container: {
-    position: 'fixed',
-    backgroundColor: 'white',
-    boxShadow: '0 3px 5px #ccc',
-    listStyle: 'none',
-    margin: 0,
-    padding: 0,
-    fontFamily: 'sans-serif',
-    fontSize: 14,
-  },
-
-  item: {
-    padding: '5px 10px',
-    cursor: 'pointer',
-  },
-
-  empty: {
-    padding: '5px 10px',
-    color: '#888',
-  },
-}
-
 var Wrapped = decorate({
   listeners() {
     return ['contextMenu'];
@@ -148,5 +129,32 @@ var Wrapped = decorate({
     };
   }
 }, ContextMenu);
+
+var styles = {
+  hidden: {
+    display: 'none',
+  },
+
+  container: {
+    position: 'fixed',
+    backgroundColor: 'white',
+    boxShadow: '0 3px 5px #ccc',
+    listStyle: 'none',
+    margin: 0,
+    padding: 0,
+    fontFamily: 'sans-serif',
+    fontSize: 14,
+  },
+
+  item: {
+    padding: '5px 10px',
+    cursor: 'pointer',
+  },
+
+  empty: {
+    padding: '5px 10px',
+    color: '#888',
+  },
+}
 
 module.exports = Wrapped;

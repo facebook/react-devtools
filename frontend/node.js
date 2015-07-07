@@ -7,14 +7,30 @@ var decorate = require('./decorate');
 var Props = require('./props');
 var flash = require('./flash');
 
+import type {Map} from './imm';
+
+type PropsType = {
+  hovered: boolean,
+  selected: boolean,
+  node: Map,
+  depth: number,
+  isBottomTagSelected: boolean,
+  onHover: (isHovered: boolean) => void,
+  onContextMenu: () => void,
+  onToggleCollapse: () => void,
+  onSelectBottom: () => void,
+  onSelect: () => void,
+};
+
 class Node {
-  props: Object;
-  head: Object;
-  tail: Object;
+  _head: Object;
+  _tail: Object;
+
+  props: PropsType;
   context: Object;
   static contextTypes: Object;
 
-  shouldComponentUpdate(nextProps) {
+  shouldComponentUpdate(nextProps: PropsType) {
     return nextProps !== this.props
   }
 
@@ -31,7 +47,7 @@ class Node {
   }
 
   ensureInView() {
-    var node = this.props.isBottomTagSelected ? this.tail : this.head;
+    var node = this.props.isBottomTagSelected ? this._tail : this._head;
     if (!node) {
       return;
     }
@@ -39,7 +55,7 @@ class Node {
     this.context.scrollTo(domnode.offsetTop, domnode.offsetHeight);
   }
 
-  render() {
+  render(): ReactElement {
     var node = this.props.node;
     if (!node) {
       return <span>Node deleted</span>;
@@ -75,7 +91,7 @@ class Node {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this.head = h} {...tagEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 "
@@ -102,7 +118,7 @@ class Node {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this.head = h} {...tagEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 <span style={tagStyle}>&lt;{name}</span>
@@ -150,7 +166,7 @@ class Node {
     );
 
     var head = (
-      <div ref={h => this.head = h} style={headStyles} {...tagEvents}>
+      <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
         <span
           title={hasState && 'This component has state'}
           onClick={this.props.onToggleCollapse} style={collapserStyle}
@@ -194,7 +210,7 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div ref={t => this.tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
+        <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
           {closeTag}
         </div>
       </div>
