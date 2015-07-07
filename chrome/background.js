@@ -10,6 +10,7 @@
  */
 'use strict';
 
+/*::
 type Port = {
   name: string,
   sender: {
@@ -29,6 +30,7 @@ declare var chrome: {
     },
   },
 };
+*/
 
 var ports = {};
 
@@ -57,11 +59,11 @@ chrome.runtime.onConnect.addListener(function (port) {
   }
 });
 
-function isNumeric(str: string): boolean {
+function isNumeric(str/*: string*/)/*: boolean*/ {
   return +str + '' === str;
 }
 
-function installReporter(tabId: number) {
+function installReporter(tabId/*: number*/) {
   chrome.tabs.executeScript(tabId, {file: 'reporter.js'}, function () {
   });
 }
