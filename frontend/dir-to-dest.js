@@ -1,6 +1,8 @@
 /* @flow */
 
-module.exports = function (dir: string, bottom: boolean, collapsed: boolean, hasChildren: boolean): ?string {
+import type {Dir, Dest} from './types';
+
+module.exports = function (dir: Dir, bottom: boolean, collapsed: boolean, hasChildren: boolean): ?Dest {
   if (dir === 'down') {
     if (bottom || collapsed || !hasChildren) {
       return 'nextSibling';

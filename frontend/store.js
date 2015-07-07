@@ -1,4 +1,4 @@
-/** @xxflow
+/** @ xx flow
  *
  * flow disabled because of the following bug:
  * possibly undefined value
@@ -10,9 +10,10 @@ import {Map, Set, List} from './imm';
 import assign from 'object-assign';
 
 import type Bridge from '../backend/bridge'
-import type {DOMNode, DOMEvent} from './types'
+import type {DOMNode, DOMEvent, Dir, Dest} from './types'
 
 import dirToDest from './dir-to-dest';
+import nodeMatchesText from './node-matches-text';
 
 var keyCodes = {
   '72': 'left',  // 'h',
@@ -37,44 +38,35 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-function nodeMatchesText(node, needle) {
-  return (
-    (node.get('name') &&
-    node.get('nodeType') !== 'Wrapper' &&
-    node.get('name').toLowerCase().indexOf(needle) !== -1) ||
-    (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
-    ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1)
-  );
-}
-
 class Store extends EventEmitter {
+  _bridge: Bridge;
+  _nodes: Map;
+  _parents: Map;
+
   contextMenu: ?ContextMenu;
-  bridge: Bridge;
-  searchRoots: ?Map;
-  data: Map;
+  searchRoots: ?List;
   roots: List;
-  parents: window.Map;
   hovered: ?ElementID;
   selected: ?ElementID;
-  selBottom: boolean;
+  isBottomTagSelected: boolean;
   searchText: string;
-  capabilities: Object;
-
+  // an object describing the capabilities of the inspected runtime.
+  capabilities: {
+    scroll?: boolean,
+  };
 
   constructor(bridge: Bridge) {
     super()
-    this.data = new Map();
+    this._nodes = new Map();
     this.roots = new List();
-    this.parents = new window.Map();
-    this.bridge = bridge;
+    this._parents = new Map();
+    this._bridge = bridge;
     this.hovered = null;
     this.selected = null;
-    this.selBottom = false;
+    this.isBottomTagSelected = false;
     this.searchText = '';
-    this.capabilities = {
-      scroll: true,
-    };
-    this.bridge.on('root', id => {
+    this.capabilities = {};
+    this._bridge.on('root', id => {
       if (this.roots.contains(id)) {
         return;
       }
@@ -82,20 +74,21 @@ class Store extends EventEmitter {
       if (!this.selected) {
         this.selected = id;
         this.emit('selected');
-        this.bridge.send('selected', id);
+        this._bridge.send('selected', id);
       }
       this.emit('roots');
     });
+    // for debugging
     window.store = this;
 
-    this.bridge.on('select', id => {
+    this._bridge.on('select', id => {
       this.revealDeep(id);
       this.selectTop(this.skipWrapper(id));
     });
 
-    this.bridge.on('mount', (data) => this.mountComponent(data));
-    this.bridge.on('update', (data) => this.updateComponent(data));
-    this.bridge.on('unmount', id => this.unmountComponenent(id));
+    this._bridge.on('mount', (data) => this.mountComponent(data));
+    this._bridge.on('update', (data) => this.updateComponent(data));
+    this._bridge.on('unmount', id => this.unmountComponenent(id));
 
     this.establishConnection();
   }
@@ -104,7 +97,7 @@ class Store extends EventEmitter {
     var tries = 0;
     var requestInt;
     var done = false;
-    this.bridge.on('capabilities', capabilities => {
+    this._bridge.on('capabilities', capabilities => {
       if (done) {
         return;
       }
@@ -113,7 +106,7 @@ class Store extends EventEmitter {
       clearInterval(requestInt);
       done = true;
     });
-    this.bridge.send('requestCapabilities');
+    this._bridge.send('requestCapabilities');
     requestInt = setInterval(() => {
       tries += 1;
       if (tries > 100) {
@@ -122,12 +115,12 @@ class Store extends EventEmitter {
         this.emit('connection failed');
         return;
       }
-      this.bridge.send('requestCapabilities');
+      this._bridge.send('requestCapabilities');
     }, 100);
   }
 
   scrollToNode(id: ElementID): void {
-    this.bridge.send('scrollToNode', id);
+    this._bridge.send('scrollToNode', id);
   }
 
   onChangeSearch(text: string): void {
@@ -139,9 +132,6 @@ class Store extends EventEmitter {
       this.searchRoots = null;
     } else {
       var base;
-      // TODO: this could be sped up by forming an index ahead of time of
-      // elements w/ the same name. ... but we'll wait to complicate things
-      // until there are perf reasons.
       if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
         this.searchRoots = this.searchRoots
           .filter(item => {
@@ -151,14 +141,15 @@ class Store extends EventEmitter {
               ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1);
           });
       } else {
-        this.searchRoots = this.data.entrySeq()
+        this.searchRoots = this._nodes.entrySeq()
           .filter(([key, val]) => nodeMatchesText(val, needle))
           .map(([key, val]) => key)
           .toList();
       }
+      // $FlowFixMe
       this.searchRoots.forEach(id => {
         if (this.hasBottom(id)) {
-          this.data = this.data.setIn([id, 'collapsed'], true);
+          this._nodes = this._nodes.setIn([id, 'collapsed'], true);
         }
       });
     }
@@ -197,16 +188,16 @@ class Store extends EventEmitter {
     if (this.searchRoots && this.searchRoots.contains(id)) {
       return;
     }
-    var pid = this.parents.get(id);
+    var pid = this._parents.get(id);
     while (pid) {
-      if (this.data.getIn([pid, 'collapsed'])) {
-        this.data = this.data.setIn([pid, 'collapsed'], false);
+      if (this._nodes.getIn([pid, 'collapsed'])) {
+        this._nodes = this._nodes.setIn([pid, 'collapsed'], false);
         this.emit(pid);
       }
       if (this.searchRoots && this.searchRoots.contains(pid)) {
         return;
       }
-      pid = this.parents.get(pid);
+      pid = this._parents.get(pid);
     }
   }
 
@@ -242,7 +233,7 @@ class Store extends EventEmitter {
       return id;
     }
     if (up) {
-      return this.parents.get(id);
+      return this._parents.get(id);
     }
     return node.get('children')[0];
   }
@@ -256,17 +247,17 @@ class Store extends EventEmitter {
     return true;
   }
 
-  getDest(dir: string): ?string {
+  getDest(dir: Dir): ?Dest {
     var id = this.selected;
     if (!id) {
       return;
     }
-    var bottom = this.selBottom;
+    var bottom = this.isBottomTagSelected;
     var node = this.get(id);
     var collapsed = node.get('collapsed');
     var children = node.get('children');
     var hasChildren = children && 'string' !== typeof children && children.length;
-    var pid = this.parents.get(id);
+    var pid = this._parents.get(id);
 
     if (this.searchRoots && this.searchRoots.contains(id)) {
       pid = null;
@@ -275,14 +266,14 @@ class Store extends EventEmitter {
     return dirToDest(dir, bottom, collapsed, hasChildren);
   }
 
-  getNewSelection(dest: string): ?ElementID {
+  getNewSelection(dest: Dest): ?ElementID {
     var id = this.selected;
     if (!id) {
       return;
     }
-    var bottom = this.selBottom;
+    var bottom = this.isBottomTagSelected;
     var node = this.get(id);
-    var pid = this.skipWrapper(this.parents.get(id), true);
+    var pid = this.skipWrapper(this._parents.get(id), true);
 
     if (this.searchRoots && this.searchRoots.contains(id)) {
       pid = null;
@@ -292,7 +283,7 @@ class Store extends EventEmitter {
       return pid;
     }
     if (dest === 'parentBottom') {
-      this.selBottom = true;
+      this.isBottomTagSelected = true;
       return pid;
     }
 
@@ -306,12 +297,12 @@ class Store extends EventEmitter {
     }
 
     if (dest === 'bottom') {
-      this.selBottom = true;
+      this.isBottomTagSelected = true;
       this.emit(this.selected);
       return;
     }
     if (dest === 'top') {
-      this.selBottom = false;
+      this.isBottomTagSelected = false;
       this.emit(this.selected);
       return;
     }
@@ -321,7 +312,7 @@ class Store extends EventEmitter {
       if ('string' === typeof children) {
         return this.getNewSelection('nextSibling');
       }
-      this.selBottom = false;
+      this.isBottomTagSelected = false;
       return this.skipWrapper(children[0]);
     }
     if (dest === 'lastChild') {
@@ -331,7 +322,7 @@ class Store extends EventEmitter {
       }
       var cid = this.skipWrapper(children[children.length - 1]);
       if (cid && !this.hasBottom(cid)) {
-        this.selBottom = false;
+        this.isBottomTagSelected = false;
       }
       return cid;
     }
@@ -340,20 +331,20 @@ class Store extends EventEmitter {
       var roots = this.searchRoots || this.roots;
       var ix = roots.indexOf(id);
       if (ix === -1) {
-        ix = roots.indexOf(this.parents.get(id));
+        ix = roots.indexOf(this._parents.get(id));
       }
       if (dest === 'prevSibling') { // prev root
         if (ix === 0) {
           return null;
         }
         var prev = this.skipWrapper(roots.get(ix - 1));
-        this.selBottom = prev ? this.hasBottom(prev) : false; // flowtype requires the ternary
+        this.isBottomTagSelected = prev ? this.hasBottom(prev) : false; // flowtype requires the ternary
         return prev;
       } else if (dest === 'nextSibling') {
         if (ix >= roots.size - 1) {
           return null;
         }
-        this.selBottom = false;
+        this.isBottomTagSelected = false;
         return this.skipWrapper(roots.get(ix + 1));
       }
       return null;
@@ -363,7 +354,7 @@ class Store extends EventEmitter {
     var pchildren = parent.get('children');
     var pix = pchildren.indexOf(id);
     if (pix === -1) {
-      pix = pchildren.indexOf(this.parents.get(id));
+      pix = pchildren.indexOf(this._parents.get(id));
     }
     if (dest === 'prevSibling') {
       if (pix === 0) {
@@ -371,7 +362,7 @@ class Store extends EventEmitter {
       }
       var cid = this.skipWrapper(pchildren[pix - 1]);
       if (cid && this.hasBottom(cid)) {
-        this.selBottom = true;
+        this.isBottomTagSelected = true;
       }
       return cid;
     }
@@ -379,14 +370,14 @@ class Store extends EventEmitter {
       if (pix === pchildren.length - 1) {
         return this.getNewSelection('parentBottom');
       }
-      this.selBottom = false;
+      this.isBottomTagSelected = false;
       return this.skipWrapper(pchildren[pix + 1]);
     }
     return null;
   }
 
   get(id: ElementID): DataType {
-    return this.data.get(id);
+    return this._nodes.get(id);
   }
 
   off(evt: DOMEvent, fn: ListenerFunction): void {
@@ -394,28 +385,28 @@ class Store extends EventEmitter {
   }
 
   toggleCollapse(id: ElementID) {
-    this.data = this.data.updateIn([id, 'collapsed'], c => !c);
+    this._nodes = this._nodes.updateIn([id, 'collapsed'], c => !c);
     this.emit(id);
   }
 
   setProps(id: ElementID, path: Array<string>, value: any) {
-    this.bridge.send('setProps', {id, path, value});
+    this._bridge.send('setProps', {id, path, value});
   }
 
   setState(id: ElementID, path: Array<string>, value: any) {
-    this.bridge.send('setState', {id, path, value});
+    this._bridge.send('setState', {id, path, value});
   }
 
   setContext(id: ElementID, path: Array<string>, value: any) {
-    this.bridge.send('setContext', {id, path, value});
+    this._bridge.send('setContext', {id, path, value});
   }
 
   inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
-    this.bridge.inspect(id, path, cb)
+    this._bridge.inspect(id, path, cb)
   }
 
   makeGlobal(id: ElementID, path: Array<string>) {
-    this.bridge.send('makeGlobal', {id, path});
+    this._bridge.send('makeGlobal', {id, path});
   }
 
   setHover(id: ElementID, isHovered: boolean) {
@@ -427,22 +418,22 @@ class Store extends EventEmitter {
       }
       this.emit(id);
       this.emit('hover');
-      this.bridge.send('highlight', id);
+      this._bridge.send('highlight', id);
     } else if (this.hovered === id) {
       this.hovered = null;
       this.emit(id);
       this.emit('hover');
-      this.bridge.send('hideHighlight');
+      this._bridge.send('hideHighlight');
     }
   }
 
   selectBottom(id: ElementID) {
-    this.selBottom = true;
+    this.isBottomTagSelected = true;
     this.select(id);
   }
 
   selectTop(id: ?ElementID) {
-    this.selBottom = false;
+    this.isBottomTagSelected = false;
     this.select(id);
   }
 
@@ -456,9 +447,9 @@ class Store extends EventEmitter {
       this.emit(id);
     }
     this.emit('selected');
-    this.bridge.send('selected', id);
+    this._bridge.send('selected', id);
     if (!noHighlight) {
-      this.bridge.send('highlight', id);
+      this._bridge.send('highlight', id);
     }
   }
 
@@ -467,14 +458,16 @@ class Store extends EventEmitter {
     if (data.nodeType === 'Custom') {
       map = map.set('collapsed', true);
     }
-    this.data = this.data.set(data.id, map);
+    this._nodes = this._nodes.set(data.id, map);
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        this.parents.set(cid, data.id);
+        this._parents = this._parents.set(cid, data.id);
       });
     }
     this.emit(data.id);
-    if (this.searchText && nodeMatchesText(map, this.searchText.toLowerCase())) {
+    if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase())) {
+      // $FlowFixMe - flow things this might still be null (but it's not b/c
+      // of line 271)
       this.searchRoots = this.searchRoots.push(data.id);
       this.emit('searchRoots');
     }
@@ -486,19 +479,19 @@ class Store extends EventEmitter {
       return;
     }
     data.renders = node.get('renders') + 1;
-    this.data = this.data.mergeIn([data.id], Map(data));
+    this._nodes = this._nodes.mergeIn([data.id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        this.parents.set(cid, data.id);
+        this._parents = this._parents.set(cid, data.id);
       });
     }
     this.emit(data.id);
   }
 
   unmountComponenent(id: ElementID) {
-    var pid = this.parents.get(id);
-    this.parents.delete(id);
-    this.data = this.data.delete(id)
+    var pid = this._parents.get(id);
+    this._parents = this._parents.delete(id);
+    this._nodes = this._nodes.delete(id)
     if (pid) {
       this.emit(pid);
     } else {
@@ -513,6 +506,7 @@ class Store extends EventEmitter {
       this.selectTop(newsel);
     }
     if (this.searchRoots && this.searchRoots.contains(id)) {
+      // $FlowFixMe flow things searchRoots might be null
       this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
       this.emit('searchRoots');
     }

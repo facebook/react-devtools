@@ -31,7 +31,7 @@ class Node {
   }
 
   ensureInView() {
-    var node = this.props.selBottom ? this.tail : this.head;
+    var node = this.props.isBottomTagSelected ? this.tail : this.head;
     if (!node) {
       return;
     }
@@ -59,7 +59,7 @@ class Node {
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      this.props.selected && (collapsed || !this.props.selBottom) && styles.headSelect,
+      this.props.selected && (collapsed || !this.props.isBottomTagSelected) && styles.headSelect,
       leftPad
     );
 
@@ -184,7 +184,7 @@ class Node {
       {},
       styles.tail,
       this.props.hovered && styles.headHover,
-      this.props.selected && this.props.selBottom && styles.headSelect,
+      this.props.selected && this.props.isBottomTagSelected && styles.headSelect,
       leftPad
     );
 
@@ -215,7 +215,7 @@ var WrappedNode = decorate({
     return {
       node,
       selected: store.selected === props.id,
-      selBottom: store.selBottom,
+      isBottomTagSelected: store.isBottomTagSelected,
       hovered: store.hovered === props.id,
       onToggleCollapse: e => {
         e.preventDefault();

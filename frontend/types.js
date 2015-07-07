@@ -1,4 +1,7 @@
 
+type Dir = 'up' | 'down' | 'left' | 'right';
+type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'top' | 'bottom' | 'collapse' | 'uncollapse' | 'parent';
+
 type DOMNode = {
   nodeName: string,
   style: Object,
@@ -23,5 +26,5 @@ type DOMEvent = {
   cancelBubble: boolean,
 };
 
-export {DOMNode, DOMEvent};
+export {DOMNode, DOMEvent, Dir, Dest};
 

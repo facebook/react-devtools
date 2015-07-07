@@ -3,6 +3,7 @@
 var React = require('react');
 var Node = require('./node');
 var TreeView = require('./tree-view');
+var {PropTypes} = React;
 
 var decorate = require('./decorate');
 
@@ -16,15 +17,8 @@ class SearchPane extends React.Component {
   input: ReactElement;
   _key: (evt: EventLike) => void;
 
-  onKey(key) {
-    if (key === 'Enter') {
-      React.findDOMNode(this.input).blur();
-      this.props.selectFirstNode();
-    }
-  }
-
   componentWillMount() {
-    this._key = this.onKeyDown.bind(this);
+    this._key = this.onWindowKeyDown.bind(this);
     window.addEventListener('keydown', this._key, true);
   }
 
@@ -32,7 +26,7 @@ class SearchPane extends React.Component {
     window.removeEventListener('keydown', this._key, true);
   }
 
-  onKeyDown(e) {
+  onWindowKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
       var node = React.findDOMNode(this.input);
       if (document.activeElement === node) {
@@ -41,16 +35,12 @@ class SearchPane extends React.Component {
       node.focus();
       e.preventDefault();
     }
-    // it has to be here to prevevnt devtool console from flipping
+    // it has to be here to prevevnt devtool console from flipping when trying
+    // to leave search mode
     if (e.keyCode === 27) { // escape
       if (!this.props.searchText) {
         return;
       }
-      /*
-      if (document.activeElement !== React.findDOMNode(this.input)) {
-        return;
-      }
-      */
       e.stopPropagation();
       e.preventDefault();
       this.cancel();
@@ -64,6 +54,13 @@ class SearchPane extends React.Component {
     }, 100)
   }
 
+  onKeyDown(key) {
+    if (key === 'Enter') {
+      React.findDOMNode(this.input).blur();
+      this.props.selectFirstNode();
+    }
+  }
+
   render() {
     return (
       <div style={styles.container}>
@@ -73,7 +70,7 @@ class SearchPane extends React.Component {
             style={styles.input}
             ref={i => this.input = i}
             value={this.props.searchText}
-            onKeyDown={e => this.onKey(e.key)}
+            onKeyDown={e => this.onKeyDown(e.key)}
             placeholder="Search by Component Name"
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
@@ -85,6 +82,13 @@ class SearchPane extends React.Component {
     );
   }
 }
+
+SearchPane.propTypes = {
+  reload: PropTypes.func,
+  searchText: PropTypes.string,
+  onChangeSearch: PropTypes.func,
+  selectFirstNode: PropTypes.func,
+};
 
 var Wrapped = decorate({
   listeners(props) {

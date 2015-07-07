@@ -7,19 +7,19 @@ var styles = {
 
 class One {
   render() {
-    return <h1>One</h1>
+    return <h1>One {this.props.val.slice(0, 20)}</h1>
   }
 }
 
 class Two {
   render() {
-    return <h1>Two</h1>
+    return <h1>Two {this.props.val.slice(0, 20)}</h1>
   }
 }
 
 class Three {
   render() {
-    return <h1>Three</h1>
+    return <h1>Three {this.props.val.slice(0, 20)}</h1>
   }
 }
 
