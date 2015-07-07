@@ -17,10 +17,13 @@ class Container {
   render(): ReactElement {
     var defaultItems = {
       tree: (id, node, store) => {
-        var items = [{
-          title: 'Show all ' + node.get('name'),
-          action: () => store.onChangeSearch(node.get('name')),
-        }];
+        var items = [];
+        if (node.get('name')) {
+          items.push({
+            title: 'Show all ' + node.get('name'),
+            action: () => store.onChangeSearch(node.get('name')),
+          });
+        }
         if (store.capabilities.scroll) {
           items.push({
             title: 'Scroll to node',

@@ -279,6 +279,7 @@ var styles = {
   },
   loading: {
     textAlign: 'center',
+    color: '#888',
     padding: 30,
     flex: 1,
   },
