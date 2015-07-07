@@ -37,6 +37,15 @@ type ContextMenu = {
   args: Array<any>,
 };
 
+function nodeMatchesText(node, needle) {
+  return (
+    (node.get('name') &&
+    node.get('nodeType') !== 'Wrapper' &&
+    node.get('name').toLowerCase().indexOf(needle) !== -1) ||
+    (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
+    ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1)
+  );
+}
 
 class Store extends EventEmitter {
   contextMenu: ?ContextMenu;
@@ -143,13 +152,7 @@ class Store extends EventEmitter {
           });
       } else {
         this.searchRoots = this.data.entrySeq()
-          .filter(([key, val]) => (
-            (val.get('name') &&
-            val.get('nodeType') !== 'Wrapper' &&
-            val.get('name').toLowerCase().indexOf(needle) !== -1) ||
-            (val.get('text') && val.get('text').toLowerCase().indexOf(needle) !== -1) ||
-            ('string' === typeof val.get('children') && val.get('children').toLowerCase().indexOf(needle) !== -1)
-          ))
+          .filter(([key, val]) => nodeMatchesText(val, needle))
           .map(([key, val]) => key)
           .toList();
       }
@@ -473,6 +476,10 @@ class Store extends EventEmitter {
       });
     }
     this.emit(data.id);
+    if (this.searchText && nodeMatchesText(map, this.searchText.toLowerCase())) {
+      this.searchRoots = this.searchRoots.push(data.id);
+      this.emit('searchRoots');
+    }
   }
 
   updateComponent(data: DataType) {
@@ -502,6 +509,14 @@ class Store extends EventEmitter {
         this.roots = this.roots.delete(ix);
         this.emit('roots');
       }
+    }
+    if (id === this.selected) {
+      var newsel = pid || this.roots.get(0);
+      this.selectTop(newsel);
+    }
+    if (this.searchRoots && this.searchRoots.contains(id)) {
+      this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
+      this.emit('searchRoots');
     }
   }
 

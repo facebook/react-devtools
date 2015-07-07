@@ -25,12 +25,15 @@ class Container extends React.Component {
           title: 'Store as global variable',
           action: () => store.makeGlobal(id, path),
         }];
+        /*
         if (val && val[consts.type] === 'function') {
           items.push({
             title: 'Call function',
             action: () => store.callFunction(id, path),
           });
         }
+        */
+        return items;
       },
     };
     return (

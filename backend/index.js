@@ -242,7 +242,6 @@ class Backend extends EventEmitter {
   }
 
   addRoot(element: Component) {
-    // console.log('rooted');
     var id = this.getId(element);
     this.roots.add(id);
     this.emit('root', id);

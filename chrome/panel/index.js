@@ -217,11 +217,11 @@ class Panel extends React.Component {
   render(): ReactElement {
     if (this.state.loading) {
       return (
-        <span>
-          Connecting to react...
+        <div style={styles.loading}>
+          <h1>Connecting to react...</h1>
           <br/>
           If this is React Native, you need to interact with the app (just tap the screen) in order to establish the bridge.
-        </span>
+        </div>
       );
     }
     if (!this.state.isReact) {
@@ -263,6 +263,11 @@ var styles = {
     display: 'flex',
   },
   stretch: {
+    flex: 1,
+  },
+  loading: {
+    textAlign: 'center',
+    padding: 30,
     flex: 1,
   },
 }

@@ -49,13 +49,22 @@ class TreeView extends React.Component {
       }
     }
 
+    if (this.props.searching && this.props.roots.count() > MAX_ROOTS) {
+      return (
+        <div style={styles.container}>
+          {this.props.roots.slice(0, MAX_ROOTS).map(id => (
+            <Node key={id} id={id} depth={0} />
+          )).toJS()}
+          <span>Some results not shown. Narrow your search criteria to find them</span>
+        </div>
+      );
+    }
+
     return (
       <div style={styles.container}>
-        {this.props.roots.slice(0, MAX_ROOTS).map(id => (
+        {this.props.roots.map(id => (
           <Node key={id} id={id} depth={0} />
         )).toJS()}
-        {this.props.roots.count() > MAX_ROOTS &&
-          <span>Some results not shown. Narrow your search criteria to find them</span>}
       </div>
     );
   }

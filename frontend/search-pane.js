@@ -43,9 +43,14 @@ class SearchPane extends React.Component {
     }
     // it has to be here to prevevnt devtool console from flipping
     if (e.keyCode === 27) { // escape
+      if (!this.props.searchText) {
+        return;
+      }
+      /*
       if (document.activeElement !== React.findDOMNode(this.input)) {
         return;
       }
+      */
       e.stopPropagation();
       e.preventDefault();
       this.cancel();
@@ -96,13 +101,14 @@ var styles = {
   cancelButton: {
     fontSize: '13px',
     padding: '0 4px',
-    boxShadow: '0 0 3px #ccc',
     borderRadius: '10px',
     height: '17px',
     position: 'absolute',
     cursor: 'pointer',
     right: '2px',
     top: '4px',
+    color: 'white',
+    backgroundColor: 'rgb(255, 137, 137)',
   },
 
   input: {
