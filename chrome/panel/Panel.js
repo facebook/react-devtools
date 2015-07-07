@@ -1,4 +1,13 @@
-/** @xxflow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @ xx flow see $FlowFixMe
+ */
 
 var React = require('react');
 
@@ -43,7 +52,8 @@ class Panel extends React.Component {
   _keyListener: ?() => void;
   _checkTimeout: ?number;
   _unMounted: boolean;
-  bridge: ?Bridge;
+  _bridge: ?Bridge;
+  _store: Store;
 
   constructor(props: Object) {
     super(props)
@@ -54,7 +64,7 @@ class Panel extends React.Component {
 
   getChildContext(): Object {
     return {
-      store: this.store,
+      store: this._store,
     };
   }
 
@@ -78,19 +88,20 @@ class Panel extends React.Component {
   }
 
   getNewSelection() {
-    if (!this.bridge) {
+    if (!this._bridge) {
       return;
     }
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
-    this.bridge.send('checkSelection');
+    // $FlowFixMe flow thinks `this._bridge` might be null
+    this._bridge.send('checkSelection');
   }
 
   sendSelection(id: string) {
-    if (!this.bridge) {
+    if (!this._bridge) {
       return;
     }
-    id = id || this.store.selected;
-    this.bridge.send('putSelectedNode', id);
+    id = id || this._store.selected;
+    this._bridge.send('putSelectedNode', id);
     setTimeout(() => {
       chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_BACKEND__.$node)');
     }, 100);
@@ -109,10 +120,10 @@ class Panel extends React.Component {
   }
 
   viewSource(id: string) {
-    if (!this.bridge) {
+    if (!this._bridge) {
       return;
     }
-    this.bridge.send('putSelectedInstance', id);
+    this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       this.inspectComponent('__REACT_DEVTOOLS_BACKEND__.$inst');
     }, 100);
@@ -143,14 +154,14 @@ class Panel extends React.Component {
       window.removeEventListener('keydown', this._keyListener);
       this._keyListener = null;
     }
-    if (this.bridge) {
-      this.bridge.send('shutdown');
+    if (this._bridge) {
+      this._bridge.send('shutdown');
     }
     if (this._port) {
       this._port.disconnect();
       this._port = null;
     }
-    this.bridge = null;
+    this._bridge = null;
   }
 
   inject() {
@@ -176,14 +187,15 @@ class Panel extends React.Component {
         disconnected = true;
       });
 
-      this.bridge = new Bridge();
-      this.bridge.attach(wall);
+      this._bridge = new Bridge();
+      // $FlowFixMe flow thinks `this._bridge` might be null
+      this._bridge.attach(wall);
 
-      this.store = new Store(this.bridge);
-      this._keyListener = this.store.onKeyDown.bind(this.store)
+      this._store = new Store(this._bridge);
+      this._keyListener = this._store.onKeyDown.bind(this._store)
       window.addEventListener('keydown', this._keyListener);
 
-      this.store.on('connected', () => {
+      this._store.on('connected', () => {
         this.setState({loading: false});
         this.getNewSelection();
       });
@@ -214,7 +226,7 @@ class Panel extends React.Component {
     });
   }
 
-  render(): ReactElement {
+  render() {
     if (this.state.loading) {
       return (
         <div style={styles.loading}>
@@ -247,7 +259,7 @@ class Panel extends React.Component {
             return [node.get('nodeType') === 'Custom' && {
               title: 'Show Source',
               action: () => this.viewSource(id),
-            }, this.store.capabilities.dom && {
+            }, this._store.capabilities.dom && {
               title: 'Show in Elements Pane',
               action: () => this.sendSelection(id),
             }];

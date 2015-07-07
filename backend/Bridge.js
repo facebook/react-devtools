@@ -1,25 +1,37 @@
-/** @ xx flow
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
  *
- * "possibly null value" on a val that has been assigned
- * unknown "performance"
- * */
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @ xx flow see $FlowFixMe
+ */
+'use strict';
 
 var consts = require('./consts');
 
+declare var performance: {
+  now: () => number,
+};
+
 type AnyFn = (...x: any) => any;
+
+// $FlowFixMe disjoint unions don't seem to be working
 type PayloadType = {
   type: 'inspect',
   id: string,
   path: Array<string>,
   callback: number,
-} & {
+} | {
   type: 'many-events',
   events: Array<Object>,
-} & {
+} | {
   type: 'callback',
   id: string,
   args: [Object, Object, Object, Object], // Array<Object>,
-} & {
+} | {
   type: 'event',
   cleaned: ?Array<Array<string>>,
   evt: string,
@@ -27,33 +39,33 @@ type PayloadType = {
 };
 
 class Bridge {
-  inspectables: Map;
-  cid: number;
-  cbs: Map;
-  listeners: Object;
-  wall: Object;
   _buffer: Array<Object>;
-  _waiting: ?number;
+  _cbs: Map;
+  _cid: number;
+  _inspectables: Map;
   _lastTime: number;
+  _listeners: Object;
+  _waiting: ?number;
+  _wall: Object;
 
   constructor() {
-    this.cbs = new Map();
-    this.listeners = {};
-    this.inspectables = new Map();
-    this.cid = 0;
+    this._cbs = new Map();
+    this._inspectables = new Map();
+    this._cid = 0;
+    this._listeners = {};
     this._buffer = [];
     this._waiting = null;
     this._lastTime = 5;
   }
 
   attach(wall: Object) {
-    this.wall = wall
-    this.wall.listen(this._handleMessage.bind(this));
+    this._wall = wall
+    this._wall.listen(this._handleMessage.bind(this));
   }
 
   inspect(id: string, path: Array<string>, cb: (val: any) => any) {
-    var cid = this.cid++;
-    this.cbs.set(cid, (data, cleaned, proto, protoclean) => {
+    var _cid = this._cid++;
+    this._cbs.set(_cid, (data, cleaned, proto, protoclean) => {
       if (cleaned.length) {
         hydrate(data, cleaned);
       }
@@ -66,9 +78,9 @@ class Bridge {
       cb(data);
     });
 
-    this.wall.send({
+    this._wall.send({
       type: 'inspect',
-      callback: cid,
+      callback: _cid,
       path,
       id,
     });
@@ -79,9 +91,9 @@ class Bridge {
     var start = performance.now();
     var san = sanitize(data, [], cleaned)
     if (cleaned.length) {
-      this.inspectables.set(data.id, data);
+      this._inspectables.set(data.id, data);
     }
-    this.wall.send({type: 'event', evt, data: san, cleaned});
+    this._wall.send({type: 'event', evt, data: san, cleaned});
   }
 
   send(evt: string, data: any) {
@@ -102,11 +114,11 @@ class Bridge {
       var cleaned = [];
       var san = sanitize(data, [], cleaned)
       if (cleaned.length) {
-        this.inspectables.set(data.id, data);
+        this._inspectables.set(data.id, data);
       }
       return {type: 'event', evt, data: san, cleaned};
     });
-    this.wall.send({type: 'many-events', events});
+    this._wall.send({type: 'many-events', events});
     this._buffer = [];
     this._waiting = null;
     this._lastTime = performance.now() - start
@@ -114,14 +126,14 @@ class Bridge {
   }
 
   forget(id: string) {
-    this.inspectables.delete(id);
+    this._inspectables.delete(id);
   }
 
   on(evt: string, fn: AnyFn) {
-    if (!this.listeners[evt]) {
-      this.listeners[evt] = [fn];
+    if (!this._listeners[evt]) {
+      this._listeners[evt] = [fn];
     } else {
-      this.listeners[evt].push(fn);
+      this._listeners[evt].push(fn);
     }
   }
 
@@ -129,8 +141,8 @@ class Bridge {
     var type = payload.type;
     if (payload.type === 'callback') {
       var [data, cleaned, proto, protoclean] = payload.args;
-      this.cbs.get(payload.id)(data, cleaned, proto, protoclean);
-      this.cbs.delete(payload.id);
+      this._cbs.get(payload.id)(data, cleaned, proto, protoclean);
+      this._cbs.delete(payload.id);
       return;
     }
 
@@ -144,7 +156,7 @@ class Bridge {
       if (payload.cleaned) {
         hydrate(payload.data, payload.cleaned);
       }
-      var fns = this.listeners[payload.evt]
+      var fns = this._listeners[payload.evt]
       if (fns) {
         fns.forEach(fn => fn(payload.data));
       }
@@ -156,7 +168,7 @@ class Bridge {
         if (payload.cleaned) {
           hydrate(payload.data, payload.cleaned);
         }
-        var fns = this.listeners[payload.evt]
+        var fns = this._listeners[payload.evt]
         if (fns) {
           fns.forEach(fn => fn(payload.data));
         }
@@ -165,7 +177,7 @@ class Bridge {
   }
 
   _inspectResponse(id: string, path: Array<string>, callback: number) {
-    var val = getIn(this.inspectables.get(id), path);
+    var val = getIn(this._inspectables.get(id), path);
     var result = {};
     var cleaned = [];
     var proto = null;
@@ -180,6 +192,7 @@ class Bridge {
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
+        // $FlowFixMe flow thinks `val` might be null
         result[name] = sanitize(val[name], [name], cleaned);
       });
 
@@ -190,12 +203,13 @@ class Bridge {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
+          // $FlowFixMe flow thinks proto (and val) might be null
           proto[name] = sanitize(val.__proto__[name], [name], protoclean);
         });
       }
     }
 
-    this.wall.send({
+    this._wall.send({
       type: 'callback',
       id: callback,
       args: [result, cleaned, proto, protoclean],

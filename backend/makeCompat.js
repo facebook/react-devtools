@@ -1,33 +1,30 @@
-/* @flow */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 import type * as Backend from './Backend'
 
-module.exports = function (window: Object, backend: Backend): boolean {
-  var hook = window.__REACT_DEVTOOLS_BACKEND__;
-  if (!hook) {
-    return false;
-  }
-  if (!hook.injectDevTools) {
-    var success = compatify(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, hook);
-    if (!success) {
-      return false;
-    }
-  }
+type OldStyleHook = {
+  _reactRuntime: Object,
+};
 
-  backend.setReactInternals({
-    // getReactHandleFromNative: hook.getReactHandleFromNative,
-    // getReactHandleFromElement: hook.getReactHandleFromElement,
-    // getNativeFromHandle: hook.getNativeFromHandle,
-    getNativeFromReactElement: hook.getNativeFromReactElement,
-    getReactElementFromNative: hook.getReactElementFromNative,
-    removeDevtools: hook.removeDevtools,
-  });
-  hook.injectDevTools(backend);
-  hook.backend = backend;
-  return true;
-}
+type NewStyleHook = {
+  backend: Backend,
+  getNativeFromReactElement: (component: Object) => void,
+  getReactElementFromNative: (native: any) => void,
+  injectDevTools: (backend: Backend) => void,
+  removeDevtools: () => void,
+};
 
-function compatify(oldHook, newHook) {
+module.exports = function makeCompat(oldHook: OldStyleHook, newHook: NewStyleHook): boolean {
   if (!oldHook || !newHook || !oldHook._reactRuntime) {
     return false;
   }

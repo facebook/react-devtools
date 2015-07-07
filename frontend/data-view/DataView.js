@@ -6,7 +6,6 @@ var consts = require('../../backend/consts');
 var assign = require('object-assign');
 var valueStyles = require('../value-styles');
 
-
 class DataView extends React.Component {
   render(): ReactElement {
     var data = this.props.data;

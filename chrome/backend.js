@@ -1,27 +1,37 @@
-/** @ xx flow
- * "called on a possibly undefined value" hl
- * https://github.com/facebook/flow/issues/603
- * **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @ xx flow see $FlowFixMe
+ */
+'use strict';
 
 var Backend = require('../backend/Backend');
 var Bridge = require('../backend/Bridge');
-var inject = require('../backend/makeCompat');
 var Highlighter = require('../frontend/Highlighter');
 
-window.addEventListener('message', welcome);
+var inject = require('../backend/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
   // this is needed to force refresh on react native
 }, 100);
 
+window.addEventListener('message', welcome);
 function welcome(evt) {
   if (evt.data.source !== 'react-devtools-reporter') {
     return;
   }
 
   window.removeEventListener('message', welcome);
+  setup()
+}
 
+function setup() {
   var listeners = [];
 
   var wall = {
@@ -47,7 +57,6 @@ function welcome(evt) {
   bridge.attach(wall);
   var backend = new Backend(window);
   backend.addBridge(bridge);
-
   var hl;
 
   backend.once('connected', () => {
@@ -68,6 +77,7 @@ function welcome(evt) {
     hl = new Highlighter(window, node => {
       backend.selectFromDOMNode(node);
     });
+    // $FlowFixMe flow things hl might be undefined
     backend.on('highlight', data => hl.highlight(data.node, data.name));
     backend.on('hideHighlight', () => hl.hideHighlight());
   }

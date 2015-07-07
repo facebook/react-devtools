@@ -1,4 +1,14 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 import {EventEmitter} from 'events'
 import assign from 'object-assign'
@@ -6,12 +16,12 @@ import type * as Bridge from './Bridge'
 
 type Component = {};
 type DataType = {
-  name: string,
-  type: string | Object,
-  state: Object,
-  props: Object,
-  context: Object,
-  updater: {
+  name: ?string,
+  type: string | ?Object,
+  state: ?Object,
+  props: ?Object,
+  context: ?Object,
+  updater: ?{
     setState: (state: Object) => void,
     forceUpdate: () => void,
     publicInstance: Object,
@@ -222,7 +232,7 @@ class Backend extends EventEmitter {
     var data = this.nodes.get(id);
     var value;
     if (path === 'instance') {
-      value = data.updater.publicInstance;
+      value = data.updater && data.updater.publicInstance;
     } else {
       value = getIn(data, path);
     }
