@@ -1,8 +1,8 @@
 /* @flow */
 
 var React = require('react');
-var Node = require('./node');
-var TreeView = require('./tree-view');
+var Node = require('./Node');
+var TreeView = require('./TreeView');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');

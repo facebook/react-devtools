@@ -1,5 +1,5 @@
 
-var Panel = require('./');
+var Panel = require('./Panel');
 var React = require('react');
 
 var node = document.getElementById('container');

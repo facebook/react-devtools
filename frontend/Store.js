@@ -9,11 +9,11 @@ import {EventEmitter} from 'events';
 import {Map, Set, List} from './imm';
 import assign from 'object-assign';
 
-import type Bridge from '../backend/bridge'
+import type Bridge from '../backend/Bridge'
 import type {DOMNode, DOMEvent, Dir, Dest} from './types'
 
-import dirToDest from './dir-to-dest';
-import nodeMatchesText from './node-matches-text';
+import dirToDest from './dirToDest';
+import nodeMatchesText from './nodeMatchesText';
 
 var keyCodes = {
   '72': 'left',  // 'h',

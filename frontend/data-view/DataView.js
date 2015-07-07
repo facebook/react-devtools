@@ -1,7 +1,7 @@
 /** @flow **/
 
 var React = require('react');
-var Simple = require('./simple');
+var Simple = require('./Simple');
 var consts = require('../../backend/consts');
 var assign = require('object-assign');
 var valueStyles = require('../value-styles');

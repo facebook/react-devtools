@@ -3,10 +3,10 @@
  * https://github.com/facebook/flow/issues/603
  * **/
 
-var Backend = require('../backend');
-var Bridge = require('../backend/bridge');
-var inject = require('../backend/make-compat');
-var Highlighter = require('../frontend/highlighter');
+var Backend = require('../backend/Backend');
+var Bridge = require('../backend/Bridge');
+var inject = require('../backend/makeCompat');
+var Highlighter = require('../frontend/Highlighter');
 
 window.addEventListener('message', welcome);
 

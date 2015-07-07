@@ -1,6 +1,6 @@
 
-var Harness = require('../frontend/harness');
-var Container = require('../frontend/container');
+var Harness = require('../frontend/Harness');
+var Container = require('../frontend/Container');
 var React = require('react');
 
 window.React = React;

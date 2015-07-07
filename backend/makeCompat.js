@@ -1,6 +1,6 @@
 /* @flow */
 
-import type * as Backend from './'
+import type * as Backend from './Backend'
 
 module.exports = function (window: Object, backend: Backend): boolean {
   var hook = window.__REACT_DEVTOOLS_BACKEND__;

@@ -1,10 +1,10 @@
 /** @flow **/
 
 var React = require('react');
-var SearchPane = require('./search-pane');
-var PropState = require('./prop-state');
-var SplitPane = require('./split-pane');
-var ContextMenu = require('./context-menu');
+var SearchPane = require('./SearchPane');
+var PropState = require('./PropState');
+var SplitPane = require('./SplitPane');
+var ContextMenu = require('./ContextMenu');
 var consts = require('../backend/consts');
 
 class Container {

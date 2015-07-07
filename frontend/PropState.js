@@ -1,7 +1,7 @@
 /** @flow **/
 
 var React = require('react');
-var DataView = require('./data-view');
+var DataView = require('./data-view/DataView');
 var decorate = require('./decorate');
 
 class PropState extends React.Component {

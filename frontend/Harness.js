@@ -4,9 +4,9 @@
  * **/
 
 var React = require('react/addons');
-var compatInject = require('../backend/compat-inject');
-var Store = require('./store');
-var Bridge = require('../backend/bridge');
+var compatInject = require('../backend/compatInject');
+var Store = require('./Store');
+var Bridge = require('../backend/Bridge');
 
 class Harness extends React.Component {
   constructor(props: Object) {

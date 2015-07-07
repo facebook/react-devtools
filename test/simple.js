@@ -1,6 +1,6 @@
 
-var Harness = require('../frontend/harness');
-var Simple = require('../frontend/simple');
+var Harness = require('../frontend/Harness');
+var Simple = require('../frontend/Simple');
 var React = require('react');
 
 var node = document.createElement('div')

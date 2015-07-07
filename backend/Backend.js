@@ -2,7 +2,7 @@
 
 import {EventEmitter} from 'events'
 import assign from 'object-assign'
-import type * as Bridge from './bridge'
+import type * as Bridge from './Bridge'
 
 type Component = {};
 type DataType = {

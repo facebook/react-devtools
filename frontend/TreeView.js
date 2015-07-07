@@ -1,7 +1,7 @@
 /** @flow **/
 
 var React = require('react');
-var Node = require('./node');
+var Node = require('./Node');
 
 var decorate = require('./decorate');
 

@@ -3,10 +3,10 @@
 var React = require('react');
 
 var inject = require('./inject');
-var Container = require('../../frontend/container');
+var Container = require('../../frontend/Container');
 var check = require('./check');
-var Store = require('../../frontend/store');
-var Bridge = require('../../backend/bridge');
+var Store = require('../../frontend/Store');
+var Bridge = require('../../backend/Bridge');
 var consts = require('../../backend/consts');
 
 type Listenable = {

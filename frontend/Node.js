@@ -4,7 +4,7 @@ var React = require('react');
 var assign = require('object-assign');
 
 var decorate = require('./decorate');
-var Props = require('./props');
+var Props = require('./Props');
 var flash = require('./flash');
 
 import type {Map} from './imm';
