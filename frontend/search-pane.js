@@ -74,6 +74,7 @@ class SearchPane extends React.Component {
             ref={i => this.input = i}
             value={this.props.searchText}
             onKeyDown={e => this.onKey(e.key)}
+            placeholder="Search by Component Name"
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
           {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
@@ -84,6 +85,19 @@ class SearchPane extends React.Component {
     );
   }
 }
+
+var Wrapped = decorate({
+  listeners(props) {
+    return ['searchText'];
+  },
+  props(store) {
+    return {
+      searchText: store.searchText,
+      onChangeSearch: text => store.onChangeSearch(text),
+      selectFirstNode: store.selectFirstNode.bind(store),
+    };
+  },
+}, SearchPane);
 
 var styles = {
   container: {
@@ -120,18 +134,5 @@ var styles = {
     outline: 'none',
   },
 }
-
-var Wrapped = decorate({
-  listeners(props) {
-    return ['searchText'];
-  },
-  props(store) {
-    return {
-      searchText: store.searchText,
-      onChangeSearch: text => store.onChangeSearch(text),
-      selectFirstNode: store.selectFirstNode.bind(store),
-    };
-  },
-}, SearchPane);
 
 module.exports = Wrapped;

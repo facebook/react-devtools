@@ -167,7 +167,6 @@ class Store extends EventEmitter {
     this.emit('searchRoots');
     if (this.searchRoots && !this.searchRoots.contains(this.selected)) {
       this.select(null, true);
-      // this.select(this.searchRoots.get(0), true);
     } else if (!this.searchRoots) {
       if (this.selected) {
         this.revealDeep(this.selected);
@@ -179,7 +178,6 @@ class Store extends EventEmitter {
 
   showContextMenu(type: string, evt: DOMEvent, ...args: Array<any>) {
     evt.preventDefault();
-    // console.log('menu', type, args);
     this.contextMenu = {type, x: evt.pageX, y: evt.pageY, args};
     this.emit('contextMenu');
   }

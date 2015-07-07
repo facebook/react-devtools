@@ -11,7 +11,10 @@ class Container extends React.Component {
   render(): ReactElement {
     var defaultItems = {
       tree: (id, node, store) => {
-        var items = [];
+        var items = [{
+          title: 'Show all ' + node.get('name'),
+          action: () => store.onChangeSearch(node.get('name')),
+        }];
         if (store.capabilities.scroll) {
           items.push({
             title: 'Scroll to node',
@@ -25,14 +28,6 @@ class Container extends React.Component {
           title: 'Store as global variable',
           action: () => store.makeGlobal(id, path),
         }];
-        /*
-        if (val && val[consts.type] === 'function') {
-          items.push({
-            title: 'Call function',
-            action: () => store.callFunction(id, path),
-          });
-        }
-        */
         return items;
       },
     };
