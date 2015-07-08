@@ -55,7 +55,9 @@ or by inspecting [Facebook](https://www.facebook.com/).
 Due to a [bug in Chrome](https://code.google.com/p/chromium/issues/detail?id=319328),
 devtools extensions are unable to use `localStorage` if the "Block third-party
 cookies and site data" option is checked in the Chrome content settings. Until
-this bug is fixed, please make sure this preference is unchecked.
+this bug is fixed, you can work around by adding React tools to your whitelist.
+Open `chrome://settings/contentExceptions#cookies`, add `fmkadmapgofadopljbjfkapdkoienihi`
+as a hostname pattern, and press `Enter`.
 
 ## Usage
 
