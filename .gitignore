@@ -2,3 +2,5 @@
 /node_modules
 *.swp
 /chrome/build
+firefox/build
+firefox/data/build

@@ -64,6 +64,7 @@ var styles = {
   container: {
     display: 'flex',
     fontFamily: 'sans-serif',
+    minWidth: 0,
     flex: 1,
   },
 
@@ -86,6 +87,7 @@ var styles = {
 
   leftPane: {
     display: 'flex',
+    minWidth: 0,
     flex: 1,
   },
 }

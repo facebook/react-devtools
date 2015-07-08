@@ -108,6 +108,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
+    minWidth: 0,
   },
 
   searchBox: {

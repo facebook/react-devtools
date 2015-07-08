@@ -81,6 +81,7 @@ var styles = {
   container: {
     flex: 1,
     display: 'flex',
+    minWidth: 0,
   },
 }
 

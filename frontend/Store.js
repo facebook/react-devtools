@@ -101,10 +101,10 @@ class Store extends EventEmitter {
       if (done) {
         return;
       }
-      this.capabilities = assign(this.capabilities, capabilities);
-      this.emit('connected');
       clearInterval(requestInt);
       done = true;
+      this.capabilities = assign(this.capabilities, capabilities);
+      this.emit('connected');
     });
     this._bridge.send('requestCapabilities');
     requestInt = setInterval(() => {
@@ -116,7 +116,7 @@ class Store extends EventEmitter {
         return;
       }
       this._bridge.send('requestCapabilities');
-    }, 100);
+    }, 500);
   }
 
   scrollToNode(id: ElementID): void {

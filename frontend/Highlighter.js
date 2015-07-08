@@ -1,8 +1,17 @@
-/* @ xx flow
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow $FlowFixMe
  * Broken:
  * - not recognizing assignment to cancel out the "possibly null value"
  * - not understanding document.createElement
- * */
+ */
+'use strict';
 
 import type {DOMNode, DOMEvent} from './types'
 
@@ -20,7 +29,7 @@ class Highlighter {
   _subs: Array<() => void>;
   _button: DOMNode;
 
-  constructor(win: Object, onSelect: () => void) {
+  constructor(win: Object, onSelect: (node: Object) => void) {
     this.win = win;
     this.onSelect = onSelect;
     this.overlay = null;
@@ -224,8 +233,8 @@ class Overlay {
       left: pos.left - dims.marginLeft + 'px',
     });
 
-    this.nameSpan.innerText = (name || node.nodeName.toLowerCase());
-    this.dimSpan.innerText = node.offsetWidth + 'px × ' + node.offsetHeight + 'px'
+    this.nameSpan.textContent = (name || node.nodeName.toLowerCase());
+    this.dimSpan.textContent = node.offsetWidth + 'px × ' + node.offsetHeight + 'px'
 
     var tipPos = findTipPos({
       top: pos.top - dims.marginTop,
