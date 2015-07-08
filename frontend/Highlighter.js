@@ -311,6 +311,12 @@ function nodePos(node) {
     top -= oP.scrollTop;
     node = oP;
   }
+  if (window.scrollX) {
+    left -= window.scrollX;
+  }
+  if (window.scrollY) {
+    top -= window.scrollY;
+  }
   return {left, top};
 }
 
