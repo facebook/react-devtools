@@ -177,10 +177,18 @@ class Backend extends EventEmitter {
     return this.reactInternals.getNativeFromReactElement(component);
   }
 
-  selectFromDOMNode(node: Object, quiet: boolean) {
+  selectFromDOMNode(node: Object, quiet?: boolean) {
     var id = this.getIDForNode(node);
     if (!id) {
       return;
+    }
+    this.emit('setSelection', {id, quiet});
+  }
+
+  selectFromReactInstance(instance: Object, quiet?: boolean) {
+    var id = this.getId(instance);
+    if (!id) {
+      console.log('no instance id', instance);
     }
     this.emit('setSelection', {id, quiet});
   }
