@@ -128,7 +128,7 @@ class Backend extends EventEmitter {
     });
     bridge.on('requestCapabilities', () => {
       bridge.send('capabilities', {
-        scroll: 'function' === typeof window.document.createElement,
+        scroll: 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
         dom: 'function' === typeof window.document.createElement,
       });
       this.emit('connected');
@@ -141,7 +141,7 @@ class Backend extends EventEmitter {
       bridge.send('unmount', id)
       bridge.forget(id);
     });
-    this.on('setSelection', id => bridge.send('select', id));
+    this.on('setSelection', data => bridge.send('select', data));
   }
 
   scrollToNode(id: string): void {
@@ -150,7 +150,11 @@ class Backend extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    node.scrollIntoViewIfNeeded();
+    if (node.scrollIntoViewIfNeeded) {
+      node.scrollIntoViewIfNeeded();
+    } else {
+      node.scrollIntoView();
+    }
     this.highlight(id);
   }
 
@@ -173,12 +177,12 @@ class Backend extends EventEmitter {
     return this.reactInternals.getNativeFromReactElement(component);
   }
 
-  selectFromDOMNode(node: Object) {
+  selectFromDOMNode(node: Object, quiet: boolean) {
     var id = this.getIDForNode(node);
     if (!id) {
       return;
     }
-    this.emit('setSelection', id);
+    this.emit('setSelection', {id, quiet});
   }
 
   getIDForNode(node: Object): ?string {

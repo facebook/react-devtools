@@ -16,6 +16,8 @@ pageMod.PageMod({
 // messaging
 
 // panel
+// for docs, see
+// https://developer.mozilla.org/en-US/Add-ons/SDK/Low-Level_APIs/dev_panel
 
 const { Panel } = require("dev/panel.js");
 const { Class } = require("sdk/core/heritage");
@@ -45,6 +47,13 @@ const ReactPanel = Class({
     const panelSide = channel.port2;
 
     addonSide.onmessage = function (evt) {
+      if (evt.data === 'panel show') {
+        console.log('panel was shown');
+        if (jsterm) {
+          passSelectedNode(jsterm);
+        }
+        return;
+      }
       console.log('from panel', evt.data);
       worker.port.emit('message', evt.data);
     };
@@ -72,39 +81,43 @@ const ReactDevtools = new Tool({
 
 const { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
 
-function makeToolbox(cbs) {
-  return {
-    initialize(options) {
-      gDevTools.on('toolbox-ready', cbs.ready);
-      gDevTools.on('toolbox-destroy', cbs.destroy);
-      gDevTools.on('toolbox-destroyed', cbs.closed);
-    },
-
-    shutdown(reason) {
-      gDevTools.off('toolbox-ready', cbs.ready);
-      gDevTools.off('toolbox-destroy', cbs.destroy);
-      gDevTools.off('toolbox-destroyed', cbs.closed);
-    }
-  }
+function main(options, callbacks) {
+  trackSelection();
 }
 
-const toolbox = makeToolbox({
-  ready(evt, toolbox) {
-  },
-  destroy(eventId, target) {
-  },
-  closed(eventId, target) {
+/**
+ * Whenever the devtools inspector panel selection changes, pass that node to
+ * __REACT_DEVTOOLS_BACKEND__.$0
+ */
+function trackSelection() {
+  var wc;
+  gDevTools.on('webconsole-init', function (eid, toolbox, panelFrame) {
+    toolbox.once('webconsole-ready', (eId, panel) => {
+      wc = panel;
+    });
+  });
+
+  gDevTools.on('inspector-init', (eid, toolbox, panelFrame) => {
+    toolbox.once('inspector-ready', (eid, panel) => {
+      panel.selection.on('new-node-front', (ev, val, reason) => {
+        passSelectedNode(wc.hud.ui.jsterm);
+      });
+    });
+  });
+}
+
+function passSelectedNode(jsterm) {
+  let inspectorSelection = jsterm.hud.owner.getInspectorSelection();
+  if (inspectorSelection && inspectorSelection.nodeFront) {
+    selectedNodeActor = inspectorSelection.nodeFront.actorID;
   }
-});
-
-
-
-function main(options, callbacks) {
-  toolbox.initialize(options);
+  // jsterm.execute('__REACT_DEVTOOLS_BACKEND__.backend.selectFromDOMNode($0)');
+  jsterm.requestEvaluation('__REACT_DEVTOOLS_BACKEND__.backend.selectFromDOMNode($0, true)', {
+    selectedNodeActor: selectedNodeActor,
+  });
 }
 
 function onUnload(reason) {
-  toolbox.shutdown(reason);
 }
 
 // Exports from this module

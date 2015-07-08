@@ -145,6 +145,8 @@ class Panel extends React.Component {
             if (!val || node.get('nodeType') !== 'Custom' || val[consts.type] !== 'function') {
               return;
             }
+            return;
+            /* TODO
             return [{
               title: 'Show Source',
               action: () => this.viewAttrSource(path),
@@ -152,8 +154,11 @@ class Panel extends React.Component {
               title: 'Execute function',
               action: () => this.executeFn(path),
             }];
+            */
           },
           tree: (id, node) => {
+            return;
+            /* TODO
             return [node.get('nodeType') === 'Custom' && {
               title: 'Show Source',
               action: () => this.viewSource(id),
@@ -161,6 +166,7 @@ class Panel extends React.Component {
               title: 'Show in Elements Pane',
               action: () => this.sendSelection(id),
             }];
+            */
           },
         }}
       />

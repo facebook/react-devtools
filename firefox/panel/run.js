@@ -28,3 +28,10 @@ window.addEventListener('message', function (evt) {
   React.render(<Panel port={port} reload={reload} />, node);
 });
 
+document.addEventListener('visibilitychange', function () {
+  console.log('visibility change');
+  if (!document.hidden) {
+    port.postMessage('panel show');
+  }
+});
+

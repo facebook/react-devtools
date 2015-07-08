@@ -81,9 +81,9 @@ class Store extends EventEmitter {
     // for debugging
     window.store = this;
 
-    this._bridge.on('select', id => {
+    this._bridge.on('select', ({id, quiet}) => {
       this.revealDeep(id);
-      this.selectTop(this.skipWrapper(id));
+      this.selectTop(this.skipWrapper(id), quiet);
     });
 
     this._bridge.on('mount', (data) => this.mountComponent(data));
@@ -432,9 +432,9 @@ class Store extends EventEmitter {
     this.select(id);
   }
 
-  selectTop(id: ?ElementID) {
+  selectTop(id: ?ElementID, noHighlight?: boolean) {
     this.isBottomTagSelected = false;
-    this.select(id);
+    this.select(id, noHighlight);
   }
 
   select(id: ?ElementID, noHighlight?: boolean) {
