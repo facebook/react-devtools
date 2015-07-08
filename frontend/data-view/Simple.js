@@ -1,34 +1,22 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
+
 var assign = require('object-assign');
 var flash = require('../flash');
 var valueStyles = require('../value-styles');
 
 import type {DOMEvent} from '../types';
-
-var BAD_INPUT = Symbol('bad input');
-
-function textToValue(txt) {
-  if (!txt.length) {
-    return BAD_INPUT;
-  }
-  if (txt === 'undefined') {
-    return undefined;
-  }
-  try {
-    return JSON.parse(txt);
-  } catch (e) {
-    return BAD_INPUT;
-  }
-}
-
-function valueToText(value) {
-  if (value === undefined) {
-    return 'undefined';
-  }
-  return JSON.stringify(value);
-}
 
 class Simple extends React.Component {
   constructor(props: Object) {
@@ -175,5 +163,28 @@ var styles = {
     fontSize: 'inherit',
   },
 };
+
+var BAD_INPUT = Symbol('bad input');
+
+function textToValue(txt) {
+  if (!txt.length) {
+    return BAD_INPUT;
+  }
+  if (txt === 'undefined') {
+    return undefined;
+  }
+  try {
+    return JSON.parse(txt);
+  } catch (e) {
+    return BAD_INPUT;
+  }
+}
+
+function valueToText(value) {
+  if (value === undefined) {
+    return 'undefined';
+  }
+  return JSON.stringify(value);
+}
 
 module.exports = Simple;

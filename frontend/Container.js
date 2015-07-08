@@ -1,17 +1,40 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
+var ContextMenu = require('./ContextMenu');
+var PropState = require('./PropState');
 var React = require('react');
 var SearchPane = require('./SearchPane');
-var PropState = require('./PropState');
 var SplitPane = require('./SplitPane');
-var ContextMenu = require('./ContextMenu');
+
 var consts = require('../backend/consts');
+
+import type MenuItem from './ContextMenu';
 
 class Container {
   props: {
     reload: () => void,
     extraPanes: Array<Object>,
-    menuItems: Object,
+    menuItems: {
+      tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
+      attr?: (
+        id: string,
+        node: Object,
+        val: any,
+        path: Array<string>,
+        name: string,
+        store: Object
+      ) => ?Array<MenuItem>,
+    },
   };
 
   render(): ReactElement {
@@ -40,6 +63,7 @@ class Container {
         return items;
       },
     };
+
     return (
       <div style={styles.container}>
         <SplitPane

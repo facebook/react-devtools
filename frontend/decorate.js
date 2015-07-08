@@ -1,37 +1,52 @@
-/* @flow */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ *
+ * This Higher Order Component decorator function is the way the components
+ * communicate with the central store.
+ *
+ * Example:
+ *
+ * class MyComp {
+ *   render() {
+ *     return (
+ *       <div>
+ *         Hello {this.props.name}.
+ *         <button onClick={this.props.sayHi}>Hi back</button>
+ *       </div>
+ *     );
+ *   }
+ * }
+ *
+ * module.exports = decorate({
+ *   listeners: () => ['nameChanged'],
+ *   props(store) {
+ *     return {
+ *       name: store.name,
+ *       sayHi: () => store.sayHi(),
+ *     };
+ *   },
+ * }, MyComp);
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
 
-function setToArray(set) {
-  var res = [];
-  for (var val of set) {
-    res.push(val);
-  }
-  return res;
-}
-
-function arrayDiff(array, oldArray) {
-  var names = new Set();
-  var missing = [];
-  for (var i=0; i<array.length; i++) {
-    names.add(array[i]);
-  }
-  for (var i=0; i<oldArray.length; i++) {
-    if (!names.has(oldArray[i])) {
-      missing.push(oldArray[i]);
-    } else {
-      names.delete(oldArray[i]);
-    }
-  }
-  return {
-    missing,
-    newItems: setToArray(names),
-  }
-}
-
 type Options = {
+  /** A function determining whether the component should rerender when the
+   * parent rerenders. Defaults to ac function returning false **/
   shouldUpdate?: (nextProps: Object, props: Object) => boolean,
+  /** A function returning a list of events to listen to **/
   listeners: (props: Object, store: Object) => Array<string>,
+  /** This is how you get data and action handlers from the store. The
+   * returned object will be spread in as props on the wrapped component. **/
   props: (store: Object, props: Object) => Object,
 };
 
@@ -43,6 +58,26 @@ module.exports = function (options: Options, Component: any): any {
     constructor(props) {
       super(props)
       this.state = {}
+    }
+
+    componentWillMount() {
+      if (!this.context.store) {
+        return console.warn('no store on context...');
+      }
+      this._update = () => this.forceUpdate();
+      this._listeners = options.listeners(this.props, this.context.store);
+      this._listeners.forEach(evt => {
+        this.context.store.on(evt, this._update);
+      });
+    }
+
+    componentWillUnmount() {
+      if (!this.context.store) {
+        return console.warn('no store on context...');
+      }
+      this._listeners.forEach(evt => {
+        this.context.store.off(evt, this._update);
+      });
     }
 
     shouldComponentUpdate(nextProps, nextState) {
@@ -70,26 +105,6 @@ module.exports = function (options: Options, Component: any): any {
       this._listeners = listeners;
     }
 
-    componentWillMount() {
-      if (!this.context.store) {
-        return console.warn('no store on context...');
-      }
-      this._update = () => this.forceUpdate();
-      this._listeners = options.listeners(this.props, this.context.store);
-      this._listeners.forEach(evt => {
-        this.context.store.on(evt, this._update);
-      });
-    }
-
-    componentWillUnmount() {
-      if (!this.context.store) {
-        return console.warn('no store on context...');
-      }
-      this._listeners.forEach(evt => {
-        this.context.store.off(evt, this._update);
-      });
-    }
-
     render() {
       var store = this.context.store;
       var props = store && options.props(store, this.props);
@@ -105,4 +120,31 @@ module.exports = function (options: Options, Component: any): any {
 
   return Wrapper;
 };
+
+function arrayDiff(array, oldArray) {
+  var names = new Set();
+  var missing = [];
+  for (var i=0; i<array.length; i++) {
+    names.add(array[i]);
+  }
+  for (var i=0; i<oldArray.length; i++) {
+    if (!names.has(oldArray[i])) {
+      missing.push(oldArray[i]);
+    } else {
+      names.delete(oldArray[i]);
+    }
+  }
+  return {
+    missing,
+    newItems: setToArray(names),
+  }
+}
+
+function setToArray(set) {
+  var res = [];
+  for (var val of set) {
+    res.push(val);
+  }
+  return res;
+}
 

@@ -1,12 +1,33 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @ xx flow $FlowFixMe
+ * flow thinks that only subclasses of React.Component can be used as
+ * ReactComponents.
+ */
+'use strict';
 
 var React = require('react');
 var Simple = require('./Simple');
-var consts = require('../../backend/consts');
-var assign = require('object-assign');
-var valueStyles = require('../value-styles');
 
-class DataView extends React.Component {
+var assign = require('object-assign');
+var consts = require('../../backend/consts');
+var previewComplex = require('./previewComplex');
+
+class DataView {
+  props: {
+    data: Object,
+    path: Array<string>,
+    inspect: () => void,
+    showMenu: () => void,
+    readOnly: boolean,
+  };
+
   render(): ReactElement {
     var data = this.props.data;
     if (!data) {
@@ -153,35 +174,6 @@ class DataItem extends React.Component {
         </div>
         {children}
       </li>
-    );
-  }
-}
-
-function previewComplex(data) {
-  if (Array.isArray(data)) {
-    return (
-      <span style={valueStyles.array}>
-        Array[{data.length}]
-      </span>
-    );
-  }
-
-  if (!data[consts.type]) {
-    return '{…}';
-  }
-
-  var type = data[consts.type];
-  if (type === 'function') {
-    return (
-      <span style={valueStyles.func}>
-        {data[consts.name] || 'fn'}()
-      </span>
-    );
-  } else if (type === 'object') {
-    return (
-      <span style={valueStyles.object}>
-        {data[consts.name] + '{}'}
-      </span>
     );
   }
 }
