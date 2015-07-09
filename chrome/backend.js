@@ -71,6 +71,9 @@ function setup() {
     console.log('has rn style');
     bridge.onCall('rn:getStyle', id => {
       var node = backend.nodes.get(id);
+      if (!node) {
+        return null;
+      }
       var style = node.props.style;
       return window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle(style);
     });

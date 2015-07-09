@@ -1,4 +1,14 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
 var assign = require('object-assign');
@@ -101,9 +111,6 @@ class Node {
                 "
               </span>
             </span>
-            <span style={styles.renderCount}>
-              {node.get('renders')}
-            </span>
           </div>
         </div>
       );
@@ -132,9 +139,6 @@ class Node {
                   <span style={tagStyle}>&lt;/{name}&gt;</span>
                 </span>
               ]}
-            </span>
-            <span style={styles.renderCount}>
-              {node.get('renders')}
             </span>
           </div>
         </div>
@@ -181,9 +185,6 @@ class Node {
           </span>
           {collapsed && '…'}
           {collapsed && closeTag}
-        </span>
-        <span style={styles.renderCount}>
-          {node.get('renders')}
         </span>
       </div>
     );
@@ -271,14 +272,6 @@ var styles = {
     cursor: 'pointer',
     position: 'relative',
     display: 'flex',
-  },
-
-  renderCount: {
-    textAlign: 'right',
-    position: 'absolute',
-    right: -3,
-    padding: 2,
-    backgroundColor: 'white',
   },
 
   tail: {
