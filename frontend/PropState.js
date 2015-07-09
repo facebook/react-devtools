@@ -2,6 +2,7 @@
 
 var React = require('react');
 var DataView = require('./data-view/DataView');
+var DepGraph = require('./DepGraph/DepGraph');
 var decorate = require('./decorate');
 
 class PropState extends React.Component {
@@ -76,6 +77,7 @@ class PropState extends React.Component {
           </div>}
         {this.props.extraPanes &&
           this.props.extraPanes.map(fn => fn(this.props.node, this.props.id))}
+        <DepGraph />
       </div>
     );
   }
@@ -126,6 +128,8 @@ var styles = {
     fontFamily: 'monospace',
     overflow: 'auto',
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
