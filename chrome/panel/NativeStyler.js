@@ -6,7 +6,9 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
+ * @ xx flow
+ * $FLowFixMe flow thinks react component classes have to inherit from
+ * React.Component
  */
 
 var React = require('react');
@@ -23,7 +25,7 @@ class NativeStyler extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps) {
+  componentWillReceiveProps(nextProps: Object) {
     if (nextProps.id === this.props.id) {
       return;
     }

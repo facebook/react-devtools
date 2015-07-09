@@ -12,7 +12,7 @@
 
 var Backend = require('../backend/Backend');
 var Bridge = require('../backend/Bridge');
-var Highlighter = require('../frontend/Highlighter');
+var Highlighter = require('../frontend/Highlighter/Highlighter');
 
 var inject = require('../backend/inject');
 
@@ -87,7 +87,7 @@ function setup() {
     });
     listeners = [];
     if (hl) {
-      hl.stopInspecting();
+      hl.remove();
     }
   });
 

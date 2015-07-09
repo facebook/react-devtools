@@ -13,7 +13,7 @@
 
 var Backend = require('../backend/Backend');
 var Bridge = require('../backend/Bridge');
-var Highlighter = require('../frontend/Highlighter');
+var Highlighter = require('../frontend/Highlighter/Highlighter');
 
 var inject = require('../backend/inject');
 
@@ -75,7 +75,7 @@ function setup() {
     });
     listeners = [];
     if (hl) {
-      hl.stopInspecting();
+      hl.remove();
     }
   });
 
@@ -85,6 +85,7 @@ function setup() {
     });
     // $FlowFixMe flow things hl might be undefined
     backend.on('highlight', data => hl.highlight(data.node, data.name));
+    backend.on('highlightMany', nodes => hl.highlightMany(nodes));
     backend.on('hideHighlight', () => hl.hideHighlight());
   }
 }
