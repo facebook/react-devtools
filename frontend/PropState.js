@@ -43,7 +43,8 @@ class PropState extends React.Component {
             <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
         <div style={styles.section}>
-          <strong>Props</strong> {propsReadOnly && <em> read-only</em>}
+          <strong>Props</strong>
+          {propsReadOnly && <em> read-only</em>}
           <DataView
             path={['props']}
             readOnly={propsReadOnly}

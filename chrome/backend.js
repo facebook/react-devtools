@@ -97,6 +97,7 @@ function setup() {
     });
     // $FlowFixMe flow things hl might be undefined
     backend.on('highlight', data => hl.highlight(data.node, data.name));
+    backend.on('highlightMany', nodes => hl.highlightMany(nodes));
     backend.on('hideHighlight', () => hl.hideHighlight());
   }
 }

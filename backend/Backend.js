@@ -90,6 +90,7 @@ class Backend extends EventEmitter {
     bridge.on('setContext', this._setContext.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
     bridge.on('highlight', id => this.highlight(id));
+    bridge.on('highlightMany', id => this.highlightMany(id));
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
     bridge.on('selected', id => this.emit('selected', id));
     bridge.on('shutdown', () => {
@@ -153,6 +154,19 @@ class Backend extends EventEmitter {
     var node = this.getNodeForID(id);
     if (node) {
       this.emit('highlight', {node, name: data.name, props: data.props});
+    }
+  }
+
+  highlightMany(ids: Array<string>) {
+    var nodes = [];
+    ids.forEach(id => {
+      var node = this.getNodeForID(id);
+      if (node) {
+        nodes.push(node);
+      }
+    });
+    if (nodes.length) {
+      this.emit('highlightMany', nodes);
     }
   }
 

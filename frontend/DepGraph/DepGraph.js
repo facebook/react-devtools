@@ -29,7 +29,7 @@ class DisplayDeps {
     return (
       <div style={styles.container}>
         <div style={styles.scrollParent}>
-          <SvgGraph graph={this.props.graph} />
+          <SvgGraph onHover={this.props.onHover} graph={this.props.graph} />
         </div>
         <div style={styles.buttons}>
           <button onClick={this.props.onReload}>Reload</button>
@@ -43,6 +43,9 @@ class DisplayDeps {
 class SvgGraph {
   render() {
     var graph = this.props.graph;
+    if (!graph) {
+      return <em>No graph to display. Select something else</em>;
+    }
     var transform = 'translate(10, 10)'
     return (
       <svg style={styles.svg} width={graph.graph().width + 20} height={graph.graph().height + 20}>
@@ -64,11 +67,14 @@ class SvgGraph {
             var node = graph.node(n);
             return (
               <rect
+                onMouseOver={this.props.onHover.bind(null, node.label)}
+                onMouseOut={this.props.onHover.bind(null, null)}
                 height={node.height}
                 width={node.width}
                 x={node.x - node.width/2}
                 y={node.y - node.height/2}
-                fill="none"
+                style={styles.rect}
+                fill="white"
                 stroke="black"
                 strokeWidth="1"
               />
@@ -80,6 +86,7 @@ class SvgGraph {
             var node = graph.node(n);
             return (
               <text
+                style={{pointerEvents: 'none'}}
                 x={node.x}
                 y={node.y+node.height/4}
                 textAnchor="middle"
@@ -113,6 +120,10 @@ var styles = {
     textAlign: 'center',
   },
 
+  rect: {
+    cursor: 'pointer',
+  },
+
   svg: {
     flexShrink: 0,
   },
@@ -131,14 +142,18 @@ function dagrize(graph) {
     ranksep: 50,
   });
   g.setDefaultEdgeLabel(() => ({}));
-  var used = {};
+  var hasNodes = false;
   for (var name in graph.nodes) {
+    hasNodes = true;
     g.setNode(name, {
       label: name,
       count: graph.nodes[name],
       width: name.length * 7 + 20,
       height: 20
     });
+  }
+  if (!hasNodes) {
+    return false;
   }
 
   for (var name in graph.edges) {
@@ -162,7 +177,10 @@ var DepWrapper = decorate({
       nodes: {},
     };
     crawlChildren('$root', [store.selected], store._nodes, 0, graph);
-    return {graph: dagrize(graph)};
+    return {
+      graph: dagrize(graph),
+      onHover: name => store.onHoverClass(name),
+    };
   }
 }, DisplayDeps);
 

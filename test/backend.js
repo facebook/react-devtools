@@ -37,5 +37,6 @@ var hl = new Highlighter(window, node => {
 });
 hl.inject();
 backend.on('highlight', data => hl.highlight(data.node, data.name));
+backend.on('highlightMany', nodes => hl.highlightMany(nodes));
 backend.on('hideHighlight', () => hl.hideHighlight());
 

@@ -169,6 +169,18 @@ class Store extends EventEmitter {
     }
   }
 
+  onHoverClass(name: string): void {
+    if (name === null) {
+      this._bridge.send('hideHighlight');
+      return;
+    }
+    var ids = this._nodesByName.get(name);
+    if (!ids) {
+      return;
+    }
+    this._bridge.send('highlightMany', ids.toArray());
+  }
+
   showContextMenu(type: string, evt: DOMEvent, ...args: Array<any>) {
     evt.preventDefault();
     this.contextMenu = {type, x: evt.pageX, y: evt.pageY, args};

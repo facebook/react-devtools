@@ -33,6 +33,7 @@ class Highlighter {
     this.win = win;
     this.onSelect = onSelect;
     this.overlay = null;
+    this.manyOverlay = null;
     this._subs = [
       subscribeCapture(this.win, 'mouseover', this.onHover.bind(this)),
       subscribeCapture(this.win, 'mousedown', this.onMouseDown.bind(this)),
@@ -53,6 +54,7 @@ class Highlighter {
   }
 
   highlight(node: DOMNode, name?: string) {
+    this.removeMultiOverlay();
     if (!this.overlay) {
       this.overlay = new Overlay(this.win);
     }
@@ -60,13 +62,34 @@ class Highlighter {
     this.overlay.inspect(node, name);
   }
 
+  highlightMany(nodes: Array<DOMNode>) {
+    this.removeOverlay();
+    if (!this.multiOverlay) {
+      this.multiOverlay = new MultiOverlay(this.win);
+    }
+    this.multiOverlay.highlightMany(nodes);
+  }
+
   hideHighlight() {
     this.inspecting = false;
+    this.removeOverlay();
+    this.removeMultiOverlay();
+  }
+
+  removeOverlay() {
     if (!this.overlay) {
       return;
     }
     this.overlay.remove();
     this.overlay = null;
+  }
+
+  removeMultiOverlay() {
+    if (!this.multiOverlay) {
+      return;
+    }
+    this.multiOverlay.remove();
+    this.multiOverlay = null;
   }
 
   onMouseDown(evt: DOMEvent) {
@@ -143,6 +166,42 @@ function boxWrap(dims, what, node) {
     borderBottomWidth: dims[what + 'Bottom'] + 'px',
     borderStyle: 'solid',
   });
+}
+
+class MultiOverlay {
+  constructor(window) {
+    this.win = window;
+    var doc = window.document;
+    this.container = doc.createElement('div');
+    doc.body.appendChild(this.container);
+  }
+
+  highlightMany(nodes) {
+    this.container.innerHTML = '';
+    nodes.forEach(node => {
+      var div = this.win.document.createElement('div');
+      var pos = nodePos(node);
+      setStyle(div, {
+        top: pos.top + 'px',
+        left: pos.left + 'px',
+        width: node.offsetWidth + 'px',
+        height: node.offsetHeight + 'px',
+        border: '2px dotted rgba(200, 100, 100, .8)',
+        boxSizing: 'border-box',
+        backgroundColor: 'rgba(200, 100, 100, .2)',
+        position: 'absolute',
+        zIndex: 100000,
+        pointerEvents: 'none',
+      });
+      this.container.appendChild(div);
+    });
+  }
+
+  remove() {
+    if (this.container.parentNode) {
+      this.container.parentNode.removeChild(this.container);
+    }
+  }
 }
 
 class Overlay {
