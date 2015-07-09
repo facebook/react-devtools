@@ -10,13 +10,14 @@
  */
 
 var React = require('react');
-
-var inject = require('./inject');
-var Container = require('../../frontend/Container');
-var check = require('./check');
-var Store = require('../../frontend/Store');
 var Bridge = require('../../backend/Bridge');
+var Container = require('../../frontend/Container');
+var NativeStyler = require('./NativeStyler');
+var Store = require('../../frontend/Store');
+
+var check = require('./check');
 var consts = require('../../backend/consts');
+var inject = require('./inject');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -265,9 +266,26 @@ class Panel extends React.Component {
             }];
           },
         }}
+        extraPanes={this._store.capabilities.rnStyle && [panelRNStyle(this._bridge)]}
       />
     );
   }
+}
+
+var panelRNStyle = bridge => (node, id) => {
+  if (node.get('nodeType') !== 'Native') {
+    return <h3>Not a native component</h3>;
+  }
+  var props = node.get('props');
+  if (!props || !props.style) {
+    return <strong>No style</strong>;
+  }
+  return (
+    <div>
+      <h3>React Native Style Editor</h3>
+      <NativeStyler id={id} bridge={bridge} />
+    </div>
+  );
 }
 
 var styles = {

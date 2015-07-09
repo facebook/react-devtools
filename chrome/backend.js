@@ -53,15 +53,33 @@ function setup() {
     },
   };
 
+  var RN_STYLE = !!window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle;
+
   var bridge = new Bridge();
   bridge.attach(wall);
-  var backend = new Backend(window);
+  var backend = new Backend(window, {
+    rnStyle: RN_STYLE,
+  });
   backend.addBridge(bridge);
   var hl;
 
   backend.once('connected', () => {
     inject(window, backend);
   });
+
+  if (RN_STYLE) {
+    console.log('has rn style');
+    bridge.onCall('rn:getStyle', id => {
+      var node = backend.nodes.get(id);
+      var style = node.props.style;
+      return window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle(style);
+    });
+    bridge.on('rn:setStyle', ({id, attr, val}) => {
+      console.log('setting rn style', id, attr, val);
+      var comp = backend.comps.get(id);
+      comp.getPublicInstance().setNativeProps({[attr]: val});
+    });
+  }
 
   backend.on('shutdown', () => {
     listeners.forEach(fn => {

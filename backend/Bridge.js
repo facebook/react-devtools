@@ -28,6 +28,10 @@ type PayloadType = {
   type: 'many-events',
   events: Array<Object>,
 } | {
+  type: 'call',
+  name: string,
+  callback: number,
+} | {
   type: 'callback',
   id: string,
   args: [Object, Object, Object, Object], // Array<Object>,
@@ -47,6 +51,7 @@ class Bridge {
   _listeners: Object;
   _waiting: ?number;
   _wall: Object;
+  _callers: Object;
 
   constructor() {
     this._cbs = new Map();
@@ -56,6 +61,7 @@ class Bridge {
     this._buffer = [];
     this._waiting = null;
     this._lastTime = 5;
+    this._callers = {};
   }
 
   attach(wall: Object) {
@@ -84,6 +90,25 @@ class Bridge {
       path,
       id,
     });
+  }
+
+  call(name: string, args: any | Array<any>, cb: (val: any) => any) {
+    var _cid = this._cid++;
+    this._cbs.set(_cid, cb);
+
+    this._wall.send({
+      type: 'call',
+      callback: _cid,
+      args,
+      name,
+    });
+  }
+
+  onCall(name: string, handler: (data: any) => any) {
+    if (this._callers[name]) {
+      throw new Error('only one call handler per call name allowed');
+    }
+    this._callers[name] = handler;
   }
 
   sendOne(evt: string, data: any) {
@@ -146,6 +171,11 @@ class Bridge {
       return;
     }
 
+    if (payload.type === 'call') {
+      this._handleCall(payload.name, payload.args, payload.callback);
+      return;
+    }
+
     if (payload.type === 'inspect') {
       this._inspectResponse(payload.id, payload.path, payload.callback);
       return;
@@ -174,6 +204,28 @@ class Bridge {
         }
       });
     }
+  }
+
+  _handleCall(name, args, callback) {
+    if (!this._callers[name]) {
+      return console.warn('unknown call');
+    }
+    var args = args;
+    if (!Array.isArray(args)) {
+      args = [args];
+    }
+    var result;
+    try {
+      result = this._callers[name].apply(null, args);
+    } catch (e) {
+      console.error('Failed to call', e);
+      return;
+    }
+    this._wall.send({
+      type: 'callback',
+      id: callback,
+      args: [result],
+    });
   }
 
   _inspectResponse(id: string, path: Array<string>, callback: number) {

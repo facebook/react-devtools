@@ -23,7 +23,7 @@ import type MenuItem from './ContextMenu';
 class Container {
   props: {
     reload: () => void,
-    extraPanes: Array<Object>,
+    extraPanes: Array<(node: Object) => ReactElement>,
     menuItems: {
       tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
       attr?: (

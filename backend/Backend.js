@@ -59,7 +59,7 @@ class Backend extends EventEmitter {
   reactInternals: InternalsObject; // injected
   _prevSelected: any;
 
-  constructor(global: Object) {
+  constructor(global: Object, capabilities?: Object) {
     super();
     this.global = global;
     this.comps = new Map();
@@ -74,22 +74,15 @@ class Backend extends EventEmitter {
       }
     });
     this._prevSelected = null;
+    this.capabilities = assign({
+      scroll: 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
+      dom: 'function' === typeof window.document.createElement,
+    }, capabilities);
   }
 
   setReactInternals(reactInternals: InternalsObject) {
     this.reactInternals = reactInternals;
   }
-
-  /*
-  once(evt, fn) {
-    var back = this;
-    var ll = function () {
-      fn.apply(this, arguments);
-      back.off(evt, ll);
-    }
-    back.on(evt, ll);
-  }
-  */
 
   addBridge(bridge: Bridge) {
     bridge.on('setState', this._setState.bind(this));
@@ -127,10 +120,7 @@ class Backend extends EventEmitter {
       }
     });
     bridge.on('requestCapabilities', () => {
-      bridge.send('capabilities', {
-        scroll: 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
-        dom: 'function' === typeof window.document.createElement,
-      });
+      bridge.send('capabilities', this.capabilities);
       this.emit('connected');
     });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
