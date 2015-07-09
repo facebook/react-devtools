@@ -23,6 +23,16 @@ class NativeStyler extends React.Component {
     });
   }
 
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.id === this.props.id) {
+      return;
+    }
+    this.setState({style: null});
+    this.props.bridge.call('rn:getStyle', nextProps.id, style => {
+      this.setState({style});
+    });
+  }
+
   _handleStyleChange(attr: string, val: string | number) {
     this.state.style[attr] = val;
     this.props.bridge.send('rn:setStyle', {id: this.props.id, attr, val});
