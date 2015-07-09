@@ -122,13 +122,17 @@ class Bridge {
   }
 
   send(evt: string, data: any) {
-    // console.log('[bridge->]', evt);
     if (!this._waiting) {
       this._buffer = [];
+      var nextTime = this._lastTime * 3;
+      if (nextTime > 500) {
+        // flush is taking an unexpected amount of time
+        nextTime = 500;
+      }
       this._waiting = setTimeout(() => {
         this.flush();
         this._waiting = null;
-      }, this._lastTime * 5);
+      }, nextTime);
     }
     this._buffer.push({evt, data});
   }
@@ -147,7 +151,6 @@ class Bridge {
     this._buffer = [];
     this._waiting = null;
     this._lastTime = performance.now() - start
-    // console.log('took', this._lastTime, events.length);
   }
 
   forget(id: string) {
