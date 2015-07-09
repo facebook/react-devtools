@@ -20,7 +20,7 @@ class DepGraph extends React.Component {
         />
       );
     }
-    return <button onClick={() => this.setState({renderCount: 1})}>Show DepGraph</button>
+    return <button onClick={() => this.setState({renderCount: 1})}>Calculate DepGraph</button>
   }
 }
 
@@ -43,9 +43,10 @@ class DisplayDeps {
 class SvgGraph {
   render() {
     var graph = this.props.graph;
+    var transform = 'translate(10, 10)'
     return (
       <svg style={styles.svg} width={graph.graph().width + 20} height={graph.graph().height + 20}>
-        <g transform="translate(10,10)">
+        <g transform={transform}>
           {graph.edges().map(n => {
             var edge = graph.edge(n);
             return (
@@ -58,7 +59,7 @@ class SvgGraph {
             );
           })}
         </g>
-        <g transform="translate(10,10)">
+        <g transform={transform}>
           {graph.nodes().map(n => {
             var node = graph.node(n);
             return (
@@ -74,7 +75,7 @@ class SvgGraph {
             );
           })}
         </g>
-        <g transform="translate(10,10)">
+        <g transform={transform}>
           {graph.nodes().map(n => {
             var node = graph.node(n);
             return (
@@ -156,8 +157,6 @@ var DepWrapper = decorate({
     return nextProps.renderCount !== props.renderCount;
   },
   props(store) {
-    // todo get the root of the current selection
-    // var graph = calcGraph(store.roots.get(0), store.nodes);
     var graph = {
       edges: {},
       nodes: {},

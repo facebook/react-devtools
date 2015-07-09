@@ -42,6 +42,7 @@ class Store extends EventEmitter {
   _bridge: Bridge;
   _nodes: Map;
   _parents: Map;
+  _nodesByName: Map;
 
   contextMenu: ?ContextMenu;
   searchRoots: ?List;
@@ -57,9 +58,10 @@ class Store extends EventEmitter {
 
   constructor(bridge: Bridge) {
     super()
-    this._nodes = new Map();
     this.roots = new List();
+    this._nodes = new Map();
     this._parents = new Map();
+    this._nodesByName = new Map();
     this._bridge = bridge;
     this.hovered = null;
     this.selected = null;
@@ -464,6 +466,8 @@ class Store extends EventEmitter {
         this._parents = this._parents.set(cid, data.id);
       });
     }
+    var curNodes = this._nodesByName.get(data.name) || new Set();
+    this._nodesByName = this._nodesByName.set(data.name, curNodes.add(data.id));
     this.emit(data.id);
     if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase())) {
       // $FlowFixMe - flow things this might still be null (but it's not b/c
@@ -488,8 +492,14 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
+  _removeFromNodesByName(id: ElementID) {
+    var node = this._nodes.get(id);
+    this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
+  }
+
   unmountComponenent(id: ElementID) {
     var pid = this._parents.get(id);
+    this._removeFromNodesByName(id);
     this._parents = this._parents.delete(id);
     this._nodes = this._nodes.delete(id)
     if (pid) {
@@ -511,7 +521,6 @@ class Store extends EventEmitter {
       this.emit('searchRoots');
     }
   }
-
 }
 
 module.exports = Store;
