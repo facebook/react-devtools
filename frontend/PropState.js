@@ -137,6 +137,7 @@ var styles = {
     userSelect: 'none',
   },
   header: {
+    flexShrink: 0,
   },
   headerName: {
     flex: 1,
@@ -145,6 +146,7 @@ var styles = {
   },
   section: {
     marginBottom: 10,
+    flexShrink: 0,
   },
   globalButton: {
     cursor: 'pointer',

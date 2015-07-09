@@ -8,36 +8,49 @@ var dagre = require('dagre');
 class DepGraph extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {on: false};
+    this.state = {renderCount: 0};
   }
   render() {
-    if (this.state.on) {
-      return <DepGrapher />;
+    if (this.state.renderCount > 0) {
+      return (
+        <DepWrapper
+          renderCount={this.state.renderCount}
+          onClose={() => this.setState({renderCount: 0})}
+          onReload={() => this.setState({renderCount: this.state.renderCount + 1})}
+        />
+      );
     }
-    return <button onClick={() => this.setState({on: true})}>Show DepGraph</button>
+    return <button onClick={() => this.setState({renderCount: 1})}>Show DepGraph</button>
   }
 }
 
-class DisplagDeps extends React.Component {
-  constructor(props) {
-    super(props);
+class DisplayDeps {
+  render() {
+    return (
+      <div style={styles.container}>
+        <div style={styles.scrollParent}>
+          <SvgGraph graph={this.props.graph} />
+        </div>
+        <div style={styles.buttons}>
+          <button onClick={this.props.onReload}>Reload</button>
+          <button onClick={this.props.onClose}>&times;</button>
+        </div>
+      </div>
+    );
   }
+}
+
+class SvgGraph {
   render() {
     var graph = this.props.graph;
     return (
-      <div style={styles.container}>
-      {/*<div style={{width: graph.graph().width, height: graph.graph().height}}>*/}
-      <svg width={graph.graph().width + 20} height={graph.graph().height + 20}>
+      <svg style={styles.svg} width={graph.graph().width + 20} height={graph.graph().height + 20}>
         <g transform="translate(10,10)">
           {graph.edges().map(n => {
             var edge = graph.edge(n);
-            var dx = 0;
-            if (edge.points[edge.points.length-1].y < edge.points[0].y) {
-              dx = 10;
-            }
             return (
               <polyline
-                points={edge.points.map(p => p.x + dx + ',' + p.y).join(' ')}
+                points={edge.points.map(p => p.x + ',' + p.y).join(' ')}
                 fill="none"
                 stroke="orange"
                 strokeWidth="2"
@@ -53,7 +66,7 @@ class DisplagDeps extends React.Component {
                 height={node.height}
                 width={node.width}
                 x={node.x - node.width/2}
-                y={node.y-node.height/2}
+                y={node.y - node.height/2}
                 fill="none"
                 stroke="black"
                 strokeWidth="1"
@@ -71,61 +84,87 @@ class DisplagDeps extends React.Component {
                 textAnchor="middle"
                 fontSize="10"
                 fontFamily="sans-serif"
-              >{node.label}</text>
+              >{node.label + ' ' + node.count}</text>
             );
           })}
         </g>
-        </svg>
-      </div>
+      </svg>
     );
   }
 }
 
 var styles = {
   container: {
-    overflow: 'auto',
     border: '1px solid red',
     position: 'relative',
+    minWidth: 0,
+    minHeight: 0,
     flex: 1,
-  }
+  },
+
+  scrollParent: {
+    overflow: 'auto',
+    top: 0,
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    textAlign: 'center',
+  },
+
+  svg: {
+    flexShrink: 0,
+  },
+
+  buttons: {
+    position: 'absolute',
+    bottom: 3,
+    right: 3,
+  },
 }
 
 function dagrize(graph) {
   var g = new dagre.graphlib.Graph();
-  g.setGraph({});
+  g.setGraph({
+    nodesep: 20,
+    ranksep: 50,
+  });
   g.setDefaultEdgeLabel(() => ({}));
   var used = {};
-  for (var name in graph) {
-    var parts = name.split('\x1f');
-    if (parts[1] in used) {
-      continue;
-    }
-    g.setNode(parts[1], {label: parts[1], width: parts[1].length * 7, height: 20});
+  for (var name in graph.nodes) {
+    g.setNode(name, {
+      label: name,
+      count: graph.nodes[name],
+      width: name.length * 7 + 20,
+      height: 20
+    });
   }
 
-  for (var name in graph) {
+  for (var name in graph.edges) {
     var parts = name.split('\x1f');
     if (parts[0] === '$root') continue;
     g.setEdge(parts[0], parts[1], {label: graph[name]});
   }
 
-  dagre.layout(g, {
-    nodesep: 20,
-    ranksep: 20,
-  });
-  window.ggg = g;
+  dagre.layout(g);
   return g;
 }
 
-var DepGrapher = decorate({
+var DepWrapper = decorate({
   listeners: () => [],
+  shouldUpdate(nextProps, props) {
+    return nextProps.renderCount !== props.renderCount;
+  },
   props(store) {
     // todo get the root of the current selection
     // var graph = calcGraph(store.roots.get(0), store.nodes);
-    var graph = {};
-    crawlChildren('$root', [store.roots.get(0)], store._nodes, 0, graph);
+    var graph = {
+      edges: {},
+      nodes: {},
+    };
+    crawlChildren('$root', [store.selected], store._nodes, 0, graph);
     return {graph: dagrize(graph)};
   }
-}, DisplagDeps);
+}, DisplayDeps);
 
 module.exports = DepGraph;

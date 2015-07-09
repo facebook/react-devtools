@@ -10,11 +10,16 @@ function crawlChildren(ptype, children, nodes, depth, graph) {
     var isCustom = child.get('nodeType') === 'Custom';
     if (isCustom) {
       var name = child.get('name');
-      var key = ptype + sep + name;
-      if (graph[key]) {
-        graph[key] += 1;
+      if (!graph.nodes[name]) {
+        graph.nodes[name] = 1;
       } else {
-        graph[key] = 1;
+        graph.nodes[name] += 1;
+      }
+      var key = ptype + sep + name;
+      if (graph.edges[key]) {
+        graph.edges[key] += 1;
+      } else {
+        graph.edges[key] = 1;
       }
     }
     if (keepCrawling) {
