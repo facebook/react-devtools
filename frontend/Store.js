@@ -56,8 +56,9 @@ class Store extends EventEmitter {
     scroll?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, win: Object) {
     super()
+    this.win = win || window;
     this.roots = new List();
     this._nodes = new Map();
     this._parents = new Map();
@@ -216,7 +217,7 @@ class Store extends EventEmitter {
   }
 
   onKeyDown(e: DOMEvent) {
-    if (window.document.activeElement !== document.body) {
+    if (this.win.document.activeElement !== this.win.document.body) {
       return;
     }
     if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {

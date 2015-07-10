@@ -9,7 +9,6 @@ var inject = require('../../backend/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
-  console.log('tick');
   // this is needed to force refresh on react native
 }, 100);
 
@@ -24,12 +23,14 @@ function setup(socket) {
       socket.sendMessage(data);
     },
     disconnect: function() {
-      socket.close();
+      socket.end();
     },
   };
 
   socket.on('close', function () {
-    backend.reactInternals.removeDevtools();
+    if (backend && backend.reactInternals) {
+      backend.reactInternals.removeDevtools();
+    }
     hasStarted = false;
     bridge = null;
     backend = null;

@@ -68,7 +68,8 @@ class Container {
       <div style={styles.container}>
         <SplitPane
           initialWidth={300}
-          left={() => <SearchPane reload={this.props.reload} />}
+          win={this.props.win}
+          left={() => <SearchPane win={this.props.win} reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
         />
         <ContextMenu itemSources={[defaultItems, this.props.menuItems]} />

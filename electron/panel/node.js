@@ -23,7 +23,7 @@ socket.on('connect', function () {
       socket.sendMessage(data);
     },
     disconnect() {
-      socket.close();
+      socket.end();
     },
   };
 

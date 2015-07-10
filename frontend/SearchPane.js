@@ -19,17 +19,20 @@ class SearchPane extends React.Component {
 
   componentWillMount() {
     this._key = this.onWindowKeyDown.bind(this);
-    window.addEventListener('keydown', this._key, true);
+    var win = this.props.win || window
+    win.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    window.removeEventListener('keydown', this._key, true);
+    var win = this.props.win || window
+    win.removeEventListener('keydown', this._key, true);
   }
 
   onWindowKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
       var node = React.findDOMNode(this.input);
-      if (document.activeElement === node) {
+      var win = this.props.win || window
+      if (win.document.activeElement === node) {
         return;
       }
       node.focus();

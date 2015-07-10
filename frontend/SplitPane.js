@@ -20,8 +20,9 @@ class SplitPane extends React.Component {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
-    window.addEventListener('mousemove', this._onMove);
-    window.addEventListener('mouseup', this._onUp);
+    var win = this.props.win || window
+    win.addEventListener('mousemove', this._onMove);
+    win.addEventListener('mouseup', this._onUp);
     this.setState({moving: true});
   }
 
@@ -35,8 +36,9 @@ class SplitPane extends React.Component {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
-    window.removeEventListener('mousemove', this._onMove);
-    window.removeEventListener('mouseup', this._onUp);
+    var win = this.props.win || window
+    win.removeEventListener('mousemove', this._onMove);
+    win.removeEventListener('mouseup', this._onUp);
     this.setState({moving: false});
   }
 

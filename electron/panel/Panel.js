@@ -66,7 +66,7 @@ class Panel extends React.Component {
 
   teardown() {
     if (this._keyListener) {
-      window.removeEventListener('keydown', this._keyListener);
+      this.win.removeEventListener('keydown', this._keyListener);
       this._keyListener = null;
     }
     if (this._bridge) {
@@ -85,9 +85,9 @@ class Panel extends React.Component {
     // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.attach(this.props.wall);
 
-    this._store = new Store(this._bridge);
+    this._store = new Store(this._bridge, this.props.win);
     this._keyListener = this._store.onKeyDown.bind(this._store)
-    window.addEventListener('keydown', this._keyListener);
+    this.props.win.addEventListener('keydown', this._keyListener);
 
     this._store.on('connected', () => {
       this.setState({loading: false});
@@ -111,6 +111,7 @@ class Panel extends React.Component {
     }
     return (
       <Container
+        win={this.props.win}
         reload={this.reload.bind(this)}
         extraPanes={[panelRNStyle(this._bridge)]}
       />
@@ -153,5 +154,7 @@ Panel.childContextTypes = {
   store: React.PropTypes.object,
 };
 
-module.exports = Panel;
+window.RNPanel = Panel;
+window.RNReact = React;
 
+module.exports = Panel;
