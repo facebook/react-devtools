@@ -75,8 +75,8 @@ class Backend extends EventEmitter {
     });
     this._prevSelected = null;
     this.capabilities = assign({
-      scroll: 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
-      dom: 'function' === typeof window.document.createElement,
+      scroll: window.document && 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
+      dom: window.document && 'function' === typeof window.document.createElement,
     }, capabilities);
   }
 
