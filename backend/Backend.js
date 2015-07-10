@@ -80,6 +80,15 @@ class Backend extends EventEmitter {
     }, capabilities);
   }
 
+  on(ev, fn) {
+    EventEmitter.prototype.on.call(this, ev, fn);
+    return () => this.off(ev, fn);
+  }
+
+  off(ev, fn) {
+    this.removeListener(ev, fn);
+  }
+
   setReactInternals(reactInternals: InternalsObject) {
     this.reactInternals = reactInternals;
   }

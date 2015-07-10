@@ -12,6 +12,7 @@
 var React = require('react');
 
 var Container = require('../../frontend/Container');
+var NativeStyler = require('../../chrome/panel/NativeStyler');
 var Store = require('../../frontend/Store');
 var Bridge = require('../../backend/Bridge');
 var consts = require('../../backend/consts');
@@ -111,9 +112,26 @@ class Panel extends React.Component {
     return (
       <Container
         reload={this.reload.bind(this)}
+        extraPanes={[panelRNStyle(this._bridge)]}
       />
     );
   }
+}
+
+var panelRNStyle = bridge => (node, id) => {
+  if (node.get('nodeType') !== 'Native') {
+    return <span/>;
+  }
+  var props = node.get('props');
+  if (!props || !props.style) {
+    return <strong>No style</strong>;
+  }
+  return (
+    <div>
+      <h3>React Native Style Editor</h3>
+      <NativeStyler id={id} bridge={bridge} />
+    </div>
+  );
 }
 
 var styles = {
