@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>React Electron App</title>
+        <meta charset=utf8>
+        <style>
+            html {
+                display: flex;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                flex: 1;
+                display: flex;
+            }
+            #container {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: white;
+            }
+            #logs {
+                position: fixed;
+                top: 0;
+                left: 0;
+                white-space: pre;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <h1>Connecting to React Native</h1>
+        </div>
+        <script src="panel/node.js"></script>
+        <script src="build/panel.js"></script>
+    </body>
+</html>

@@ -4,3 +4,5 @@
 /chrome/build
 firefox/build
 firefox/data/build
+electron/build
+electron/node_modules
