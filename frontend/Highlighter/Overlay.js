@@ -13,6 +13,8 @@
 var nodePos = require('./nodePos');
 var setStyle = require('./setStyle');
 
+import type {DOMNode} from '../types';
+
 class Overlay {
   win: Object;
   container: DOMNode;
@@ -24,7 +26,7 @@ class Overlay {
   nameSpan: DOMNode;
   dimSpan: DOMNode;
 
-  constructor(window) {
+  constructor(window: Object) {
     var doc = window.document;
     this.win = window;
     this.container = doc.createElement('div');
@@ -83,7 +85,7 @@ class Overlay {
     }
   }
 
-  inspect(node, name) {
+  inspect(node: DOMNode, name?: ?string) {
     var pos = nodePos(node);
     var dims = getElementDimensions(node);
 

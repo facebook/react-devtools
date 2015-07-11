@@ -7,14 +7,15 @@ var Bridge = require('../../backend/Bridge');
 
 var inject = require('../../backend/inject');
 
-// TODO: check to see if we're in RN before doing this?
-setInterval(function () {
-  // this is needed to force refresh on react native
-}, 100);
-
 var hasStarted = false;
 
 function setup(socket) {
+
+  // TODO: check to see if we're in RN before doing this?
+  setInterval(function () {
+    // this is needed to force refresh on react native
+  }, 100);
+
   var wall = {
     listen: function(fn) {
       socket.on('message', fn);
@@ -28,8 +29,11 @@ function setup(socket) {
   };
 
   socket.on('close', function () {
-    if (backend && backend.reactInternals) {
-      backend.reactInternals.removeDevtools();
+    if (backend) {
+      backend.emit('shutdown');
+      if (backend.reactInternals) {
+        backend.reactInternals.removeDevtools();
+      }
     }
     hasStarted = false;
     bridge = null;
@@ -51,7 +55,7 @@ function setup(socket) {
     return window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle(style);
   });
   bridge.on('rn:setStyle', ({id, attr, val}) => {
-    console.log('setting rn style', id, attr, val);
+    // console.log('setting rn style', id, attr, val);
     var comp = backend.comps.get(id);
     comp.getPublicInstance().setNativeProps({[attr]: val});
   });
@@ -64,6 +68,7 @@ function setup(socket) {
     hasStarted = true;
     inject(window, backend);
     clearTimeout(_connectTimeout);
+    window.__REACT_DEVTOOLS_BACKEND__._startupListeners.forEach(fn => fn(backend));
   });
 }
 
@@ -77,7 +82,7 @@ server.on('connection', function (socket) {
   console.log('server connection');
   if (hasStarted) {
     console.warn('already connected');
-    return socket.close();
+    return socket.end();
   }
   setup(new JsonSocket(socket));
 });

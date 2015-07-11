@@ -65,6 +65,7 @@ function setup() {
 
   backend.once('connected', () => {
     inject(window, backend);
+    window.__REACT_DEVTOOLS_BACKEND__._startupListeners.forEach(fn => fn(backend));
   });
 
   if (RN_STYLE) {

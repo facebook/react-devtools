@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
+ * @ xx flow
  */
 'use strict';
 
@@ -57,6 +57,7 @@ class Backend extends EventEmitter {
   roots: Set;
   rootIDs: Map;
   reactInternals: InternalsObject; // injected
+  capabilities: Object;
   _prevSelected: any;
 
   constructor(global: Object, capabilities?: Object) {
@@ -80,12 +81,14 @@ class Backend extends EventEmitter {
     }, capabilities);
   }
 
-  on(ev, fn) {
+  // todo fix subscription to be more normal?
+  // $FlowFixMe you can't override methods and give them a different signature?
+  on(ev: string, fn: (data: any) => void): () => void {
     EventEmitter.prototype.on.call(this, ev, fn);
     return () => this.off(ev, fn);
   }
 
-  off(ev, fn) {
+  off(ev: string, fn: (data: any) => void) {
     this.removeListener(ev, fn);
   }
 

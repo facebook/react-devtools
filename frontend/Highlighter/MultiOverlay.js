@@ -13,15 +13,20 @@
 var nodePos = require('./nodePos');
 var setStyle = require('./setStyle');
 
+import type {DOMNode} from '../types';
+
 class MultiOverlay {
-  constructor(window) {
+  win: Object;
+  container: DOMNode;
+
+  constructor(window: Object) {
     this.win = window;
     var doc = window.document;
     this.container = doc.createElement('div');
     doc.body.appendChild(this.container);
   }
 
-  highlightMany(nodes) {
+  highlightMany(nodes: Array<DOMNode>) {
     this.container.innerHTML = '';
     nodes.forEach(node => {
       var div = this.win.document.createElement('div');
@@ -34,7 +39,7 @@ class MultiOverlay {
         border: '2px dotted rgba(200, 100, 100, .8)',
         boxSizing: 'border-box',
         backgroundColor: 'rgba(200, 100, 100, .2)',
-        position: 'absolute',
+        position: 'fixed',
         zIndex: 100000,
         pointerEvents: 'none',
       });

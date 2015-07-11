@@ -10,7 +10,9 @@
  */
 'use strict';
 
-function setStyle(node, style) {
+import type {DOMNode} from '../types';
+
+function setStyle(node: DOMNode, style: Object) {
   for (var name in style) {
     node.style[name] = style[name];
   }

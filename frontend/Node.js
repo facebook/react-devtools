@@ -36,8 +36,8 @@ class Node {
   _head: Object;
   _tail: Object;
 
-  props: PropsType;
   context: Object;
+  props: PropsType;
   static contextTypes: Object;
 
   shouldComponentUpdate(nextProps: PropsType) {
@@ -68,7 +68,7 @@ class Node {
   render(): ReactElement {
     var node = this.props.node;
     if (!node) {
-      return <span>Node deleted</span>;
+      return <span>Node was deleted</span>;
     }
     var children = node.get('children');
 
@@ -120,6 +120,7 @@ class Node {
 
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
 
+    // Single-line tag (collapsed / simple content / no content)
     if (!children || 'string' === typeof children || !children.length) {
       var name = node.get('name');
       var content = children || node.get('text');
@@ -145,6 +146,7 @@ class Node {
       );
     }
 
+    // Plain string
     if ('string' === typeof children) {
       return <div style={leftPad}>{children}</div>;
     }
@@ -211,7 +213,7 @@ class Node {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom} >
+        <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
           {closeTag}
         </div>
       </div>
@@ -256,6 +258,9 @@ var WrappedNode = decorate({
 }, Node);
 
 var styles = {
+  // TODO(jared): how do people feel about empty style rules? I put them here
+  // in case we need them later, and the corresponding divs refernce them. But
+  // I could remove them if desired.
   container: {
   },
 

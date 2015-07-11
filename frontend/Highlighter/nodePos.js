@@ -10,7 +10,9 @@
  */
 'use strict';
 
-function nodePos(node) {
+import type {DOMNode} from '../types';
+
+function nodePos(node: DOMNode): {left: number, top: number} {
   var left = node.offsetLeft;
   var top = node.offsetTop;
   while (node && node !== document.body && node.offsetParent) {

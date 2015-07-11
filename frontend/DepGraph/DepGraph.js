@@ -1,4 +1,14 @@
-/* @flow */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
 var decorate = require('../decorate');
@@ -25,6 +35,11 @@ class DepGraph extends React.Component {
 }
 
 class DisplayDeps {
+  componentWillReceiveProps(nextProps) {
+    if (nextProps.selected !== this.props.selected) {
+      return this.props.onClose()
+    }
+  }
   render() {
     return (
       <div style={styles.container}>
@@ -167,7 +182,7 @@ function dagrize(graph) {
 }
 
 var DepWrapper = decorate({
-  listeners: () => [],
+  listeners: () => ['selected'],
   shouldUpdate(nextProps, props) {
     return nextProps.renderCount !== props.renderCount;
   },
@@ -178,6 +193,7 @@ var DepWrapper = decorate({
     };
     crawlChildren('$root', [store.selected], store._nodes, 0, graph);
     return {
+      selected: store.selected,
       graph: dagrize(graph),
       onHover: name => store.onHoverClass(name),
     };
