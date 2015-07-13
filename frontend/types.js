@@ -1,6 +1,6 @@
 
 type Dir = 'up' | 'down' | 'left' | 'right';
-type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'top' | 'bottom' | 'collapse' | 'uncollapse' | 'parent';
+type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent';
 
 type DOMNode = {
   nodeName: string,

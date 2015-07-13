@@ -70,7 +70,7 @@ class SearchPane extends React.Component {
   onKeyDown(key) {
     if (key === 'Enter') {
       React.findDOMNode(this.input).blur();
-      this.props.selectFirstNode();
+      this.props.selectFirstSearchResult();
     }
   }
 
@@ -100,7 +100,7 @@ SearchPane.propTypes = {
   reload: PropTypes.func,
   searchText: PropTypes.string,
   onChangeSearch: PropTypes.func,
-  selectFirstNode: PropTypes.func,
+  selectFirstSearchResult: PropTypes.func,
 };
 
 var Wrapped = decorate({
@@ -110,8 +110,8 @@ var Wrapped = decorate({
   props(store) {
     return {
       searchText: store.searchText,
-      onChangeSearch: text => store.onChangeSearch(text),
-      selectFirstNode: store.selectFirstNode.bind(store),
+      onChangeSearch: text => store.changeSearch(text),
+      selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
     };
   },
 }, SearchPane);

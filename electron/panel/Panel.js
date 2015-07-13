@@ -11,11 +11,13 @@
 
 var React = require('react');
 
+var Bridge = require('../../backend/Bridge');
 var Container = require('../../frontend/Container');
 var NativeStyler = require('../../chrome/panel/NativeStyler');
 var Store = require('../../frontend/Store');
-var Bridge = require('../../backend/Bridge');
+
 var consts = require('../../backend/consts');
+var keyboardNav = require('../../frontend/keyboardNav');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -86,7 +88,7 @@ class Panel extends React.Component {
     this._bridge.attach(this.props.wall);
 
     this._store = new Store(this._bridge, this.props.win);
-    this._keyListener = this._store.onKeyDown.bind(this._store)
+    this._keyListener = keyboardNav(this._store, this.props.win);
     this.props.win.addEventListener('keydown', this._keyListener);
 
     this._store.on('connected', () => {

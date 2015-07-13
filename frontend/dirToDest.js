@@ -31,9 +31,6 @@ module.exports = function (dir: Dir, bottom: boolean, collapsed: boolean, hasChi
 
   if (dir === 'left') {
     if (!collapsed && hasChildren) {
-      if (bottom) {
-        return 'top';
-      }
       return 'collapse';
     }
     return 'parent';

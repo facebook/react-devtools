@@ -13,6 +13,7 @@
 var React = require('react/addons');
 var compatInject = require('../backend/compatInject');
 var Store = require('../frontend/Store');
+var keyboardNav = require('../frontend/keyboardNav');
 var Bridge = require('../backend/Bridge');
 
 class Harness extends React.Component {
@@ -44,8 +45,8 @@ class Harness extends React.Component {
     var bridge = new Bridge();
     bridge.attach(wall);
 
-    this.store = new Store(bridge);
-    window.addEventListener('keydown', this.store.onKeyDown.bind(this.store));
+    this.store = new Store(bridge, window);
+    window.addEventListener('keydown', keyboardNav(this.store, window));
 
     // inject the backend part
     var script = win.document.createElement('script');

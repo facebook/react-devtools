@@ -1,31 +1,26 @@
-/** @ xx flow
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @ xx flow
  *
  * flow disabled because of the following bug:
  * possibly undefined value
  * https://github.com/facebook/flow/issues/603
-**/
+ */
+'use strict';
 
-import {EventEmitter} from 'events';
-import {Map, Set, List} from './imm';
-import assign from 'object-assign';
+var {EventEmitter} = require('events');
+var {Map, Set, List} = require('./imm');
+var assign = require('object-assign');
+var nodeMatchesText = require('./nodeMatchesText');
 
 import type Bridge from '../backend/Bridge'
 import type {DOMNode, DOMEvent, Dir, Dest} from './types'
-
-import dirToDest from './dirToDest';
-import nodeMatchesText from './nodeMatchesText';
-
-var keyCodes = {
-  '72': 'left',  // 'h',
-  '74': 'down',  // 'j',
-  '75': 'up',    // 'k',
-  '76': 'right', // 'l',
-
-  '37': 'left',
-  '38': 'up',
-  '39': 'right',
-  '40': 'down',
-}
 
 type ElementID = string;
 
@@ -38,37 +33,75 @@ type ContextMenu = {
   args: Array<any>,
 };
 
+/**
+ * Public events:
+ *
+ * - connected / connection failed
+ * - roots
+ * - searchText
+ * - searchRoots
+ * - contextMenu
+ * - hover
+ * - selected
+ * - [node id]
+ *
+ * Public state:
+ *  see attrs / constructor
+ *
+ * Public actions:
+ * - scrollToNode(id)
+ * - changeTextContent(id, text)
+ * - changeSearch
+ * - hoverClass
+ * - selectFirstOfClass
+ * - showContextMenu
+ * - hideContextMenu
+ * - selectFirstSearchResult
+ * 
+ * Public methods:
+ * - get(id) => Map (the node)
+ * - getParent(id) => pid
+ */
 class Store extends EventEmitter {
   _bridge: Bridge;
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
 
+  // Public state
   contextMenu: ?ContextMenu;
-  searchRoots: ?List;
-  roots: List;
   hovered: ?ElementID;
-  selected: ?ElementID;
   isBottomTagSelected: boolean;
+  roots: List;
+  searchRoots: ?List;
   searchText: string;
+  selected: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
   };
 
-  constructor(bridge: Bridge, win: Object) {
+  constructor(bridge: Bridge) {
     super()
-    this.win = win || window;
-    this.roots = new List();
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
+
+    // Public state
+    this.roots = new List();
+    this.contextMenu = null;
+    this.searchRoots = null;
     this.hovered = null;
     this.selected = null;
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
+
+    // for debugging
+    window.store = this;
+
+    // events from the backend
     this._bridge.on('root', id => {
       if (this.roots.contains(id)) {
         return;
@@ -81,31 +114,22 @@ class Store extends EventEmitter {
       }
       this.emit('roots');
     });
-    // for debugging
-    window.store = this;
-
-    this._bridge.on('select', ({id, quiet}) => {
-      this.revealDeep(id);
-      this.selectTop(this.skipWrapper(id), quiet);
-    });
-
     this._bridge.on('mount', (data) => this.mountComponent(data));
     this._bridge.on('update', (data) => this.updateComponent(data));
     this._bridge.on('unmount', id => this.unmountComponenent(id));
+    this._bridge.on('select', ({id, quiet}) => {
+      this._revealDeep(id);
+      this.selectTop(this.skipWrapper(id), quiet);
+    });
 
-    this.establishConnection();
+    this._establishConnection();
   }
 
-  establishConnection() {
+  _establishConnection() {
     var tries = 0;
     var requestInt;
-    var done = false;
-    this._bridge.on('capabilities', capabilities => {
-      if (done) {
-        return;
-      }
+    this._bridge.once('capabilities', capabilities => {
       clearInterval(requestInt);
-      done = true;
       this.capabilities = assign(this.capabilities, capabilities);
       this.emit('connected');
     });
@@ -140,7 +164,7 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
-  onChangeSearch(text: string): void {
+  changeSearch(text: string): void {
     var needle = text.toLowerCase();
     if (needle === this.searchText.toLowerCase()) {
       return;
@@ -177,14 +201,14 @@ class Store extends EventEmitter {
       this.select(null, true);
     } else if (!this.searchRoots) {
       if (this.selected) {
-        this.revealDeep(this.selected);
+        this._revealDeep(this.selected);
       } else {
         this.select(this.roots.get(0));
       }
     }
   }
 
-  onHoverClass(name: string): void {
+  hoverClass(name: string): void {
     if (name === null) {
       this._bridge.send('hideHighlight');
       return;
@@ -202,7 +226,7 @@ class Store extends EventEmitter {
       return;
     }
     var id = ids.toSeq().first()
-    this.revealDeep(id);
+    this._revealDeep(id);
     this.selectTop(id);
   }
 
@@ -217,13 +241,13 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
-  selectFirstNode() {
+  selectFirstSearchResult() {
     if (this.searchRoots) {
       this.select(this.searchRoots.get(0), true);
     }
   }
 
-  revealDeep(id: ElementID) {
+  _revealDeep(id: ElementID) {
     if (this.searchRoots && this.searchRoots.contains(id)) {
       return;
     }
@@ -237,29 +261,6 @@ class Store extends EventEmitter {
         return;
       }
       pid = this._parents.get(pid);
-    }
-  }
-
-  onKeyDown(e: DOMEvent) {
-    if (this.win.document.activeElement !== this.win.document.body) {
-      return;
-    }
-    if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
-      return;
-    }
-
-    var direction = keyCodes[e.keyCode];
-    if (!direction) {
-      return;
-    }
-    e.preventDefault();
-    var dest = this.getDest(direction);
-    if (!dest) {
-      return;
-    }
-    var move = this.getNewSelection(dest);
-    if (move && move !== this.selected) {
-      this.select(move);
     }
   }
 
@@ -286,137 +287,12 @@ class Store extends EventEmitter {
     return true;
   }
 
-  getDest(dir: Dir): ?Dest {
-    var id = this.selected;
-    if (!id) {
-      return;
-    }
-    var bottom = this.isBottomTagSelected;
-    var node = this.get(id);
-    var collapsed = node.get('collapsed');
-    var children = node.get('children');
-    var hasChildren = children && 'string' !== typeof children && children.length;
-    var pid = this._parents.get(id);
-
-    if (this.searchRoots && this.searchRoots.contains(id)) {
-      pid = null;
-    }
-
-    return dirToDest(dir, bottom, collapsed, hasChildren);
-  }
-
-  getNewSelection(dest: Dest): ?ElementID {
-    var id = this.selected;
-    if (!id) {
-      return;
-    }
-    var bottom = this.isBottomTagSelected;
-    var node = this.get(id);
-    var pid = this.skipWrapper(this._parents.get(id), true);
-
-    if (this.searchRoots && this.searchRoots.contains(id)) {
-      pid = null;
-    }
-
-    if (dest === 'parent') {
-      return pid;
-    }
-    if (dest === 'parentBottom') {
-      this.isBottomTagSelected = true;
-      return pid;
-    }
-
-    if (dest === 'collapse') {
-      this.toggleCollapse(id);
-      return;
-    }
-    if (dest === 'uncollapse') {
-      this.toggleCollapse(id);
-      return;
-    }
-
-    if (dest === 'bottom') {
-      this.isBottomTagSelected = true;
-      this.emit(this.selected);
-      return;
-    }
-    if (dest === 'top') {
-      this.isBottomTagSelected = false;
-      this.emit(this.selected);
-      return;
-    }
-
-    if (dest === 'firstChild') {
-      var children = node.get('children')
-      if ('string' === typeof children) {
-        return this.getNewSelection('nextSibling');
-      }
-      this.isBottomTagSelected = false;
-      return this.skipWrapper(children[0]);
-    }
-    if (dest === 'lastChild') {
-      var children = node.get('children');
-      if ('string' === typeof children) {
-        return this.getNewSelection('prevSibling');
-      }
-      var cid = this.skipWrapper(children[children.length - 1]);
-      if (cid && !this.hasBottom(cid)) {
-        this.isBottomTagSelected = false;
-      }
-      return cid;
-    }
-
-    if (!pid) {
-      var roots = this.searchRoots || this.roots;
-      var ix = roots.indexOf(id);
-      if (ix === -1) {
-        ix = roots.indexOf(this._parents.get(id));
-      }
-      if (dest === 'prevSibling') { // prev root
-        if (ix === 0) {
-          return null;
-        }
-        var prev = this.skipWrapper(roots.get(ix - 1));
-        this.isBottomTagSelected = prev ? this.hasBottom(prev) : false; // flowtype requires the ternary
-        return prev;
-      } else if (dest === 'nextSibling') {
-        if (ix >= roots.size - 1) {
-          return null;
-        }
-        this.isBottomTagSelected = false;
-        return this.skipWrapper(roots.get(ix + 1));
-      }
-      return null;
-    }
-
-    var parent = this.get(pid);
-    var pchildren = parent.get('children');
-    var pix = pchildren.indexOf(id);
-    if (pix === -1) {
-      pix = pchildren.indexOf(this._parents.get(id));
-    }
-    if (dest === 'prevSibling') {
-      if (pix === 0) {
-        return this.getNewSelection('parent');
-      }
-      var cid = this.skipWrapper(pchildren[pix - 1]);
-      if (cid && this.hasBottom(cid)) {
-        this.isBottomTagSelected = true;
-      }
-      return cid;
-    }
-    if (dest === 'nextSibling') {
-      if (pix === pchildren.length - 1) {
-        return this.getNewSelection('parentBottom');
-      }
-      this.isBottomTagSelected = false;
-      return this.skipWrapper(pchildren[pix + 1]);
-    }
-    return null;
-  }
-
   get(id: ElementID): DataType {
     return this._nodes.get(id);
+  }
+
+  getParent(id: ElementID): ElementID {
+    return this._parents.get(id);
   }
 
   off(evt: DOMEvent, fn: ListenerFunction): void {
@@ -529,11 +405,6 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
-  _removeFromNodesByName(id: ElementID) {
-    var node = this._nodes.get(id);
-    this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
-  }
-
   unmountComponenent(id: ElementID) {
     var pid = this._parents.get(id);
     this._removeFromNodesByName(id);
@@ -557,6 +428,11 @@ class Store extends EventEmitter {
       this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
       this.emit('searchRoots');
     }
+  }
+
+  _removeFromNodesByName(id: ElementID) {
+    var node = this._nodes.get(id);
+    this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
   }
 }
 

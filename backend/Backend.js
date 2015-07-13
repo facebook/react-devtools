@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow
+ * @flow
  */
 'use strict';
 
@@ -83,9 +83,8 @@ class Backend extends EventEmitter {
     }, capabilities);
   }
 
-  // todo fix subscription to be more normal?
-  // $FlowFixMe you can't override methods and give them a different signature?
-  on(ev: string, fn: (data: any) => void): () => void {
+  // return "unsubscribe" function
+  sub(ev: string, fn: (data: any) => void): () => void {
     EventEmitter.prototype.on.call(this, ev, fn);
     return () => this.off(ev, fn);
   }

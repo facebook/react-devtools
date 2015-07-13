@@ -165,6 +165,25 @@ class Bridge {
     }
   }
 
+  off(evt: string, fn: AnyFn) {
+    if (!this._listeners[evt]) {
+      return;
+    }
+    var ix = this._listeners[evt].indexOf(fn);
+    if (ix !== -1) {
+      this._listeners[evt].splice(ix, 1);
+    }
+  }
+
+  once(evt: string, fn: AnyFn) {
+    var bridge = this;
+    var listener = function () {
+      fn.apply(this, arguments);
+      bridge.off(evt, listener);
+    }
+    this.on(evt, listener);
+  }
+
   _handleMessage(payload: PayloadType) {
     var type = payload.type;
     if (payload.type === 'callback') {

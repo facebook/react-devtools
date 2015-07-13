@@ -14,6 +14,7 @@ var Bridge = require('../../backend/Bridge');
 var Container = require('../../frontend/Container');
 var NativeStyler = require('./NativeStyler');
 var Store = require('../../frontend/Store');
+var keyboardNav = require('../../frontend/keyboardNav');
 
 var check = require('./check');
 var consts = require('../../backend/consts');
@@ -193,7 +194,8 @@ class Panel extends React.Component {
       this._bridge.attach(wall);
 
       this._store = new Store(this._bridge);
-      this._keyListener = this._store.onKeyDown.bind(this._store)
+      this._keyListener = keyboardNav(this._store, window);
+
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {

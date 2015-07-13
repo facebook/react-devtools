@@ -11,10 +11,12 @@
 
 var React = require('react');
 
+var Bridge = require('../../backend/Bridge');
 var Container = require('../../frontend/Container');
 var Store = require('../../frontend/Store');
-var Bridge = require('../../backend/Bridge');
+
 var consts = require('../../backend/consts');
+var keyboardNav = require('../../frontend/keyboardNav');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -50,7 +52,7 @@ class Panel extends React.Component {
 
   componentDidMount() {
     this.setup();
-    /* TODO
+    /* TODO(jared): make this work when the page reloads
     chrome.devtools.network.onNavigated.addListener(() => {
       this.reload();
     });
@@ -114,7 +116,7 @@ class Panel extends React.Component {
     this._bridge.attach(wall);
 
     this._store = new Store(this._bridge);
-    this._keyListener = this._store.onKeyDown.bind(this._store)
+    this._keyListener = keyboardNav(this._store);
     window.addEventListener('keydown', this._keyListener);
 
     this._store.on('connected', () => {

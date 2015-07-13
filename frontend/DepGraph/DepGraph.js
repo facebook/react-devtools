@@ -200,7 +200,7 @@ var DepWrapper = decorate({
     return {
       selected: store.selected,
       graph: dagrize(graph),
-      onHover: name => store.onHoverClass(name),
+      onHover: name => store.hoverClass(name),
       onClick: name => store.selectFirstOfClass(name),
     };
   }
