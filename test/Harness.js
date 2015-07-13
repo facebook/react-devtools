@@ -29,7 +29,7 @@ class Harness extends React.Component {
   }
 
   injectBackend(win) {
-    if (!win.__REACT_DEVTOOLS_BACKEND__.injectDevTools && !win.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime) {
+    if (!win.__REACT_DEVTOOLS_BACKEND__.attachDevTools && !win.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime) {
       return console.warn("Looks like React wasn't loaded");
     }
 

@@ -11,26 +11,21 @@
 'use strict';
 
 import type * as Backend from './Backend';
-import makeCompat from './makeCompat';
+import shim from './shim';
 
 module.exports = function (window: Object, backend: Backend): boolean {
   var hook = window.__REACT_DEVTOOLS_BACKEND__;
   if (!hook) {
     return false;
   }
-  if (!hook.injectDevTools) {
-    var success = makeCompat(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, hook);
+  if (!hook.attachDevTools) {
+    var success = shim(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, hook);
     if (!success) {
       return false;
     }
   }
 
-  backend.setReactInternals({
-    getNativeFromReactElement: hook.getNativeFromReactElement,
-    getReactElementFromNative: hook.getReactElementFromNative,
-    removeDevtools: hook.removeDevtools,
-  });
-  hook.injectDevTools(backend);
+  hook.attachDevTools(backend);
   hook.backend = backend;
   return true;
 }

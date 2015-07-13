@@ -41,7 +41,7 @@ var React = require('react');
 
 type Options = {
   /** A function determining whether the component should rerender when the
-   * parent rerenders. Defaults to ac function returning false **/
+   * parent rerenders. Defaults to function returning false **/
   shouldUpdate?: (nextProps: Object, props: Object) => boolean,
   /** A function returning a list of events to listen to **/
   listeners: (props: Object, store: Object) => Array<string>,

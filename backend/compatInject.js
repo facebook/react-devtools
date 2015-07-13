@@ -27,7 +27,7 @@ module.exports = function compatInject(window: Object) {
     value: {
       getReactHandleFromNative: null,
       getNativeFromHandle: null,
-      injectDevTools: null,
+      attachDevTools: null,
     },
   });
 }

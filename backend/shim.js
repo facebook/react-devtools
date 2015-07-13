@@ -7,51 +7,127 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @flow
+ *
+ * Bring react 0.13/14 up to the interface that the new devtools want.
+ *
+ * Currently, react exposes itself on the global hook, including the Mount,
+ * Reconciler, and other internal objects. This is undesirable, as it
+ * restricts the ability to refactor react internals.
+ *
+ * This shim takes the current internals, and exposes instead a much less
+ * intrusive interface.
+ *
+ * This is the new handoff:
+ *
+ * 1. Devtools sets the __REACT_DEVTOOLS_BACKEND__ global.
+ * 2. React (if present) sets 2 functions:
+ *    - attachDevTools(backend) => void
+ *    - removeDevtools() => void
+ * 3. Devtools (if the 2 functions have been added), sets things up, creates
+ * the backend instance, and calls `attachDevTools(backend)`
+ *
+ * Now things are hooked up.
+ *
+ * When devtools closes, it calls `removeDevtools()` to remove the listeners
+ * and any overhead caused by the backend.
  */
 'use strict';
 
-import type * as Backend from './Backend'
+type Internals = {
+  getNativeFromReactElement: ?(component: ComponentType) => ?NativeType,
+  getReactElementFromNative: ?(native: NativeType) => ?ComponentType,
+  removeDevtools: () => void,
+};
+
+type Backend = {
+  setReactInternals: (internals: Internals) => void,
+  addRoot: (el: ComponentType) => void,
+  onMounted: (el: ComponentType, data: DataType) => void,
+  onUpdated: (el: ComponentType, data: DataType) => void,
+  onUnmounted: (el: ComponentType) => void,
+};
+
+type DataType = {
+  nodeType: 'Native' | 'Wrapper' | 'Custom' | 'Text' | 'Unknown',
+  type: ?(string | Object),
+  name: ?string,
+  props: ?Object,
+  state: ?Object,
+  context: ?Object,
+  children: ?(string | Array<Object>),
+  text: ?string,
+  updater: ?{
+    setState: ?(newState: any) => void,
+    forceUpdate: ?() => void,
+    publicInstance: Object,
+  },
+};
+
+type AnyFn = (...args: Array<any>) => any;
+
+// This type is entirely opaque to the backend.
+type ComponentType = {
+  _rootNodeID: string,
+};
+type NativeType = {};
 
 type OldStyleHook = {
-  _reactRuntime: Object,
+  _reactRuntime: {
+    Reconciler: {
+      mountComponent: AnyFn,
+      performUpdateIfNecessary: AnyFn,
+      receiveComponent: AnyFn,
+      unmountComponent: AnyFn,
+    },
+    // $FlowFixMe flow doesn't understand this tagged union
+    Mount: Object /*{ // React Native
+      nativeTagToRootNodeID: (tag: number) => string,
+      findNodeHandle: (component: Object) => number,
+      renderComponent: AnyFn,
+      _instancesByContainerID: Object,
+    } | { // React DOM
+      getID: (node: DOMNode) => string,
+      getNode: (id: string) => ?DOMNode,
+      _instancesByReactRootID: Object,
+      _renderNewRootComponent: AnyFn,
+    },*/
+  },
 };
 
 type NewStyleHook = {
   backend: Backend,
-  getNativeFromReactElement: (component: Object) => void,
-  getReactElementFromNative: (native: any) => void,
-  injectDevTools: (backend: Backend) => void,
+  attachDevTools: (backend: Backend) => void,
   removeDevtools: () => void,
 };
 
-module.exports = function makeCompat(oldHook: OldStyleHook, newHook: NewStyleHook): boolean {
+module.exports = function shim(oldHook: OldStyleHook, newHook: NewStyleHook): boolean {
   if (!oldHook || !newHook || !oldHook._reactRuntime) {
     return false;
   }
 
   var runtime = oldHook._reactRuntime;
-  var reconciler = runtime.Reconciler;
-  var reactMount = runtime.Mount;
   var rootNodeIDMap = new Map();
+  var getNativeFromReactElement;
+  var getReactElementFromNative;
 
   // RN to React differences
   if (runtime.Mount.findNodeHandle && runtime.Mount.nativeTagToRootNodeID) {
-    newHook.getNativeFromReactElement = function (component) {
+    getNativeFromReactElement = function (component) {
       return runtime.Mount.findNodeHandle(component);
     };
 
-    newHook.getReactElementFromNative = function (nativeTag) {
+    getReactElementFromNative = function (nativeTag) {
       var id = runtime.Mount.nativeTagToRootNodeID(nativeTag);
       return rootNodeIDMap.get(id);
     }
   } else if (runtime.Mount.getID && runtime.Mount.getNode) {
-    newHook.getNativeFromReactElement = function (component) {
+    getNativeFromReactElement = function (component) {
       try {
         return runtime.Mount.getNode(component._rootNodeID);
       } catch (e) {}
     };
 
-    newHook.getReactElementFromNative = function (node) {
+    getReactElementFromNative = function (node) {
       var id = runtime.Mount.getID(node);
       while (node && node.parentNode && !id) {
         node = node.parentNode;
@@ -67,12 +143,22 @@ module.exports = function makeCompat(oldHook: OldStyleHook, newHook: NewStyleHoo
   var oldRenderNode;
   var oldRenderComponent;
 
-  newHook.injectDevTools = function (backend) {
+  newHook.attachDevTools = function (backend) {
+    backend.setReactInternals({
+      getNativeFromReactElement,
+      getReactElementFromNative,
+      removeDevtools: newHook.removeDevtools,
+    });
+
+    // React DOM
     if (runtime.Mount._renderNewRootComponent) {
       oldRenderNode = decorateResult(runtime.Mount, '_renderNewRootComponent', (element) => {
         backend.addRoot(element);
       });
-    } else if (runtime.Mount.renderComponent) { // React Native
+    // React Native
+    } else if (runtime.Mount.renderComponent) {
+      // $FlowFixMe flow doesn't understand that runtime.Mount has
+      // renderComponent in this branch
       oldRenderComponent = decorateResult(runtime.Mount, 'renderComponent', element => {
         backend.addRoot(element._reactInternalInstance);
       });
@@ -144,7 +230,7 @@ function childrenList(children) {
   return res;
 }
 
-function getData(element) {
+function getData(element): DataType {
   var children = null;
   var props = null;
   var state = null;
@@ -166,6 +252,7 @@ function getData(element) {
   } else if (element._renderedChildren) {
     children = childrenList(element._renderedChildren);
   } else if (element._currentElement.props) {
+    // string children
     children = element._currentElement.props.children
   }
 
@@ -197,7 +284,17 @@ function getData(element) {
     }
   }
 
-  return {nodeType, props, state, context, children, updater, type, name, text};
+  return {
+    nodeType,
+    type,
+    name,
+    props,
+    state,
+    context,
+    children,
+    text,
+    updater,
+  };
 }
 
 type NodeLike = {
@@ -236,4 +333,3 @@ function restoreMany(source, olds) {
     source[name] = olds[name];
   }
 }
-

@@ -28,7 +28,7 @@ Object.defineProperty(global, '__REACT_DEVTOOLS_BACKEND__', {
     _startupListeners: [],
     getReactHandleFromNative: null,
     getNativeFromHandle: null,
-    injectDevTools: null,
+    attachDevTools: null,
   },
 });
 

@@ -1,5 +1,5 @@
 
-if (unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime || unsafeWindow.__REACT_DEVTOOLS_BACKEND__.injectDevTools) {
+if (unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime || unsafeWindow.__REACT_DEVTOOLS_BACKEND__.attachDevTools) {
   self.port.emit('hasReact', true);
   injectBackend();
 } else {

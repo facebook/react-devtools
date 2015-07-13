@@ -37,7 +37,7 @@ var source = `
       _startupListeners: [],
       getReactHandleFromNative: null,
       getNativeFromHandle: null,
-      injectDevTools: null,
+      attachDevTools: null,
     },
   });
 `;

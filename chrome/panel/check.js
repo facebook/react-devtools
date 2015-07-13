@@ -22,7 +22,7 @@ declare var chrome: {
 module.exports = function (done: (pageHasReact: boolean) => void) {
   chrome.devtools.inspectedWindow.eval(`!!(
     window.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime ||
-    window.__REACT_DEVTOOLS_BACKEND__.injectDevTools
+    window.__REACT_DEVTOOLS_BACKEND__.attachDevTools
   )`, function (pageHasReact, err) {
     done(pageHasReact);
   });

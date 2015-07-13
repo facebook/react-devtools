@@ -40,7 +40,7 @@ var js = (
         "}," +
         "_startupListeners: []," +
         "getNativeFromHandle: null," +
-        "injectDevTools: null," +
+        "attachDevTools: null," +
       "}," +
     "});" +
   "}"
