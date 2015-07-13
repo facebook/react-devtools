@@ -9,7 +9,6 @@
  * @ xx flow
  * $FLowFixMe
  * - thinks all react component classes must inherit from React.Component
- * - 
  */
 'use strict';
 

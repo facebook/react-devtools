@@ -1,4 +1,16 @@
-/* @flow */
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ * $FLowFixMe
+ * - thinks all react component classes must inherit from React.Component
+ */
+'use strict';
 
 var React = require('react');
 var Node = require('./Node');
@@ -38,8 +50,6 @@ class SearchPane extends React.Component {
       node.focus();
       e.preventDefault();
     }
-    // it has to be here to prevevnt devtool console from flipping when trying
-    // to leave search mode
     if (e.keyCode === 27) { // escape
       if (!this.props.searchText) {
         return;
