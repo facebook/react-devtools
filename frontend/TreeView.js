@@ -1,11 +1,21 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
 var Node = require('./Node');
 
 var decorate = require('./decorate');
 
-var MAX_ROOTS = 200;
+var MAX_SEARCH_ROOTS = 200;
 
 class TreeView extends React.Component {
   getChildContext() {
@@ -49,10 +59,10 @@ class TreeView extends React.Component {
       }
     }
 
-    if (this.props.searching && this.props.roots.count() > MAX_ROOTS) {
+    if (this.props.searching && this.props.roots.count() > MAX_SEARCH_ROOTS) {
       return (
         <div style={styles.container}>
-          {this.props.roots.slice(0, MAX_ROOTS).map(id => (
+          {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
             <Node key={id} id={id} depth={0} />
           )).toJS()}
           <span>Some results not shown. Narrow your search criteria to find them</span>

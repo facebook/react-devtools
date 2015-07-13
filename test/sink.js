@@ -2,6 +2,8 @@
 import React from 'react/addons'
 import assign from 'object-assign'
 
+// Different test things
+
 class LongRender {
   render() {
     var t = Date.now();
@@ -51,6 +53,64 @@ class BadUnmount {
   }
 }
 
+class Mounty {
+  render() {
+    return <h1>{this.props.name} {this.props.val}</h1>
+  }
+}
+
+class LotsOfMounts {
+  componentDidMount() {
+    var node = React.findDOMNode(this.node);
+    this.roots = [];
+    this.make('Rock');
+    this.make('Solid');
+    this.mounty('One');
+    this.mounty('Two');
+    this.mounty('Three');
+  }
+
+  componentWillUnmount() {
+    this.roots.forEach(div => React.unmountComponentAtNode(div));
+  }
+
+  make(name) {
+    var node = React.findDOMNode(this.node);
+    if (!node) {
+      return;
+    }
+    var val = Math.random().toString(0x0f).slice(0, 20);
+    var div = document.createElement('div');
+
+    node.appendChild(div);
+    this.roots.push(div);
+    React.render(<Mounty name={name} val={val} />, div);
+    return div;
+  }
+
+  mounty(name) {
+    var div = this.make(name);
+    if (!div) {
+      return;
+    }
+    setTimeout(() => {
+      if (this.roots.indexOf(div) === -1) {
+        return;
+      }
+      React.unmountComponentAtNode(div);
+      var ix = this.roots.indexOf(div);
+      this.roots.splice(ix, 1);
+      this.mounty(name);
+    }, Math.random() * 1000 + 1000);
+  }
+
+  render() {
+    return <div ref={node => this.node = node} />
+  }
+}
+
+// Render the list of tests
+
 class Sink {
   render() {
     var examples = {
@@ -58,6 +118,7 @@ class Sink {
       DeepTree,
       BadUnmount,
       Nester,
+      LotsOfMounts,
     };
 
     var view = Comp => run(View, {Comp})

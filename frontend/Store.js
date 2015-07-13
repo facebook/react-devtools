@@ -57,10 +57,21 @@ type ContextMenu = {
  * - showContextMenu
  * - hideContextMenu
  * - selectFirstSearchResult
+ * - toggleCollapse
+ * - setProps/State/Context
+ * - makeGlobal(id, path)
+ * - setHover(id, isHovered)
+ * - selectTop(id)
+ * - selectBottom(id)
+ * - select(id)
  * 
  * Public methods:
  * - get(id) => Map (the node)
  * - getParent(id) => pid
+ * - skipWrapper(id, up?) => id
+ * - hasBottom(id) => bool
+ * - on / off
+ * - inspect(id, path, cb)
  */
 class Store extends EventEmitter {
   _bridge: Bridge;
@@ -114,9 +125,9 @@ class Store extends EventEmitter {
       }
       this.emit('roots');
     });
-    this._bridge.on('mount', (data) => this.mountComponent(data));
-    this._bridge.on('update', (data) => this.updateComponent(data));
-    this._bridge.on('unmount', id => this.unmountComponenent(id));
+    this._bridge.on('mount', (data) => this._mountComponent(data));
+    this._bridge.on('update', (data) => this._updateComponent(data));
+    this._bridge.on('unmount', id => this._unmountComponenent(id));
     this._bridge.on('select', ({id, quiet}) => {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
@@ -125,27 +136,7 @@ class Store extends EventEmitter {
     this._establishConnection();
   }
 
-  _establishConnection() {
-    var tries = 0;
-    var requestInt;
-    this._bridge.once('capabilities', capabilities => {
-      clearInterval(requestInt);
-      this.capabilities = assign(this.capabilities, capabilities);
-      this.emit('connected');
-    });
-    this._bridge.send('requestCapabilities');
-    requestInt = setInterval(() => {
-      tries += 1;
-      if (tries > 100) {
-        console.error('failed to connect');
-        clearInterval(requestInt);
-        this.emit('connection failed');
-        return;
-      }
-      this._bridge.send('requestCapabilities');
-    }, 500);
-  }
-
+  // Public actions
   scrollToNode(id: ElementID): void {
     this._bridge.send('scrollToNode', id);
   }
@@ -247,37 +238,6 @@ class Store extends EventEmitter {
     }
   }
 
-  _revealDeep(id: ElementID) {
-    if (this.searchRoots && this.searchRoots.contains(id)) {
-      return;
-    }
-    var pid = this._parents.get(id);
-    while (pid) {
-      if (this._nodes.getIn([pid, 'collapsed'])) {
-        this._nodes = this._nodes.setIn([pid, 'collapsed'], false);
-        this.emit(pid);
-      }
-      if (this.searchRoots && this.searchRoots.contains(pid)) {
-        return;
-      }
-      pid = this._parents.get(pid);
-    }
-  }
-
-  skipWrapper(id: ElementID, up?: boolean): ?ElementID {
-    if (!id) {
-      return;
-    }
-    var node = this.get(id);
-    if (node.get('nodeType') !== 'Wrapper') {
-      return id;
-    }
-    if (up) {
-      return this._parents.get(id);
-    }
-    return node.get('children')[0];
-  }
-
   hasBottom(id: ElementID): boolean {
     var node = this.get(id);
     var children = node.get('children');
@@ -285,18 +245,6 @@ class Store extends EventEmitter {
       return false;
     }
     return true;
-  }
-
-  get(id: ElementID): DataType {
-    return this._nodes.get(id);
-  }
-
-  getParent(id: ElementID): ElementID {
-    return this._parents.get(id);
-  }
-
-  off(evt: DOMEvent, fn: ListenerFunction): void {
-    this.removeListener(evt, fn);
   }
 
   toggleCollapse(id: ElementID) {
@@ -314,10 +262,6 @@ class Store extends EventEmitter {
 
   setContext(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setContext', {id, path, value});
-  }
-
-  inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
-    this._bridge.inspect(id, path, cb)
   }
 
   makeGlobal(id: ElementID, path: Array<string>) {
@@ -342,14 +286,14 @@ class Store extends EventEmitter {
     }
   }
 
-  selectBottom(id: ElementID) {
-    this.isBottomTagSelected = true;
-    this.select(id);
-  }
-
   selectTop(id: ?ElementID, noHighlight?: boolean) {
     this.isBottomTagSelected = false;
     this.select(id, noHighlight);
+  }
+
+  selectBottom(id: ElementID) {
+    this.isBottomTagSelected = true;
+    this.select(id);
   }
 
   select(id: ?ElementID, noHighlight?: boolean) {
@@ -368,7 +312,77 @@ class Store extends EventEmitter {
     }
   }
 
-  mountComponent(data: DataType) {
+  // Public methods
+  get(id: ElementID): DataType {
+    return this._nodes.get(id);
+  }
+
+  getParent(id: ElementID): ElementID {
+    return this._parents.get(id);
+  }
+
+  skipWrapper(id: ElementID, up?: boolean): ?ElementID {
+    if (!id) {
+      return;
+    }
+    var node = this.get(id);
+    if (node.get('nodeType') !== 'Wrapper') {
+      return id;
+    }
+    if (up) {
+      return this._parents.get(id);
+    }
+    return node.get('children')[0];
+  }
+
+  off(evt: DOMEvent, fn: ListenerFunction): void {
+    this.removeListener(evt, fn);
+  }
+
+  inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
+    this._bridge.inspect(id, path, cb)
+  }
+
+  // Private stuff
+  _establishConnection() {
+    var tries = 0;
+    var requestInt;
+    this._bridge.once('capabilities', capabilities => {
+      clearInterval(requestInt);
+      this.capabilities = assign(this.capabilities, capabilities);
+      this.emit('connected');
+    });
+    this._bridge.send('requestCapabilities');
+    requestInt = setInterval(() => {
+      tries += 1;
+      if (tries > 100) {
+        console.error('failed to connect');
+        clearInterval(requestInt);
+        this.emit('connection failed');
+        return;
+      }
+      this._bridge.send('requestCapabilities');
+    }, 500);
+  }
+
+  _revealDeep(id: ElementID) {
+    if (this.searchRoots && this.searchRoots.contains(id)) {
+      return;
+    }
+    var pid = this._parents.get(id);
+    while (pid) {
+      if (this._nodes.getIn([pid, 'collapsed'])) {
+        this._nodes = this._nodes.setIn([pid, 'collapsed'], false);
+        this.emit(pid);
+      }
+      if (this.searchRoots && this.searchRoots.contains(pid)) {
+        return;
+      }
+      pid = this._parents.get(pid);
+    }
+  }
+
+  _mountComponent(data: DataType) {
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Custom') {
       map = map.set('collapsed', true);
@@ -390,7 +404,7 @@ class Store extends EventEmitter {
     }
   }
 
-  updateComponent(data: DataType) {
+  _updateComponent(data: DataType) {
     var node = this.get(data.id)
     if (!node) {
       return;
@@ -405,7 +419,7 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
-  unmountComponenent(id: ElementID) {
+  _unmountComponenent(id: ElementID) {
     var pid = this._parents.get(id);
     this._removeFromNodesByName(id);
     this._parents = this._parents.delete(id);

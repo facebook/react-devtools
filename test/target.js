@@ -1,3 +1,6 @@
+/**
+ * A TodoMVC++ app for trying out the inspector
+ */
 
 var React = require('react');
 var assign = require('object-assign');
