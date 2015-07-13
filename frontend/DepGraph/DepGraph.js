@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
+ * @ xxflow
  */
 'use strict';
 
@@ -44,7 +44,11 @@ class DisplayDeps {
     return (
       <div style={styles.container}>
         <div style={styles.scrollParent}>
-          <SvgGraph onHover={this.props.onHover} graph={this.props.graph} />
+          <SvgGraph
+            onHover={this.props.onHover}
+            onClick={this.props.onClick}
+            graph={this.props.graph}
+          />
         </div>
         <div style={styles.buttons}>
           <button onClick={this.props.onReload}>Reload</button>
@@ -84,6 +88,7 @@ class SvgGraph {
               <rect
                 onMouseOver={this.props.onHover.bind(null, node.label)}
                 onMouseOut={this.props.onHover.bind(null, null)}
+                onClick={this.props.onClick.bind(null, node.label)}
                 height={node.height}
                 width={node.width}
                 x={node.x - node.width/2}
@@ -196,6 +201,7 @@ var DepWrapper = decorate({
       selected: store.selected,
       graph: dagrize(graph),
       onHover: name => store.onHoverClass(name),
+      onClick: name => store.selectFirstOfClass(name),
     };
   }
 }, DisplayDeps);

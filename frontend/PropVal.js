@@ -6,7 +6,10 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
+ * @ xx flow
+ * $FLowFixMe
+ * - thinks all react component classes must inherit from React.Component
+ * - 
  */
 'use strict';
 
@@ -14,6 +17,27 @@ var React = require('react/addons');
 var consts = require('../backend/consts');
 var valueStyles = require('./value-styles');
 var flash = require('./flash');
+
+class PropVal {
+  props: {
+    val: any,
+    nested: boolean,
+  };
+  componentDidUpdate(prevProps: Object) {
+    if (this.props.val === prevProps.val) {
+      return;
+    }
+    if (this.props.val && prevProps.val && 'object' === typeof this.props.val && 'object' === typeof prevProps.val) {
+      return;
+    }
+    var node = React.findDOMNode(this);
+    flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
+  }
+
+  render(): ReactElement {
+    return previewProp(this.props.val, this.props.nested);
+  }
+}
 
 function previewProp(val: any, nested: boolean) {
   if ('number' === typeof val) {
@@ -60,23 +84,6 @@ function previewProp(val: any, nested: boolean) {
     return <span>{'{…}'}</span>;
   }
   return previewObject(val);
-}
-
-class PropVal {
-  componentDidUpdate(prevProps) {
-    if (this.props.val === prevProps.val) {
-      return;
-    }
-    if (this.props.val && prevProps.val && 'object' === typeof this.props.val && 'object' === typeof prevProps.val) {
-      return;
-    }
-    var node = React.findDOMNode(this);
-    flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
-  }
-
-  render() {
-    return previewProp(this.props.val, this.props.nested);
-  }
 }
 
 function previewArray(val) {

@@ -136,6 +136,12 @@ class Simple extends React.Component {
   }
 }
 
+Simple.propTypes = {
+  data: React.PropTypes.any,
+  path: React.PropTypes.array,
+  readOnly: React.PropTypes.bool,
+};
+
 Simple.contextTypes = {
   onChange: React.PropTypes.func.isRequired,
 }

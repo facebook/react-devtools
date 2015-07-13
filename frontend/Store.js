@@ -126,6 +126,20 @@ class Store extends EventEmitter {
     this._bridge.send('scrollToNode', id);
   }
 
+  // TODO(jared): get this working for react native
+  changeTextContent(id: ElementID, text: string): void {
+    this._bridge.send('changeTextContent', {id, text});
+    var node = this._nodes.get(id);
+    if (node.get('nodeType') === 'Text') {
+      this._nodes = this._nodes.set(id, node.set('text', text));
+    } else {
+      this._nodes = this._nodes.set(id, node.set('children', text));
+      var props = node.get('props');
+      props.children = text;
+    }
+    this.emit(id);
+  }
+
   onChangeSearch(text: string): void {
     var needle = text.toLowerCase();
     if (needle === this.searchText.toLowerCase()) {
@@ -180,6 +194,16 @@ class Store extends EventEmitter {
       return;
     }
     this._bridge.send('highlightMany', ids.toArray());
+  }
+
+  selectFirstOfClass(name: string): void {
+    var ids = this._nodesByName.get(name);
+    if (!ids || !ids.size) {
+      return;
+    }
+    var id = ids.toSeq().first()
+    this.revealDeep(id);
+    this.selectTop(id);
   }
 
   showContextMenu(type: string, evt: DOMEvent, ...args: Array<any>) {

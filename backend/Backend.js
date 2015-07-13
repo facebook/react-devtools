@@ -75,9 +75,11 @@ class Backend extends EventEmitter {
       }
     });
     this._prevSelected = null;
+    var isReactDOM = window.document && 'function' === typeof window.document.createElement;
     this.capabilities = assign({
-      scroll: window.document && 'function' === typeof window.document.createElement && 'function' === typeof window.document.body.scrollIntoView,
-      dom: window.document && 'function' === typeof window.document.createElement,
+      scroll: isReactDOM && 'function' === typeof window.document.body.scrollIntoView,
+      dom: isReactDOM,
+      editTextContent: isReactDOM,
     }, capabilities);
   }
 
@@ -105,6 +107,13 @@ class Backend extends EventEmitter {
     bridge.on('highlightMany', id => this.highlightMany(id));
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('changeTextContent', ({id, text}) => {
+      var node = this.getNodeForID(id);
+      if (!node) {
+        return;
+      }
+      node.textContent = text;
+    });
     bridge.on('shutdown', () => {
       this.emit('shutdown');
       if (this.reactInternals && this.reactInternals.removeDevtools) {

@@ -1,8 +1,20 @@
-/** @flow **/
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var React = require('react');
+var BlurInput = require('./BlurInput');
 var DataView = require('./data-view/DataView');
 var DepGraph = require('./DepGraph/DepGraph');
+
 var decorate = require('./decorate');
 
 class PropState extends React.Component {
@@ -16,16 +28,40 @@ class PropState extends React.Component {
 
   render() {
     if (!this.props.node) {
+      // TODO(jared): style this
       return <span>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
+
     if (nodeType === 'Text') {
+      if (this.props.canEditTextContent) {
+        return (
+          <div style={styles.container}>
+            <BlurInput
+              value={this.props.node.get('text')}
+              onChange={this.props.onChangeText}
+            />
+          </div>
+        );
+      }
       return (
         <div style={styles.container}>
           Text node (no props/state)
         </div>
       );
+    }
+
+    var editTextContent = null;
+    if (this.props.canEditTextContent) {
+      if ('string' === typeof this.props.node.get('children')) {
+        editTextContent = (
+          <BlurInput
+            value={this.props.node.get('children')}
+            onChange={this.props.onChangeText}
+          />
+        );
+      }
     }
 
     var state = this.props.node.get('state');
@@ -42,6 +78,7 @@ class PropState extends React.Component {
           {nodeType === 'Custom' &&
             <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
+        {editTextContent}
         <div style={styles.section}>
           <strong>Props</strong>
           {propsReadOnly && <em> read-only</em>}
@@ -105,6 +142,10 @@ var WrappedPropState = decorate({
     return {
       id: store.selected,
       node,
+      canEditTextContent: store.capabilities.editTextContent,
+      onChangeText(text) {
+        store.changeTextContent(store.selected, text);
+      },
       onChange(path, val) {
         if (path[0] === 'props') {
           store.setProps(store.selected, path.slice(1), val);

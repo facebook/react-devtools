@@ -14,6 +14,7 @@ var React = require('react');
 var PropVal = require('./PropVal');
 
 class Props {
+  props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
     if (nextProps === this.props) {
       return false;
