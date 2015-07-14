@@ -64,7 +64,7 @@ type ContextMenu = {
  * - selectTop(id)
  * - selectBottom(id)
  * - select(id)
- * 
+ *
  * Public methods:
  * - get(id) => Map (the node)
  * - getParent(id) => pid
@@ -384,7 +384,7 @@ class Store extends EventEmitter {
 
   _mountComponent(data: DataType) {
     var map = Map(data).set('renders', 1);
-    if (data.nodeType === 'Custom') {
+    if (data.nodeType === 'Composite') {
       map = map.set('collapsed', true);
     }
     this._nodes = this._nodes.set(data.id, map);

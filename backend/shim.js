@@ -48,7 +48,7 @@ type Backend = {
 };
 
 type DataType = {
-  nodeType: 'Native' | 'Wrapper' | 'Custom' | 'Text' | 'Unknown',
+  nodeType: 'Native' | 'Wrapper' | 'Composite' | 'Text',
   type: ?(string | Object),
   name: ?string,
   props: ?Object,
@@ -265,8 +265,11 @@ function getData(element): DataType {
     if ('string' === typeof type) {
       name = type;
     } else if (element.getName) {
-      nodeType = 'Custom';
-      name = element.getName() || 'Unknown';
+      nodeType = 'Composite';
+      name = element.getName();
+      if (name === null) {
+        nodeType = 'Wrapper';
+      }
     } else if (element._stringText) {
       nodeType = 'Text';
       text = element._stringText;

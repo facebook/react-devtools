@@ -66,7 +66,6 @@ class PropState extends React.Component {
 
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
-    var isCustom = this.props.node.get('nodeType') === 'Custom';
     var propsReadOnly = !this.props.node.get('canUpdate');
 
     return (
@@ -75,7 +74,7 @@ class PropState extends React.Component {
           <span style={styles.headerName}>
             &lt;{this.props.node.get('name')}&gt;
           </span>
-          {nodeType === 'Custom' &&
+          {nodeType === 'Composite' &&
             <span style={styles.consoleHint}>($r in the console)</span>}
         </div>
         {editTextContent}

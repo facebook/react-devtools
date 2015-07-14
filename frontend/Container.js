@@ -45,7 +45,7 @@ class Container {
         if (node.get('name')) {
           items.push({
             title: 'Show all ' + node.get('name'),
-            action: () => store.onChangeSearch(node.get('name')),
+            action: () => store.changeSearch(node.get('name')),
           });
         }
         if (store.capabilities.scroll) {

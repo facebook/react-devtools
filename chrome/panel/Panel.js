@@ -247,7 +247,7 @@ class Panel extends React.Component {
         reload={this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path, name) => {
-            if (!val || node.get('nodeType') !== 'Custom' || val[consts.type] !== 'function') {
+            if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
               return;
             }
             return [{
@@ -259,7 +259,7 @@ class Panel extends React.Component {
             }];
           },
           tree: (id, node) => {
-            return [node.get('nodeType') === 'Custom' && {
+            return [node.get('nodeType') === 'Composite' && {
               title: 'Show Source',
               action: () => this.viewSource(id),
             }, this._store.capabilities.dom && {

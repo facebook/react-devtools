@@ -7,7 +7,7 @@ function crawlChildren(ptype, children, nodes, depth, graph) {
   var keepCrawling = true;//depth < MAX_DEPTH;
   children.forEach(cid => {
     var child = nodes.get(cid);
-    var isCustom = child.get('nodeType') === 'Custom';
+    var isCustom = child.get('nodeType') === 'Composite';
     if (isCustom) {
       var name = child.get('name');
       if (!graph.nodes[name]) {

@@ -118,7 +118,7 @@ class Node {
       );
     }
 
-    var isCustom = node.get('nodeType') === 'Custom';
+    var isCustom = node.get('nodeType') === 'Composite';
 
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
 
