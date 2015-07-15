@@ -32,8 +32,7 @@ declare var chrome: {
  */
 
 chrome.devtools.inspectedWindow.eval(`!!(
-  window.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime ||
-  window.__REACT_DEVTOOLS_BACKEND__.attachDevTools
+  Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length
 )`, function (pageHasReact, err) {
   if (!pageHasReact) {
     return;

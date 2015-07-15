@@ -435,7 +435,7 @@ class Store extends EventEmitter {
     }
     if (id === this.selected) {
       var newsel = pid || this.roots.get(0);
-      this.selectTop(newsel);
+      this.selectTop(newsel, true);
     }
     if (this.searchRoots && this.searchRoots.contains(id)) {
       // $FlowFixMe flow things searchRoots might be null

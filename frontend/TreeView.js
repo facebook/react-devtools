@@ -88,8 +88,8 @@ var styles = {
   container: {
     padding: 3,
     overflow: 'auto',
-    fontFamily: 'monospace',
-    fontSize: '12px',
+    fontFamily: 'Menlo, monospace',
+    fontSize: '11px',
     flex: 1,
 
     WebkitUserSelect: 'none',

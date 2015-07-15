@@ -10,7 +10,7 @@
  */
 'use strict';
 
-var Backend = require('../backend/Backend');
+var Agent = require('../backend/Agent');
 var Bridge = require('../backend/Bridge');
 var Highlighter = require('../frontend/Highlighter/Highlighter');
 
@@ -27,7 +27,7 @@ var wall = {
 
 var bridge = new Bridge();
 bridge.attach(wall);
-var backend = new Backend(window);
+var backend = new Agent(window);
 backend.addBridge(bridge);
 
 inject(window, backend);

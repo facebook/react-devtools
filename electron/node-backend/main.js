@@ -2,7 +2,7 @@
 require('babel-core/register');
 require('./globals.js');
 
-var Backend = require('../../backend/Backend');
+var Agent = require('../../backend/Agent');
 var Bridge = require('../../backend/Bridge');
 
 var inject = require('../../backend/inject');
@@ -43,7 +43,7 @@ function setup(socket) {
 
   var bridge = new Bridge();
   bridge.attach(wall);
-  var backend = new Backend(window);
+  var backend = new Agent(window);
   backend.addBridge(bridge);
 
   bridge.onCall('rn:getStyle', id => {
@@ -86,4 +86,3 @@ server.on('connection', function (socket) {
   }
   setup(new JsonSocket(socket));
 });
-

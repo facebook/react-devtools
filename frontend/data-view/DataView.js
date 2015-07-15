@@ -81,12 +81,12 @@ class DataItem extends React.Component {
   }
 
   inspect() {
+    this.setState({loading: true, open: true});
     this.props.inspect(this.props.path, value => {
       assign(this.props.value, value);
       this.props.value[consts.inspected] = true;
       this.setState({loading: false});
     });
-    this.setState({loading: true, open: true});
   }
 
   toggleOpen() {
@@ -166,7 +166,7 @@ class DataItem extends React.Component {
             {this.props.name}:
           </div>
           <div
-            onContextMenu={e => this.props.showMenu(e, this.props.value, this.props.path, this.props.name)} 
+            onContextMenu={e => this.props.showMenu(e, this.props.value, this.props.path, this.props.name)}
             style={styles.preview}
           >
             {preview}

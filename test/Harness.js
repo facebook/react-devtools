@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react/addons');
-var compatInject = require('../backend/compatInject');
+var globalHook = require('../backend/GlobalHook');
 var Store = require('../frontend/Store');
 var keyboardNav = require('../frontend/keyboardNav');
 var Bridge = require('../backend/Bridge');
@@ -29,7 +29,7 @@ class Harness extends React.Component {
   }
 
   injectBackend(win) {
-    if (!win.__REACT_DEVTOOLS_BACKEND__.attachDevTools && !win.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime) {
+    if (!Object.keys(win.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length) {
       return console.warn("Looks like React wasn't loaded");
     }
 
@@ -68,7 +68,7 @@ class Harness extends React.Component {
       var win = iframe.contentWindow
       var doc = win.document;
 
-      compatInject(win);
+      globalHook(win);
 
       var script = doc.createElement('script');
       doc.head.appendChild(script);

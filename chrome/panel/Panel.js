@@ -93,7 +93,7 @@ class Panel extends React.Component {
     if (!this._bridge) {
       return;
     }
-    chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_BACKEND__.$0 = $0');
+    chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = $0');
     // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.send('checkSelection');
   }
@@ -105,7 +105,7 @@ class Panel extends React.Component {
     id = id || this._store.selected;
     this._bridge.send('putSelectedNode', id);
     setTimeout(() => {
-      chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_BACKEND__.$node)');
+      chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$node)');
     }, 100);
   }
 
@@ -127,7 +127,7 @@ class Panel extends React.Component {
     }
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
-      this.inspectComponent('__REACT_DEVTOOLS_BACKEND__.$inst');
+      this.inspectComponent('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst');
     }, 100);
   }
 

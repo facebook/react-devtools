@@ -10,10 +10,7 @@
  */
 'use strict';
 
-// Inject a `__REACT_DEVTOOLS_GLOBAL_HOOK__` global so that React can detect that the
-// devtools are installed (and skip its suggestion to install the devtools).
-
-function globalHook(window) {
+module.exports = function globalHook(window: Object) {
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: {
       _renderers: {},
@@ -54,14 +51,4 @@ function globalHook(window) {
     }
   });
 }
-
-var js = (
-  '(' + globalHook.toString() + '(window))'
-);
-
-// This script runs before the <head> element is created, so we add the script
-// to <html> instead.
-var script = document.createElement('script');
-script.textContent = js;
-document.documentElement.appendChild(script);
-script.parentNode.removeChild(script);
+window.globalHook = module.exports;

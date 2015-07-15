@@ -10,7 +10,7 @@
  */
 'use strict';
 
-var Backend = require('../backend/Backend');
+var Agent = require('../backend/Agent');
 var Bridge = require('../backend/Bridge');
 var Highlighter = require('../frontend/Highlighter/Highlighter');
 
@@ -53,42 +53,44 @@ function setup() {
     },
   };
 
-  var RN_STYLE = !!window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle;
+  var RN_STYLE = !!window.__REACT_DEVTOOLS_GLOBAL_HOOK__.resolveRNStyle;
 
   var bridge = new Bridge();
   bridge.attach(wall);
-  var backend = new Backend(window, {
+  var agent = new Agent(window, {
     rnStyle: RN_STYLE,
   });
-  backend.addBridge(bridge);
+  agent.addBridge(bridge);
   var hl;
+  var subs = [];
 
-  backend.once('connected', () => {
-    inject(window, backend);
-    window.__REACT_DEVTOOLS_BACKEND__._startupListeners.forEach(fn => fn(backend));
+  agent.once('connected', () => {
+    subs = inject(window, agent);
+    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('react-devtools', agent);
   });
 
   if (RN_STYLE) {
     console.log('has rn style');
     bridge.onCall('rn:getStyle', id => {
-      var node = backend.nodes.get(id);
+      var node = agent.nodes.get(id);
       if (!node) {
         return null;
       }
       var style = node.props.style;
-      return window.__REACT_DEVTOOLS_BACKEND__.resolveRNStyle(style);
+      return window.__REACT_DEVTOOLS_GLOBAL_HOOK__.resolveRNStyle(style);
     });
     bridge.on('rn:setStyle', ({id, attr, val}) => {
       console.log('setting rn style', id, attr, val);
-      var comp = backend.comps.get(id);
+      var comp = agent.comps.get(id);
       comp.getPublicInstance().setNativeProps({[attr]: val});
     });
   }
 
-  backend.on('shutdown', () => {
+  agent.on('shutdown', () => {
     listeners.forEach(fn => {
       window.removeEventListener('message', fn);
     });
+    subs.forEach(fn => fn());
     listeners = [];
     if (hl) {
       hl.remove();
@@ -97,11 +99,11 @@ function setup() {
 
   if (window.document && window.document.createElement) {
     hl = new Highlighter(window, node => {
-      backend.selectFromDOMNode(node);
+      agent.selectFromDOMNode(node);
     });
     // $FlowFixMe flow things hl might be undefined
-    backend.on('highlight', data => hl.highlight(data.node, data.name));
-    backend.on('highlightMany', nodes => hl.highlightMany(nodes));
-    backend.on('hideHighlight', () => hl.hideHighlight());
+    agent.on('highlight', data => hl.highlight(data.node, data.name));
+    agent.on('highlightMany', nodes => hl.highlightMany(nodes));
+    agent.on('hideHighlight', () => hl.hideHighlight());
   }
 }

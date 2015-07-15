@@ -195,7 +195,7 @@ class Filter {
             onClick={this.props.onFilter.bind(null, text)}
           >{text}</button>
         ))}
-        <button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>
+        {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
       </div>
     );
   }
@@ -289,7 +289,7 @@ class Something {
   doot() {
     return 10;
   }
-} 
+}
 
 var someVal = new Something();
 someVal.awesome = 2;
@@ -378,4 +378,3 @@ class Target extends React.Component {
 var node = document.createElement('div');
 document.body.appendChild(node)
 React.render(<Wrap more={['a',2,'c',4]} str="thing" awesome={1}/>, node);
-

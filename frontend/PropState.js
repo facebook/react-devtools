@@ -165,8 +165,8 @@ var WrappedPropState = decorate({
 var styles = {
   container: {
     padding: 3,
-    fontSize: '12px',
-    fontFamily: 'monospace',
+    fontSize: '11px',
+    fontFamily: 'Menlo, monospace',
     overflow: 'auto',
     flex: 1,
     display: 'flex',
