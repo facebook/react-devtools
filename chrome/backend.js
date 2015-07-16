@@ -7,7 +7,6 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @flow
- * see $FlowFixMe
  */
 'use strict';
 
@@ -81,8 +80,7 @@ function setup(hook) {
       console.log('setting rn style', id, attr, val);
       var data = agent.elementData.get(id);
       // $FlowFixMe "computed property keys not supported"
-      var newStyle = {}; // {[attr]: val};
-      newStyle[attr] = val;
+      var newStyle = {[attr]: val};
       if (!data.updater || !data.updater.setInProps) {
         var el:Object = agent.reactElements.get(id);
         if (el.setNativeProps) {
@@ -125,7 +123,7 @@ function setup(hook) {
       agent.selectFromDOMNode(node);
     });
     // $FlowFixMe flow thinks hl might be undefined
-    agent.on('highlight', data => hl && hl.highlight(data.node, data.name));
+    agent.on('highlight', data => hl.highlight(data.node, data.name));
     agent.on('highlightMany', nodes => hl && hl.highlightMany(nodes));
     agent.on('hideHighlight', () => hl && hl.hideHighlight());
   }

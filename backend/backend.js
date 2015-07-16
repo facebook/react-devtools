@@ -31,9 +31,6 @@ var attachRenderer = require('./attachRenderer');
  * Normal names
  */
 module.exports = function setupBackend(hook: Hook): boolean {
-  if (!hook) {
-    return false;
-  }
   for (var id in hook._renderers) {
     hook.helpers[id] = attachRenderer(hook, id, hook._renderers[id]);
     hook.emit('renderer-attached', {id, renderer: hook._renderers[id], helpers: hook.helpers[id]});

@@ -89,23 +89,23 @@ function getData(element: OpaqueReactElement): DataType {
   };
 }
 
-function setInProps(inst, path: Array<string>, value: any) {
+function setInProps(inst, path: Array<string | number>, value: any) {
   inst.props = copyWithSet(inst.props, path, value);
   // setIn(inst.props, path, value);
   inst.forceUpdate();
 }
 
-function setInState(inst, path: Array<string>, value: any) {
+function setInState(inst, path: Array<string | number>, value: any) {
   setIn(inst.state, path, value);
   inst.forceUpdate();
 }
 
-function setInContext(inst, path: Array<string>, value: any) {
+function setInContext(inst, path: Array<string | number>, value: any) {
   setIn(inst.context, path, value);
   inst.forceUpdate();
 }
 
-function setIn(obj: Object, path: Array<string>, value: any) {
+function setIn(obj: Object, path: Array<string | number>, value: any) {
   var last = path.pop();
   var parent = path.reduce((obj, attr) => obj ? obj[attr] : null, obj);
   if (parent) {
@@ -113,11 +113,12 @@ function setIn(obj: Object, path: Array<string>, value: any) {
   }
 }
 
-function copyWithSet(obj: Object, path: Array<string>, value: any) {
+function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any) {
   var newObj = {};
   var curObj = newObj;
   var last = path.pop();
   var cancelled = path.some(attr => {
+    // $FlowFixMe
     if (!obj[attr]) {
       return true;
     }
@@ -139,21 +140,27 @@ function copyWithSet(obj: Object, path: Array<string>, value: any) {
           if (Array.isArray(obj[attr])) {
             next = [];
           }
+          // $FlowFixMe number or string is fine here
           curObj[name] = next;
         } else {
+          // $FlowFixMe number or string is fine here
           curObj[name] = obj[name];
         }
       }
     }
     curObj = next;
+    // $FlowFixMe number or string is fine here
     obj = obj[attr];
   });
   if (!cancelled) {
-    for (var name in obj) {
-      if (name === last) {
-        curObj[name] = value;
-      } else {
-        curObj[name] = obj[name];
+    if (Array.isArray(obj)) {
+    } else {
+      for (var name in obj) {
+        if (name === last) {
+          curObj[name] = value;
+        } else {
+          curObj[name] = obj[name];
+        }
       }
     }
   }

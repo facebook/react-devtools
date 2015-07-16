@@ -11,9 +11,9 @@
 'use strict';
 
 import type {DataType, OpaqueReactElement, NativeType, Hook, ReactRenderer, Helpers} from './types';
+var getData = require('./getData');
 
 type NodeLike = {};
-var getData = require('./getData');
 
 function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   var rootNodeIDMap = new Map();
@@ -59,8 +59,6 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     });
   // React Native
   } else if (renderer.Mount.renderComponent) {
-    // $FlowFixMe flow doesn't understand that renderer.Mount has
-    // renderComponent in this branch
     oldRenderComponent = decorateResult(renderer.Mount, 'renderComponent', element => {
       hook.emit('root', {renderer: rid, element: element._reactInternalInstance});
     });

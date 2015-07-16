@@ -13,8 +13,7 @@
 var React = require('react');
 import type {DOMNode, DOMEvent} from './types'
 
-// $FlowFixMe the "extends React.Component" is just to help flow
-class Draggable extends React.Component {
+class Draggable {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
   props: Object;

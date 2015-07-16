@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow see $FlowFixMe
+ * @flow
  */
 
 var React = require('react');
@@ -101,9 +101,7 @@ class Panel extends React.Component {
     }
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = $0');
     // $FlowFixMe flow thinks `this._bridge` might be null
-    if (this._bridge) {
-      this._bridge.send('checkSelection');
-    }
+    this._bridge.send('checkSelection');
   }
 
   sendSelection(id: string) {
@@ -199,9 +197,7 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge();
       // $FlowFixMe flow thinks `this._bridge` might be null
-      if (this._bridge) {
-        this._bridge.attach(wall);
-      }
+      this._bridge.attach(wall);
 
       this._store = new Store(this._bridge);
       this._keyListener = keyboardNav(this._store, window);
@@ -253,6 +249,7 @@ class Panel extends React.Component {
       return <span>Looking for react...</span>;
     }
     return (
+      // $FlowFixMe flow thinks Container needs to extend React.Component
       <Container
         reload={this.reload.bind(this)}
         menuItems={{

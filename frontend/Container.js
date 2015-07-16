@@ -20,8 +20,7 @@ var consts = require('../agent/consts');
 
 import type MenuItem from './ContextMenu';
 
-// $FlowFixMe flow things this needs to extend React.Component
-class Container extends React.Component {
+class Container {
   props: {
     reload: () => void,
     win: Object,
