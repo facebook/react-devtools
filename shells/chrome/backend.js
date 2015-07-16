@@ -61,7 +61,6 @@ function setup(hook) {
     rnStyle: RN_STYLE,
   });
   agent.addBridge(bridge);
-  var hl;
 
   agent.once('connected', () => {
     inject(hook, agent);
@@ -107,6 +106,7 @@ function setup(hook) {
     });
   }
 
+  var hl;
   agent.on('shutdown', () => {
     hook.emit('shutdown');
     listeners.forEach(fn => {
@@ -124,7 +124,9 @@ function setup(hook) {
     });
     // $FlowFixMe flow thinks hl might be undefined
     agent.on('highlight', data => hl.highlight(data.node, data.name));
-    agent.on('highlightMany', nodes => hl && hl.highlightMany(nodes));
-    agent.on('hideHighlight', () => hl && hl.hideHighlight());
+    // $FlowFixMe flow thinks hl might be undefined
+    agent.on('highlightMany', nodes => hl.highlightMany(nodes));
+    // $FlowFixMe flow thinks hl might be undefined
+    agent.on('hideHighlight', () => hl.hideHighlight());
   }
 }

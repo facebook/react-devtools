@@ -50,5 +50,6 @@ module.exports = function (hook: Object, agent: Agent) {
   hook.reactDevtoolsAgent = agent;
   agent.on('shutdown', () => {
     subs.forEach(fn => fn());
+    hook.reactDevtoolsAgent = null;
   });
 }
