@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
  */
 'use strict';
 
@@ -20,8 +20,15 @@ declare var performance: {
 
 type AnyFn = (...x: any) => any;
 type Wall = {
-  listen: (fn: (data: any) => void) => void,
-  send: (data: any) => void,
+  listen: (fn: (data: PayloadType) => void) => void,
+  send: (data: PayloadType) => void,
+};
+
+type EventPayload = {
+  type: 'event',
+  cleaned: ?Array<Array<string>>,
+  evt: string,
+  data: any,
 };
 
 // $FlowFixMe disjoint unions don't seem to be working
@@ -32,32 +39,28 @@ type PayloadType = {
   callback: number,
 } | {
   type: 'many-events',
-  events: Array<Object>,
+  events: Array<EventPayload>,
 } | {
   type: 'call',
   name: string,
+  args: Array<any>,
   callback: number,
 } | {
   type: 'callback',
   id: string,
-  args: [Object, Object, Object, Object], // Array<Object>,
-} | {
-  type: 'event',
-  cleaned: ?Array<Array<string>>,
-  evt: string,
-  data: any,
-};
+  args: Array<any>,
+} | EventPayload;
 
 class Bridge {
-  _buffer: Array<Object>;
+  _buffer: Array<{evt: string, data: any}>;
   _cbs: Map;
   _cid: number;
   _inspectables: Map;
   _lastTime: number;
-  _listeners: Object;
+  _listeners: {[key: string]: Array<(data: any) => void>};
   _waiting: ?number;
-  _wall: Object;
-  _callers: Object;
+  _wall: Wall;
+  _callers: {[key: string]: AnyFn};
 
   constructor() {
     this._cbs = new Map();
@@ -193,8 +196,7 @@ class Bridge {
   _handleMessage(payload: PayloadType) {
     var type = payload.type;
     if (payload.type === 'callback') {
-      var [data, cleaned, proto, protoclean] = payload.args;
-      this._cbs.get(payload.id)(data, cleaned, proto, protoclean);
+      this._cbs.get(payload.id)(...payload.args);
       this._cbs.delete(payload.id);
       return;
     }
@@ -216,6 +218,7 @@ class Bridge {
       }
       var fns = this._listeners[payload.evt]
       if (fns) {
+        // $FlowFixMe tagged unions not valid inside function?
         fns.forEach(fn => fn(payload.data));
       }
     }
@@ -234,7 +237,7 @@ class Bridge {
     }
   }
 
-  _handleCall(name, args, callback) {
+  _handleCall(name: string, args: Array<any>, callback: number) {
     if (!this._callers[name]) {
       return console.warn('unknown call');
     }

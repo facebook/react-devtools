@@ -6,7 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow
+ * @flow
  *
  * flow disabled because of the following bug:
  * possibly undefined value
@@ -19,7 +19,7 @@ var {Map, Set, List} = require('./imm');
 var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 
-import type Bridge from '../backend/Bridge'
+import type * as Bridge from '../agent/Bridge'
 import type {DOMNode, DOMEvent, Dir, Dest} from './types'
 
 type ElementID = string;
@@ -397,8 +397,6 @@ class Store extends EventEmitter {
     this._nodesByName = this._nodesByName.set(data.name, curNodes.add(data.id));
     this.emit(data.id);
     if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase())) {
-      // $FlowFixMe - flow things this might still be null (but it's not b/c
-      // of line 271)
       this.searchRoots = this.searchRoots.push(data.id);
       this.emit('searchRoots');
     }

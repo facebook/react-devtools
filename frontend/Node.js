@@ -6,9 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow
- * $FLowFixMe
- * - thinks all react component classes must inherit from React.Component
+ * @flow
  */
 'use strict';
 
@@ -132,6 +130,7 @@ class Node {
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 <span style={tagStyle}>&lt;{name}</span>
+                {/* $FlowFixMe doesn't need to inherit from React.Component */}
                 {node.get('props') && <Props props={node.get('props')}/>}
                 {!content && '/'}
                 <span style={tagStyle}>&gt;</span>
@@ -184,6 +183,7 @@ class Node {
         <span style={styles.tagText}>
           <span style={styles.openTag}>
             <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
+            {/* $FlowFixMe doesn't need to inherit from React.Component */}
             {node.get('props') && <Props props={node.get('props')}/>}
             <span style={tagStyle}>&gt;</span>
           </span>

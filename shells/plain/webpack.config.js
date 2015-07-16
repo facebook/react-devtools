@@ -1,10 +1,13 @@
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
-  entry: './simple.js',
+  entry: {
+    backend: './backend.js',
+    container: './container.js',
+  },
   output: {
     path: __dirname + '/build',
-    filename: 'simple.js',
+    filename: '[name].js',
   },
 
   module: {
@@ -14,11 +17,6 @@ module.exports = {
       exclude: [
         'node_modules',
       ],
-      /*
-    }, {
-      test: /\.json$/,
-      loader: 'json-loader',
-      */
     }]
   },
 }

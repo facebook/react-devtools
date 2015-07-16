@@ -6,17 +6,17 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow
+ * @ xx flow unused at the moment
  */
 'use strict';
 
 var React = require('react');
-var decorate = require('../decorate');
+var decorate = require('../../frontend/decorate');
 var crawlChildren = require('./crawlChildren');
 var dagre = require('dagre');
 
 class DepGraph extends React.Component {
-  constructor(props) {
+  constructor(props: Object) {
     super(props);
     this.state = {renderCount: 0};
   }
@@ -35,6 +35,7 @@ class DepGraph extends React.Component {
 }
 
 class DisplayDeps {
+  props: Object;
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected !== this.props.selected) {
       return this.props.onClose()
@@ -44,6 +45,7 @@ class DisplayDeps {
     return (
       <div style={styles.container}>
         <div style={styles.scrollParent}>
+          {/* $FlowFixMe doesn't need to inherit from React.Component */}
           <SvgGraph
             onHover={this.props.onHover}
             onClick={this.props.onClick}
@@ -60,6 +62,7 @@ class DisplayDeps {
 }
 
 class SvgGraph {
+  props: Object;
   render() {
     var graph = this.props.graph;
     if (!graph) {

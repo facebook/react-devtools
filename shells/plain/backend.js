@@ -10,11 +10,11 @@
  */
 'use strict';
 
-var Agent = require('../agent/Agent');
-var Bridge = require('../agent/Bridge');
-var Highlighter = require('../frontend/Highlighter/Highlighter');
+var Agent = require('../../agent/Agent');
+var Bridge = require('../../agent/Bridge');
+var Highlighter = require('../../frontend/Highlighter/Highlighter');
 
-var inject = require('../agent/inject');
+var inject = require('../../agent/inject');
 
 var wall = {
   listen(fn) {

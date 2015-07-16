@@ -6,14 +6,11 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow $FlowFixMe
- * Broken:
- * - not recognizing assignment to cancel out the "possibly null value"
- * - not understanding document.createElement
+ * @flow
  */
 'use strict';
 
-import type {DOMNode, DOMEvent} from './types'
+import type {DOMNode, DOMEvent} from '../types'
 import Overlay from './Overlay'
 import MultiOverlay from './MultiOverlay'
 
@@ -21,12 +18,12 @@ class Highlighter {
   _overlay: ?Overlay;
   _multiOverlay: ?MultiOverlay;
   _win: Object;
-  _onSelect: () => void;
+  _onSelect: (node: DOMNode) => void;
   _inspecting: boolean;
   _subs: Array<() => void>;
   _button: DOMNode;
 
-  constructor(win: Object, onSelect: (node: Object) => void) {
+  constructor(win: Object, onSelect: (node: DOMNode) => void) {
     this._win = win;
     this._onSelect = onSelect;
     this._overlay = null;
@@ -60,6 +57,7 @@ class Highlighter {
     if (!this._overlay) {
       this._overlay = new Overlay(this._win);
     }
+    // $FlowFixMe this._overlay is clearly not null at this point
     this._overlay.inspect(node, name);
   }
 
@@ -68,6 +66,7 @@ class Highlighter {
     if (!this._multiOverlay) {
       this._multiOverlay = new MultiOverlay(this._win);
     }
+    // $FlowFixMe this._multiOverlay is clearly not null at this point
     this._multiOverlay.highlightMany(nodes);
   }
 
@@ -138,7 +137,7 @@ function captureSubscription(obj, evt, cb) {
 }
 
 function makeMagnifier() {
-  var button = document.createElement('button');
+  var button = window.document.createElement('button');
   button.innerHTML = '&#128269;';
   button.style.backgroundColor = 'transparent';
   button.style.border = 'none';

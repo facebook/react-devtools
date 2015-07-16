@@ -1,10 +1,13 @@
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
-  entry: './target.js',
+  entry: {
+    target: './target.js',
+    sink: './sink.js',
+  },
   output: {
     path: __dirname + '/build',
-    filename: 'target.js',
+    filename: '[name].js',
   },
 
   module: {
@@ -14,11 +17,6 @@ module.exports = {
       exclude: [
         'node_modules',
       ],
-      /*
-    }, {
-      test: /\.json$/,
-      loader: 'json-loader',
-      */
     }]
   },
 }

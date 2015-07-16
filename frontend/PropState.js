@@ -12,8 +12,7 @@
 
 var React = require('react');
 var BlurInput = require('./BlurInput');
-var DataView = require('./data-view/DataView');
-var DepGraph = require('./DepGraph/DepGraph');
+var DataView = require('./DataView/DataView');
 
 var decorate = require('./decorate');
 
@@ -81,6 +80,7 @@ class PropState extends React.Component {
         <div style={styles.section}>
           <strong>Props</strong>
           {propsReadOnly && <em> read-only</em>}
+          {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
           <DataView
             path={['props']}
             readOnly={propsReadOnly}
@@ -93,6 +93,7 @@ class PropState extends React.Component {
         {state &&
           <div style={styles.section}>
             <strong>State</strong>
+            {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
             <DataView
               data={state}
               path={['state']}
@@ -104,6 +105,7 @@ class PropState extends React.Component {
         {context &&
           <div style={styles.section}>
             <strong>Context</strong>
+            {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
             <DataView
               data={context}
               path={['context']}
@@ -114,7 +116,6 @@ class PropState extends React.Component {
           </div>}
         {this.props.extraPanes &&
           this.props.extraPanes.map(fn => fn(this.props.node, this.props.id))}
-        <DepGraph />
       </div>
     );
   }

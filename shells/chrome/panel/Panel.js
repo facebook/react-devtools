@@ -10,17 +10,17 @@
  */
 
 var React = require('react');
-var Bridge = require('../../agent/Bridge');
-var Container = require('../../frontend/Container');
-var NativeStyler = require('./NativeStyler');
-var Store = require('../../frontend/Store');
-var keyboardNav = require('../../frontend/keyboardNav');
+var Bridge = require('../../../agent/Bridge');
+var Container = require('../../../frontend/Container');
+var NativeStyler = require('../../../plugins/ReactNativeStyle/ReactNativeStyle.js');
+var Store = require('../../../frontend/Store');
+var keyboardNav = require('../../../frontend/keyboardNav');
 
-var check = require('./check');
-var consts = require('../../agent/consts');
+var checkForReact = require('./checkForReact');
+var consts = require('../../../agent/consts');
 var inject = require('./inject');
 
-import type {DOMEvent} from '../../frontend/types';
+import type {DOMEvent} from '../../../frontend/types';
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -105,9 +105,10 @@ class Panel extends React.Component {
   }
 
   sendSelection(id: string) {
-    if (!this._bridge) {
+    if (!this._bridge || (!id && !this._store.selected)) {
       return;
     }
+    // $FlowFixMe - either id or this._store.selected is not null
     id = id || this._store.selected;
     this._bridge.send('putSelectedNode', id);
     setTimeout(() => {
@@ -199,7 +200,10 @@ class Panel extends React.Component {
       // $FlowFixMe flow thinks `this._bridge` might be null
       this._bridge.attach(wall);
 
-      this._store = new Store(this._bridge);
+      // xx FlowFixMe this._bridge is not null
+      if (this._bridge) {
+        this._store = new Store(this._bridge);
+      }
       this._keyListener = keyboardNav(this._store, window);
 
       window.addEventListener('keydown', this._keyListener);
@@ -224,7 +228,7 @@ class Panel extends React.Component {
   }
 
   lookForReact() {
-    check(isReact => {
+    checkForReact(isReact => {
       if (isReact) {
         this.setState({isReact: true, loading: true});
         this.inject();

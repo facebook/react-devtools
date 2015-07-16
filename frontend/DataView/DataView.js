@@ -6,9 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow $FlowFixMe
- * flow thinks that only subclasses of React.Component can be used as
- * ReactComponents.
+ * @flow
  */
 'use strict';
 
@@ -140,6 +138,7 @@ class DataItem extends React.Component {
       // TODO path
       children = (
         <div style={styles.children}>
+          {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
           <DataView
             data={this.props.value}
             path={this.props.path}
