@@ -10,9 +10,6 @@
  */
 'use strict';
 
-// this file is not transpiled
-
-/*::
 type Panel = {
   onShown: {
     addListener: (cb: (window: Object) => void) => void,
@@ -29,7 +26,6 @@ declare var chrome: {
     },
   },
 };
- */
 
 chrome.devtools.inspectedWindow.eval(`!!(
   Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length

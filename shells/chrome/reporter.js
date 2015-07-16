@@ -10,10 +10,6 @@
  */
 'use strict';
 
-// this file is not compiled
-
-/*::
-
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
 }
@@ -42,8 +38,6 @@ declare var chrome: {
     connect: (config: Object) => Port,
   },
 };
-
-*/
 
 // proxy from main page to devtools (via the background page)
 var port = chrome.runtime.connect({
