@@ -14,7 +14,7 @@ var React = require('react/addons');
 var globalHook = require('../backend/GlobalHook');
 var Store = require('../frontend/Store');
 var keyboardNav = require('../frontend/keyboardNav');
-var Bridge = require('../backend/Bridge');
+var Bridge = require('../agent/Bridge');
 
 class Harness extends React.Component {
   constructor(props: Object) {

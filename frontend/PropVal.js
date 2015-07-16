@@ -6,18 +6,18 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow
+ * @flow
  * $FLowFixMe
  * - thinks all react component classes must inherit from React.Component
  */
 'use strict';
 
 var React = require('react/addons');
-var consts = require('../backend/consts');
+var consts = require('../agent/consts');
 var valueStyles = require('./value-styles');
 var flash = require('./flash');
 
-class PropVal {
+class PropVal extends React.Component {
   props: {
     val: any,
     nested: boolean,

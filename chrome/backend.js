@@ -6,15 +6,16 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
+ * see $FlowFixMe
  */
 'use strict';
 
-var Agent = require('../backend/Agent');
-var Bridge = require('../backend/Bridge');
+var Agent = require('../agent/Agent');
+var Bridge = require('../agent/Bridge');
 var Highlighter = require('../frontend/Highlighter/Highlighter');
 
-var inject = require('../backend/inject');
+var inject = require('../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
@@ -28,10 +29,10 @@ function welcome(evt) {
   }
 
   window.removeEventListener('message', welcome);
-  setup()
+  setup(window.__REACT_DEVTOOLS_GLOBAL_HOOK__)
 }
 
-function setup() {
+function setup(hook) {
   var listeners = [];
 
   var wall = {
@@ -53,7 +54,7 @@ function setup() {
     },
   };
 
-  var RN_STYLE = !!window.__REACT_DEVTOOLS_GLOBAL_HOOK__.resolveRNStyle;
+  var RN_STYLE = !!hook.resolveRNStyle;
 
   var bridge = new Bridge();
   bridge.attach(wall);
@@ -62,27 +63,36 @@ function setup() {
   });
   agent.addBridge(bridge);
   var hl;
-  var subs = [];
 
   agent.once('connected', () => {
-    subs = inject(window, agent);
-    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('react-devtools', agent);
+    inject(hook, agent);
   });
 
   if (RN_STYLE) {
-    console.log('has rn style');
     bridge.onCall('rn:getStyle', id => {
-      var node = agent.nodes.get(id);
-      if (!node) {
+      var node = agent.elementData.get(id);
+      if (!node || !node.props) {
         return null;
       }
       var style = node.props.style;
-      return window.__REACT_DEVTOOLS_GLOBAL_HOOK__.resolveRNStyle(style);
+      return hook.resolveRNStyle(style);
     });
     bridge.on('rn:setStyle', ({id, attr, val}) => {
       console.log('setting rn style', id, attr, val);
-      var comp = agent.comps.get(id);
-      comp.getPublicInstance().setNativeProps({[attr]: val});
+      var data = agent.elementData.get(id);
+      if (!data.updater || !data.updater.setInProps) {
+        return;
+      }
+      var style = data.props && data.props.style;
+      // $FlowFixMe "computed property keys not supported"
+      var newStyle = {}; // {[attr]: val};
+      newStyle[attr] = val;
+      if (Array.isArray(style)) {
+        style = style.concat([newStyle]);
+      } else {
+        style = [style, newStyle];
+      }
+      data.updater.setInProps(['style'], style);
     });
   }
 
@@ -90,7 +100,6 @@ function setup() {
     listeners.forEach(fn => {
       window.removeEventListener('message', fn);
     });
-    subs.forEach(fn => fn());
     listeners = [];
     if (hl) {
       hl.remove();
@@ -102,8 +111,8 @@ function setup() {
       agent.selectFromDOMNode(node);
     });
     // $FlowFixMe flow things hl might be undefined
-    agent.on('highlight', data => hl.highlight(data.node, data.name));
-    agent.on('highlightMany', nodes => hl.highlightMany(nodes));
-    agent.on('hideHighlight', () => hl.hideHighlight());
+    agent.on('highlight', data => hl && hl.highlight(data.node, data.name));
+    agent.on('highlightMany', nodes => hl && hl.highlightMany(nodes));
+    agent.on('hideHighlight', () => hl && hl.hideHighlight());
   }
 }

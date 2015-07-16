@@ -11,12 +11,18 @@
 'use strict';
 
 var consts = require('./consts');
+var hydrate = require('./hydrate');
+var sanitize = require('./sanitize');
 
 declare var performance: {
   now: () => number,
 };
 
 type AnyFn = (...x: any) => any;
+type Wall = {
+  listen: (fn: (data: any) => void) => void,
+  send: (data: any) => void,
+};
 
 // $FlowFixMe disjoint unions don't seem to be working
 type PayloadType = {
@@ -64,7 +70,7 @@ class Bridge {
     this._callers = {};
   }
 
-  attach(wall: Object) {
+  attach(wall: Wall) {
     this._wall = wall
     this._wall.listen(this._handleMessage.bind(this));
   }
@@ -290,68 +296,6 @@ class Bridge {
     });
   }
 
-}
-
-function hydrate(data, cleaned) {
-  cleaned.forEach(path => {
-    var last = path.pop();
-    var obj = path.reduce((obj, attr) => obj ? obj[attr] : null, data);
-    if (!obj || !obj[last]) {
-      return;
-    }
-    var replace = {};
-    replace[consts.name] = obj[last].name;
-    replace[consts.type] = obj[last].type;
-    replace[consts.meta] = obj[last].meta;
-    replace[consts.inspected] = false;
-    obj[last] = replace;
-  });
-}
-
-function sanitize(data: Object, path: Array<string>, cleaned: Array<Array<string>>, level?: number) {
-  level = level || 0;
-  if ('function' === typeof data) {
-    cleaned.push(path);
-    return {
-      name: data.name,
-      type: 'function',
-    };
-  }
-  if (!data || 'object' !== typeof data) {
-    if ('string' === typeof data && data.length > 500) {
-      return data.slice(0, 500) + '...';
-    }
-    return data;
-  }
-  if (data._reactFragment) {
-    return 'A react fragment';
-  }
-  if (level > 2) {
-    cleaned.push(path);
-    return {
-      type: Array.isArray(data) ? 'array' : 'object',
-      name: 'Object' === data.constructor.name ? '' : data.constructor.name,
-      meta: {
-        length: data.length,
-      },
-    }
-  }
-  if (Array.isArray(data)) {
-    return data.map((item, i) => sanitize(item, path.concat([i]), cleaned, level + 1));
-  }
-  // TODO when this is in the iframe window, we can just use Object
-  if (data.constructor && 'function' === typeof data.constructor && data.constructor.name !== 'Object') {
-    cleaned.push(path);
-    return {
-      name: data.constructor.name,
-      type: 'object',
-    };
-  }
-  var res = {};
-  for (var name in data) {
-    res[name] = sanitize(data[name], path.concat([name]), cleaned, level + 1);
-  }
-  return res;
 }
 
 function getIn(obj, path) {

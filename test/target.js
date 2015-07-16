@@ -309,14 +309,14 @@ class Wrap extends React.Component {
       <span val={null}/>
       <span val={undefined}/>
       <div>&lt;</div>*/}
-     <OldStyle/>
+     <OldStyle awesome={2}/>
     </div>
   }
 }
 
 var OldStyle = React.createClass({
   render() {
-    return <span>OldStyle</span>
+    return <span>OldStyle {this.props.awesome}</span>
   }
 });
 

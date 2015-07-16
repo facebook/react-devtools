@@ -10,11 +10,11 @@
  */
 'use strict';
 
-var Agent = require('../backend/Agent');
-var Bridge = require('../backend/Bridge');
+var Agent = require('../agent/Agent');
+var Bridge = require('../agent/Bridge');
 var Highlighter = require('../frontend/Highlighter/Highlighter');
 
-var inject = require('../backend/inject');
+var inject = require('../agent/inject');
 
 var wall = {
   listen(fn) {
@@ -30,7 +30,7 @@ bridge.attach(wall);
 var backend = new Agent(window);
 backend.addBridge(bridge);
 
-inject(window, backend);
+inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend);
 
 var hl = new Highlighter(window, node => {
   backend.selectFromDOMNode(node);

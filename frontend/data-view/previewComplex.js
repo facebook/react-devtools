@@ -12,7 +12,7 @@
 
 var React = require('react');
 
-var consts = require('../../backend/consts');
+var consts = require('../../agent/consts');
 var valueStyles = require('../value-styles');
 
 function previewComplex(data: Object) {
