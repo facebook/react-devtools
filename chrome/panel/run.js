@@ -21,5 +21,5 @@ function reload() {
   React.render(<Panel reload={reload} />, node);
 }
 
-React.render(<Panel reload={reload} />, node);
+React.render(<Panel alreadyFoundReact={true} reload={reload} />, node);
 

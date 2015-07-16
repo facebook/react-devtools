@@ -6,19 +6,21 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow see $FlowFixMe
  */
 
 var React = require('react');
-var Bridge = require('../../backend/Bridge');
+var Bridge = require('../../agent/Bridge');
 var Container = require('../../frontend/Container');
 var NativeStyler = require('./NativeStyler');
 var Store = require('../../frontend/Store');
 var keyboardNav = require('../../frontend/keyboardNav');
 
 var check = require('./check');
-var consts = require('../../backend/consts');
+var consts = require('../../agent/consts');
 var inject = require('./inject');
+
+import type {DOMEvent} from '../../frontend/types';
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -51,7 +53,7 @@ declare var chrome: {
 
 class Panel extends React.Component {
   _port: ?Port;
-  _keyListener: ?() => void;
+  _keyListener: ?(e: DOMEvent) => void;
   _checkTimeout: ?number;
   _unMounted: boolean;
   _bridge: ?Bridge;
@@ -59,7 +61,7 @@ class Panel extends React.Component {
 
   constructor(props: Object) {
     super(props)
-    this.state = {loading: true, isReact: true};
+    this.state = {loading: true, isReact: this.props.alreadyFoundReact};
     this._unMounted = false;
     window.panel = this;
   }
@@ -71,7 +73,11 @@ class Panel extends React.Component {
   }
 
   componentDidMount() {
-    this.inject();
+    if (this.props.alreadyFoundReact) {
+      this.inject();
+    } else {
+      this.lookForReact();
+    }
 
     chrome.devtools.network.onNavigated.addListener(() => {
       this.reload();
@@ -95,7 +101,9 @@ class Panel extends React.Component {
     }
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = $0');
     // $FlowFixMe flow thinks `this._bridge` might be null
-    this._bridge.send('checkSelection');
+    if (this._bridge) {
+      this._bridge.send('checkSelection');
+    }
   }
 
   sendSelection(id: string) {
@@ -191,7 +199,9 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge();
       // $FlowFixMe flow thinks `this._bridge` might be null
-      this._bridge.attach(wall);
+      if (this._bridge) {
+        this._bridge.attach(wall);
+      }
 
       this._store = new Store(this._bridge);
       this._keyListener = keyboardNav(this._store, window);
@@ -220,7 +230,7 @@ class Panel extends React.Component {
   lookForReact() {
     check(isReact => {
       if (isReact) {
-        this.setState({isReact: true});
+        this.setState({isReact: true, loading: true});
         this.inject();
       } else {
         console.log('still looking...');
@@ -275,9 +285,11 @@ class Panel extends React.Component {
 }
 
 var panelRNStyle = bridge => (node, id) => {
+  /*
   if (node.get('nodeType') !== 'Native') {
     return <span/>;
   }
+  */
   var props = node.get('props');
   if (!props || !props.style) {
     return <strong>No style</strong>;

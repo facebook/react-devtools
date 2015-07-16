@@ -6,3 +6,5 @@ firefox/build
 firefox/data/build
 electron/build
 electron/node_modules
+/chrome.crx
+/chrome.pem

@@ -21,6 +21,7 @@ function getData(element: OpaqueReactElement): DataType {
   var name = null;
   var type = null;
   var text = null;
+  var publicInstance = null;
   var nodeType = 'Native';
   if (element._renderedComponent) {
     nodeType = 'Wrapper';
@@ -70,8 +71,8 @@ function getData(element: OpaqueReactElement): DataType {
       setInProps: inst.forceUpdate && setInProps.bind(null, inst),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
-      publicInstance: inst,
     }
+    publicInstance = inst;
   }
 
   return {
@@ -84,25 +85,29 @@ function getData(element: OpaqueReactElement): DataType {
     children,
     text,
     updater,
+    publicInstance,
   };
 }
 
 function setInProps(inst, path: Array<string>, value: any) {
   inst.props = copyWithSet(inst.props, path, value);
+  // setIn(inst.props, path, value);
   inst.forceUpdate();
 }
 
 function setInState(inst, path: Array<string>, value: any) {
   setIn(inst.state, path, value);
+  inst.forceUpdate();
 }
 
 function setInContext(inst, path: Array<string>, value: any) {
   setIn(inst.context, path, value);
+  inst.forceUpdate();
 }
 
 function setIn(obj: Object, path: Array<string>, value: any) {
   var last = path.pop();
-  var parent = path.reduce((obj, attr) => obj ? obj[attr] : null);
+  var parent = path.reduce((obj, attr) => obj ? obj[attr] : null, obj);
   if (parent) {
     parent[last] = value;
   }
@@ -117,18 +122,40 @@ function copyWithSet(obj: Object, path: Array<string>, value: any) {
       return true;
     }
     var next = {};
-    for (var name in obj) {
-      if (name === attr) {
-        curObj[name] = next;
-      } else {
-        curObj[name] = obj[name];
+    if (Array.isArray(obj)) {
+      for (var i=0; i<obj.length; i++) {
+        if (i === attr) {
+          if (Array.isArray(obj[i])) {
+            next = [];
+          }
+          curObj[i] = next;
+        } else {
+          curObj[i] = obj[i];
+        }
+      }
+    } else {
+      for (var name in obj) {
+        if (name === attr) {
+          if (Array.isArray(obj[attr])) {
+            next = [];
+          }
+          curObj[name] = next;
+        } else {
+          curObj[name] = obj[name];
+        }
       }
     }
     curObj = next;
     obj = obj[attr];
   });
   if (!cancelled) {
-    curObj[last] = value;
+    for (var name in obj) {
+      if (name === last) {
+        curObj[name] = value;
+      } else {
+        curObj[name] = obj[name];
+      }
+    }
   }
   return newObj;
 }

@@ -10,7 +10,6 @@
  */
 'use strict';
 
-// import type * as Agent from './Agent';
 import type {DataType, OpaqueReactElement, NativeType} from '../backend/types';
 
 var setupBackend = require('../backend/backend');
@@ -41,6 +40,7 @@ module.exports = function (hook: Object, agent: Agent) {
     hook.sub('unmount', ({renderer, element}) => agent.onUnmounted(element)),
   ];
 
+  // TODO: support react versions other than 0.13 & 0.14
   var success = setupBackend(hook);
   if (!success) {
     return;

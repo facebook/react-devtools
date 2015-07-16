@@ -80,23 +80,37 @@ function setup(hook) {
     bridge.on('rn:setStyle', ({id, attr, val}) => {
       console.log('setting rn style', id, attr, val);
       var data = agent.elementData.get(id);
-      if (!data.updater || !data.updater.setInProps) {
-        return;
-      }
-      var style = data.props && data.props.style;
       // $FlowFixMe "computed property keys not supported"
       var newStyle = {}; // {[attr]: val};
       newStyle[attr] = val;
+      if (!data.updater || !data.updater.setInProps) {
+        var el:Object = agent.reactElements.get(id);
+        if (el.setNativeProps) {
+          el.setNativeProps(newStyle);
+        } else {
+          console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+        }
+        return;
+      }
+      var style = data.props && data.props.style;
+      debugger;
       if (Array.isArray(style)) {
-        style = style.concat([newStyle]);
+        if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
+          data.updater.setInProps(['style', style.length - 1, attr], val);
+        } else {
+          style = style.concat([newStyle]);
+          data.updater.setInProps(['style'], style);
+        }
       } else {
         style = [style, newStyle];
+        data.updater.setInProps(['style'], style);
       }
-      data.updater.setInProps(['style'], style);
+      agent.emit('hideHighlight');
     });
   }
 
   agent.on('shutdown', () => {
+    hook.emit('shutdown');
     listeners.forEach(fn => {
       window.removeEventListener('message', fn);
     });
@@ -106,11 +120,11 @@ function setup(hook) {
     }
   });
 
-  if (window.document && window.document.createElement) {
+  if (!RN_STYLE) {
     hl = new Highlighter(window, node => {
       agent.selectFromDOMNode(node);
     });
-    // $FlowFixMe flow things hl might be undefined
+    // $FlowFixMe flow thinks hl might be undefined
     agent.on('highlight', data => hl && hl.highlight(data.node, data.name));
     agent.on('highlightMany', nodes => hl && hl.highlightMany(nodes));
     agent.on('hideHighlight', () => hl && hl.hideHighlight());

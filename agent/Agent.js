@@ -15,20 +15,6 @@ import assign from 'object-assign'
 import type * as Bridge from './Bridge'
 import type {DataType, OpaqueReactElement, NativeType} from '../backend/types';
 
-type DataType = {
-  name: ?string,
-  type: string | ?Object,
-  state: ?Object,
-  props: ?Object,
-  context: ?Object,
-  renderer: string,
-  updater: ?{
-    setState: (state: Object) => void,
-    forceUpdate: () => void,
-    publicInstance: Object,
-  },
-};
-
 type Bridge = {
   send: (evt: string, data?: any) => void,
   on: (evt: string, fn: (data: any) => any) => void,
@@ -70,8 +56,8 @@ class Agent extends EventEmitter {
     this.reactInternals = {};
     this.on('selected', id => {
       var data = this.elementData.get(id);
-      if (data && data.updater) {
-        this.global.$r = data.updater.publicInstance;
+      if (data && data.publicInstance) {
+        this.global.$r = data.publicInstance;
       }
     });
     this._prevSelected = null;
@@ -121,8 +107,8 @@ class Agent extends EventEmitter {
     });
     bridge.on('putSelectedInstance', id => {
       var node = this.elementData.get(id);
-      if (node.updater && node.updater.publicInstance) {
-        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.updater.publicInstance;
+      if (node.publicInstance) {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.publicInstance;
       } else {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = null;
       }
@@ -190,6 +176,10 @@ class Agent extends EventEmitter {
   getNodeForID(id: string): ?Object {
     var component = this.reactElements.get(id);
     if (!component) {
+      return null;
+    }
+    var data = this.elementData.get(id);
+    if (!data) {
       return null;
     }
     var renderer = this.elementData.get(id).renderer;
@@ -266,7 +256,7 @@ class Agent extends EventEmitter {
     var data = this.elementData.get(id);
     var value;
     if (path === 'instance') {
-      value = data.updater && data.updater.publicInstance;
+      value = data.publicInstance;
     } else {
       value = getIn(data, path);
     }

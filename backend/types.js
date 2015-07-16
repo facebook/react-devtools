@@ -1,12 +1,12 @@
 
 type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'Composite' | 'Text',
-  type: ?(string | Object),
+  type: ?(string | AnyFn),
   name: ?string,
   props: ?Object,
   state: ?Object,
   context: ?Object,
-  children: ?(string | Array<Object>),
+  children: ?(string | Array<OpaqueReactElement>),
   text: ?string,
   updater: ?{
     setInProps: ?(path: Array<string>, value: any) => void,
@@ -14,8 +14,8 @@ type DataType = {
     setInContext: ?(path: Array<string>, value: any) => void,
     // setState: ?(newState: any) => void,
     forceUpdate: ?() => void,
-    publicInstance: Object,
   },
+  publicInstance: ?Object,
 };
 
 // This type is entirely opaque to the backend.
