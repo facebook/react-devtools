@@ -1,4 +1,68 @@
-# React Developer Tools
+# New React Developer Tools
+
+React Developer Tools is a system that allows you to inspect a React Renderer,
+including the Component hierarchy, props, state, and more.
+
+There are shells for chrome (adding it to the chrome devtools), firefox,
+atom/nuclide, and as a standalone electron app.
+
+## Installing the Chrome Plugin
+Because that's likely why you're here.
+
+### Easy
+
+[Install the extension from Chrome Web Store](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
+
+If you inspect an element or launch the developer tools on a React page, you
+should see an extra tab called **React** in the inspector.
+
+### For Hacking
+See also [Hackage](#Hackage) below.
+
+Check out the [Readme.md](/shells/chrome) in the `/shells/chrome` directory.
+
+## Usage
+
+### Tree View
+
+### Side Pane
+
+## Hackage
+
+For changes that don't directly involve chrome/firefox/etc. APIs, there is a
+"plain" shell that just renders the devtools into an html page along with a
+TodoMVC test app. This is by far the quickest way to develop. Check out
+[the Readme.md](/shells/plain) in `/shells/plain` for info.
+
+For other shells, see the respective directories in `/shells`.
+
+## FAQ
+
+### How do I use this for React < 0.13?
+You can use the old plugin.
+{{TODO link to .crx}}
+
+### The React Tab Doesn't Show Up
+
+There are a couple of possible causes.
+
+- you are using react &lt; v0.13. See above.
+- react hasn't loaded on your page yet. The react tab will not show up if
+  react is not yet present on the page.
+
+## Debugging (in chrome)
+What to do if the extension breaks.
+
+- check the error console of devtools. Part of React Devtools runs scripts in
+    the context of your page, and is vulnerable to misbehaving polyfills.
+- pop devtools out into a new window, and then hit the shortcut to open
+    devtools again (cmd-option-j or ctrl+shift+j). This is the "debug
+    devtools" debugger. Check the console there for errors.
+- open `chrome://extensions`, find react devtools, and click "background page"
+    under "Inspected views". You might find the errors there.
+
+
+# The Old Readme
 
 React Developer Tools is a Chrome extension that allows you to inspect the React
 component hierarchy in the Chrome Developer Tools (formerly WebKit Web

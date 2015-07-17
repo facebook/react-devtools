@@ -11,12 +11,12 @@
 
 var React = require('react');
 
-var Bridge = require('../../backend/Bridge');
-var Container = require('../../frontend/Container');
-var Store = require('../../frontend/Store');
+var Bridge = require('../../../agent/Bridge');
+var Container = require('../../../frontend/Container');
+var Store = require('../../../frontend/Store');
 
-var consts = require('../../backend/consts');
-var keyboardNav = require('../../frontend/keyboardNav');
+var consts = require('../../../agent/consts');
+var keyboardNav = require('../../../frontend/keyboardNav');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,

@@ -38,7 +38,7 @@ const ReactPanel = Class({
   onReady() {
     var tabs = require('sdk/tabs');
     var worker = tabs.activeTab.attach({
-      contentScriptFile: './backend.js',
+      contentScriptFile: 'backend.js',
     });
 
     const { MessageChannel } = require("sdk/messaging");
@@ -54,17 +54,22 @@ const ReactPanel = Class({
         }
         return;
       }
-      console.log('from panel', evt.data);
+      // console.log('from panel', evt.data);
       worker.port.emit('message', evt.data);
     };
     worker.port.on('message', function (data) {
-      console.log('to panel', data);
+      // console.log('to panel', data);
       addonSide.postMessage(data);
     });
+    worker.on('error', function (error) {
+      console.log('More Error!!', error);
+    });
+    worker.port.on('error', function (error) {
+      console.log('Error!!', error);
+    });
 
-    // this.debuggee.start();
     this.postMessage('port', [panelSide]);
-    console.log('ready');
+    console.log('Panel ready');
   },
 });
 
@@ -87,7 +92,7 @@ function main(options, callbacks) {
 
 /**
  * Whenever the devtools inspector panel selection changes, pass that node to
- * __REACT_DEVTOOLS_BACKEND__.$0
+ * __REACT_DEVTOOLS_GLOBAL_HOOK__.$0
  */
 function trackSelection() {
   var wc;
@@ -111,8 +116,7 @@ function passSelectedNode(jsterm) {
   if (inspectorSelection && inspectorSelection.nodeFront) {
     selectedNodeActor = inspectorSelection.nodeFront.actorID;
   }
-  // jsterm.execute('__REACT_DEVTOOLS_BACKEND__.backend.selectFromDOMNode($0)');
-  jsterm.requestEvaluation('__REACT_DEVTOOLS_BACKEND__.backend.selectFromDOMNode($0, true)', {
+  jsterm.requestEvaluation('__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.selectFromDOMNode($0, true)', {
     selectedNodeActor: selectedNodeActor,
   });
 }

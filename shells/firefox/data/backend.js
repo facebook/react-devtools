@@ -1,5 +1,5 @@
 
-if (unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._reactRuntime || unsafeWindow.__REACT_DEVTOOLS_BACKEND__.attachDevTools) {
+if (Object.keys(unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length) {
   self.port.emit('hasReact', true);
   injectBackend();
 } else {
@@ -29,7 +29,7 @@ function injectBackend() {
     node.parentNode.removeChild(node);
   }
 
-  node.src = 'resource://react-devtools/build/backend.js'
+  node.src = 'resource://react-devtools/data/build/backend.js'
   document.documentElement.appendChild(node);
 }
 

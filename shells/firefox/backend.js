@@ -6,16 +6,15 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
  */
 'use strict';
 
+var Agent = require('../../agent/Agent');
+var Bridge = require('../../agent/Bridge');
+var Highlighter = require('../../frontend/Highlighter/Highlighter');
 
-var Agent = require('../backend/Agent');
-var Bridge = require('../backend/Bridge');
-var Highlighter = require('../frontend/Highlighter/Highlighter');
-
-var inject = require('../backend/inject');
+var inject = require('../../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
@@ -65,7 +64,7 @@ function setup() {
   }, 1000);
 
   backend.once('connected', () => {
-    inject(window, backend);
+    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend);
     clearTimeout(_connectTimeout);
   });
 
@@ -85,7 +84,9 @@ function setup() {
     });
     // $FlowFixMe flow things hl might be undefined
     backend.on('highlight', data => hl.highlight(data.node, data.name));
+    // $FlowFixMe flow things hl might be undefined
     backend.on('highlightMany', nodes => hl.highlightMany(nodes));
+    // $FlowFixMe flow things hl might be undefined
     backend.on('hideHighlight', () => hl.hideHighlight());
   }
 }

@@ -10,37 +10,49 @@
  */
 'use strict';
 
-var source = `
-  // 0.13
+function globalHook(window) {
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: {
-      inject: function(runtime) {
-        this._reactRuntime = runtime;
+      _renderers: {},
+      helpers: {},
+      inject: function(renderer) {
+        var id = Math.random().toString(15).slice(10, 20);
+        this._renderers[id] = renderer;
+        this.emit('renderer', {id, renderer});
       },
-      getSelectedInstance: null,
-      Overlay: null,
-    }
-  });
-
-  // vNext
-  Object.defineProperty(window, '__REACT_DEVTOOLS_BACKEND__', {
-    value: {
-      addStartupListener: function (fn) {
-        this._startupListeners.push(fn);
+      _listeners: {},
+      sub: function (evt, fn) {
+        this.on(evt, fn);
+        return function () {this.off(evt, fn)}.bind(this);
       },
-      removeStartupListener: function (fn) {
-        var ix = this._startupListeners.indexOf(fn);
+      on: function (evt, fn) {
+        if (!this._listeners[evt]) {
+          this._listeners[evt] = [];
+        }
+        this._listeners[evt].push(fn);
+      },
+      off: function (evt, fn) {
+        if (!this._listeners[evt]) {
+          return;
+        }
+        var ix = this._listeners[evt].indexOf(fn);
         if (ix !== -1) {
-          this._startupListeners.splice(ix, 1);
+          this._listeners[evt].splice(ix, 1);
+        }
+        if (!this._listeners[evt].length) {
+          this._listeners[evt] = null;
         }
       },
-      _startupListeners: [],
-      getReactHandleFromNative: null,
-      getNativeFromHandle: null,
-      attachDevTools: null,
-    },
+      emit: function (evt, data) {
+        if (this._listeners[evt]) {
+          this._listeners[evt].map(function (fn) {fn(data)});
+        }
+      },
+    }
   });
-`;
+}
+
+var source = ';(' + globalHook.toString() + ')(window);';
 
 var script = document.createElement('script');
 script.textContent = source;

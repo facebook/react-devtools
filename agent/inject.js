@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, NativeType} from '../backend/types';
+import type {DataType, OpaqueReactElement, NativeType, Hook} from '../backend/types';
 
 var setupBackend = require('../backend/backend');
 
@@ -28,7 +28,7 @@ type Agent = {
   on: (evt: string, fn: (...args: Array<any>) => any) => any,
 };
 
-module.exports = function (hook: Object, agent: Agent) {
+module.exports = function (hook: Hook, agent: Agent) {
   var subs = [
     hook.sub('renderer-attached', ({id, renderer, helpers}) => {
       agent.setReactInternals(id, helpers);

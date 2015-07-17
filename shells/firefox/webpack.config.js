@@ -1,10 +1,13 @@
 
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
-  entry: './panel/run.js',
+  // devtool: 'cheap-module-eval-source-map',
+  entry: {
+    panel: './panel/run.js',
+    backend: './backend.js',
+  },
   output: {
     path: __dirname + '/data/build',
-    filename: 'panel.js',
+    filename: '[name].js',
   },
 
   module: {
