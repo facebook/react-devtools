@@ -54,12 +54,17 @@ type Helpers = {
   cleanup: () => void,
 };
 
+type Handler = (data: any) => void;
+
 type Hook = {
   _renderers: {[key: string]: ReactRenderer},
+  _listeners: {[key: string]: Array<Handler>},
   helpers: {[key: string]: Helpers},
-  on: (evt: string, handler: (data: any) => void) => void,
-  off: (evt: string, handler: (data: any) => void) => void,
+  inject: (renderer: ReactRenderer) => void,
   emit: (evt: string, data: any) => void,
+  sub: (evt: string, handler: Handler) => () => void,
+  on: (evt: string, handler: Handler) => void,
+  off: (evt: string, handler: Handler) => void,
 };
 
 export {DataType, OpaqueReactElement, Native, ReactRenderer, Helpers, Hook};

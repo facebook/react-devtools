@@ -92,7 +92,6 @@ class Panel extends React.Component {
     var wall = {
       listen(fn) {
         port.onmessage = evt => {
-          // window.logs.innerHTML += '\n <- ' + JSON.stringify(evt.data);
           fn(evt.data);
         }
       },
@@ -100,7 +99,6 @@ class Panel extends React.Component {
         if (disconnected) {
           return;
         }
-          // window.logs.innerHTML += '\n -> ' + JSON.stringify(data);
         port.postMessage(data);
       },
     };
@@ -115,6 +113,12 @@ class Panel extends React.Component {
     // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.attach(wall);
 
+    this._bridge.on('hasReact', hasReact => {
+      if (!hasReact) {
+        this.setState({isReact: false});
+      }
+    });
+
     this._store = new Store(this._bridge);
     this._keyListener = keyboardNav(this._store);
     window.addEventListener('keydown', this._keyListener);
@@ -126,6 +130,9 @@ class Panel extends React.Component {
   }
 
   render() {
+    if (!this.state.isReact) {
+      return <span>No React found on page...</span>;
+    }
     if (this.state.loading) {
       return (
         <div style={styles.loading}>
@@ -135,9 +142,6 @@ class Panel extends React.Component {
           <button onClick={() => this.reload()}>Reload</button>
         </div>
       );
-    }
-    if (!this.state.isReact) {
-      return <span>Looking for react...</span>;
     }
     return (
       <Container
