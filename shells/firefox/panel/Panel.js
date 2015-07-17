@@ -6,8 +6,9 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
  */
+'use strict';
 
 var React = require('react');
 
@@ -113,13 +114,18 @@ class Panel extends React.Component {
     // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.attach(wall);
 
+    // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.on('hasReact', hasReact => {
       if (!hasReact) {
         this.setState({isReact: false});
       }
     });
 
-    this._store = new Store(this._bridge);
+    // xx FlowFixMe flow thinks `this._bridge` might be null
+    if (this._bridge) {
+      this._store = new Store(this._bridge);
+    }
+    // $FlowFixMe flow thinks `this._store` might be null
     this._keyListener = keyboardNav(this._store);
     window.addEventListener('keydown', this._keyListener);
 
@@ -144,6 +150,7 @@ class Panel extends React.Component {
       );
     }
     return (
+      // $FlowFixMe Flow thinks Container must inherit from React.Component
       <Container
         reload={this.reload.bind(this)}
         menuItems={{
