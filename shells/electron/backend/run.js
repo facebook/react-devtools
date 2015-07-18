@@ -11,7 +11,7 @@ var Bridge = require('../../../agent/Bridge');
 
 var inject = require('../../../agent/inject');
 
-fakeGlobal.wall.onClose(() => {
+FOR_BACKEND.wall.onClose(() => {
   if (agent) {
     agent.emit('shutdown');
   }
@@ -21,7 +21,7 @@ fakeGlobal.wall.onClose(() => {
 });
 
 var bridge = new Bridge();
-bridge.attach(fakeGlobal.wall);
+bridge.attach(FOR_BACKEND.wall);
 var agent = new Agent({});
 agent.addBridge(bridge);
 
@@ -31,7 +31,7 @@ bridge.onCall('rn:getStyle', id => {
     return null;
   }
   var style = node.props.style;
-  return fakeGlobal.resolveRNStyle(style);
+  return FOR_BACKEND.resolveRNStyle(style);
 });
 bridge.on('rn:setStyle', ({id, attr, val}) => {
   console.log('setting rn style', id, attr, val);
