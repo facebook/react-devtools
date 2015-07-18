@@ -11,13 +11,13 @@
 
 var React = require('react');
 
-var Bridge = require('../../backend/Bridge');
-var Container = require('../../frontend/Container');
-var NativeStyler = require('../../chrome/panel/NativeStyler');
-var Store = require('../../frontend/Store');
+var Bridge = require('../../../agent/Bridge');
+var Container = require('../../../frontend/Container');
+var NativeStyler = require('../../../plugins/ReactNativeStyle/ReactNativeStyle');
+var Store = require('../../../frontend/Store');
 
-var consts = require('../../backend/consts');
-var keyboardNav = require('../../frontend/keyboardNav');
+var consts = require('../../../agent/consts');
+var keyboardNav = require('../../../frontend/keyboardNav');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -122,9 +122,6 @@ class Panel extends React.Component {
 }
 
 var panelRNStyle = bridge => (node, id) => {
-  if (node.get('nodeType') !== 'Native') {
-    return <span/>;
-  }
   var props = node.get('props');
   if (!props || !props.style) {
     return <strong>No style</strong>;

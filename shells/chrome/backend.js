@@ -90,7 +90,6 @@ function setup(hook) {
         return;
       }
       var style = data.props && data.props.style;
-      debugger;
       if (Array.isArray(style)) {
         if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
           data.updater.setInProps(['style', style.length - 1, attr], val);

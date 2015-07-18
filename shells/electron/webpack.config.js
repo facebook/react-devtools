@@ -3,10 +3,13 @@ module.exports = {
   debug: true,
   devtool: 'source-map',
   // devtool: 'cheap-module-eval-source-map',
-  entry: './panel/Panel.js',
+  entry: {
+    panel: './panel/run.js',
+    backend: './backend/run.js',
+  },
   output: {
     path: __dirname + '/build',
-    filename: 'panel-el.js',
+    filename: '[name].js',
   },
 
   module: {
@@ -19,5 +22,4 @@ module.exports = {
     }]
   },
 }
-
 

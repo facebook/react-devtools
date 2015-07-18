@@ -286,11 +286,6 @@ class Panel extends React.Component {
 }
 
 var panelRNStyle = bridge => (node, id) => {
-  /*
-  if (node.get('nodeType') !== 'Native') {
-    return <span/>;
-  }
-  */
   var props = node.get('props');
   if (!props || !props.style) {
     return <strong>No style</strong>;

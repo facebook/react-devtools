@@ -6,14 +6,14 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
  */
 'use strict';
 
-var Agent = require('../backend/Agent');
-var Bridge = require('../backend/Bridge');
+var Agent = require('../../agent/Agent');
+var Bridge = require('../../agent/Bridge');
 
-var inject = require('../backend/inject');
+var inject = require('../../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {

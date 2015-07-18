@@ -156,12 +156,9 @@ function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, val
     if (Array.isArray(obj)) {
     } else {
       for (var name in obj) {
-        if (name === last) {
-          curObj[name] = value;
-        } else {
-          curObj[name] = obj[name];
-        }
+        curObj[name] = obj[name];
       }
+      curObj[last] = value;
     }
   }
   return newObj;

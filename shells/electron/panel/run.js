@@ -21,14 +21,20 @@ function reload() {
   React.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    React.render(<Panel wall={wall} reload={reload} />, node);
+    React.render(<Panel win={window} wall={wall} reload={reload} />, node);
   }, 100);
 }
+
+window.onDisconnected = function () {
+  React.unmountComponentAtNode(node);
+  node.innerHTML = 'Disconnected...';
+};
 
 // set in port.js
 window.onConnected = function (_wall) {
   console.log('connected');
   wall = _wall;
-  React.render(<Panel wall={wall} reload={reload} />, node);
+  reload();
+  // React.render(<Panel wall={wall} reload={reload} />, node);
 }
 
