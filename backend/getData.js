@@ -12,7 +12,7 @@
 
 import type {DataType, OpaqueReactElement, NativeType} from './types';
 
-function getData(element: OpaqueReactElement): DataType {
+function getData(element: Object): DataType {
   var children = null;
   var props = null;
   var state = null;

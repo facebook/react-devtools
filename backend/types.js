@@ -1,5 +1,6 @@
+/** @flow **/
 
-type DataType = {
+export type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'Composite' | 'Text',
   type: ?(string | AnyFn),
   name: ?string,
@@ -19,21 +20,21 @@ type DataType = {
 };
 
 // This type is entirely opaque to the backend.
-type OpaqueReactElement = {
+export type OpaqueReactElement = {
   _rootNodeID: string,
 };
-type NativeType = {};
+export type NativeType = {};
 
-type AnyFn = (...args: Array<any>) => any;
+export type AnyFn = (...args: Array<any>) => any;
 
-type ReactRenderer = {
+export type ReactRenderer = {
   Reconciler: {
     mountComponent: AnyFn,
     performUpdateIfNecessary: AnyFn,
     receiveComponent: AnyFn,
     unmountComponent: AnyFn,
   },
-  // $FlowFixMe flow doesn't understand this tagged union
+  // $ FlowFixMe flow doesn't understand this tagged union
   Mount: Object /*{ // React Native
     nativeTagToRootNodeID: (tag: number) => string,
     findNodeHandle: (component: Object) => number,
@@ -47,16 +48,17 @@ type ReactRenderer = {
   },*/
 };
 
-type Helpers = {
+export type Helpers = {
   getNativeFromReactElement?: ?(component: OpaqueReactElement) => ?NativeType,
   getReactElementFromNative?: ?(component: NativeType) => ?OpaqueReactElement,
   walkTree: (visit: (component: OpaqueReactElement, data: DataType) => void, visitRoot: (element: OpaqueReactElement) => void) => void,
   cleanup: () => void,
 };
 
-type Handler = (data: any) => void;
+export type Handler = (data: any) => void;
 
-type Hook = {
+
+export type Hook = {
   _renderers: {[key: string]: ReactRenderer},
   _listeners: {[key: string]: Array<Handler>},
   helpers: {[key: string]: Helpers},
@@ -65,6 +67,5 @@ type Hook = {
   sub: (evt: string, handler: Handler) => () => void,
   on: (evt: string, handler: Handler) => void,
   off: (evt: string, handler: Handler) => void,
+  reactDevtoolsAgent?: ?Object,
 };
-
-export {DataType, OpaqueReactElement, Native, ReactRenderer, Helpers, Hook};

@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react');
-import type {DOMEvent} from '../../backend/types';
+import type {DOMEvent} from '../../frontend/types';
 
 class BlurInput extends React.Component {
   constructor(props: Object) {

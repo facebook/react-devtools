@@ -12,8 +12,8 @@
 
 import type {Hook} from './types';
 
-module.exports = function globalHook(window: Object) {
-  var hook: Hook = {
+function makeHook(): Hook {
+  return {
     _renderers: {},
     helpers: {},
     inject: function(renderer) {
@@ -50,8 +50,13 @@ module.exports = function globalHook(window: Object) {
       }
     },
   };
-  Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
-    value: hook
-  });
+}
+
+module.exports = function globalHook(window: Object) {
+  if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+    Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
+      value: makeHook(),
+    });
+  }
 }
 window.globalHook = module.exports;

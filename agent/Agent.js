@@ -44,6 +44,7 @@ class Agent extends EventEmitter {
   roots: Set<string>;
   reactInternals: {[key: string]: InternalsObject}; // injected
   capabilities: {[key: string]: boolean};
+  renderers: Map<string, string>;
   _prevSelected: any;
 
   constructor(global: Object, capabilities?: Object) {
@@ -51,6 +52,7 @@ class Agent extends EventEmitter {
     this.global = global;
     this.reactElements = new Map();
     this.ids = new WeakMap();
+    this.renderers = new Map();
     this.elementData = new Map();
     this.roots = new Set();
     this.reactInternals = {};
@@ -182,7 +184,7 @@ class Agent extends EventEmitter {
     if (!data) {
       return null;
     }
-    var renderer = this.elementData.get(id).renderer;
+    var renderer = this.renderers.get(id);
     if (!this.reactInternals[renderer]) {
       return null;
     }
@@ -283,7 +285,7 @@ class Agent extends EventEmitter {
 
   onMounted(renderer: string, component: OpaqueReactElement, data: DataType) {
     var id = this.getId(component);
-    data.renderer = renderer;
+    this.renderers.set(id, renderer);
     this.elementData.set(id, data);
 
     var send = assign({}, data);
@@ -299,7 +301,6 @@ class Agent extends EventEmitter {
 
   onUpdated(component: OpaqueReactElement, data: DataType) {
     var id = this.getId(component);
-    data.renderer = this.elementData.get(id).renderer
     this.elementData.set(id, data);
 
     var send = assign({}, data);
@@ -317,6 +318,7 @@ class Agent extends EventEmitter {
     var id = this.getId(component);
     this.elementData.delete(id);
     this.roots.delete(id);
+    this.renderers.delete(id);
     this.emit('unmount', id);
     this.ids.delete(component);
   }
