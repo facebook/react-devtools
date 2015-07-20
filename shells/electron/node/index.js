@@ -1,59 +1,66 @@
 
 // this is not compiled by babel / webpack
-
-var http = require('http');
 var ws = require('ws');
-var serveBackend = require('./node/serveBackend.js');
+var fs = require('fs');
 
-var server = http.createServer(function (req, res) {
-  // console.log('req'+ req.url);
-  if (req.url === '/backend') {
-    return serveBackend(res);
-  } else if (req.url === '/websocket') {
-    return; // handled by wss
+var socket = ws.connect('ws://localhost:8081/devtools');
+
+socket.onmessage = initialMessage;
+
+function initialMessage(evt) {
+  if (evt.data === 'attach:agent') {
+    initialize();
   }
-  res.writeHead(404);
-  res.end('Not found');
-}).listen(8097, '::');
+};
 
-var wss = new ws.Server({
-  server: server,
-  path: '/websocket',
-});
+socket.onerror = function (err) {
+  window.onDisconnected();
+  console.log('error connection', err);
+};
+socket.onclose = function () {
+  window.onDisconnected();
+  console.log('error things');
+};
 
-wss.on('connection', function (ws) {
-  var listeners;
-  ws.onerror = function (err) {
-    window.onDisconnected();
-    console.log('error connection', err);
-  };
-  ws.onclose = function () {
-    window.onDisconnected();
-    console.log('error things');
-  };
-  ws.onmessage = function (evt) {
-    // console.log('<<--', evt.data);
-    var data = JSON.parse(evt.data);
-    listeners.forEach(function (fn) {fn(data)});
-  };
-  console.log('connected to react native');
-  listeners = [];
+function initialize() {
+  fs.readFile(__dirname + '/build/backend.js', function (err, data) {
+    if (err) {
+      return console.error('failed to load...', err);
+    }
+    socket.send('eval:' + data.toString('utf8'));
+    socket.onmessage = function (evt) {
+      // console.log('<<--', evt.data);
+      var data = JSON.parse(evt.data);
+      if (data.$close || data.$error) {
+        console.log('Closing or Erroring')
+        window.onDisconnected();
+        socket.onmessage = initialMessage;
+        return;
+      }
+      if (data.$open) {
+        return; // ignore
+      }
+      listeners.forEach(function (fn) {fn(data)});
+    };
+    console.log('connected to react native');
+    listeners = [];
 
-  var wall = {
-    listen(fn) {
-      listeners.push(fn);
-    },
-    send(data) {
-      // console.log('-->>' + JSON.stringify(data));
-      ws.send(JSON.stringify(data));
-    },
-    disconnect() {
-      ws.close();
-    },
-  };
+    var wall = {
+      listen(fn) {
+        listeners.push(fn);
+      },
+      send(data) {
+        // console.log('-->>' + JSON.stringify(data));
+        socket.send(JSON.stringify(data));
+      },
+      disconnect() {
+        socket.close();
+      },
+    };
 
-  onConnected(wall);
-});
+    onConnected(wall);
+  });
+}
 
 window.onConnected = function () {
   console.error('No onConnected set');
@@ -61,4 +68,3 @@ window.onConnected = function () {
 window.onDisconnected = function () {
   console.error('No onDisconnected set');
 };
-
