@@ -27,10 +27,30 @@ import type {Hook} from './types';
 
 var attachRenderer = require('./attachRenderer');
 
+function findOldReact() {
+  if (window.React) {
+    return window.React.__internals;
+  }
+  if (!window.require) {
+    return;
+  }
+  try {
+    return window.require('react').__internals;
+  } catch (e) {}
+  try {
+    return window.require('React').__internals;
+  } catch (e) {}
+}
+
 /**
  * Normal names
  */
 module.exports = function setupBackend(hook: Hook): boolean {
+  var oldReact = findOldReact();
+  if (oldReact && Object.keys(hook._renderers).length === 0) {
+    hook.inject(oldReact);
+  }
+
   for (var id in hook._renderers) {
     hook.helpers[id] = attachRenderer(hook, id, hook._renderers[id]);
     hook.emit('renderer-attached', {id, renderer: hook._renderers[id], helpers: hook.helpers[id]});

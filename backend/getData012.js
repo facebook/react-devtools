@@ -12,11 +12,11 @@
 
 import type {DataType, OpaqueReactElement, NativeType} from './types';
 
-function getData(element: Object): DataType {
+function getData012(element: Object): DataType {
   var children = null;
-  var props = null;
-  var state = null;
-  var context = null;
+  var props = element.props;
+  var state = element.state;
+  var context = element.context;
   var updater = null;
   var name = null;
   var type = null;
@@ -26,17 +26,17 @@ function getData(element: Object): DataType {
   if (element._renderedComponent) {
     nodeType = 'Wrapper';
     children = [element._renderedComponent];
-    props = element._instance.props;
-    state = element._instance.state;
-    context = element._instance.context;
     if (context && Object.keys(context).length === 0) {
       context = null;
     }
   } else if (element._renderedChildren) {
+    name = element.constructor.displayName;
     children = childrenList(element._renderedChildren);
-  } else if (element._currentElement.props) {
+  } else if ('string' === typeof props.children) {
     // string children
-    children = element._currentElement.props.children
+    name = element.constructor.displayName;
+    children = props.children;
+    nodeType = 'Native'
   }
 
   if (!props && element._currentElement && element._currentElement.props) {
@@ -47,36 +47,36 @@ function getData(element: Object): DataType {
     type = element._currentElement.type;
     if ('string' === typeof type) {
       name = type;
-    } else if (element.getName) {
-      nodeType = 'Composite';
-      name = element.getName();
-      if (name === null) {
-        // 0.14 top-level wrapper
-        if (element._currentElement.props === element._renderedComponent._currentElement) {
-          nodeType = 'Wrapper';
-        } else {
-          name = 'No display name';
-        }
-      }
-    } else if (element._stringText) {
-      nodeType = 'Text';
-      text = element._stringText;
     } else {
-      name = type.displayName || type.name || 'Unknown';
+      nodeType = 'Composite';
+      name = type.displayName;
+      if (!name) {
+        name = 'No display name';
+      }
     }
   }
 
-  if (element._instance) {
-    var inst = element._instance
+  if (!name) {// && element.constructor.displayName) {
+    name = element.constructor.displayName || 'No display name';
+    nodeType = 'Composite';
+  }
+
+  if ('string' === typeof props) {
+    nodeType = 'Text';
+    text = props;
+    props = null;
+    name = null;
+  }
+
+  if (element.forceUpdate) {
     updater = {
-      setState: inst.setState && inst.setState.bind(inst),
-      forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
-      // setNativeProps: inst.setNativeProps && inst.setNativeProps.bind(inst),
-      setInProps: inst.forceUpdate && setInProps.bind(null, inst),
-      setInState: inst.forceUpdate && setInState.bind(null, inst),
-      setInContext: inst.forceUpdate && setInContext.bind(null, inst),
+      setState: element.setState.bind(element),
+      forceUpdate: element.forceUpdate.bind(element),
+      setInProps: element.forceUpdate && setInProps.bind(null, element),
+      setInState: element.forceUpdate && setInState.bind(null, element),
+      setInContext: element.forceUpdate && setInContext.bind(null, element),
     }
-    publicInstance = inst;
+    publicInstance = element;
   }
 
   return {
@@ -176,4 +176,4 @@ function childrenList(children) {
   return res;
 }
 
-module.exports = getData;
+module.exports = getData012;

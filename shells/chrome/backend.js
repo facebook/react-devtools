@@ -92,9 +92,11 @@ function setup(hook) {
       var style = data.props && data.props.style;
       if (Array.isArray(style)) {
         if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
+          // $FlowFixMe we know that updater is not null here
           data.updater.setInProps(['style', style.length - 1, attr], val);
         } else {
           style = style.concat([newStyle]);
+          // $FlowFixMe we know that updater is not null here
           data.updater.setInProps(['style'], style);
         }
       } else {

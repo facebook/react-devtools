@@ -12,12 +12,14 @@
 
 import type {DataType, OpaqueReactElement, NativeType, Hook, ReactRenderer, Helpers} from './types';
 var getData = require('./getData');
+var getData012 = require('./getData012');
 
 type NodeLike = {};
 
 function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   var rootNodeIDMap = new Map();
   var extras = {};
+  var is012 = !renderer.Reconciler;
 
   // RN to React differences
   if (renderer.Mount.findNodeHandle && renderer.Mount.nativeTagToRootNodeID) {
@@ -64,29 +66,56 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     });
   }
 
-  oldMethods = decorateMany(renderer.Reconciler, {
-    mountComponent(element, rootID, transaction, context) {
-      var data = getData(element, context)
-      rootNodeIDMap.set(element._rootNodeID, element);
-      hook.emit('mount', {element, data, renderer: rid});
-    },
-    performUpdateIfNecessary(element, nextChild, transaction, context) {
-      hook.emit('update', {element, data: getData(element, context), renderer: rid});
-    },
-    receiveComponent(element, nextChild, transaction, context) {
-      hook.emit('update', {element, data: getData(element, context), renderer: rid});
-    },
-    unmountComponent(element) {
-      hook.emit('unmount', {element, renderer: rid});
-    }
-  });
+  if (renderer.Component) {
+    console.error('You are using a version of React with limited support in this version of the devtools.\nPlease upgrade to use at least 0.13, or you can downgrade to use the old version of the devtools:\ninstructions here https://github.com/facebook/react-devtools/tree/devtools-next#how-do-i-use-this-for-react--013');
+    // 0.11 - 0.12
+    // Monkey patched to track updates
+    var ReactComponent = renderer.Component;
+
+    // Monkey patch Components to track rerenders
+    var ComponentMixin = ReactComponent.Mixin;
+
+    oldMethods = decorateMany(renderer.Component.Mixin, {
+      mountComponent() {
+        var data = getData012(this, {});
+        rootNodeIDMap.set(this._rootNodeID, this);
+        hook.emit('mount', {element: this, data, renderer: rid});
+      },
+      updateComponent() {
+        console.log('updating', this);
+        hook.emit('update', {element: this, data: getData012(this, {}), renderer: rid});
+      },
+      unmountComponent() {
+        hook.emit('unmount', {element: this, renderer: rid});
+        rootNodeIDMap.delete(this._rootNodeID, this);
+      },
+    });
+  } else if (renderer.Reconciler) {
+    oldMethods = decorateMany(renderer.Reconciler, {
+      mountComponent(element, rootID, transaction, context) {
+        var data = getData(element, context)
+        rootNodeIDMap.set(element._rootNodeID, element);
+        hook.emit('mount', {element, data, renderer: rid});
+      },
+      performUpdateIfNecessary(element, nextChild, transaction, context) {
+        hook.emit('update', {element, data: getData(element, context), renderer: rid});
+      },
+      receiveComponent(element, nextChild, transaction, context) {
+        hook.emit('update', {element, data: getData(element, context), renderer: rid});
+      },
+      unmountComponent(element) {
+        hook.emit('unmount', {element, renderer: rid});
+        rootNodeIDMap.delete(element._rootNodeID, element);
+      }
+    });
+  }
 
   extras.walkTree = function (visit: (component: OpaqueReactElement, data: DataType) => void, visitRoot: (element: OpaqueReactElement) => void) {
     var onMount = (component, data) => {
       rootNodeIDMap.set(component._rootNodeID, component);
       visit(component, data);
     };
-    walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot);
+    walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot, is012);
   };
 
   extras.cleanup = function () {
@@ -107,17 +136,17 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   return extras;
 }
 
-function walkRoots(roots, onMount, onRoot) {
+function walkRoots(roots, onMount, onRoot, is012) {
   for (var name in roots) {
-    walkNode(roots[name], onMount);
+    walkNode(roots[name], onMount, is012);
     onRoot(roots[name]);
   }
 }
 
-function walkNode(element, onMount) {
-  var data = getData(element);
+function walkNode(element, onMount, is012) {
+  var data = is012 ? getData012(element) : getData(element);
   if (data.children && Array.isArray(data.children)) {
-    data.children.forEach(child => walkNode(child, onMount));
+    data.children.forEach(child => walkNode(child, onMount, is012));
   }
   onMount(element, data);
 }
