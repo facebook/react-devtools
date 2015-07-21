@@ -11,8 +11,9 @@
 'use strict';
 
 import type {DOMNode, DOMEvent} from '../types'
-import Overlay from './Overlay'
-import MultiOverlay from './MultiOverlay'
+
+var Overlay = require('./Overlay');
+var MultiOverlay = require('./MultiOverlay');
 
 class Highlighter {
   _overlay: ?Overlay;
