@@ -16,8 +16,6 @@ var React = require('react');
 var SearchPane = require('./SearchPane');
 var SplitPane = require('./SplitPane');
 
-var consts = require('../agent/consts');
-
 import type MenuItem from './ContextMenu';
 
 class Container {

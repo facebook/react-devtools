@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, NativeType} from './types';
+import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 
 function getData(element: Object): DataType {
@@ -111,7 +111,7 @@ function setInContext(inst, path: Array<string | number>, value: any) {
 
 function setIn(obj: Object, path: Array<string | number>, value: any) {
   var last = path.pop();
-  var parent = path.reduce((obj, attr) => obj ? obj[attr] : null, obj);
+  var parent = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
   if (parent) {
     parent[last] = value;
   }

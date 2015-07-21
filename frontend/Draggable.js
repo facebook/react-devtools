@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react');
-import type {DOMNode, DOMEvent} from './types';
+import type {DOMEvent} from './types';
 
 class Draggable {
   _onMove: (evt: DOMEvent) => void;

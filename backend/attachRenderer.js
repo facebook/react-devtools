@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, NativeType, Hook, ReactRenderer, Helpers} from './types';
+import type {DataType, OpaqueReactElement, Hook, ReactRenderer, Helpers} from './types';
 var getData = require('./getData');
 var getData012 = require('./getData012');
 

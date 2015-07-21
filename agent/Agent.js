@@ -327,10 +327,10 @@ function randid() {
   return Math.random().toString(0x0f).slice(10, 20);
 }
 
-function getIn(obj, path) {
+function getIn(base, path) {
   return path.reduce((obj, attr) => {
     return obj ? obj[attr] : null;
-  }, obj);
+  }, base);
 }
 
 module.exports = Agent;

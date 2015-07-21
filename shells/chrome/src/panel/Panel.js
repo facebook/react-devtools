@@ -8,6 +8,7 @@
  *
  * @flow
  */
+'use strict';
 
 var React = require('react');
 var Bridge = require('../../../../agent/Bridge');
@@ -133,7 +134,7 @@ class Panel extends React.Component {
         inspect(window.${vbl}.render) : inspect(window.${vbl}.constructor)`;
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
-        debugger;
+        console.error('Failed to inspect component', err);
       }
     });
   }
@@ -153,7 +154,7 @@ class Panel extends React.Component {
     var code = 'inspect(window.$r' + attrs + ')';
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
-        debugger;
+        console.error('Failed to inspect source', err);
       }
     });
   }
@@ -163,7 +164,7 @@ class Panel extends React.Component {
     var code = 'window.$r' + attrs + '()';
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
-        debugger;
+        console.error('Failed to call function', err);
       }
     });
   }

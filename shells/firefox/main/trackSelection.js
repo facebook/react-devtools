@@ -9,8 +9,8 @@
  */
 'use strict';
 
-const { Cu } = require("chrome");
-const { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {});
+const { Cu } = require('chrome');
+const { gDevTools } = Cu.import('resource:///modules/devtools/gDevTools.jsm', {});
 
 /**
  * Whenever the devtools inspector panel selection changes, pass that node to
@@ -18,13 +18,13 @@ const { gDevTools } = Cu.import("resource:///modules/devtools/gDevTools.jsm", {}
  */
 function trackSelection() {
   var wc;
-  gDevTools.on('webconsole-init', function (eid, toolbox, panelFrame) {
-    toolbox.once('webconsole-ready', (eId, panel) => {
+  gDevTools.on('webconsole-init', function (_, toolbox, panelFrame) {
+    toolbox.once('webconsole-ready', (eid, panel) => {
       wc = panel;
     });
   });
 
-  gDevTools.on('inspector-init', (eid, toolbox, panelFrame) => {
+  gDevTools.on('inspector-init', (_, toolbox, panelFrame) => {
     toolbox.once('inspector-ready', (eid, panel) => {
       panel.selection.on('new-node-front', (ev, val, reason) => {
         passSelectedNode(wc.hud.ui.jsterm);

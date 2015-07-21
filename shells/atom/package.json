@@ -6,7 +6,7 @@
   "keywords": [
   ],
   "activationCommands": {
-    "atom-workspace": "atom:toggle"
+    "react-devtools": "atom-react-devtools:toggle"
   },
   "repository": "https://github.com/facebook/react-devtools",
   "license": "See LICENSE.txt",

@@ -66,7 +66,9 @@ class Todos extends React.Component {
   sort() {
     var todos = this.state.todos.slice();
     todos.sort((a, b) => {
-      if (a.title === b.title) return 0;
+      if (a.title === b.title) {
+        return 0;
+      }
       return a.title > b.title ? 1 : -1;
     });
     this.setState({todos});
@@ -329,7 +331,7 @@ var OldStyle = React.createClass({
   }
 });
 
-function long(children) {
+function long(children) { // eslint-disable-line no-unused-vars
   return <div style={styles.longStyle}>
     <div>Hello</div>
     <div>Hello</div>
@@ -370,8 +372,8 @@ class Target extends React.Component {
     }
     var count = this.state.num;
     var children = [];
-    for (var i=0; i<count; i++) {
-      children.push(<Target key={Math.random()} count={count-1}/>);
+    for (var i = 0; i < count; i++) {
+      children.push(<Target key={Math.random()} count={count - 1}/>);
     }
     return <div style={{
       margin: 5,

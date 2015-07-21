@@ -125,13 +125,6 @@ PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
 
-var toStr = val => {
-  try {
-    return JSON.stringify(val);
-  } catch (e) {}
-  return '' + val;
-};
-
 var WrappedPropState = decorate({
   listeners(props, store) {
     return ['selected', store.selected];

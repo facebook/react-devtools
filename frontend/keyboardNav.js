@@ -73,7 +73,6 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   if (!id) {
     return;
   }
-  var bottom = store.isBottomTagSelected;
   var node = store.get(id);
   var pid = store.skipWrapper(store.getParent(id), true);
 

@@ -12,6 +12,7 @@
 // this is not compiled by babel / webpack
 var ws = require('ws');
 var fs = require('fs');
+var path = require('path');
 
 var socket = ws.connect('ws://localhost:8081/devtools');
 
@@ -21,7 +22,7 @@ function initialMessage(evt) {
   if (evt.data === 'attach:agent') {
     initialize();
   }
-};
+}
 
 socket.onerror = function (err) {
   window.onDisconnected();
@@ -33,11 +34,11 @@ socket.onclose = function () {
 };
 
 function initialize() {
-  fs.readFile(__dirname + '/build/backend.js', function (err, data) {
+  fs.readFile(path.join(__dirname, '/build/backend.js'), function (err, backendScript) {
     if (err) {
       return console.error('failed to load...', err);
     }
-    socket.send('eval:' + data.toString('utf8'));
+    socket.send('eval:' + backendScript.toString('utf8'));
     socket.onmessage = function (evt) {
       // console.log('<<--', evt.data);
       var data = JSON.parse(evt.data);
@@ -50,10 +51,10 @@ function initialize() {
       if (data.$open) {
         return; // ignore
       }
-      listeners.forEach(function (fn) {fn(data);});
+      listeners.forEach(function (fn) {fn(data); });
     };
     console.log('connected to react native');
-    listeners = [];
+    var listeners = [];
 
     var wall = {
       listen(fn) {
@@ -68,7 +69,7 @@ function initialize() {
       },
     };
 
-    onConnected(wall);
+    window.onConnected(wall);
   });
 }
 

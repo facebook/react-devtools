@@ -9,7 +9,7 @@
  */
 'use strict';
 
-var self = require('sdk/self');
+// var self = require('sdk/self');
 
 // this installs the global hook
 require('./pageMod');

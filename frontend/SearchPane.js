@@ -13,7 +13,6 @@
 'use strict';
 
 var React = require('react');
-var Node = require('./Node');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
 

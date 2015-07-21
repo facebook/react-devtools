@@ -193,7 +193,6 @@ class Bridge {
   }
 
   _handleMessage(payload: PayloadType) {
-    var type = payload.type;
     if (payload.type === 'callback') {
       this._cbs.get(payload.id)(...payload.args);
       this._cbs.delete(payload.id);
@@ -278,15 +277,15 @@ class Bridge {
         result[name] = sanitize(val[name], [name], cleaned);
       });
 
-      if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
+      if (!protod && val.__proto__ && val.constructor.name !== 'Object') { // eslint-disable-line no-proto
         proto = {};
-        var pIsFn = typeof val.__proto__ === 'function';
-        Object.getOwnPropertyNames(val.__proto__).forEach(name => {
+        var pIsFn = typeof val.__proto__ === 'function'; // eslint-disable-line no-proto
+        Object.getOwnPropertyNames(val.__proto__).forEach(name => { // eslint-disable-line no-proto
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
           // $FlowFixMe flow thinks proto (and val) might be null
-          proto[name] = sanitize(val.__proto__[name], [name], protoclean);
+          proto[name] = sanitize(val.__proto__[name], [name], protoclean); // eslint-disable-line no-proto
         });
       }
     }
@@ -300,10 +299,10 @@ class Bridge {
 
 }
 
-function getIn(obj, path) {
+function getIn(base, path) {
   return path.reduce((obj, attr) => {
     return obj ? obj[attr] : null;
-  }, obj);
+  }, base);
 }
 
 module.exports = Bridge;

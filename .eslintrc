@@ -19,6 +19,7 @@
     "__DEV__": true,
     "__dirname": false,
     "__fbBatchedBridgeConfig": false,
+    "ReactElement": false,
     "cancelAnimationFrame": false,
     "clearImmediate": true,
     "clearInterval": false,
@@ -81,7 +82,7 @@
     "consistent-return": 0,          // require return statements to either always or never specify values
     "curly": 1,                      // specify curly brace conventions for all control statements
     "default-case": 0,               // require default case in switch statements (off by default)
-    "dot-notation": 1,               // encourages use of dot notation whenever possible
+    "dot-notation": 0,               // encourages use of dot notation whenever possible
     "eqeqeq": 1,                     // require the use of === and !==
     "guard-for-in": 0,               // make sure for-in loops have an if statement (off by default)
     "no-alert": 1,                   // disallow the use of alert, confirm, and prompt
@@ -121,7 +122,7 @@
     "semi-spacing": 1,	             // require a space after a semi-colon
     "vars-on-top": 0,                // requires to declare all vars on top of their containing scope (off by default)
     "wrap-iife": 0,                  // require immediate function invocation to be wrapped in parentheses (off by default)
-    "yoda": 1,                       // require or disallow Yoda conditions
+    "yoda": 0,                       // require or disallow Yoda conditions
 
   // Strict Mode
   // These rules relate to using strict mode.
@@ -209,7 +210,7 @@
     "react/jsx-quotes": [1, "double", "avoid-escape"],
     "react/jsx-no-undef": 1,
     "react/jsx-sort-props": 0,
-    "react/jsx-uses-react": 0,
+    "react/jsx-uses-react": 1,
     "react/jsx-uses-vars": 1,
     "react/no-did-mount-set-state": [1, "allow-in-func"],
     "react/no-did-update-set-state": [1, "allow-in-func"],

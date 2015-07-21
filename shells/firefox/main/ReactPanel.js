@@ -9,8 +9,8 @@
  */
 'use strict';
 
-const { Panel } = require("dev/panel.js");
-const { Class } = require("sdk/core/heritage");
+const { Panel } = require('dev/panel.js');
+const { Class } = require('sdk/core/heritage');
 
 // panel
 // for docs, see
@@ -19,7 +19,7 @@ const ReactPanel = Class({
   extends: Panel,
   label: 'React',
   tooltip: 'Debug & Develop React Apps',
-  icon: "./icon.png",
+  icon: './icon.png',
   url: './panel.html',
   setup(options) {
     // this.debuggee = options.debuggee;
@@ -33,19 +33,12 @@ const ReactPanel = Class({
       contentScriptFile: 'build/contentScript.js',
     });
 
-    const { MessageChannel } = require("sdk/messaging");
+    const { MessageChannel } = require('sdk/messaging');
     const channel = new MessageChannel();
     const addonSide = channel.port1;
     const panelSide = channel.port2;
 
     addonSide.onmessage = function (evt) {
-      if (evt.data === 'panel show') {
-        console.log('panel was shown');
-        if (jsterm) {
-          passSelectedNode(jsterm);
-        }
-        return;
-      }
       // console.log('from panel', evt.data);
       worker.port.emit('message', evt.data);
     };

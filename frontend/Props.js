@@ -25,13 +25,11 @@ class Props {
   render(): ReactElement {
     var props = this.props.props;
     if (!props || 'object' !== typeof props) {
-      return <span/>;;
+      return <span/>;
     }
 
     var names = Object.keys(props).filter(name => {
-      if (name[0] === '_') return false;
-      if (name === 'children') return false;
-      return true;
+      return name[0] !== '_' && name !== 'children';
     });
 
     var items = [];

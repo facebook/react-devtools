@@ -15,7 +15,7 @@ var consts = require('./consts');
 function hydrate(data: Object, cleaned: Array<Array<string>>): void {
   cleaned.forEach(path => {
     var last = path.pop();
-    var obj = path.reduce((obj, attr) => obj ? obj[attr] : null, data);
+    var obj = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, data);
     if (!obj || !obj[last]) {
       return;
     }

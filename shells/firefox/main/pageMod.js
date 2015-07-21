@@ -10,10 +10,10 @@
 'use strict';
 
 // inject the global hook
-var pageMod = require("sdk/page-mod");
+var pageMod = require('sdk/page-mod');
 
 pageMod.PageMod({
-  include: ["*", "file://*"],
+  include: ['*', 'file://*'],
   contentScriptFile: './build/GlobalHook.js',
   contentScriptWhen: 'start',
 });

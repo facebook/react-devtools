@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, NativeType, Hook} from '../backend/types';
+import type {DataType, OpaqueReactElement, Hook} from '../backend/types';
 
 var setupBackend = require('../backend/backend');
 

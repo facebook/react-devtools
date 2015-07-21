@@ -15,7 +15,6 @@ var assign = require('object-assign');
 
 var decorate = require('./decorate');
 var Props = require('./Props');
-var flash = require('./flash');
 
 import type {Map} from './imm';
 
@@ -136,8 +135,8 @@ class Node {
                 <span style={tagStyle}>&gt;</span>
               </span>
               {content && [
-                <span key='content' style={styles.textContent}>{content}</span>,
-                <span key='close' style={styles.closeTag}>
+                <span key="content" style={styles.textContent}>{content}</span>,
+                <span key="close" style={styles.closeTag}>
                   <span style={tagStyle}>&lt;/{name}&gt;</span>
                 </span>
               ]}

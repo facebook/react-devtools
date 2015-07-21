@@ -26,7 +26,7 @@ module.exports = function globalHook(window: Object) {
         _listeners: {},
         sub: function (evt, fn) {
           this.on(evt, fn);
-          return function () {this.off(evt, fn);}.bind(this);
+          return function () {this.off(evt, fn); }.bind(this);
         },
         on: function (evt, fn) {
           if (!this._listeners[evt]) {
@@ -48,7 +48,7 @@ module.exports = function globalHook(window: Object) {
         },
         emit: function (evt, data) {
           if (this._listeners[evt]) {
-            this._listeners[evt].map(function (fn) {fn(data);});
+            this._listeners[evt].map(function (fn) {fn(data); });
           }
         },
       }: Hook),

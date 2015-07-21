@@ -14,7 +14,7 @@ type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
 }
 
-type Port = {
+type Port = { // eslint-disable-line no-unused-vars
   disconnect: () => void,
   onMessage: Listenable,
   onDisconnect: Listenable,

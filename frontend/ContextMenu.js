@@ -116,7 +116,7 @@ var Wrapped = decorate({
       }
       var newItems = source[type](...args);
       if (newItems) {
-        items = items.concat(newItems.filter(x => !!x));
+        items = items.concat(newItems.filter(v => !!v));
       }
     });
 

@@ -51,9 +51,9 @@ module.exports = function setupBackend(hook: Hook): boolean {
     hook.inject(oldReact);
   }
 
-  for (var id in hook._renderers) {
-    hook.helpers[id] = attachRenderer(hook, id, hook._renderers[id]);
-    hook.emit('renderer-attached', {id, renderer: hook._renderers[id], helpers: hook.helpers[id]});
+  for (var rid in hook._renderers) {
+    hook.helpers[rid] = attachRenderer(hook, rid, hook._renderers[rid]);
+    hook.emit('renderer-attached', {id: rid, renderer: hook._renderers[rid], helpers: hook.helpers[rid]});
   }
 
   hook.on('renderer', ({id, renderer}) => {

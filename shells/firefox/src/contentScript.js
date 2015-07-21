@@ -6,8 +6,14 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
+ * @flow
  */
 'use strict';
+/* global self */
+
+declare var unsafeWindow: {
+  __REACT_DEVTOOLS_GLOBAL_HOOK__: Object,
+};
 
 if (Object.keys(unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length) {
   self.port.emit('hasReact', true);

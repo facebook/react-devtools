@@ -9,10 +9,10 @@
  */
 'use strict';
 
-const { Tool } = require("dev/toolbox");
+const { Tool } = require('dev/toolbox');
 const { ReactPanel } = require('./ReactPanel');
 
-const ReactDevtools = new Tool({
+const ReactDevtools = new Tool({ // eslint-disable-line no-unused-vars
   name: 'React Devtools',
   panels: {
     react: ReactPanel,

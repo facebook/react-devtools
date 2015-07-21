@@ -21,7 +21,7 @@ function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, val
     }
     var next = {};
     if (Array.isArray(obj)) {
-      for (var i=0; i<obj.length; i++) {
+      for (var i = 0; i < obj.length; i++) {
         if (i === attr) {
           if (Array.isArray(obj[i])) {
             next = [];
@@ -51,7 +51,7 @@ function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, val
   });
   if (!cancelled) {
     if (Array.isArray(obj)) {
-      for (var i=0; i<obj.length; i++) {
+      for (var i = 0; i < obj.length; i++) {
         curObj[i] = obj[i];
       }
       curObj[last] = value;

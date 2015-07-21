@@ -10,7 +10,7 @@
  */
 'use strict';
 
-type Panel = {
+type Panel = { // eslint-disable-line no-unused-vars
   onShown: {
     addListener: (cb: (window: Object) => void) => void,
   }

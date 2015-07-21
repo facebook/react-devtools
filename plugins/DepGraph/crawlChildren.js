@@ -14,7 +14,7 @@ var sep = '\x1f'; // separator
 // var MAX_DEPTH = 100;
 
 function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map>, depth: number, graph: Object) {
-  var grandchildren = [];
+  var descendents = [];
   var keepCrawling = true;//depth < MAX_DEPTH;
   children.forEach(cid => {
     var child = nodes.get(cid);
@@ -34,19 +34,19 @@ function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string
       }
     }
     if (keepCrawling) {
-      var children = child.get('children');
-      if (children && Array.isArray(children)) {
+      var grandChildren = child.get('children');
+      if (grandChildren && Array.isArray(grandChildren)) {
         if (isCustom) {
-          crawlChildren(name, children, nodes, depth + 1, graph);
+          crawlChildren(name, grandChildren, nodes, depth + 1, graph);
         } else {
-          grandchildren = grandchildren.concat(children);
+          descendents = descendents.concat(grandChildren);
         }
       }
     }
   });
 
-  if (keepCrawling && grandchildren.length) {
-    crawlChildren(ptype, grandchildren, nodes, depth + 1, graph);
+  if (keepCrawling && descendents.length) {
+    crawlChildren(ptype, descendents, nodes, depth + 1, graph);
   }
 }
 

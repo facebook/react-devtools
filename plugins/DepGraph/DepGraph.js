@@ -94,8 +94,8 @@ class SvgGraph {
                 onClick={this.props.onClick.bind(null, node.label)}
                 height={node.height}
                 width={node.width}
-                x={node.x - node.width/2}
-                y={node.y - node.height/2}
+                x={node.x - node.width / 2}
+                y={node.y - node.height / 2}
                 style={styles.rect}
                 fill="white"
                 stroke="black"
@@ -111,7 +111,7 @@ class SvgGraph {
               <text
                 style={{pointerEvents: 'none'}}
                 x={node.x}
-                y={node.y+node.height/4}
+                y={node.y + node.height / 4}
                 textAnchor="middle"
                 fontSize="10"
                 fontFamily="sans-serif"
@@ -181,7 +181,9 @@ function dagrize(graph) {
 
   for (var name in graph.edges) {
     var parts = name.split('\x1f');
-    if (parts[0] === '$root') continue;
+    if (parts[0] === '$root') {
+      continue;
+    }
     g.setEdge(parts[0], parts[1], {label: graph[name]});
   }
 

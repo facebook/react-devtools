@@ -10,7 +10,7 @@
  */
 'use strict';
 
-type Port = {
+type Port = { // eslint-disable-line no-unused-vars
   name: string,
   sender: {
     tab: {

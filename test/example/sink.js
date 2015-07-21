@@ -11,8 +11,8 @@
  */
 'use strict';
 
-import React from 'react/addons';
-import assign from 'object-assign';
+var React = require('react/addons');
+var assign = require('object-assign');
 
 // Different test things
 
@@ -28,7 +28,7 @@ class LongRender {
 class DeepTree {
   render() {
     var child = <span>At the bottom</span>;
-    for (var i=0; i<20; i++) {
+    for (var i = 0; i < 20; i++) {
       child = <span>({i}{child}</span>;
     }
     return child;
@@ -73,7 +73,6 @@ class Mounty {
 
 class LotsOfMounts {
   componentDidMount() {
-    var node = React.findDOMNode(this.node);
     this.roots = [];
     this.make('Rock');
     this.make('Solid');

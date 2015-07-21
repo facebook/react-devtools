@@ -6,8 +6,9 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @ xx flow see $FlowFixMe
+ * @flow
  */
+'use strict';
 
 var React = require('react');
 
@@ -16,8 +17,9 @@ var Container = require('../../../frontend/Container');
 var NativeStyler = require('../../../plugins/ReactNativeStyle/ReactNativeStyle');
 var Store = require('../../../frontend/Store');
 
-var consts = require('../../../agent/consts');
 var keyboardNav = require('../../../frontend/keyboardNav');
+
+import type {DOMEvent} from '../../../frontend/types';
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -32,7 +34,7 @@ type Port = {
 
 class Panel extends React.Component {
   _port: ?Port;
-  _keyListener: ?() => void;
+  _keyListener: ?(evt: DOMEvent) => void;
   _checkTimeout: ?number;
   _unMounted: boolean;
   _bridge: ?Bridge;
@@ -81,13 +83,14 @@ class Panel extends React.Component {
   }
 
   setup() {
-    var disconnected = false;
-
     this._bridge = new Bridge();
     // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.attach(this.props.wall);
 
-    this._store = new Store(this._bridge, this.props.win);
+    // $ FlowFixMe flow thinks this._bridge might be null
+    if (this._bridge) {
+      this._store = new Store(this._bridge, this.props.win);
+    }
     this._keyListener = keyboardNav(this._store, this.props.win);
     this.props.win.addEventListener('keydown', this._keyListener);
 
@@ -112,6 +115,7 @@ class Panel extends React.Component {
       return <span>Looking for react...</span>;
     }
     return (
+      // $FlowFixMe Container needn't inherit from React.Component
       <Container
         win={this.props.win}
         reload={this.reload.bind(this)}

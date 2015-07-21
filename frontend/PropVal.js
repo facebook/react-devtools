@@ -92,7 +92,7 @@ function previewArray(val) {
     items['c' + i] = ',';
   });
   if (val.length > 3) {
-    items['last'] = '…';
+    items.last = '…';
   } else {
     delete items['c' + (val.length - 1)];
   }
@@ -113,7 +113,7 @@ function previewObject(val) {
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
-    items['rest'] = '…';
+    items.rest = '…';
   } else {
     delete items['m' + (names.length - 1)];
   }
@@ -123,19 +123,5 @@ function previewObject(val) {
     </span>
   );
 }
-
-var styles = {
-  previewNumber: {
-    color: 'blue',
-  },
-
-  previewString: {
-    color: 'orange',
-  },
-
-  previewNull: {
-    color: '#999',
-  },
-};
 
 module.exports = PropVal;

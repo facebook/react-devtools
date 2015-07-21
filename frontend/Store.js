@@ -20,7 +20,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 
 import type * as Bridge from '../agent/Bridge';
-import type {DOMNode, DOMEvent, Dir, Dest, ElementID} from './types';
+import type {DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -161,7 +161,6 @@ class Store extends EventEmitter {
     if (!text) {
       this.searchRoots = null;
     } else {
-      var base;
       if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
         this.searchRoots = this.searchRoots
           .filter(item => {

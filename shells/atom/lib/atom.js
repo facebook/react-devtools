@@ -14,7 +14,7 @@ var CompositeDisposable = require('atom').CompositeDisposable;
 
 var isVisible = false;
 
-module.exports = Atom = {
+module.exports = {
   atomView: null,
   modalPanel: null,
   subscriptions: null,
