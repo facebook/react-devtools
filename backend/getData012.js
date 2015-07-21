@@ -11,6 +11,7 @@
 'use strict';
 
 import type {DataType, OpaqueReactElement, NativeType} from './types';
+var copyWithSet = require('./copyWithSet');
 
 function getData012(element: Object): DataType {
   var children = null;
@@ -56,7 +57,7 @@ function getData012(element: Object): DataType {
     }
   }
 
-  if (!name) {// && element.constructor.displayName) {
+  if (!name) {
     name = element.constructor.displayName || 'No display name';
     nodeType = 'Composite';
   }
@@ -95,7 +96,6 @@ function getData012(element: Object): DataType {
 
 function setInProps(inst, path: Array<string | number>, value: any) {
   inst.props = copyWithSet(inst.props, path, value);
-  // setIn(inst.props, path, value);
   inst.forceUpdate();
 }
 
@@ -115,57 +115,6 @@ function setIn(obj: Object, path: Array<string | number>, value: any) {
   if (parent) {
     parent[last] = value;
   }
-}
-
-function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any) {
-  var newObj = {};
-  var curObj = newObj;
-  var last = path.pop();
-  var cancelled = path.some(attr => {
-    // $FlowFixMe
-    if (!obj[attr]) {
-      return true;
-    }
-    var next = {};
-    if (Array.isArray(obj)) {
-      for (var i=0; i<obj.length; i++) {
-        if (i === attr) {
-          if (Array.isArray(obj[i])) {
-            next = [];
-          }
-          curObj[i] = next;
-        } else {
-          curObj[i] = obj[i];
-        }
-      }
-    } else {
-      for (var name in obj) {
-        if (name === attr) {
-          if (Array.isArray(obj[attr])) {
-            next = [];
-          }
-          // $FlowFixMe number or string is fine here
-          curObj[name] = next;
-        } else {
-          // $FlowFixMe number or string is fine here
-          curObj[name] = obj[name];
-        }
-      }
-    }
-    curObj = next;
-    // $FlowFixMe number or string is fine here
-    obj = obj[attr];
-  });
-  if (!cancelled) {
-    if (Array.isArray(obj)) {
-    } else {
-      for (var name in obj) {
-        curObj[name] = obj[name];
-      }
-      curObj[last] = value;
-    }
-  }
-  return newObj;
 }
 
 function childrenList(children) {

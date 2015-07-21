@@ -10,11 +10,11 @@
  */
 'use strict';
 
-var Agent = require('../../agent/Agent');
-var Bridge = require('../../agent/Bridge');
-var Highlighter = require('../../frontend/Highlighter/Highlighter');
+var Agent = require('../../../agent/Agent');
+var Bridge = require('../../../agent/Bridge');
+var Highlighter = require('../../../frontend/Highlighter/Highlighter');
 
-var inject = require('../../agent/inject');
+var inject = require('../../../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
@@ -23,7 +23,7 @@ setInterval(function () {
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
-  if (evt.data.source !== 'react-devtools-reporter') {
+  if (evt.data.source !== 'react-devtools-content-script') {
     return;
   }
 
@@ -37,7 +37,7 @@ function setup(hook) {
   var wall = {
     listen(fn) {
       var listener = evt => {
-        if (evt.data.source !== 'react-devtools-reporter' || !evt.data.payload) {
+        if (evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
           return;
         }
         fn(evt.data.payload)

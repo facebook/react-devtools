@@ -16,10 +16,11 @@ var React = require('react');
 var node = document.getElementById('container');
 
 function reload() {
-  React.unmountComponentAtNode(node);
-  node.innerHTML = '';
-  React.render(<Panel reload={reload} />, node);
+  setTimeout(() => {
+    React.unmountComponentAtNode(node);
+    node.innerHTML = '';
+    React.render(<Panel reload={reload} />, node);
+  }, 100);
 }
 
 React.render(<Panel alreadyFoundReact={true} reload={reload} />, node);
-

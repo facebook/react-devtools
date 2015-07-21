@@ -20,9 +20,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 
 import type * as Bridge from '../agent/Bridge'
-import type {DOMNode, DOMEvent, Dir, Dest} from './types'
-
-type ElementID = string;
+import type {DOMNode, DOMEvent, Dir, Dest, ElementID} from './types'
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -335,7 +333,7 @@ class Store extends EventEmitter {
     return node.get('children')[0];
   }
 
-  off(evt: DOMEvent, fn: ListenerFunction): void {
+  off(evt: string, fn: ListenerFunction): void {
     this.removeListener(evt, fn);
   }
 

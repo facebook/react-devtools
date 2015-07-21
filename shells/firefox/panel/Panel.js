@@ -19,6 +19,7 @@ var Store = require('../../../frontend/Store');
 var consts = require('../../../agent/consts');
 var keyboardNav = require('../../../frontend/keyboardNav');
 
+import type {DOMEvent} from '../../../frontend/types';
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
 }
@@ -32,7 +33,7 @@ type Port = {
 
 class Panel extends React.Component {
   _port: ?Port;
-  _keyListener: ?() => void;
+  _keyListener: ?(evt: DOMEvent) => void;
   _checkTimeout: ?number;
   _unMounted: boolean;
   _bridge: ?Bridge;

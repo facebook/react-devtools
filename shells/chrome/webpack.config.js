@@ -2,12 +2,12 @@
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
-    main: './main.js',
-    backend: './backend.js',
-    background: './background.js',
-    inject: './injected/GlobalHook.js',
-    reporter: './reporter.js',
-    panel: './panel/run.js',
+    main: './src/main.js',
+    backend: './src/backend.js',
+    background: './src/background.js',
+    inject: './src/GlobalHook.js',
+    contentScript: './src/contentScript.js',
+    panel: './src/panel/run.js',
   },
   output: {
     path: __dirname + '/build',

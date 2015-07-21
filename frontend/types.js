@@ -1,8 +1,21 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
-type Dir = 'up' | 'down' | 'left' | 'right';
-type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent';
+export type Dir = 'up' | 'down' | 'left' | 'right';
+export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom';
 
-type DOMNode = {
+export type ElementID = string;
+
+export type DOMNode = {
   nodeName: string,
   style: Object,
   offsetTop: number,
@@ -17,14 +30,20 @@ type DOMNode = {
   removeChild: (child: DOMNode) => void,
   parentNode: DOMNode,
   innerText: string,
+  value: string,
+  innerHTML: string,
+  textContent: string,
+  removeListener: (evt: string, fn: () => void) => void,
 };
 
-type DOMEvent = {
+export type DOMEvent = {
   target: DOMNode,
+  pageX: number,
+  pageY: number,
   preventDefault: () => void,
   stopPropagation: () => void,
   cancelBubble: boolean,
+  keyCode: number,
 };
 
-export {DOMNode, DOMEvent, Dir, Dest};
 

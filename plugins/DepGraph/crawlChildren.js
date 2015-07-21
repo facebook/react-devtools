@@ -1,8 +1,19 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
 var sep = '\x1f'; // separator
 // var MAX_DEPTH = 100;
 
-function crawlChildren(ptype, children, nodes, depth, graph) {
+function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map>, depth: number, graph: Object) {
   var grandchildren = [];
   var keepCrawling = true;//depth < MAX_DEPTH;
   children.forEach(cid => {

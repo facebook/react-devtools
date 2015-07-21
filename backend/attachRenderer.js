@@ -69,6 +69,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   if (renderer.Component) {
     console.error('You are using a version of React with limited support in this version of the devtools.\nPlease upgrade to use at least 0.13, or you can downgrade to use the old version of the devtools:\ninstructions here https://github.com/facebook/react-devtools/tree/devtools-next#how-do-i-use-this-for-react--013');
     // 0.11 - 0.12
+    // $FlowFixMe renderer.Component is not "possibly undefined"
     oldMethods = decorateMany(renderer.Component.Mixin, {
       mountComponent() {
         var data = getData012(this, {});
@@ -114,7 +115,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
 
   extras.cleanup = function () {
     if (oldMethods) {
-      if (is012) {
+      if (renderer.Component) {
         restoreMany(renderer.Component.Mixin, oldMethods);
       } else {
         restoreMany(renderer.Reconciler, oldMethods);

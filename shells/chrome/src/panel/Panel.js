@@ -10,17 +10,17 @@
  */
 
 var React = require('react');
-var Bridge = require('../../../agent/Bridge');
-var Container = require('../../../frontend/Container');
-var NativeStyler = require('../../../plugins/ReactNativeStyle/ReactNativeStyle.js');
-var Store = require('../../../frontend/Store');
-var keyboardNav = require('../../../frontend/keyboardNav');
+var Bridge = require('../../../../agent/Bridge');
+var Container = require('../../../../frontend/Container');
+var NativeStyler = require('../../../../plugins/ReactNativeStyle/ReactNativeStyle.js');
+var Store = require('../../../../frontend/Store');
+var keyboardNav = require('../../../../frontend/keyboardNav');
 
 var checkForReact = require('./checkForReact');
-var consts = require('../../../agent/consts');
+var consts = require('../../../../agent/consts');
 var inject = require('./inject');
 
-import type {DOMEvent} from '../../../frontend/types';
+import type {DOMEvent} from '../../../../frontend/types';
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -38,6 +38,7 @@ declare var chrome: {
     network: {
       onNavigated: {
         addListener: (fn: () => void) => void,
+        removeListener: (fn: () => void) => void,
       },
     },
     inspectedWindow: {
@@ -58,6 +59,7 @@ class Panel extends React.Component {
   _unMounted: boolean;
   _bridge: ?Bridge;
   _store: Store;
+  _unsub: ?() => void;
 
   constructor(props: Object) {
     super(props)
@@ -79,16 +81,24 @@ class Panel extends React.Component {
       this.lookForReact();
     }
 
-    chrome.devtools.network.onNavigated.addListener(() => {
-      this.reload();
-    });
+    var reload = () => this.reload();
+    this._unsub = () => {
+      chrome.devtools.network.onNavigated.removeListener(reload);
+    }
+    chrome.devtools.network.onNavigated.addListener(reload);
   }
 
   componentWillUnmount() {
     this._unMounted = true;
+    if (this._unsub) {
+      this._unsub();
+    }
   }
 
   reload() {
+    if (this._unsub) {
+      this._unsub();
+    }
     this.teardown();
     if (!this._unMounted) {
       this.setState({loading: true}, this.props.reload);

@@ -38,22 +38,22 @@ chrome.runtime.onConnect.addListener(function (port) {
   if (isNumeric(port.name)) {
     tab = port.name;
     name = 'devtools';
-    installReporter(+port.name);
+    installContentScript(+port.name);
   } else {
     tab = port.sender.tab.id;
-    name = 'reporter';
+    name = 'content-script';
   }
 
   if (!ports[tab]) {
     ports[tab] = {
       devtools: null,
-      reporter: null,
+      'content-script': null,
     };
   }
   ports[tab][name] = port;
 
-  if (ports[tab]['devtools'] && ports[tab]['reporter']) {
-    doublePipe(ports[tab]['devtools'], ports[tab]['reporter']);
+  if (ports[tab]['devtools'] && ports[tab]['content-script']) {
+    doublePipe(ports[tab]['devtools'], ports[tab]['content-script']);
   }
 });
 
@@ -61,8 +61,8 @@ function isNumeric(str: string): boolean {
   return +str + '' === str;
 }
 
-function installReporter(tabId: number) {
-  chrome.tabs.executeScript(tabId, {file: '/build/reporter.js'}, function () {
+function installContentScript(tabId: number) {
+  chrome.tabs.executeScript(tabId, {file: '/build/contentScript.js'}, function () {
   });
 }
 
