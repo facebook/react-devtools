@@ -11,3 +11,9 @@
 /shells/plain/build
 /plugins/node_modules
 *.swo
+backend/__tests__/node_modules
+backend/__tests__/v0.11/node_modules
+backend/__tests__/v0.12/node_modules
+backend/__tests__/v0.13/node_modules
+backend/__tests__/v0.14/node_modules
+backend/__tests__/build

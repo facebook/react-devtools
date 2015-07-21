@@ -1,0 +1,39 @@
+<!doctype>
+<html>
+    <head>
+        <meta charset=utf8>
+        <title>React Tests</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            .status {
+                font-size: 20px;
+            }
+            a {
+                display: block;
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <a href="index.html">Home</a>
+        <script src="http://localhost:8080/webpack-dev-server.js"></script>
+        <script>
+            var src = location.search.slice(1);
+            if (src.length) {
+                var script = document.createElement('script');
+                script.src = src;
+                document.body.appendChild(script);
+            } else {
+                var link;
+                for (var v=11; v<15; v++) {
+                    link = document.createElement('a');
+                    link.href = '?v0' + v + '.js';
+                    link.textContent = 'Version 0.' + v;
+                    document.body.appendChild(link);
+                }
+            }
+        </script>
+    </body>
+</html>

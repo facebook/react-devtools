@@ -72,13 +72,18 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     // $FlowFixMe renderer.Component is not "possibly undefined"
     oldMethods = decorateMany(renderer.Component.Mixin, {
       mountComponent() {
-        var data = getData012(this, {});
         rootNodeIDMap.set(this._rootNodeID, this);
-        hook.emit('mount', {element: this, data, renderer: rid});
+        // FIXME maybe shim something else to remove this hack
+        setTimeout(() => {
+          hook.emit('mount', {element: this, data: getData012(this, {}), renderer: rid});
+        }, 0);
       },
       updateComponent() {
-        console.log('updating', this);
-        hook.emit('update', {element: this, data: getData012(this, {}), renderer: rid});
+        // we need this because DOMComponent updates itself *after* calling
+        // this method.
+        setTimeout(() => {
+          hook.emit('update', {element: this, data: getData012(this, {}), renderer: rid});
+        }, 0);
       },
       unmountComponent() {
         hook.emit('unmount', {element: this, renderer: rid});
