@@ -74,7 +74,7 @@ class Bridge {
   }
 
   attach(wall: Wall) {
-    this._wall = wall
+    this._wall = wall;
     this._wall.listen(this._handleMessage.bind(this));
   }
 
@@ -88,7 +88,7 @@ class Bridge {
         hydrate(proto, protoclean);
       }
       if (proto) {
-        data[consts.proto] = proto
+        data[consts.proto] = proto;
       }
       cb(data);
     });
@@ -122,8 +122,7 @@ class Bridge {
 
   sendOne(evt: string, data: any) {
     var cleaned = [];
-    var start = performance.now();
-    var san = sanitize(data, [], cleaned)
+    var san = sanitize(data, [], cleaned);
     if (cleaned.length) {
       this._inspectables.set(data.id, data);
     }
@@ -150,7 +149,7 @@ class Bridge {
     var start = performance.now();
     var events = this._buffer.map(({evt, data}) => {
       var cleaned = [];
-      var san = sanitize(data, [], cleaned)
+      var san = sanitize(data, [], cleaned);
       if (cleaned.length) {
         this._inspectables.set(data.id, data);
       }
@@ -159,7 +158,7 @@ class Bridge {
     this._wall.send({type: 'many-events', events});
     this._buffer = [];
     this._waiting = null;
-    this._lastTime = performance.now() - start
+    this._lastTime = performance.now() - start;
   }
 
   forget(id: string) {
@@ -185,10 +184,10 @@ class Bridge {
   }
 
   once(evt: string, fn: AnyFn) {
-    var bridge = this;
+    var self = this;
     var listener = function () {
       fn.apply(this, arguments);
-      bridge.off(evt, listener);
+      self.off(evt, listener);
     }
     this.on(evt, listener);
   }
@@ -224,14 +223,14 @@ class Bridge {
     }
 
     if (payload.type === 'many-events') {
-      payload.events.forEach(payload => {
+      payload.events.forEach(event => {
         // console.log('[bridge<-]', payload.evt);
-        if (payload.cleaned) {
-          hydrate(payload.data, payload.cleaned);
+        if (event.cleaned) {
+          hydrate(event.data, event.cleaned);
         }
-        var fns = this._listeners[payload.evt]
-        if (fns) {
-          fns.forEach(fn => fn(payload.data));
+        var handlers = this._listeners[event.evt];
+        if (handlers) {
+          handlers.forEach(fn => fn(event.data));
         }
       });
     }

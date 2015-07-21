@@ -10,9 +10,10 @@
  */
 'use strict';
 
-import {EventEmitter} from 'events'
-import assign from 'object-assign'
-import type * as Bridge from './Bridge'
+var {EventEmitter} = require('events');
+var assign = require('object-assign');
+
+import type * as Bridge from './Bridge';
 import type {DataType, OpaqueReactElement, NativeType} from '../backend/types';
 
 type Bridge = {
@@ -20,8 +21,6 @@ type Bridge = {
   on: (evt: string, fn: (data: any) => any) => void,
   forget: (id: string) => void,
 };
-
-type Handle = {};
 
 type InternalsObject = {
   getNativeFromReactElement: (el: OpaqueReactElement) => NativeType,
@@ -63,9 +62,9 @@ class Agent extends EventEmitter {
       }
     });
     this._prevSelected = null;
-    var isReactDOM = window.document && 'function' === typeof window.document.createElement;
+    var isReactDOM = window.document && typeof window.document.createElement === 'function';
     this.capabilities = assign({
-      scroll: isReactDOM && 'function' === typeof window.document.body.scrollIntoView,
+      scroll: isReactDOM && typeof window.document.body.scrollIntoView === 'function',
       dom: isReactDOM,
       editTextContent: false,//isReactDOM,
     }, capabilities);
@@ -130,11 +129,11 @@ class Agent extends EventEmitter {
       this.emit('connected');
     });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
-    this.on('root', id => bridge.send('root', id))
-    this.on('mount', data => bridge.send('mount', data))
+    this.on('root', id => bridge.send('root', id));
+    this.on('mount', data => bridge.send('mount', data));
     this.on('update', data => bridge.send('update', data));
     this.on('unmount', id => {
-      bridge.send('unmount', id)
+      bridge.send('unmount', id);
       bridge.forget(id);
     });
     this.on('setSelection', data => bridge.send('select', data));
@@ -267,7 +266,7 @@ class Agent extends EventEmitter {
   }
 
   getId(element: OpaqueReactElement): string {
-    if ('object' !== typeof element) {
+    if (typeof element !== 'object') {
       return element;
     }
     if (!this.ids.has(element)) {
@@ -311,7 +310,7 @@ class Agent extends EventEmitter {
     send.canUpdate = send.updater && !!send.updater.forceUpdate;
     delete send.type;
     delete send.updater;
-    this.emit('update', send)
+    this.emit('update', send);
   }
 
   onUnmounted(component: OpaqueReactElement) {
@@ -325,7 +324,7 @@ class Agent extends EventEmitter {
 }
 
 function randid() {
-  return Math.random().toString(0x0f).slice(10, 20)
+  return Math.random().toString(0x0f).slice(10, 20);
 }
 
 function getIn(obj, path) {
@@ -334,4 +333,4 @@ function getIn(obj, path) {
   }, obj);
 }
 
-module.exports = Agent
+module.exports = Agent;
