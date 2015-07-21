@@ -42,7 +42,7 @@ function initialize() {
       // console.log('<<--', evt.data);
       var data = JSON.parse(evt.data);
       if (data.$close || data.$error) {
-        console.log('Closing or Erroring')
+        console.log('Closing or Erroring');
         window.onDisconnected();
         socket.onmessage = initialMessage;
         return;
@@ -50,7 +50,7 @@ function initialize() {
       if (data.$open) {
         return; // ignore
       }
-      listeners.forEach(function (fn) {fn(data)});
+      listeners.forEach(function (fn) {fn(data);});
     };
     console.log('connected to react native');
     listeners = [];

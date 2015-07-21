@@ -20,10 +20,10 @@ import type {DOMEvent} from '../types';
 
 class Simple extends React.Component {
   constructor(props: Object) {
-    super(props)
+    super(props);
     this.state = {
       editing: false,
-    }
+    };
   }
 
   onChange(e: DOMEvent) {
@@ -76,8 +76,8 @@ class Simple extends React.Component {
 
   selectAll() {
     var node = React.findDOMNode(this.input);
-    node.selectionStart = 0
-    node.selectionEnd = node.value.length
+    node.selectionStart = 0;
+    node.selectionEnd = node.value.length;
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -106,7 +106,7 @@ class Simple extends React.Component {
 
     var data = this.props.data;
     var type = typeof data;
-    var style = styles.simple
+    var style = styles.simple;
     var typeStyle;
     if ('boolean' === type) {
       typeStyle = valueStyles.bool;
@@ -144,7 +144,7 @@ Simple.propTypes = {
 
 Simple.contextTypes = {
   onChange: React.PropTypes.func.isRequired,
-}
+};
 
 var styles = {
   simple: {

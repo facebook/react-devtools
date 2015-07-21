@@ -85,6 +85,6 @@ var styles = {
     display: 'flex',
     minWidth: 0,
   },
-}
+};
 
 module.exports = Container;

@@ -62,7 +62,7 @@ class Panel extends React.Component {
   _unsub: ?() => void;
 
   constructor(props: Object) {
-    super(props)
+    super(props);
     this.state = {loading: true, isReact: this.props.alreadyFoundReact};
     this._unMounted = false;
     window.panel = this;
@@ -84,7 +84,7 @@ class Panel extends React.Component {
     var reload = () => this.reload();
     this._unsub = () => {
       chrome.devtools.network.onNavigated.removeListener(reload);
-    }
+    };
     chrome.devtools.network.onNavigated.addListener(reload);
   }
 
@@ -306,7 +306,7 @@ var panelRNStyle = bridge => (node, id) => {
       <NativeStyler id={id} bridge={bridge} />
     </div>
   );
-}
+};
 
 var styles = {
   chromePane: {
@@ -321,7 +321,7 @@ var styles = {
     padding: 30,
     flex: 1,
   },
-}
+};
 
 Panel.childContextTypes = {
   store: React.PropTypes.object,

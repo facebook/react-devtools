@@ -31,19 +31,19 @@ class SearchPane extends React.Component {
 
   componentWillMount() {
     this._key = this.onWindowKeyDown.bind(this);
-    var win = this.props.win || window
+    var win = this.props.win || window;
     win.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    var win = this.props.win || window
+    var win = this.props.win || window;
     win.removeEventListener('keydown', this._key, true);
   }
 
   onWindowKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
       var node = React.findDOMNode(this.input);
-      var win = this.props.win || window
+      var win = this.props.win || window;
       if (win.document.activeElement === node) {
         return;
       }
@@ -64,7 +64,7 @@ class SearchPane extends React.Component {
     this.props.onChangeSearch('');
     setTimeout(() => {
       React.findDOMNode(this.input).blur();
-    }, 100)
+    }, 100);
   }
 
   onKeyDown(key) {
@@ -151,6 +151,6 @@ var styles = {
     borderTop: '1px solid #ccc',
     outline: 'none',
   },
-}
+};
 
 module.exports = Wrapped;

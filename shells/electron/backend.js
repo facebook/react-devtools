@@ -26,13 +26,13 @@ function setup() {
 
   global.__REACT_DEVTOOLS_GLOBAL_HOOK__.poll = function (messages) {
     messages.forEach(message => {
-      listeners.forEach(fn => fn(message))
+      listeners.forEach(fn => fn(message));
     });
 
     var waiting = waitingMessages;
     waitingMessages = [];
     return waiting;
-  }
+  };
 
   var wall = {
     listen(fn) {

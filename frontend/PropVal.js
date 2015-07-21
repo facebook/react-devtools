@@ -40,16 +40,16 @@ class PropVal extends React.Component {
 
 function previewProp(val: any, nested: boolean) {
   if ('number' === typeof val) {
-    return <span style={valueStyles.number}>{val}</span>
+    return <span style={valueStyles.number}>{val}</span>;
   }
   if ('string' === typeof val) {
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
-    return <span style={valueStyles.string}>"{val}"</span>
+    return <span style={valueStyles.string}>"{val}"</span>;
   }
   if ('boolean' === typeof val) {
-    return <span style={valueStyles.bool}>{'' + val}</span>
+    return <span style={valueStyles.bool}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
     if (nested) {
@@ -76,7 +76,7 @@ function previewProp(val: any, nested: boolean) {
       return <span>{val[consts.name] + '{}'}</span>;
     }
     if (type === 'array') {
-      return <span>Array[{val[consts.meta].length}]</span>
+      return <span>Array[{val[consts.meta].length}]</span>;
     }
   }
   if (nested) {
@@ -136,6 +136,6 @@ var styles = {
   previewNull: {
     color: '#999',
   },
-}
+};
 
 module.exports = PropVal;

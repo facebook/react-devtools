@@ -19,8 +19,8 @@ var {Map, Set, List} = require('./imm');
 var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 
-import type * as Bridge from '../agent/Bridge'
-import type {DOMNode, DOMEvent, Dir, Dest, ElementID} from './types'
+import type * as Bridge from '../agent/Bridge';
+import type {DOMNode, DOMEvent, Dir, Dest, ElementID} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -91,7 +91,7 @@ class Store extends EventEmitter {
   };
 
   constructor(bridge: Bridge) {
-    super()
+    super();
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
@@ -165,7 +165,7 @@ class Store extends EventEmitter {
       if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
         this.searchRoots = this.searchRoots
           .filter(item => {
-            var node = this.get(item)
+            var node = this.get(item);
             return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) ||
               (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
               ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1);
@@ -214,7 +214,7 @@ class Store extends EventEmitter {
     if (!ids || !ids.size) {
       return;
     }
-    var id = ids.toSeq().first()
+    var id = ids.toSeq().first();
     this._revealDeep(id);
     this.selectTop(id);
   }
@@ -338,7 +338,7 @@ class Store extends EventEmitter {
   }
 
   inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
-    this._bridge.inspect(id, path, cb)
+    this._bridge.inspect(id, path, cb);
   }
 
   // Private stuff
@@ -401,7 +401,7 @@ class Store extends EventEmitter {
   }
 
   _updateComponent(data: DataType) {
-    var node = this.get(data.id)
+    var node = this.get(data.id);
     if (!node) {
       return;
     }
@@ -419,7 +419,7 @@ class Store extends EventEmitter {
     var pid = this._parents.get(id);
     this._removeFromNodesByName(id);
     this._parents = this._parents.delete(id);
-    this._nodes = this._nodes.delete(id)
+    this._nodes = this._nodes.delete(id);
     if (pid) {
       this.emit(pid);
     } else {

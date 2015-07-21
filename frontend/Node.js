@@ -41,7 +41,7 @@ class Node {
   static contextTypes: Object;
 
   shouldComponentUpdate(nextProps: PropsType) {
-    return nextProps !== this.props
+    return nextProps !== this.props;
   }
 
   componentDidMount() {
@@ -61,7 +61,7 @@ class Node {
     if (!node) {
       return;
     }
-    var domnode = React.findDOMNode(node)
+    var domnode = React.findDOMNode(node);
     this.context.scrollTo(domnode.offsetTop, domnode.offsetHeight);
   }
 
@@ -232,7 +232,7 @@ var WrappedNode = decorate({
     return [props.id];
   },
   props(store, props) {
-    var node = store.get(props.id)
+    var node = store.get(props.id);
     return {
       node,
       selected: store.selected === props.id,

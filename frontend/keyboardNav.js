@@ -26,7 +26,7 @@ var keyCodes = {
   '38': 'up',
   '39': 'right',
   '40': 'down',
-}
+};
 
 module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) => void {
   win = win || window;
@@ -51,8 +51,8 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
     if (move && move !== store.selected) {
       store.select(move);
     }
-  }
-}
+  };
+};
 
 function getDest(dir: Dir, store: Store): ?Dest {
   var id = store.selected;
@@ -96,7 +96,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
 
   // Children
   if (dest === 'firstChild') {
-    var children = node.get('children')
+    var children = node.get('children');
     if ('string' === typeof children) {
       return getNewSelection('nextSibling', store);
     }

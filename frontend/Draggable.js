@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react');
-import type {DOMNode, DOMEvent} from './types'
+import type {DOMNode, DOMEvent} from './types';
 
 class Draggable {
   _onMove: (evt: DOMEvent) => void;
@@ -25,7 +25,7 @@ class Draggable {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
-    var win = this.props.win || window
+    var win = this.props.win || window;
     win.addEventListener('mousemove', this._onMove);
     win.addEventListener('mouseup', this._onUp);
     this.props.onStart();
@@ -38,7 +38,7 @@ class Draggable {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
-    var win = this.props.win || window
+    var win = this.props.win || window;
     win.removeEventListener('mousemove', this._onMove);
     win.removeEventListener('mouseup', this._onUp);
     this.props.onStop();

@@ -188,7 +188,7 @@ class Bridge {
     var listener = function () {
       fn.apply(this, arguments);
       self.off(evt, listener);
-    }
+    };
     this.on(evt, listener);
   }
 
@@ -215,7 +215,7 @@ class Bridge {
       if (payload.cleaned) {
         hydrate(payload.data, payload.cleaned);
       }
-      var fns = this._listeners[payload.evt]
+      var fns = this._listeners[payload.evt];
       if (fns) {
         // $FlowFixMe tagged unions not valid inside function?
         fns.forEach(fn => fn(payload.data));
@@ -265,8 +265,8 @@ class Bridge {
     var proto = null;
     var protoclean = [];
     if (val) {
-      var protod = false
-      var isFn = typeof val === 'function'
+      var protod = false;
+      var isFn = typeof val === 'function';
       Object.getOwnPropertyNames(val).forEach(name => {
         if (name === '__proto__') {
           protod = true;
@@ -280,7 +280,7 @@ class Bridge {
 
       if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
         proto = {};
-        var pIsFn = typeof val.__proto__ === 'function'
+        var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;

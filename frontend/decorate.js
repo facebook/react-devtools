@@ -56,8 +56,8 @@ module.exports = function (options: Options, Component: any): any {
     _update: () => void;
 
     constructor(props) {
-      super(props)
-      this.state = {}
+      super(props);
+      this.state = {};
     }
 
     componentWillMount() {
@@ -85,7 +85,7 @@ module.exports = function (options: Options, Component: any): any {
         return true;
       }
       if (options.shouldUpdate) {
-        return options.shouldUpdate(nextProps, this.props)
+        return options.shouldUpdate(nextProps, this.props);
       }
       return false;
     }
@@ -137,7 +137,7 @@ function arrayDiff(array, oldArray) {
   return {
     missing,
     newItems: setToArray(names),
-  }
+  };
 }
 
 function setToArray(set) {

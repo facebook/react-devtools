@@ -52,7 +52,7 @@ class SplitPane extends React.Component {
       <div style={rightStyle}>
         {this.props.right()}
       </div>
-    </div>
+    </div>;
   }
 }
 
@@ -86,6 +86,6 @@ var styles = {
     minWidth: 0,
     flex: 1,
   },
-}
+};
 
 module.exports = SplitPane;

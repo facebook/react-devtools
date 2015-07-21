@@ -10,7 +10,7 @@
 'use strict';
 
 var JsonSocket = require('../../electron/node_modules/json-socket');
-var net = require('net')
+var net = require('net');
 
 module.exports = function (onConnected) {
   var socket = new JsonSocket(new net.Socket());
@@ -42,4 +42,4 @@ module.exports = function (onConnected) {
   });
 
   socket.connect(8011); // , 'localhost');
-}
+};

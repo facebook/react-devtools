@@ -37,9 +37,9 @@ function injectBackend() {
       self.port.emit('message', evt.data.payload);
     });
     node.parentNode.removeChild(node);
-  }
+  };
 
-  node.src = 'resource://react-devtools/data/build/backend.js'
+  node.src = 'resource://react-devtools/data/build/backend.js';
   document.documentElement.appendChild(node);
 }
 

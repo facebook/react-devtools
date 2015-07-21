@@ -30,7 +30,7 @@ class DepGraph extends React.Component {
         />
       );
     }
-    return <button onClick={() => this.setState({renderCount: 1})}>Calculate DepGraph</button>
+    return <button onClick={() => this.setState({renderCount: 1})}>Calculate DepGraph</button>;
   }
 }
 
@@ -38,7 +38,7 @@ class DisplayDeps {
   props: Object;
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected !== this.props.selected) {
-      return this.props.onClose()
+      return this.props.onClose();
     }
   }
   render() {
@@ -68,7 +68,7 @@ class SvgGraph {
     if (!graph) {
       return <em>No graph to display. Select something else</em>;
     }
-    var transform = 'translate(10, 10)'
+    var transform = 'translate(10, 10)';
     return (
       <svg style={styles.svg} width={graph.graph().width + 20} height={graph.graph().height + 20}>
         <g transform={transform}>
@@ -156,7 +156,7 @@ var styles = {
     bottom: 3,
     right: 3,
   },
-}
+};
 
 function dagrize(graph) {
   var g = new dagre.graphlib.Graph();

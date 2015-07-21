@@ -82,7 +82,7 @@ class TreeView extends React.Component {
 
 TreeView.childContextTypes = {
   scrollTo: React.PropTypes.func,
-}
+};
 
 var styles = {
   container: {

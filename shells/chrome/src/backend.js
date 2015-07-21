@@ -28,7 +28,7 @@ function welcome(evt) {
   }
 
   window.removeEventListener('message', welcome);
-  setup(window.__REACT_DEVTOOLS_GLOBAL_HOOK__)
+  setup(window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 }
 
 function setup(hook) {
@@ -40,7 +40,7 @@ function setup(hook) {
         if (evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
           return;
         }
-        fn(evt.data.payload)
+        fn(evt.data.payload);
       };
       listeners.push(listener);
       window.addEventListener('message', listener);

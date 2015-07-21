@@ -154,6 +154,6 @@ var styles = {
     padding: '5px 10px',
     color: '#888',
   },
-}
+};
 
 module.exports = Wrapped;

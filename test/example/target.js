@@ -292,7 +292,7 @@ var styles = {
     height: 200,
     overflow: 'auto',
   }
-}
+};
 
 class Something {
   doot() {
@@ -319,13 +319,13 @@ class Wrap extends React.Component {
       <span val={undefined}/>
       <div>&lt;</div>*/}
      <OldStyle awesome={2}/>
-    </div>
+    </div>;
   }
 }
 
 var OldStyle = React.createClass({
   render() {
-    return <span>OldStyle {this.props.awesome}</span>
+    return <span>OldStyle {this.props.awesome}</span>;
   }
 });
 
@@ -350,26 +350,26 @@ function long(children) {
     <div>Hello</div>
     <div>Hello</div>
     {children}
-  </div>
+  </div>;
 }
 
 class Target extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {
       awesome: false,
       num: this.props.count || 5,
-    }
+    };
   }
 
   render() {
     if (this.state.num === 1) {
       return <div onClick={() => this.setState({awesome: !this.state.awesome})}>
         {'' + !!this.state.awesome}
-      </div>
+      </div>;
     }
     var count = this.state.num;
-    var children = []
+    var children = [];
     for (var i=0; i<count; i++) {
       children.push(<Target key={Math.random()} count={count-1}/>);
     }
@@ -380,10 +380,10 @@ class Target extends React.Component {
     }}>
       {count} : {this.state.num} / {'' + !!this.state.awesome}
       {children}
-    </div>
+    </div>;
   }
 }
 
 var node = document.createElement('div');
-document.body.appendChild(node)
+document.body.appendChild(node);
 React.render(<Wrap more={['a',2,'c',4]} str="thing" awesome={1}/>, node);

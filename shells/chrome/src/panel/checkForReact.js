@@ -24,5 +24,5 @@ module.exports = function (done: (pageHasReact: boolean) => void) {
   )`, function (pageHasReact, err) {
     done(pageHasReact);
   });
-}
+};
 

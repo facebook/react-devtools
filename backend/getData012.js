@@ -37,7 +37,7 @@ function getData012(element: Object): DataType {
     // string children
     name = element.constructor.displayName;
     children = props.children;
-    nodeType = 'Native'
+    nodeType = 'Native';
   }
 
   if (!props && element._currentElement && element._currentElement.props) {
@@ -76,7 +76,7 @@ function getData012(element: Object): DataType {
       setInProps: element.forceUpdate && setInProps.bind(null, element),
       setInState: element.forceUpdate && setInState.bind(null, element),
       setInContext: element.forceUpdate && setInContext.bind(null, element),
-    }
+    };
     publicInstance = element;
   }
 

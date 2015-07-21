@@ -39,7 +39,7 @@ class Panel extends React.Component {
   _store: Store;
 
   constructor(props: Object) {
-    super(props)
+    super(props);
     this.state = {loading: true, isReact: true};
     this._unMounted = false;
     window.panel = this;
@@ -132,7 +132,7 @@ var panelRNStyle = bridge => (node, id) => {
       <NativeStyler id={id} bridge={bridge} />
     </div>
   );
-}
+};
 
 var styles = {
   chromePane: {
@@ -147,7 +147,7 @@ var styles = {
     padding: 30,
     flex: 1,
   },
-}
+};
 
 Panel.childContextTypes = {
   store: React.PropTypes.object,

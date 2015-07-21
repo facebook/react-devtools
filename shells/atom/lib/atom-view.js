@@ -9,17 +9,17 @@
  */
 'use strict';
 
-require('../../electron/build/panel-el')
-var Panel = window.RNPanel
-var React = window.RNReact
+require('../../electron/build/panel-el');
+var Panel = window.RNPanel;
+var React = window.RNReact;
 var connect = require('./node');
-module.exports = ReactNativeView
+module.exports = ReactNativeView;
 
 function ReactNativeView(serializedState) {
   // Create root element
-  this.element = document.createElement('div')
-  this.element.classList.add('atom')
-  this.element.innerHTML = 'Loading...'
+  this.element = document.createElement('div');
+  this.element.classList.add('atom');
+  this.element.innerHTML = 'Loading...';
   setStyle(this.element, {
     display: 'flex',
     backgroundColor: 'white',
@@ -37,9 +37,9 @@ function setStyle(node, style) {
 
 ReactNativeView.prototype = {
   connect: function () {
-    var self = this
+    var self = this;
     connect(function (wall) {
-      self.element.innerHTML = ''
+      self.element.innerHTML = '';
       self.iframe = document.createElement('iframe');
       self.iframe.style.flex = 1;
       self.iframe.style.border = 'none';
@@ -53,13 +53,13 @@ ReactNativeView.prototype = {
         bottom: 0,
         display: 'flex',
       });
-      self.wall = wall
+      self.wall = wall;
       React.render(React.createElement(Panel, {wall: wall, win: self.iframe.contentWindow}), el);
-    })
+    });
   },
 
   disconnect: function () {
-    this.wall.disconnect()
+    this.wall.disconnect();
   },
 
   // Returns an object that can be retrieved when package is activated
@@ -68,10 +68,10 @@ ReactNativeView.prototype = {
 
   // Tear down any state and detach
   destroy: function () {
-    return this.element.remove()
+    return this.element.remove();
   },
 
   getElement: function () {
-    return this.element
+    return this.element;
   },
-}
+};

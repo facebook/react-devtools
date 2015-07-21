@@ -48,7 +48,7 @@ class Props {
     if (names.length > 3) {
       items.push('…');
     }
-    return <span>{items}</span>
+    return <span>{items}</span>;
   }
 }
 

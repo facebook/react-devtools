@@ -30,7 +30,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     extras.getReactElementFromNative = function (nativeTag) {
       var id = renderer.Mount.nativeTagToRootNodeID(nativeTag);
       return rootNodeIDMap.get(id);
-    }
+    };
   } else if (renderer.Mount.getID && renderer.Mount.getNode) {
     extras.getNativeFromReactElement = function (component) {
       try {
@@ -45,7 +45,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
         id = renderer.Mount.getID(node);
       }
       return rootNodeIDMap.get(id);
-    }
+    };
   } else {
     console.warn('Unknown react version (does not have getID), probably an unshimmed React Native');
   }
@@ -88,7 +88,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   } else if (renderer.Reconciler) {
     oldMethods = decorateMany(renderer.Reconciler, {
       mountComponent(element, rootID, transaction, context) {
-        var data = getData(element, context)
+        var data = getData(element, context);
         rootNodeIDMap.set(element._rootNodeID, element);
         hook.emit('mount', {element, data, renderer: rid});
       },
@@ -130,7 +130,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     oldMethods = null;
     oldRenderRoot = null;
     oldRenderComponent = null;
-  }
+  };
 
   return extras;
 }

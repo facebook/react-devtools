@@ -18,7 +18,7 @@ declare var FOR_BACKEND: {
 
 window.performance = {
   now: () => Date.now(),
-}
+};
 var globalHook = require('../../../backend/GlobalHook.js');
 
 globalHook(window);

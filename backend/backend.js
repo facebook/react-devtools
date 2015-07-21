@@ -70,4 +70,4 @@ module.exports = function setupBackend(hook: Hook): boolean {
   hook.on('shutdown', shutdown);
 
   return true;
-}
+};

@@ -36,5 +36,5 @@ window.onConnected = function (_wall) {
   wall = _wall;
   reload();
   // React.render(<Panel wall={wall} reload={reload} />, node);
-}
+};
 

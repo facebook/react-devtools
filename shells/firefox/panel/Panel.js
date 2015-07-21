@@ -40,7 +40,7 @@ class Panel extends React.Component {
   _store: Store;
 
   constructor(props: Object) {
-    super(props)
+    super(props);
     this.state = {loading: true, isReact: true};
     this._unMounted = false;
     window.panel = this;
@@ -95,7 +95,7 @@ class Panel extends React.Component {
       listen(fn) {
         port.onmessage = evt => {
           fn(evt.data);
-        }
+        };
       },
       send(data) {
         if (disconnected) {
@@ -201,7 +201,7 @@ var styles = {
     padding: 30,
     flex: 1,
   },
-}
+};
 
 Panel.childContextTypes = {
   store: React.PropTypes.object,

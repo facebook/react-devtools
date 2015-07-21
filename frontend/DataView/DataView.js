@@ -68,7 +68,7 @@ class DataView {
 
 class DataItem extends React.Component {
   constructor(props) {
-    super(props)
+    super(props);
     this.state = {open: false, loading: false};
   }
 

@@ -16,14 +16,14 @@ var React = require('react');
 
 window.React = React;
 
-var node = document.createElement('div')
-document.body.appendChild(node)
+var node = document.createElement('div');
+document.body.appendChild(node);
 React.render(
   <Harness backendSrc="./build/backend.js" targetSrc="../../test/example/build/target.js">
     {/* $FlowFixMe flow thinks Container needs to extend React.Component */}
     <Container/>
   </Harness>,
   node
-)
+);
 
 

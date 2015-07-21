@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DOMNode, DOMEvent} from '../types'
+import type {DOMNode, DOMEvent} from '../types';
 
 var Overlay = require('./Overlay');
 var MultiOverlay = require('./MultiOverlay');

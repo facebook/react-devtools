@@ -11,8 +11,8 @@
  */
 'use strict';
 
-import React from 'react/addons'
-import assign from 'object-assign'
+import React from 'react/addons';
+import assign from 'object-assign';
 
 // Different test things
 
@@ -21,15 +21,15 @@ class LongRender {
     var t = Date.now();
     while (Date.now() - t < 50) {
     }
-    return <div>That took a long time</div>
+    return <div>That took a long time</div>;
   }
 }
 
 class DeepTree {
   render() {
-    var child = <span>At the bottom</span>
+    var child = <span>At the bottom</span>;
     for (var i=0; i<20; i++) {
-      child = <span>({i}{child}</span>
+      child = <span>({i}{child}</span>;
     }
     return child;
   }
@@ -44,13 +44,13 @@ class Nester extends React.Component {
   render() {
     var depth = this.props.depth || 0;
     if (depth > 10) {
-      return <span>bottom</span>
+      return <span>bottom</span>;
     }
     return <div>
       <button onClick={() => this.setState({click: 1})}>Rerender</button>
       <Nester depth={depth + 1} />
       <Nester depth={depth + 1} />
-    </div>
+    </div>;
   }
 }
 
@@ -67,7 +67,7 @@ class BadUnmount {
 
 class Mounty {
   render() {
-    return <h1>{this.props.name} {this.props.val}</h1>
+    return <h1>{this.props.name} {this.props.val}</h1>;
   }
 }
 
@@ -117,7 +117,7 @@ class LotsOfMounts {
   }
 
   render() {
-    return <div ref={node => this.node = node} />
+    return <div ref={node => this.node = node} />;
   }
 }
 
@@ -133,7 +133,7 @@ class Sink {
       LotsOfMounts,
     };
 
-    var view = Comp => run(View, {Comp})
+    var view = Comp => run(View, {Comp});
 
     return (
       <ul style={styles.sinkList}>
@@ -152,12 +152,12 @@ class Sink {
 class HighlightHover extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {hover: null}
+    this.state = {hover: null};
   }
 
   isMe(evt) {
     var node = React.findDOMNode(this.node);
-    return evt.target === node
+    return evt.target === node;
   }
 
   onOver(evt) {
@@ -175,7 +175,7 @@ class HighlightHover extends React.Component {
   }
 
   render() {
-    var style = this.props.style
+    var style = this.props.style;
     if (this.state.hover) {
       style = assign({}, style, {
         backgroundColor: '#eee'
@@ -197,7 +197,7 @@ class HighlightHover extends React.Component {
 
 class View {
   render() {
-    var Comp = this.props.Comp
+    var Comp = this.props.Comp;
     return (
       <div>
         <button onClick={() => run(Sink)}>Back to Sink</button>
@@ -208,7 +208,7 @@ class View {
 }
 
 function run(Comp, props) {
-  props = props || {}
+  props = props || {};
   React.unmountComponentAtNode(node);
   React.render(<Comp {...props} />, node);
 }

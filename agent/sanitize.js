@@ -36,7 +36,7 @@ function sanitize(data: Object, path: Array<string>, cleaned: Array<Array<string
       meta: {
         length: data.length,
       },
-    }
+    };
   }
   if (Array.isArray(data)) {
     return data.map((item, i) => sanitize(item, path.concat([i]), cleaned, level + 1));

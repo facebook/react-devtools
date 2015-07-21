@@ -52,4 +52,4 @@ module.exports = function (hook: Hook, agent: Agent) {
     subs.forEach(fn => fn());
     hook.reactDevtoolsAgent = null;
   });
-}
+};

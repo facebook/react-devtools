@@ -104,7 +104,7 @@ class Overlay {
     });
 
     this.nameSpan.textContent = (name || node.nodeName.toLowerCase());
-    this.dimSpan.textContent = node.offsetWidth + 'px × ' + node.offsetHeight + 'px'
+    this.dimSpan.textContent = node.offsetWidth + 'px × ' + node.offsetHeight + 'px;'
 
     var tipPos = findTipPos({
       top: pos.top - dims.marginTop,

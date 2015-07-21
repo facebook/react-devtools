@@ -9,7 +9,7 @@
  */
 'use strict';
 
-var AtomView = require('./atom-view')
+var AtomView = require('./atom-view');
 var CompositeDisposable = require('atom').CompositeDisposable;
 
 var isVisible = false;
@@ -20,13 +20,13 @@ module.exports = Atom = {
   subscriptions: null,
 
   activate: function (state) {
-    this.atomView = new AtomView(state.atomViewState)
+    this.atomView = new AtomView(state.atomViewState);
 
     //  Events subscribed to in atom's system can be easily cleaned up with a CompositeDisposable
     this.subscriptions = new CompositeDisposable();
 
     //  Register command that toggles this view
-    this.subscriptions.add(atom.commands.add('atom-workspace', {'atom:toggle': this.toggle.bind(this)}))
+    this.subscriptions.add(atom.commands.add('atom-workspace', {'atom:toggle': this.toggle.bind(this)}));
   },
 
   deactivate: function () {
@@ -38,20 +38,20 @@ module.exports = Atom = {
   serialize: function () {
     return {
       atomViewState: this.atomView.serialize()
-    }
+    };
   },
 
   toggle: function () {
-    console.log('React Devtools was toggled!')
+    console.log('React Devtools was toggled!');
 
     if (isVisible) {
-      isVisible = false
-      this.modalPanel.destroy()
-      this.atomView.disconnect()
+      isVisible = false;
+      this.modalPanel.destroy();
+      this.atomView.disconnect();
     } else {
-      isVisible = true
-      this.modalPanel = atom.workspace.addBottomPanel({item: this.atomView.getElement()}) // , visible: false);
-      this.atomView.connect()
+      isVisible = true;
+      this.modalPanel = atom.workspace.addBottomPanel({item: this.atomView.getElement()}); // , visible: false);
+      this.atomView.connect();
     }
   },
 };

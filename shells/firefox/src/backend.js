@@ -28,7 +28,7 @@ function welcome(evt) {
   }
 
   window.removeEventListener('message', welcome);
-  setup()
+  setup();
 }
 
 function setup() {
@@ -40,7 +40,7 @@ function setup() {
         if (evt.data.source !== 'react-devtools-reporter' || !evt.data.payload) {
           return;
         }
-        fn(evt.data.payload)
+        fn(evt.data.payload);
       };
       listeners.push(listener);
       window.addEventListener('message', listener);

@@ -49,5 +49,5 @@ module.exports = function (dir: Dir, bottom: boolean, collapsed: boolean, hasChi
     }
     return null;
   }
-}
+};
 

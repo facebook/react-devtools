@@ -37,7 +37,7 @@ function getData(element: Object): DataType {
     children = childrenList(element._renderedChildren);
   } else if (element._currentElement.props) {
     // string children
-    children = element._currentElement.props.children
+    children = element._currentElement.props.children;
   }
 
   if (!props && element._currentElement && element._currentElement.props) {
@@ -68,7 +68,7 @@ function getData(element: Object): DataType {
   }
 
   if (element._instance) {
-    var inst = element._instance
+    var inst = element._instance;
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
@@ -76,7 +76,7 @@ function getData(element: Object): DataType {
       setInProps: inst.forceUpdate && setInProps.bind(null, inst),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
-    }
+    };
     publicInstance = inst;
   }
 

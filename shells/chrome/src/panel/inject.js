@@ -32,6 +32,6 @@ module.exports = function (scriptName: string, done: () => void) {
       console.log(err);
     }
     done();
-  })
-}
+  });
+};
 

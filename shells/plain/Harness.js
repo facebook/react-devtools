@@ -18,8 +18,8 @@ var Bridge = require('../../agent/Bridge');
 
 class Harness extends React.Component {
   constructor(props: Object) {
-    super(props)
-    this.state = {loading: true}
+    super(props);
+    this.state = {loading: true};
   }
 
   getChildContext(): Object {
@@ -50,12 +50,12 @@ class Harness extends React.Component {
 
     // inject the backend part
     var script = win.document.createElement('script');
-    script.src = this.props.backendSrc
+    script.src = this.props.backendSrc;
 
     script.onload = () => {
       console.log('loaded backend!');
       this.setState({loading: false});
-    }
+    };
 
     win.document.head.appendChild(script);
   }
@@ -63,9 +63,9 @@ class Harness extends React.Component {
   componentDidMount() {
     // firefox needs a slight delay
     setTimeout(() => {
-      var iframe = React.findDOMNode(this.iframe)
+      var iframe = React.findDOMNode(this.iframe);
 
-      var win = iframe.contentWindow
+      var win = iframe.contentWindow;
       var doc = win.document;
 
       globalHook(win);
@@ -76,8 +76,8 @@ class Harness extends React.Component {
       script.onload = () => {
         console.log('loaded child!');
         this.injectBackend(win);
-      }
-      script.src = this.props.targetSrc
+      };
+      script.src = this.props.targetSrc;
     }, 100);
   }
 
@@ -89,7 +89,7 @@ class Harness extends React.Component {
       <div style={styles.bottom}>
         {this.state.loading ? 'Loading...' : React.addons.cloneWithProps(this.props.children)}
       </div>
-    </div>
+    </div>;
   }
 }
 
@@ -135,6 +135,6 @@ var styles = {
     textAlign: 'center',
     fontFamily: 'sans-serif',
   },
-}
+};
 
-module.exports = Harness
+module.exports = Harness;
