@@ -10,3 +10,4 @@
 /shells/chrome.pem
 /shells/plain/build
 /plugins/node_modules
+*.swo
