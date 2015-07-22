@@ -8,7 +8,7 @@
   },
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
-    "test": "jest"
+    "test": "node --harmony ./node_modules/.bin/jest"
   },
   "jest": {
     "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
