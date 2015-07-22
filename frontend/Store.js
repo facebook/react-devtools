@@ -238,6 +238,9 @@ class Store extends EventEmitter {
   hasBottom(id: ElementID): boolean {
     var node = this.get(id);
     var children = node.get('children');
+    if (node.get('nodeType') === 'NativeWrapper') {
+      children = store.get(children[0]).get('children');
+    }
     if ('string' === typeof children || !children || !children.length || node.get('collapsed')) {
       return false;
     }
@@ -323,7 +326,11 @@ class Store extends EventEmitter {
       return;
     }
     var node = this.get(id);
-    if (node.get('nodeType') !== 'Wrapper') {
+    var nodeType = node.get('nodeType');
+    if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
+      return id;
+    }
+    if (nodeType === 'Native' && this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper') {
       return id;
     }
     if (up) {
@@ -429,7 +436,7 @@ class Store extends EventEmitter {
       }
     }
     if (id === this.selected) {
-      var newsel = pid || this.roots.get(0);
+      var newsel = pid ? this.skipWrapper(pid, true) : this.roots.get(0);
       this.selectTop(newsel, true);
     }
     if (this.searchRoots && this.searchRoots.contains(id)) {

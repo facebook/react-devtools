@@ -71,6 +71,10 @@ class Node {
     }
     var children = node.get('children');
 
+    if (node.get('nodeType') === 'NativeWrapper') {
+      children = this.props.wrappedChildren;
+    }
+
     if (node.get('nodeType') === 'Wrapper') {
       return <WrappedNode id={children[0]} depth={this.props.depth} />;
     }
@@ -232,8 +236,14 @@ var WrappedNode = decorate({
   },
   props(store, props) {
     var node = store.get(props.id);
+    var wrappedChildren = null;
+    if (node && node.get('nodeType') === 'NativeWrapper') {
+      var child = store.get(node.get('children')[0])
+      wrappedChildren = child && child.get('children');
+    }
     return {
       node,
+      wrappedChildren,
       selected: store.selected === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
       hovered: store.hovered === props.id,

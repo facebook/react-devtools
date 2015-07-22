@@ -63,6 +63,9 @@ function getDest(dir: Dir, store: Store): ?Dest {
   var node = store.get(id);
   var collapsed = node.get('collapsed');
   var children = node.get('children');
+  if (node.get('nodeType') === 'NativeWrapper') {
+    children = store.get(children[0]).get('children');
+  }
   var hasChildren = children && 'string' !== typeof children && children.length;
 
   return dirToDest(dir, bottom, collapsed, hasChildren);
@@ -89,13 +92,20 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
 
   if (dest === 'collapse' || dest === 'uncollapse') {
+    if (dest === 'collapse') {
+      store.isBottomTagSelected = false;
+    }
     store.toggleCollapse(id);
     return;
   }
 
+  var children = node.get('children');
+  if (node.get('nodeType') === 'NativeWrapper') {
+    children = store.get(children[0]).get('children');
+  }
+
   // Children
   if (dest === 'firstChild') {
-    var children = node.get('children');
     if ('string' === typeof children) {
       return getNewSelection('nextSibling', store);
     }
@@ -103,7 +113,6 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     return store.skipWrapper(children[0]);
   }
   if (dest === 'lastChild') {
-    var children = node.get('children');
     if ('string' === typeof children) {
       return getNewSelection('prevSibling', store);
     }
@@ -139,7 +148,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
 
   // Siblings
-  var parent = store.get(pid);
+  var parent = store.get(store.getParent(id));
   var pchildren = parent.get('children');
   var pix = pchildren.indexOf(id);
   if (pix === -1) {

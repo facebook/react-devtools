@@ -25,7 +25,7 @@ function getData(element: Object): DataType {
   var publicInstance = null;
   var nodeType = 'Native';
   if (element._renderedComponent) {
-    nodeType = 'Wrapper';
+    nodeType = 'NativeWrapper';
     children = [element._renderedComponent];
     props = element._instance.props;
     state = element._instance.state;
