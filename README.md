@@ -6,6 +6,8 @@ including the Component hierarchy, props, state, and more.
 There are shells for chrome (adding it to the chrome devtools), firefox,
 atom/nuclide, and as a standalone electron app.
 
+![](/images/devtools-full.gif)
+
 ## Installation
 
 ### Pre-packaged
@@ -36,9 +38,14 @@ For other shells (chrome, firefox, etc.), see the respective directories in `/sh
 - Use the search bar to find components by name
 - A red collapser means the component has state/context
 
+![](/images/devtools-tree-view.png)
+
 ### Side Pane
 
 - Right-click to store as global variable
+- Updates are highlighted
+
+![](/images/devtools-side-pane.gif)
 
 ## FAQ
 
