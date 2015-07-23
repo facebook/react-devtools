@@ -34,7 +34,7 @@ chrome.devtools.inspectedWindow.eval(`!!(
     return;
   }
 
-  chrome.devtools.panels.create('NReact', '', 'panel.html', function (panel) {
+  chrome.devtools.panels.create('React', '', 'panel.html', function (panel) {
     panel.onShown.addListener(function (window) {
       // when the user switches to the panel, check for an elements tab
       // selection
