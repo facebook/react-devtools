@@ -63,7 +63,7 @@ function setup(hook) {
   agent.addBridge(bridge);
 
   agent.once('connected', () => {
-    inject(hook, agent);
+    inject(hook, agent, /* lookForOldReact= */true);
   });
 
   if (RN_STYLE) {

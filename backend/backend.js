@@ -45,10 +45,12 @@ function findOldReact() {
 /**
  * Normal names
  */
-module.exports = function setupBackend(hook: Hook): boolean {
-  var oldReact = findOldReact();
-  if (oldReact && Object.keys(hook._renderers).length === 0) {
-    hook.inject(oldReact);
+module.exports = function setupBackend(hook: Hook, lookForOldReact?: boolean): boolean {
+  if (lookForOldReact) {
+    var oldReact = findOldReact();
+    if (oldReact && Object.keys(hook._renderers).length === 0) {
+      hook.inject(oldReact);
+    }
   }
 
   for (var rid in hook._renderers) {

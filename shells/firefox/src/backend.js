@@ -64,7 +64,7 @@ function setup() {
   }, 1000);
 
   backend.once('connected', () => {
-    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend);
+    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend, /* lookForOldReact= */true);
     clearTimeout(_connectTimeout);
   });
 
