@@ -1,5 +1,19 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
 
-module.exports = function setupRNStyle(bridge, agent, resolveRNStyle) {
+import type Bridge from '../../agent/Bridge';
+import type Agent from '../../agent/Agent';
+
+module.exports = function setupRNStyle(bridge: Bridge, agent: Agent, resolveRNStyle: (style: number) => ?Object) {
   bridge.onCall('rn-style:get', id => {
     var node = agent.elementData.get(id);
     if (!node || !node.props) {
@@ -8,12 +22,6 @@ module.exports = function setupRNStyle(bridge, agent, resolveRNStyle) {
     return resolveRNStyle(node.props.style);
   });
 
-  /*
-  bridge.on('rn-style:unset', ({id, oldName, newName, val}) => {
-    unsetStyle(agent, id, oldName);
-  });
-  */
-
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
   });
@@ -21,7 +29,7 @@ module.exports = function setupRNStyle(bridge, agent, resolveRNStyle) {
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
   });
-}
+};
 
 function shallowClone(obj) {
   var nobj = {};
@@ -47,10 +55,10 @@ function renameStyle(agent, id, oldName, newName, val) {
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
     if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
-      // $FlowFixMe we know that updater is not null here
       var customStyle = shallowClone(style[style.length - 1]);
       delete customStyle[oldName];
       customStyle[newName] = val;
+      // $FlowFixMe we know that updater is not null here
       data.updater.setInProps(['style', style.length - 1], customStyle);
     } else {
       style = style.concat([newStyle]);
@@ -59,9 +67,10 @@ function renameStyle(agent, id, oldName, newName, val) {
     }
   } else {
     if ('object' === typeof style) {
-      var customStyle = shallowClone(style[style.length - 1]);
+      var customStyle = shallowClone(style);
       delete customStyle[oldName];
       customStyle[newName] = val;
+      // $FlowFixMe we know that updater is not null here
       data.updater.setInProps(['style'], customStyle);
     } else {
       style = [style, newStyle];

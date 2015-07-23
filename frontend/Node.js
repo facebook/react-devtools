@@ -239,7 +239,7 @@ var WrappedNode = decorate({
     var node = store.get(props.id);
     var wrappedChildren = null;
     if (node && node.get('nodeType') === 'NativeWrapper') {
-      var child = store.get(node.get('children')[0])
+      var child = store.get(node.get('children')[0]);
       wrappedChildren = child && child.get('children');
     }
     return {
