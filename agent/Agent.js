@@ -187,7 +187,9 @@ class Agent extends EventEmitter {
     if (!this.reactInternals[renderer]) {
       return null;
     }
-    return this.reactInternals[renderer].getNativeFromReactElement(component);
+    if (this.reactInternals[renderer].getNativeFromReactElement) {
+      return this.reactInternals[renderer].getNativeFromReactElement(component);
+    }
   }
 
   selectFromDOMNode(node: Object, quiet?: boolean) {

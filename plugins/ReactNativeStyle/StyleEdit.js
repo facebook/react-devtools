@@ -13,11 +13,21 @@
 var React = require('react');
 var BlurInput = require('./BlurInput');
 
-class StyleEdit {
+class StyleEdit extends React.Component {
   props: {
     style: Object,
     onChange: (attr: string, val: string | number) => void,
   };
+
+  constructor(props) {
+    super(props);
+    this.state = {newAttr: '', newValue: ''};
+  }
+
+  onNew() {
+    this.props.onChange(this.state.newAttr, val);
+    this.setState({newAttr: '', newValue: ''});
+  }
 
   render(): ReactElement {
     var attrs = Object.keys(this.props.style);
@@ -25,13 +35,28 @@ class StyleEdit {
       <ul style={styles.container}>
         {attrs.map(name => (
           <li style={styles.attr}>
-            {name}:
+            <BlurInput
+              value={name}
+              onChange={newName => this.props.onRename(name, newName, this.props.style[name])}
+            />
+            :
             <BlurInput
               value={this.props.style[name]}
               onChange={val => this.props.onChange(name, val)}
             />
           </li>
         ))}
+        <li style={styles.attr}>
+          <BlurInput
+            value={this.state.newAttr}
+            onChange={newAttr => this.setState({newAttr})}
+          />
+          :
+          {this.state.newAttr && <BlurInput
+            value={''}
+            onChange={val => this.props.onChange(this.state.newAttr, val)}
+          />}
+        </li>
       </ul>
     );
   }

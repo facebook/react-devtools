@@ -20,9 +20,7 @@ class BlurInput extends React.Component {
   }
 
   componentWillReceiveProps(nextProps: Object) {
-    if (nextProps.value !== this.props.value) {
-      this.setState({text: '' + nextProps.value});
-    }
+    this.setState({text: '' + nextProps.value});
   }
 
   done() {
