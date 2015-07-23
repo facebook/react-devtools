@@ -62,7 +62,6 @@ class NativeStyler extends React.Component {
       return <em>loading</em>;
     }
     return (
-      // $FlowFixMe doesn't have to inherit from React.Component
       <StyleEdit
         style={this.state.style}
         onRename={this._handleStyleRename.bind(this)}

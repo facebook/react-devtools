@@ -24,6 +24,7 @@ type PropsType = {
   node: Map,
   depth: number,
   isBottomTagSelected: boolean,
+  wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
   onContextMenu: () => void,
   onToggleCollapse: () => void,
@@ -71,12 +72,12 @@ class Node {
     }
     var children = node.get('children');
 
-    if (node.get('nodeType') === 'NativeWrapper') {
-      children = this.props.wrappedChildren;
-    }
-
     if (node.get('nodeType') === 'Wrapper') {
       return <WrappedNode id={children[0]} depth={this.props.depth} />;
+    }
+
+    if (node.get('nodeType') === 'NativeWrapper') {
+      children = this.props.wrappedChildren;
     }
 
     var collapsed = node.get('collapsed');

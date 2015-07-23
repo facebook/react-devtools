@@ -54,20 +54,20 @@ function setup(hook) {
     },
   };
 
-  var RN_STYLE = !!hook.resolveRNStyle;
+  var isReactNative = !!hook.resolveRNStyle;
 
   var bridge = new Bridge();
   bridge.attach(wall);
   var agent = new Agent(window, {
-    rnStyle: RN_STYLE,
+    rnStyle: isReactNative,
   });
   agent.addBridge(bridge);
 
   agent.once('connected', () => {
-    inject(hook, agent, /* lookForOldReact= */true);
+    inject(hook, agent, /* lookForOldReact= */!isReactNative);
   });
 
-  if (RN_STYLE) {
+  if (isReactNative) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
 
@@ -83,7 +83,7 @@ function setup(hook) {
     }
   });
 
-  if (!RN_STYLE) {
+  if (!isReactNative) {
     hl = new Highlighter(window, node => {
       agent.selectFromDOMNode(node);
     });

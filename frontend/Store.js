@@ -239,7 +239,7 @@ class Store extends EventEmitter {
     var node = this.get(id);
     var children = node.get('children');
     if (node.get('nodeType') === 'NativeWrapper') {
-      children = store.get(children[0]).get('children');
+      children = this.get(children[0]).get('children');
     }
     if ('string' === typeof children || !children || !children.length || node.get('collapsed')) {
       return false;

@@ -28,7 +28,7 @@ type Agent = {
   on: (evt: string, fn: (...args: Array<any>) => any) => any,
 };
 
-module.exports = function (hook: Hook, agent: Agent, lookForOldReact: boolean) {
+module.exports = function (hook: Hook, agent: Agent, lookForOldReact?: boolean) {
   var subs = [
     hook.sub('renderer-attached', ({id, renderer, helpers}) => {
       agent.setReactInternals(id, helpers);
