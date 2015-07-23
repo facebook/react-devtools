@@ -25,8 +25,8 @@ globalHook(window);
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
-
 var inject = require('../../../agent/inject');
+var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 
 FOR_BACKEND.wall.onClose(() => {
   if (agent) {
@@ -42,50 +42,7 @@ bridge.attach(FOR_BACKEND.wall);
 var agent = new Agent({});
 agent.addBridge(bridge);
 
-bridge.onCall('rn:getStyle', id => {
-  if (!agent) {
-    return;
-  }
-  var node = agent.elementData.get(id);
-  if (!node || !node.props) {
-    return null;
-  }
-  var style = node.props.style;
-  return FOR_BACKEND.resolveRNStyle(style);
-});
-bridge.on('rn:setStyle', ({id, attr, val}) => {
-  if (!agent) {
-    return;
-  }
-  // console.log('setting rn style', id, attr, val);
-  var data = agent.elementData.get(id);
-  // $FlowFixMe "computed property keys not supported"
-  var newStyle = {[attr]: val};
-  if (!data.updater || !data.updater.setInProps) {
-    var el:Object = agent.reactElements.get(id);
-    if (el.setNativeProps) {
-      el.setNativeProps(newStyle);
-    } else {
-      console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
-    }
-    return;
-  }
-  var style = data.props && data.props.style;
-  if (Array.isArray(style)) {
-    if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
-      // $FlowFixMe data.updater is defined in this branch
-      data.updater.setInProps(['style', style.length - 1, attr], val);
-    } else {
-      style = style.concat([newStyle]);
-      // $FlowFixMe data.updater is defined in this branch
-      data.updater.setInProps(['style'], style);
-    }
-  } else {
-    style = [style, newStyle];
-    data.updater.setInProps(['style'], style);
-  }
-  agent.emit('hideHighlight');
-});
+setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
 
 var _connectTimeout = setTimeout(function () {
   console.error('react-devtools agent got no connection');

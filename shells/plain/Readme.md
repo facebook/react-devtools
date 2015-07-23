@@ -1,5 +1,7 @@
 # Pure HTML Example
 
+![Screenshot](/images/plain-shell.png)
+
 This is an example of using the devtools outside of chrome/firefox/etc. In
 order to simulate the same network restrictions found in a plugin environment,
 the inspection target is within an iframe, and communication is done via
