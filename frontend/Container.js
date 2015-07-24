@@ -18,7 +18,7 @@ var SplitPane = require('./SplitPane');
 
 import type MenuItem from './ContextMenu';
 
-class Container {
+class Container extends React.Component {
   props: {
     reload: () => void,
     win: Object,

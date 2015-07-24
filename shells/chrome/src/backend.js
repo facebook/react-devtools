@@ -93,5 +93,9 @@ function setup(hook) {
     agent.on('highlightMany', nodes => hl.highlightMany(nodes));
     // $FlowFixMe flow thinks hl might be undefined
     agent.on('hideHighlight', () => hl.hideHighlight());
+    // $FlowFixMe flow thinks hl might be undefined
+    agent.on('startInspecting', () => hl.startInspecting());
+    // $FlowFixMe flow thinks hl might be undefined
+    agent.on('stopInspecting', () => hl.stopInspecting());
   }
 }

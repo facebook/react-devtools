@@ -6,6 +6,7 @@
         <style>
             html {
                 display: flex;
+                font-family: sans-serif;
             }
             body {
                 margin: 0;
@@ -28,11 +29,18 @@
                 left: 0;
                 white-space: pre;
             }
+            #waiting {
+                text-align: center;
+                font-family: sans-serif;
+                flex: 1;
+                padding: 30px;
+                color: #aaa;
+            }
         </style>
     </head>
     <body>
         <div id="container">
-            <h1>Waiting for a connection from React Native</h1>
+            <h2 id="waiting">Waiting for a connection from React Native</h2>
         </div>
         <script src="node/index.js"></script>
         <script src="build/panel.js"></script>

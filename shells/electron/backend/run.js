@@ -39,10 +39,14 @@ FOR_BACKEND.wall.onClose(() => {
 
 var bridge = new Bridge();
 bridge.attach(FOR_BACKEND.wall);
-var agent = new Agent({});
+var agent = new Agent(window, {
+  rnStyle: !!FOR_BACKEND.resolveRNStyle,
+});
 agent.addBridge(bridge);
 
-setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
+if (FOR_BACKEND.resolveRNStyle) {
+  setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
+}
 
 var _connectTimeout = setTimeout(function () {
   console.error('react-devtools agent got no connection');

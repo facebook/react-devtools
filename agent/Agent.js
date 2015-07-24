@@ -92,6 +92,8 @@ class Agent extends EventEmitter {
     bridge.on('highlight', id => this.highlight(id));
     bridge.on('highlightMany', id => this.highlightMany(id));
     bridge.on('hideHighlight', () => this.emit('hideHighlight'));
+    bridge.on('startInspecting', () => this.emit('startInspecting'));
+    bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
     bridge.on('changeTextContent', ({id, text}) => {
       var node = this.getNodeForID(id);

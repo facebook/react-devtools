@@ -264,7 +264,6 @@ class Panel extends React.Component {
       return <span>Looking for react...</span>;
     }
     return (
-      // $FlowFixMe flow thinks Container needs to extend React.Component
       <Container
         reload={this.reload.bind(this)}
         menuItems={{

@@ -151,7 +151,6 @@ class Panel extends React.Component {
       );
     }
     return (
-      // $FlowFixMe Flow thinks Container must inherit from React.Component
       <Container
         reload={this.reload.bind(this)}
         menuItems={{

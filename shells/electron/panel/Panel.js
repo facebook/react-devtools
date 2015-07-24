@@ -115,11 +115,10 @@ class Panel extends React.Component {
       return <span>Looking for react...</span>;
     }
     return (
-      // $FlowFixMe Container needn't inherit from React.Component
       <Container
         win={this.props.win}
         reload={this.reload.bind(this)}
-        extraPanes={[panelRNStyle(this._bridge)]}
+        extraPanes={[this._store.capabilities.rnStyle && panelRNStyle(this._bridge)]}
       />
     );
   }

@@ -27,7 +27,7 @@ function reload() {
 
 window.onDisconnected = function () {
   React.unmountComponentAtNode(node);
-  node.innerHTML = 'Disconnected...';
+  node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 };
 
 // set in port.js

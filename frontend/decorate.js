@@ -44,7 +44,7 @@ type Options = {
    * parent rerenders. Defaults to function returning false **/
   shouldUpdate?: (nextProps: Object, props: Object) => boolean,
   /** A function returning a list of events to listen to **/
-  listeners: (props: Object, store: Object) => Array<string>,
+  listeners?: (props: Object, store: Object) => Array<string>,
   /** This is how you get data and action handlers from the store. The
    * returned object will be spread in as props on the wrapped component. **/
   props: (store: Object, props: Object) => Object,
@@ -65,6 +65,9 @@ module.exports = function (options: Options, Component: any): any {
         return console.warn('no store on context...');
       }
       this._update = () => this.forceUpdate();
+      if (!options.listeners) {
+        return;
+      }
       this._listeners = options.listeners(this.props, this.context.store);
       this._listeners.forEach(evt => {
         this.context.store.on(evt, this._update);
@@ -93,6 +96,9 @@ module.exports = function (options: Options, Component: any): any {
     componentWillUpdate(nextProps, nextState) {
       if (!this.context.store) {
         return console.warn('no store on context...');
+      }
+      if (!options.listeners) {
+        return;
       }
       var listeners = options.listeners(this.props, this.context.store);
       var diff = arrayDiff(listeners, this._listeners);

@@ -117,9 +117,9 @@ class Store extends EventEmitter {
       }
       this.roots = this.roots.push(id);
       if (!this.selected) {
-        this.selected = id;
+        this.selected = this.skipWrapper(id);
         this.emit('selected');
-        this._bridge.send('selected', id);
+        this._bridge.send('selected', this.selected);
       }
       this.emit('roots');
     });

@@ -51,13 +51,12 @@ function getData(element: Object): DataType {
     } else if (element.getName) {
       nodeType = 'Composite';
       name = element.getName();
+      // 0.14 top-level wrapper
+      if ((name === null || name === 'TopLevelWrapper') && element._currentElement.props === element._renderedComponent._currentElement) {
+        nodeType = 'Wrapper';
+      }
       if (name === null) {
-        // 0.14 top-level wrapper
-        if (element._currentElement.props === element._renderedComponent._currentElement) {
-          nodeType = 'Wrapper';
-        } else {
-          name = 'No display name';
-        }
+        name = 'No display name';
       }
     } else if (element._stringText) {
       nodeType = 'Text';
@@ -72,7 +71,6 @@ function getData(element: Object): DataType {
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
-      // setNativeProps: inst.setNativeProps && inst.setNativeProps.bind(inst),
       setInProps: inst.forceUpdate && setInProps.bind(null, inst),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),

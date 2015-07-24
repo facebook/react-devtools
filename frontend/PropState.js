@@ -115,7 +115,7 @@ class PropState extends React.Component {
             />
           </div>}
         {this.props.extraPanes &&
-          this.props.extraPanes.map(fn => fn(this.props.node, this.props.id))}
+          this.props.extraPanes.map(fn => fn && fn(this.props.node, this.props.id))}
       </div>
     );
   }
