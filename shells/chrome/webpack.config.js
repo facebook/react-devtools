@@ -12,12 +12,12 @@
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
-    main: './src/main.js',
-    backend: './src/backend.js',
-    background: './src/background.js',
-    inject: './src/GlobalHook.js',
-    contentScript: './src/contentScript.js',
-    panel: './src/panel/run.js',
+    main: __dirname + '/src/main.js',
+    backend: __dirname + '/src/backend.js',
+    background: __dirname + '/src/background.js',
+    inject: __dirname + '/src/GlobalHook.js',
+    contentScript: __dirname + '/src/contentScript.js',
+    panel: __dirname + '/src/panel/run.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat

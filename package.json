@@ -7,6 +7,7 @@
     "react": "^0.13.3"
   },
   "scripts": {
+    "build-chrome": "webpack --config shells/chrome/webpack.config.js",
     "lint": "./node_modules/.bin/eslint .",
     "test": "node --harmony ./node_modules/.bin/jest"
   },
