@@ -6,9 +6,26 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- *
+ * @flow
+ */
+'use strict';
+
+var React = require('react');
+
+type Options = {
+  /** A function determining whether the component should rerender when the
+   * parent rerenders. Defaults to function returning false **/
+  shouldUpdate?: (nextProps: Object, props: Object) => boolean,
+  /** A function returning a list of events to listen to **/
+  listeners?: (props: Object, store: Object) => Array<string>,
+  /** This is how you get data and action handlers from the store. The
+   * returned object will be spread in as props on the wrapped component. **/
+  props: (store: Object, props: Object) => Object,
+};
+
+/**
  * This Higher Order Component decorator function is the way the components
- * communicate with the central store.
+ * communicate with the central Store.
  *
  * Example:
  *
@@ -32,24 +49,7 @@
  *     };
  *   },
  * }, MyComp);
- *
- * @flow
  */
-'use strict';
-
-var React = require('react');
-
-type Options = {
-  /** A function determining whether the component should rerender when the
-   * parent rerenders. Defaults to function returning false **/
-  shouldUpdate?: (nextProps: Object, props: Object) => boolean,
-  /** A function returning a list of events to listen to **/
-  listeners?: (props: Object, store: Object) => Array<string>,
-  /** This is how you get data and action handlers from the store. The
-   * returned object will be spread in as props on the wrapped component. **/
-  props: (store: Object, props: Object) => Object,
-};
-
 module.exports = function (options: Options, Component: any): any {
   class Wrapper extends React.Component {
     _listeners: Array<string>;

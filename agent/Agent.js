@@ -36,6 +36,34 @@ type InternalsObject = {
  * mapping of those IDs to elements, handling messages from the frontend, and
  * translating between react elements and native handles.
  *
+ *
+ *   React
+ *     |
+ *     v
+ *  backend
+ *     |
+ *     v
+ *  -----------
+ * | **Agent** |
+ *  -----------
+ *     ^
+ *     |
+ *     v
+ *  (Bridge)
+ *     ^
+ *     |
+ * serialization
+ *     |
+ *     v
+ *  (Bridge)
+ *     ^
+ *     |
+ *     v
+ *  ----------------
+ * | Frontend Store |
+ *  ----------------
+ *
+ *
  * Events from the `backend`:
  * - root (got a root)
  * - mount (a component mounted)
@@ -164,6 +192,8 @@ class Agent extends EventEmitter {
     this.on('update', data => bridge.send('update', data));
     this.on('unmount', id => {
       bridge.send('unmount', id);
+      // once an element has been unmounted, the bridge doesn't need to be
+      // able to inspect it anymore.
       bridge.forget(id);
     });
     this.on('setSelection', data => bridge.send('select', data));

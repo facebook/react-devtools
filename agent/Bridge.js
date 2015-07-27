@@ -51,6 +51,62 @@ type PayloadType = {
   args: Array<any>,
 } | EventPayload;
 
+/**
+ * The bridge is responsible for serializing requests between the Agent and
+ * the Frontend Store. It needs to be connected to a Wall object that can send
+ * JSONable data to the bridge on the other side.
+ *
+ * complex data
+ *     |
+ *     v
+ *  [Bridge]
+ *     |
+ * jsonable data
+ *     |
+ *     v
+ *   [wall]
+ *     |
+ *     v
+ * ~ some barrier ~
+ *     |
+ *     v
+ *   [wall]
+ *     |
+ *     v
+ *  [Bridge]
+ *     |
+ *     v
+ * "hydrated" data
+ *
+ * When an item is passed in that can't be serialized (anything other than a
+ * plain array, object, or literal value), the object is "cleaned", and
+ * rehydrated on the other side with `Symbol` attributes indicating that the
+ * object needs to be inspected for more detail.
+ *
+ * Example:
+ *
+ * bridge.send('evname', {id: 'someid', foo: MyCoolObjectInstance})
+ * ->
+ * shows up, hydrated as
+ * {
+ *   id: 'someid',
+ *   foo: {
+ *     [consts.name]: 'MyCoolObjectInstance',
+ *     [consts.type]: 'object',
+ *     [consts.meta]: {},
+ *     [consts.inspected]: false,
+ *   }
+ * }
+ *
+ * The `consts` variables are Symbols, and as such are non-ennumerable.
+ * The front-end therefore needs to check for `consts.inspected` on received
+ * objects, and can thereby display object proxies and inspect them.
+ *
+ * Complex objects that are passed are expected to have a top-level `id`
+ * attribute, which is used for later lookup + inspection. Once it has been
+ * determined that an object is no longer needed, call `.forget(id)` to clean
+ * up.
+ */
 class Bridge {
   _buffer: Array<{evt: string, data: any}>;
   _cbs: Map;

@@ -32,6 +32,13 @@ type ContextMenu = {
 };
 
 /**
+ * This is the main frontend [fluxy?] Store, responsible for taking care of
+ * state. It emits events when things change that you can subscribe to. The
+ * best way to interact with the Store (if you are a React Component) is to
+ * use the `dectorator` in `dectorator.js`. The top-level component  (defined
+ * by a shell) is generally responsible for creating the Store connecting it
+ * up to a bridge, and putting it on `context` so the decorator can access it.
+ *
  * Public events:
  *
  * - connected / connection failed
