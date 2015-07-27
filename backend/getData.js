@@ -13,6 +13,9 @@
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 
+/**
+ * Convert a react internal instance to a sanitized data object.
+ */
 function getData(element: Object): DataType {
   var children = null;
   var props = null;

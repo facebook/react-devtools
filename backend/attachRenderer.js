@@ -16,12 +16,17 @@ var getData012 = require('./getData012');
 
 type NodeLike = {};
 
+/**
+ * This takes care of patching the renderer to emit events on the global
+ * `Hook`. The returned object has a `.cleanup` method to un-patch everything.
+ */
 function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   var rootNodeIDMap = new Map();
   var extras = {};
-  var is012 = !renderer.Reconciler;
+  // Before 0.13 there was no Reconciler, so we patch Component.Mixin
+  var isPre013 = !renderer.Reconciler;
 
-  // RN to React differences
+  // React Native
   if (renderer.Mount.findNodeHandle && renderer.Mount.nativeTagToRootNodeID) {
     extras.getNativeFromReactElement = function (component) {
       return renderer.Mount.findNodeHandle(component);
@@ -31,6 +36,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       var id = renderer.Mount.nativeTagToRootNodeID(nativeTag);
       return rootNodeIDMap.get(id);
     };
+  // React DOM
   } else if (renderer.Mount.getID && renderer.Mount.getNode) {
     extras.getNativeFromReactElement = function (component) {
       try {
@@ -115,7 +121,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       rootNodeIDMap.set(component._rootNodeID, component);
       visit(component, data);
     };
-    walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot, is012);
+    walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot, isPre013);
   };
 
   extras.cleanup = function () {
@@ -140,17 +146,17 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   return extras;
 }
 
-function walkRoots(roots, onMount, onRoot, is012) {
+function walkRoots(roots, onMount, onRoot, isPre013) {
   for (var name in roots) {
-    walkNode(roots[name], onMount, is012);
+    walkNode(roots[name], onMount, isPre013);
     onRoot(roots[name]);
   }
 }
 
-function walkNode(element, onMount, is012) {
-  var data = is012 ? getData012(element) : getData(element);
+function walkNode(element, onMount, isPre013) {
+  var data = isPre013 ? getData012(element) : getData(element);
   if (data.children && Array.isArray(data.children)) {
-    data.children.forEach(child => walkNode(child, onMount, is012));
+    data.children.forEach(child => walkNode(child, onMount, isPre013));
   }
   onMount(element, data);
 }

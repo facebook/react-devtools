@@ -17,22 +17,27 @@
         </style>
     </head>
     <body>
-        <a href="index.html">Home</a>
+        <h1 id="title">Home</h1>
         <script src="http://localhost:8080/webpack-dev-server.js"></script>
         <script>
             var src = location.search.slice(1);
+            var link;
             if (src.length) {
+                document.getElementById('title').textContent = src;
                 var script = document.createElement('script');
                 script.src = src;
                 document.body.appendChild(script);
             } else {
-                var link;
                 for (var v=11; v<15; v++) {
                     link = document.createElement('a');
                     link.href = '?v0' + v + '.js';
                     link.textContent = 'Version 0.' + v;
                     document.body.appendChild(link);
                 }
+                link = document.createElement('a');
+                link.href = 'all.html';
+                link.textContent = 'All at once';
+                document.body.appendChild(link);
             }
         </script>
     </body>

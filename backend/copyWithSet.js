@@ -10,6 +10,10 @@
  */
 'use strict';
 
+/**
+ * This basically just does React.addons.update, where the only operation is
+ * $set. Should I just move to using that?
+ */
 function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any): Object | Array<any> {
   var newObj = {};
   var curObj = newObj;

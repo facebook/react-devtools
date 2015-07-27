@@ -42,9 +42,6 @@ function findOldReact() {
   } catch (e) {}
 }
 
-/**
- * Normal names
- */
 module.exports = function setupBackend(hook: Hook, lookForOldReact?: boolean): boolean {
   if (lookForOldReact) {
     var oldReact = findOldReact();
