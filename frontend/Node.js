@@ -16,7 +16,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
 
-import type {Map} from './imm';
+import type {Map} from 'immutable';
 
 type PropsType = {
   hovered: boolean,

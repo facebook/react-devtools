@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Map} from './imm';
+import type {Map} from 'immutable';
 
 function nodeMatchesText(node: Map, needle: string): boolean {
   var name = node.get('name');
