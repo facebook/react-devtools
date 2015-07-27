@@ -178,7 +178,7 @@ class Bridge {
 
   sendOne(evt: string, data: any) {
     var cleaned = [];
-    var san = sanitize(data, [], cleaned);
+    var san = sanitize(data, cleaned);
     if (cleaned.length) {
       this._inspectables.set(data.id, data);
     }
@@ -205,7 +205,7 @@ class Bridge {
     var start = performance.now();
     var events = this._buffer.map(({evt, data}) => {
       var cleaned = [];
-      var san = sanitize(data, [], cleaned);
+      var san = sanitize(data, cleaned);
       if (cleaned.length) {
         this._inspectables.set(data.id, data);
       }
@@ -330,7 +330,7 @@ class Bridge {
           return;
         }
         // $FlowFixMe flow thinks `val` might be null
-        result[name] = sanitize(val[name], [name], cleaned);
+        result[name] = sanitize(val[name], cleaned, [name]);
       });
 
       if (!protod && val.__proto__ && val.constructor.name !== 'Object') { // eslint-disable-line no-proto
@@ -341,7 +341,7 @@ class Bridge {
             return;
           }
           // $FlowFixMe flow thinks proto (and val) might be null
-          proto[name] = sanitize(val.__proto__[name], [name], protoclean); // eslint-disable-line no-proto
+          proto[name] = sanitize(val.__proto__[name], protoclean, [name]); // eslint-disable-line no-proto
         });
       }
     }
