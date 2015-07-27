@@ -29,11 +29,34 @@ type InternalsObject = {
 };
 
 /**
- * Events from React:
+ * The agent lives on the page in the same context as React, observes events
+ * from the `backend`, and communicates (via a `Bridge`) with the frontend.
+ *
+ * It is responsible for generating IDs for each react element, maintaining a
+ * mapping of those IDs to elements, handling messages from the frontend, and
+ * translating between react elements and native handles.
+ *
+ * Events from the `backend`:
  * - root (got a root)
  * - mount (a component mounted)
  * - update (a component updated)
  * - unmount (a component mounted)
+ *
+ * Events from the `frontend` Store:
+ * - see `addBridge` for subscriptions
+ *
+ * Events that Agent fires:
+ * - selected
+ * - hideHighlight
+ * - startInspecting
+ * - stopInspecting
+ * - shutdown
+ * - highlight /highlightMany
+ * - setSelection
+ * - root
+ * - mount
+ * - update
+ * - unmount
  */
 class Agent extends EventEmitter {
   reactElements: Map<string, OpaqueReactElement>;
@@ -66,11 +89,11 @@ class Agent extends EventEmitter {
     this.capabilities = assign({
       scroll: isReactDOM && typeof window.document.body.scrollIntoView === 'function',
       dom: isReactDOM,
-      editTextContent: false,//isReactDOM,
+      editTextContent: false,
     }, capabilities);
   }
 
-  // return "unsubscribe" function
+  // returns an "unsubscribe" function
   sub(ev: string, fn: (data: any) => void): () => void {
     EventEmitter.prototype.on.call(this, ev, fn);
     return () => this.off(ev, fn);
@@ -85,6 +108,12 @@ class Agent extends EventEmitter {
   }
 
   addBridge(bridge: Bridge) {
+    /** Events received from the frontend **/
+    // the initial handshake
+    bridge.on('requestCapabilities', () => {
+      bridge.send('capabilities', this.capabilities);
+      this.emit('connected');
+    });
     bridge.on('setState', this._setState.bind(this));
     bridge.on('setProps', this._setProps.bind(this));
     bridge.on('setContext', this._setContext.bind(this));
@@ -95,6 +124,7 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('shutdown', () => this.emit('shutdown'));
     bridge.on('changeTextContent', ({id, text}) => {
       var node = this.getNodeForID(id);
       if (!node) {
@@ -102,12 +132,11 @@ class Agent extends EventEmitter {
       }
       node.textContent = text;
     });
-    bridge.on('shutdown', () => {
-      this.emit('shutdown');
-    });
+    // used to "inspect node in Elements pane"
     bridge.on('putSelectedNode', id => {
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$node = this.getNodeForID(id);
     });
+    // used to "view source in Sources pane"
     bridge.on('putSelectedInstance', id => {
       var node = this.elementData.get(id);
       if (node.publicInstance) {
@@ -116,6 +145,7 @@ class Agent extends EventEmitter {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = null;
       }
     });
+    // used to select the inspected node ($0)
     bridge.on('checkSelection', () => {
       var newSelected = window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0;
       if (newSelected !== this._prevSelected) {
@@ -126,11 +156,9 @@ class Agent extends EventEmitter {
         }
       }
     });
-    bridge.on('requestCapabilities', () => {
-      bridge.send('capabilities', this.capabilities);
-      this.emit('connected');
-    });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
+
+    /** Events sent to the frontend **/
     this.on('root', id => bridge.send('root', id));
     this.on('mount', data => bridge.send('mount', data));
     this.on('update', data => bridge.send('update', data));
@@ -224,10 +252,6 @@ class Agent extends EventEmitter {
         return this.getId(component);
       }
     }
-  }
-
-  setEnabled(val: boolean): Object {
-    throw new Error("React hasn't injected... what's up?");
   }
 
   _setProps({id, path, value}: {id: string, path: Array<string>, value: any}) {
