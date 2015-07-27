@@ -15,7 +15,7 @@
 'use strict';
 
 var {EventEmitter} = require('events');
-var {Map, Set, List} = require('./imm');
+var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 

@@ -1,7 +1,6 @@
 [ignore]
 .*node_modules/babel.*
 .*node_modules/classnames.*
-.*node_modules/immutable.*
 .*node_modules/json-loader.*
 .*node_modules/node-libs-browser.*
 .*node_modules/webpack.*
