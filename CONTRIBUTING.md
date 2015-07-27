@@ -1,27 +1,16 @@
-# Contributing to React
-
-React is one of Facebook's first open source projects that is both under very active development and is also being used to ship code to everybody on facebook.com. We're still working out the kinks to make contributing to this project as easy and transparent as possible, but we're not quite there yet. Hopefully this document makes the process for contributing clear and preempts some questions you may have.
-
-## Our Development Process
-
-Some of the core team will be working directly on GitHub. These changes will be public from the beginning. Other changesets will come via a bridge with Facebook's internal source control. This is a necessity as it allows engineers at Facebook outside of the core team to move fast and contribute from an environment they are comfortable in.
-
-### `master` is unsafe
-
-We will do our best to keep `master` in good shape, with tests passing at all times. But in order to move fast, we will make API changes that your application might not be compatible with. We will do our best to communicate these changes and always version appropriately so you can lock into a specific version if need be.
+# Contributing to React Devtools
 
 ### Pull Requests
 
-The core team will be monitoring for pull requests. When we get one, we'll run some Facebook-specific integration tests on it first. From here, we'll need to get another person to sign off on the changes and then merge the pull request. For API changes we may need to fix internal uses, which could cause some delay. We'll do our best to provide updates and feedback throughout the process.
+The core team will be monitoring for pull requests.
 
 *Before* submitting a pull request, please make sure the following is done…
 
 1. Fork the repo and create your branch from `master`.
 2. If you've added code that should be tested, add tests!
 3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes (`grunt test`).
-5. Make sure your code lints (`grunt lint`) - we've done our best to make sure these rules match our internal linting guidelines.
-6. If you haven't already, complete the CLA.
+4. Make sure your code lints (`npm run lint`) - we've done our best to make sure these rules match our internal linting guidelines.
+5. If you haven't already, complete the CLA.
 
 ### Contributor License Agreement ("CLA")
 
@@ -58,6 +47,8 @@ Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the safe
 * 80 character line length
 * "Attractive"
 
+Please `npm run lint`.
+
 ## License
 
-By contributing to React, you agree that your contributions will be licensed under the [Apache License Version 2.0 (APLv2)](LICENSE).
+By contributing to React, you agree that your contributions will be licensed under the [attached License](LICENSE).
