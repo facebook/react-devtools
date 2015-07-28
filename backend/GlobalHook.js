@@ -55,5 +55,3 @@ module.exports = function globalHook(window: Object) {
     });
   }
 };
-
-window.globalHook = module.exports;
