@@ -26,7 +26,7 @@ class PropVal extends React.Component {
     if (this.props.val === prevProps.val) {
       return;
     }
-    if (this.props.val && prevProps.val && 'object' === typeof this.props.val && 'object' === typeof prevProps.val) {
+    if (this.props.val && prevProps.val && typeof this.props.val === 'object' && typeof prevProps.val === 'object') {
       return;
     }
     var node = React.findDOMNode(this);
@@ -39,16 +39,16 @@ class PropVal extends React.Component {
 }
 
 function previewProp(val: any, nested: boolean) {
-  if ('number' === typeof val) {
+  if (typeof val === 'number') {
     return <span style={valueStyles.number}>{val}</span>;
   }
-  if ('string' === typeof val) {
+  if (typeof val === 'string') {
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
     return <span style={valueStyles.string}>"{val}"</span>;
   }
-  if ('boolean' === typeof val) {
+  if (typeof val === 'boolean') {
     return <span style={valueStyles.bool}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
@@ -60,7 +60,7 @@ function previewProp(val: any, nested: boolean) {
   if (!val) {
     return <span style={valueStyles.empty}>{'' + val}</span>;
   }
-  if ('object' !== typeof val) {
+  if (typeof val !== 'object') {
     return <span>…</span>;
   }
   if (val[consts.type]) {

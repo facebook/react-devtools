@@ -174,7 +174,7 @@ class Store extends EventEmitter {
             var node = this.get(item);
             return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) ||
               (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
-              ('string' === typeof node.get('children') && node.get('children').toLowerCase().indexOf(needle) !== -1);
+              (typeof node.get('children') === 'string' && node.get('children').toLowerCase().indexOf(needle) !== -1);
           });
       } else {
         this.searchRoots = this._nodes.entrySeq()
@@ -248,7 +248,7 @@ class Store extends EventEmitter {
     if (node.get('nodeType') === 'NativeWrapper') {
       children = this.get(children[0]).get('children');
     }
-    if ('string' === typeof children || !children || !children.length || node.get('collapsed')) {
+    if (typeof children === 'string' || !children || !children.length || node.get('collapsed')) {
       return false;
     }
     return true;

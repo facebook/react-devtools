@@ -108,18 +108,18 @@ class Simple extends React.Component {
     var type = typeof data;
     var style = styles.simple;
     var typeStyle;
-    if ('boolean' === type) {
+    if (type === 'boolean') {
       typeStyle = valueStyles.bool;
     } else if (!this.props.data) {
       typeStyle = valueStyles.empty;
     }
-    if ('string' === type) {
+    if (type === 'string') {
       typeStyle = valueStyles.string;
       if (data.length > 200) {
         data = data.slice(0, 200) + '…';
       }
     }
-    if ('number' === type) {
+    if (type === 'number') {
       typeStyle = valueStyles.number;
     }
     style = assign({}, style, typeStyle);

@@ -24,7 +24,7 @@ class Props {
 
   render(): ReactElement {
     var props = this.props.props;
-    if (!props || 'object' !== typeof props) {
+    if (!props || typeof props !== 'object') {
       return <span/>;
     }
 

@@ -53,7 +53,7 @@ class PropState extends React.Component {
 
     var editTextContent = null;
     if (this.props.canEditTextContent) {
-      if ('string' === typeof this.props.node.get('children')) {
+      if (typeof this.props.node.get('children') === 'string') {
         editTextContent = (
           <BlurInput
             value={this.props.node.get('children')}

@@ -33,7 +33,7 @@ function getData012(element: Object): DataType {
   } else if (element._renderedChildren) {
     name = element.constructor.displayName;
     children = childrenList(element._renderedChildren);
-  } else if ('string' === typeof props.children) {
+  } else if (typeof props.children === 'string') {
     // string children
     name = element.constructor.displayName;
     children = props.children;
@@ -46,7 +46,7 @@ function getData012(element: Object): DataType {
 
   if (element._currentElement) {
     type = element._currentElement.type;
-    if ('string' === typeof type) {
+    if (typeof type === 'string') {
       name = type;
     } else {
       nodeType = 'Composite';
@@ -62,7 +62,7 @@ function getData012(element: Object): DataType {
     nodeType = 'Composite';
   }
 
-  if ('string' === typeof props) {
+  if (typeof props === 'string') {
     nodeType = 'Text';
     text = props;
     props = null;

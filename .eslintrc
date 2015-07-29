@@ -119,7 +119,7 @@
     "semi-spacing": 1,	             // require a space after a semi-colon
     "vars-on-top": 0,                // requires to declare all vars on top of their containing scope (off by default)
     "wrap-iife": 0,                  // require immediate function invocation to be wrapped in parentheses (off by default)
-    "yoda": 0,                       // require or disallow Yoda conditions
+    "yoda": 1,                       // require or disallow Yoda conditions
 
   // Strict Mode
   // These rules relate to using strict mode.

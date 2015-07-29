@@ -13,15 +13,15 @@
 function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   level = level || 0;
   path = path || [];
-  if ('function' === typeof data) {
+  if (typeof data === 'function') {
     cleaned.push(path);
     return {
       name: data.name,
       type: 'function',
     };
   }
-  if (!data || 'object' !== typeof data) {
-    if ('string' === typeof data && data.length > 500) {
+  if (!data || typeof data !== 'object') {
+    if (typeof data === 'string' && data.length > 500) {
       return data.slice(0, 500) + '...';
     }
     return data;
@@ -34,7 +34,7 @@ function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<stri
     cleaned.push(path);
     return {
       type: Array.isArray(data) ? 'array' : 'object',
-      name: 'Object' === data.constructor.name ? '' : data.constructor.name,
+      name: data.constructor.name === 'Object' ? '' : data.constructor.name,
       meta: {
         length: data.length,
       },
@@ -45,7 +45,7 @@ function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<stri
     return data.map((item, i) => sanitize(item, cleaned, path.concat([i]), level + 1));
   }
   // TODO when this is in the iframe window, we can just use Object
-  if (data.constructor && 'function' === typeof data.constructor && data.constructor.name !== 'Object') {
+  if (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object') {
     cleaned.push(path);
     return {
       name: data.constructor.name,

@@ -54,7 +54,7 @@ function renameStyle(agent, id, oldName, newName, val) {
   }
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
-    if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
+    if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
       var customStyle = shallowClone(style[style.length - 1]);
       delete customStyle[oldName];
       customStyle[newName] = val;
@@ -66,7 +66,7 @@ function renameStyle(agent, id, oldName, newName, val) {
       data.updater.setInProps(['style'], style);
     }
   } else {
-    if ('object' === typeof style) {
+    if (typeof style === 'object') {
       var customStyle = shallowClone(style);
       delete customStyle[oldName];
       customStyle[newName] = val;
@@ -95,7 +95,7 @@ function setStyle(agent, id, attr, val) {
   }
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
-    if ('object' === typeof style[style.length - 1] && !Array.isArray(style[style.length - 1])) {
+    if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
       // $FlowFixMe we know that updater is not null here
       data.updater.setInProps(['style', style.length - 1, attr], val);
     } else {

@@ -101,7 +101,7 @@ class Node {
       onMouseDown: this.props.onSelect,
     };
 
-    if (null === node.get('name')) {
+    if (node.get('name') === null) {
       var content = children || node.get('text');
       return (
         <div style={styles.container}>
@@ -125,7 +125,7 @@ class Node {
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
 
     // Single-line tag (collapsed / simple content / no content)
-    if (!children || 'string' === typeof children || !children.length) {
+    if (!children || typeof children === 'string' || !children.length) {
       var name = node.get('name');
       var content = children || node.get('text');
       return (
@@ -152,7 +152,7 @@ class Node {
     }
 
     // Plain string
-    if ('string' === typeof children) {
+    if (typeof children === 'string') {
       return <div style={leftPad}>{children}</div>;
     }
 

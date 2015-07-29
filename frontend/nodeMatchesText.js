@@ -24,7 +24,7 @@ function nodeMatchesText(node: Map, needle: string): boolean {
     return true;
   }
   var children = node.get('children');
-  if ('string' === typeof children && children.toLowerCase().indexOf(needle) !== -1) {
+  if (typeof children === 'string' && children.toLowerCase().indexOf(needle) !== -1) {
     return true;
   }
   return false;
