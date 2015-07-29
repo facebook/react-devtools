@@ -13,8 +13,9 @@
 var {EventEmitter} = require('events');
 var assign = require('object-assign');
 
-import type * as Bridge from './Bridge';
-import type {DataType, OpaqueReactElement, NativeType} from '../backend/types';
+import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
+
+type ElementID = string;
 
 type Bridge = {
   send: (evt: string, data?: any) => void,
@@ -22,19 +23,14 @@ type Bridge = {
   forget: (id: string) => void,
 };
 
-type InternalsObject = {
-  getNativeFromReactElement: (el: OpaqueReactElement) => NativeType,
-  getReactElementFromNative: (node: NativeType) => OpaqueReactElement,
-  cleanup: () => void,
-};
-
 /**
  * The agent lives on the page in the same context as React, observes events
  * from the `backend`, and communicates (via a `Bridge`) with the frontend.
  *
- * It is responsible for generating IDs for each react element, maintaining a
- * mapping of those IDs to elements, handling messages from the frontend, and
- * translating between react elements and native handles.
+ * It is responsible for generating string IDs (ElementID) for each react
+ * element, maintaining a mapping of those IDs to elements, handling messages
+ * from the frontend, and translating between react elements and native
+ * handles.
  *
  *
  *   React
@@ -87,15 +83,16 @@ type InternalsObject = {
  * - unmount
  */
 class Agent extends EventEmitter {
-  reactElements: Map<string, OpaqueReactElement>;
+  // the window or global -> used to "make a value available in the console"
   global: Object;
-  ids: WeakMap<OpaqueReactElement, string>;
-  elementData: Map<string, DataType>;
-  roots: Set<string>;
-  reactInternals: {[key: string]: InternalsObject}; // injected
+  reactElements: Map<ElementID, OpaqueNodeHandle>;
+  ids: WeakMap<OpaqueNodeHandle, ElementID>;
+  elementData: Map<ElementID, DataType>;
+  roots: Set<ElementID>;
+  reactInternals: {[key: RendererID]: Helpers};
   capabilities: {[key: string]: boolean};
-  renderers: Map<string, string>;
-  _prevSelected: any;
+  renderers: Map<ElementID, RendererID>;
+  _prevSelected: ?NativeType;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -123,15 +120,13 @@ class Agent extends EventEmitter {
 
   // returns an "unsubscribe" function
   sub(ev: string, fn: (data: any) => void): () => void {
-    EventEmitter.prototype.on.call(this, ev, fn);
-    return () => this.off(ev, fn);
+    this.on(ev, fn);
+    return () => {
+      this.removeListener(ev, fn);
+    };
   }
 
-  off(ev: string, fn: (data: any) => void) {
-    this.removeListener(ev, fn);
-  }
-
-  setReactInternals(renderer: string, reactInternals: InternalsObject) {
+  setReactInternals(renderer: RendererID, reactInternals: Helpers) {
     this.reactInternals[renderer] = reactInternals;
   }
 
@@ -199,7 +194,7 @@ class Agent extends EventEmitter {
     this.on('setSelection', data => bridge.send('select', data));
   }
 
-  scrollToNode(id: string): void {
+  scrollToNode(id: ElementID): void {
     var node = this.getNodeForID(id);
     if (!node) {
       console.warn('unable to get the node for scrolling');
@@ -213,7 +208,7 @@ class Agent extends EventEmitter {
     this.highlight(id);
   }
 
-  highlight(id: string) {
+  highlight(id: ElementID) {
     var data = this.elementData.get(id);
     var node = this.getNodeForID(id);
     if (node) {
@@ -221,7 +216,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  highlightMany(ids: Array<string>) {
+  highlightMany(ids: Array<ElementID>) {
     var nodes = [];
     ids.forEach(id => {
       var node = this.getNodeForID(id);
@@ -234,7 +229,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  getNodeForID(id: string): ?Object {
+  getNodeForID(id: ElementID): ?Object {
     var component = this.reactElements.get(id);
     if (!component) {
       return null;
@@ -248,6 +243,7 @@ class Agent extends EventEmitter {
       return null;
     }
     if (this.reactInternals[renderer].getNativeFromReactElement) {
+      // $FlowFixMe I literally just checked this
       return this.reactInternals[renderer].getNativeFromReactElement(component);
     }
   }
@@ -260,7 +256,7 @@ class Agent extends EventEmitter {
     this.emit('setSelection', {id, quiet});
   }
 
-  selectFromReactInstance(instance: OpaqueReactElement, quiet?: boolean) {
+  selectFromReactInstance(instance: OpaqueNodeHandle, quiet?: boolean) {
     var id = this.getId(instance);
     if (!id) {
       console.log('no instance id', instance);
@@ -269,13 +265,14 @@ class Agent extends EventEmitter {
     this.emit('setSelection', {id, quiet});
   }
 
-  getIDForNode(node: Object): ?string {
+  getIDForNode(node: Object): ?ElementID {
     if (!this.reactInternals) {
       return null;
     }
     var component;
     for (var renderer in this.reactInternals) {
       try {
+        // $FlowFixMe possibly null - it's not null
         component = this.reactInternals[renderer].getReactElementFromNative(node);
       } catch (e){}
       if (component) {
@@ -284,7 +281,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setProps({id, path, value}: {id: string, path: Array<string>, value: any}) {
+  _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
     if (data.updater && data.updater.setInProps) {
       data.updater.setInProps(path, value);
@@ -293,7 +290,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setState({id, path, value}: {id: string, path: Array<string>, value: any}) {
+  _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
     if (data.updater && data.updater.setInState) {
       data.updater.setInState(path, value);
@@ -302,7 +299,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setContext({id, path, value}: {id: string, path: Array<string>, value: any}) {
+  _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
     if (data.updater && data.updater.setInContext) {
       data.updater.setInContext(path, value);
@@ -311,7 +308,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _makeGlobal({id, path}: {id: string, path: Array<string>}) {
+  _makeGlobal({id, path}: {id: ElementID, path: Array<string>}) {
     var data = this.elementData.get(id);
     var value;
     if (path === 'instance') {
@@ -323,7 +320,7 @@ class Agent extends EventEmitter {
     console.log('$tmp =', value);
   }
 
-  getId(element: OpaqueReactElement): string {
+  getId(element: OpaqueNodeHandle): ElementID {
     if (typeof element !== 'object') {
       return element;
     }
@@ -334,13 +331,13 @@ class Agent extends EventEmitter {
     return this.ids.get(element);
   }
 
-  addRoot(renderer: string, element: OpaqueReactElement) {
+  addRoot(renderer: RendererID, element: OpaqueNodeHandle) {
     var id = this.getId(element);
     this.roots.add(id);
     this.emit('root', id);
   }
 
-  onMounted(renderer: string, component: OpaqueReactElement, data: DataType) {
+  onMounted(renderer: RendererID, component: OpaqueNodeHandle, data: DataType) {
     var id = this.getId(component);
     this.renderers.set(id, renderer);
     this.elementData.set(id, data);
@@ -356,7 +353,7 @@ class Agent extends EventEmitter {
     this.emit('mount', send);
   }
 
-  onUpdated(component: OpaqueReactElement, data: DataType) {
+  onUpdated(component: OpaqueNodeHandle, data: DataType) {
     var id = this.getId(component);
     this.elementData.set(id, data);
 
@@ -371,7 +368,7 @@ class Agent extends EventEmitter {
     this.emit('update', send);
   }
 
-  onUnmounted(component: OpaqueReactElement) {
+  onUnmounted(component: OpaqueNodeHandle) {
     var id = this.getId(component);
     this.elementData.delete(id);
     this.roots.delete(id);
@@ -382,7 +379,7 @@ class Agent extends EventEmitter {
 }
 
 function randid() {
-  return Math.random().toString(0x0f).slice(10, 20);
+  return Math.random().toString(16).slice(2);
 }
 
 function getIn(base, path) {

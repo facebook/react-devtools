@@ -10,21 +10,16 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, Hook} from '../backend/types';
+import type {DataType, RendererID, OpaqueNodeHandle, Helpers, Hook} from '../backend/types';
 
 var setupBackend = require('../backend/backend');
 
-// This type is entirely opaque to the backend.
-type OpaqueReactElement = {
-  _rootNodeID: string,
-};
-
 type Agent = {
-  addRoot: (renderer: string, el: OpaqueReactElement) => void,
-  onMounted: (renderer: string, el: OpaqueReactElement, data: DataType) => void,
-  onUpdated: (el: OpaqueReactElement, data: DataType) => void,
-  onUnmounted: (el: OpaqueReactElement) => void,
-  setReactInternals: (renderer: string, internals: Object) => void,
+  addRoot: (renderer: RendererID, el: OpaqueNodeHandle) => void,
+  onMounted: (renderer: RendererID, el: OpaqueNodeHandle, data: DataType) => void,
+  onUpdated: (el: OpaqueNodeHandle, data: DataType) => void,
+  onUnmounted: (el: OpaqueNodeHandle) => void,
+  setReactInternals: (renderer: RendererID, internals: Helpers) => void,
   on: (evt: string, fn: (...args: Array<any>) => any) => any,
 };
 

@@ -3,8 +3,8 @@
 React Developer Tools is a system that allows you to inspect a React Renderer,
 including the Component hierarchy, props, state, and more.
 
-There are shells for chrome (adding it to the chrome devtools), firefox,
-atom/nuclide, and as a standalone electron app.
+There are shells for Chrome (adding it to the Chrome devtools), Firefox,
+Atom/Nuclide, and as a standalone Electron app.
 
 ![](/images/devtools-full.gif)
 
@@ -15,18 +15,13 @@ The official extensions represent the current stable release.
 
 - [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 - Firefox extension (coming soon)
-- Stand-alone app (coming soon)
+- Standalone app (coming soon)
 
 If you inspect an element or launch the developer tools on a React page, you
 should see an extra tab called **React** in the inspector.
 
-### For Hacking
-For changes that don't directly involve chrome/firefox/etc. APIs, there is a
-"plain" shell that just renders the devtools into an html page along with a
-TodoMVC test app. This is by far the quickest way to develop. Check out
-[the Readme.md](/shells/plain) in `/shells/plain` for info.
-
-For other shells (chrome, firefox, etc.), see the respective directories in `/shells`.
+Check out [For Hacking](#for-hacking) if you want to develop the Developer
+Tools or use a pre-prelease version.
 
 ## Usage
 
@@ -47,6 +42,14 @@ For other shells (chrome, firefox, etc.), see the respective directories in `/sh
 
 ![](/images/devtools-side-pane.gif)
 
+## For Hacking
+For changes that don't directly involve Chrome/Firefox/etc. APIs, there is a
+"plain" shell that just renders the devtools into an html page along with a
+TodoMVC test app. This is by far the quickest way to develop. Check out
+[the Readme.md](/shells/plain) in `/shells/plain` for info.
+
+For other shells (Chrome, Firefox, etc.), see the respective directories in `/shells`.
+
 ## FAQ
 
 ### The React Tab Doesn't Show Up
@@ -62,7 +65,7 @@ for the devtools to function.)
 You can test this on the [React website](http://facebook.github.io/react/)
 or by inspecting [Facebook](https://www.facebook.com/).
 
-Currently iframes and chrome apps/extensions are not inspectable.
+Currently iframes and Chrome apps/extensions are not inspectable.
 
 ### ProTips
 
@@ -70,7 +73,7 @@ If you inspect a React element on the page using the regular **Elements** tab,
 then switch over to the **React** tab, that element will be automatically
 selected in the React tree.
 
-## Debugging (in chrome)
+## Debugging (in Chrome)
 
 What to do if the extension breaks.
 

@@ -17,7 +17,7 @@ export type DataType = {
   props: ?Object,
   state: ?Object,
   context: ?Object,
-  children: ?(string | Array<OpaqueReactElement>),
+  children: ?(string | Array<OpaqueNodeHandle>),
   text: ?string,
   updater: ?{
     setInProps: ?(path: Array<string>, value: any) => void,
@@ -30,10 +30,11 @@ export type DataType = {
 };
 
 // This type is entirely opaque to the backend.
-export type OpaqueReactElement = {
+export type OpaqueNodeHandle = {
   _rootNodeID: string,
 };
 export type NativeType = {};
+export type RendererID = string;
 
 type DOMNode = {};
 
@@ -66,9 +67,9 @@ export type ReactRenderer = {
 };
 
 export type Helpers = {
-  getNativeFromReactElement?: ?(component: OpaqueReactElement) => ?NativeType,
-  getReactElementFromNative?: ?(component: NativeType) => ?OpaqueReactElement,
-  walkTree: (visit: (component: OpaqueReactElement, data: DataType) => void, visitRoot: (element: OpaqueReactElement) => void) => void,
+  getNativeFromReactElement?: ?(component: OpaqueNodeHandle) => ?NativeType,
+  getReactElementFromNative?: ?(component: NativeType) => ?OpaqueNodeHandle,
+  walkTree: (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) => void,
   cleanup: () => void,
 };
 

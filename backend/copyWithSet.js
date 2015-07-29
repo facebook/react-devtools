@@ -10,63 +10,19 @@
  */
 'use strict';
 
-/**
- * This basically just does React.addons.update, where the only operation is
- * $set. Should I just move to using that?
- */
-function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any): Object | Array<any> {
-  var newObj = {};
-  var curObj = newObj;
-  var last = path.pop();
-  var cancelled = path.some(attr => {
-    // $FlowFixMe
-    if (!obj[attr]) {
-      return true;
-    }
-    var next = {};
-    if (Array.isArray(obj)) {
-      for (var i = 0; i < obj.length; i++) {
-        if (i === attr) {
-          if (Array.isArray(obj[i])) {
-            next = [];
-          }
-          curObj[i] = next;
-        } else {
-          curObj[i] = obj[i];
-        }
-      }
-    } else {
-      for (var name in obj) {
-        if (name === attr) {
-          if (Array.isArray(obj[attr])) {
-            next = [];
-          }
-          // $FlowFixMe number or string is fine here
-          curObj[name] = next;
-        } else {
-          // $FlowFixMe number or string is fine here
-          curObj[name] = obj[name];
-        }
-      }
-    }
-    curObj = next;
-    // $FlowFixMe number or string is fine here
-    obj = obj[attr];
-  });
-  if (!cancelled) {
-    if (Array.isArray(obj)) {
-      for (var i = 0; i < obj.length; i++) {
-        curObj[i] = obj[i];
-      }
-      curObj[last] = value;
-    } else {
-      for (var name in obj) {
-        curObj[name] = obj[name];
-      }
-      curObj[last] = value;
-    }
+function copyWithSetImpl(obj, path, idx, value) {
+  if (idx >= path.length) {
+    return value;
   }
-  return newObj;
+  var key = path[idx];
+  var updated = Array.isArray(obj) ? obj.slice() : {...obj};
+  // $FlowFixMe number or string is fine here
+  updated[key] = copyWithSetImpl(obj[key], path, idx + 1, value);
+  return updated;
+}
+
+function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any): Object | Array<any> {
+  return copyWithSetImpl(obj, path, 0, value);
 }
 
 module.exports = copyWithSet;

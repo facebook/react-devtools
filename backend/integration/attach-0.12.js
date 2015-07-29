@@ -299,6 +299,7 @@ group('State updating', () => {
       var updates = els.get(simple);
       // because of timing issues, the first mount will show the setState :(
       t.equal(updates[1].props.pass, 100, 't=1, prop=100');
+      t.end();
     }, 0);
   });
 });

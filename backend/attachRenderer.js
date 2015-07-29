@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueReactElement, Hook, ReactRenderer, Helpers} from './types';
+import type {DataType, OpaqueNodeHandle, Hook, ReactRenderer, Helpers} from './types';
 var getData = require('./getData');
 var getData012 = require('./getData012');
 
@@ -79,14 +79,16 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     oldMethods = decorateMany(renderer.Component.Mixin, {
       mountComponent() {
         rootNodeIDMap.set(this._rootNodeID, this);
-        // FIXME maybe shim something else to remove this hack
+        // FIXME DOMComponent calls Component.Mixin, and sets up the
+        // `children` *after* that call, meaning we don't have access to the
+        // children at this point. Maybe we should find something else to shim
+        // (do we have access to DOMComponent here?) so that we don't have to
+        // setTimeout.
         setTimeout(() => {
           hook.emit('mount', {element: this, data: getData012(this, {}), renderer: rid});
         }, 0);
       },
       updateComponent() {
-        // we need this because DOMComponent updates itself *after* calling
-        // this method.
         setTimeout(() => {
           hook.emit('update', {element: this, data: getData012(this, {}), renderer: rid});
         }, 0);
@@ -116,7 +118,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     });
   }
 
-  extras.walkTree = function (visit: (component: OpaqueReactElement, data: DataType) => void, visitRoot: (element: OpaqueReactElement) => void) {
+  extras.walkTree = function (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) {
     var onMount = (component, data) => {
       rootNodeIDMap.set(component._rootNodeID, component);
       visit(component, data);

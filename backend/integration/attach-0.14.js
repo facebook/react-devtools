@@ -285,6 +285,7 @@ group('State updating', () => {
     t.equal(updates[0].props.pass, false, 't=0, prop=false');
     t.equal(updates[1].props.pass, true, 't=1, prop=true');
     t.equal(updates[2].props.pass, 100, 't=2, prop=100');
+    t.end();
   });
 });
 

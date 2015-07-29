@@ -16,9 +16,7 @@
 
   // Map from global var to bool specifying if it can be redefined
   "globals": {
-    "__DEV__": true,
     "__dirname": false,
-    "__fbBatchedBridgeConfig": false,
     "ReactElement": false,
     "cancelAnimationFrame": false,
     "clearImmediate": true,
@@ -44,7 +42,6 @@
     "setTimeout": false,
     "window": false,
     "XMLHttpRequest": false,
-    "pit": false
   },
 
   "rules": {

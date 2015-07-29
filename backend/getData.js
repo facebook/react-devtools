@@ -39,7 +39,8 @@ function getData(element: Object): DataType {
   } else if (element._renderedChildren) {
     children = childrenList(element._renderedChildren);
   } else if (element._currentElement.props) {
-    // string children
+    // This is a native node without rendered children -- meaning the children
+    // prop is just a string.
     children = element._currentElement.props.children;
   }
 
@@ -49,13 +50,14 @@ function getData(element: Object): DataType {
 
   if (element._currentElement) {
     type = element._currentElement.type;
-    if ('string' === typeof type) {
+    if (typeof type === 'string') {
       name = type;
     } else if (element.getName) {
       nodeType = 'Composite';
       name = element.getName();
       // 0.14 top-level wrapper
-      if ((name === null || name === 'TopLevelWrapper') && element._currentElement.props === element._renderedComponent._currentElement) {
+      // TODO(jared): The backend should just act as if these don't exist.
+      if (element._currentElement.props === element._renderedComponent._currentElement) {
         nodeType = 'Wrapper';
       }
       if (name === null) {

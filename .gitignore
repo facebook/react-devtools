@@ -1,5 +1,3 @@
-*.swp
-*.swo
 /node_modules
 /test/build
 /shells/chrome/build
@@ -17,4 +15,4 @@
 /backend/integration/v0.13/node_modules
 /backend/integration/v0.14/node_modules
 /backend/integration/build
-shells/firefox/*.xpi
+/shells/firefox/*.xpi
