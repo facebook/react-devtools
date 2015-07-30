@@ -235,13 +235,7 @@ class Agent extends EventEmitter {
       return null;
     }
     var data = this.elementData.get(id);
-    if (!data) {
-      return null;
-    }
     var renderer = this.renderers.get(id);
-    if (!this.reactInternals[renderer]) {
-      return null;
-    }
     if (this.reactInternals[renderer].getNativeFromReactElement) {
       // $FlowFixMe I literally just checked this
       return this.reactInternals[renderer].getNativeFromReactElement(component);
@@ -271,6 +265,7 @@ class Agent extends EventEmitter {
     }
     var component;
     for (var renderer in this.reactInternals) {
+      // If a renderer doesn't know about a reactId, it will throw an error.
       try {
         // $FlowFixMe possibly null - it's not null
         component = this.reactInternals[renderer].getReactElementFromNative(node);

@@ -8,6 +8,7 @@
 [include]
 
 [libs]
+agent/flow.js
 
 [options]
 suppress_type=$FlowIssue

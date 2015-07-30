@@ -112,7 +112,6 @@ class Panel extends React.Component {
     */
 
     this._bridge = new Bridge();
-    // $FlowFixMe flow thinks `this._bridge` might be null
     this._bridge.attach(wall);
 
     // $FlowFixMe flow thinks `this._bridge` might be null

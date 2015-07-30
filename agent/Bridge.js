@@ -14,10 +14,6 @@ var consts = require('./consts');
 var hydrate = require('./hydrate');
 var sanitize = require('./sanitize');
 
-declare var performance: {
-  now: () => number,
-};
-
 type AnyFn = (...x: any) => any;
 type Wall = {
   listen: (fn: (data: PayloadType) => void) => void,
