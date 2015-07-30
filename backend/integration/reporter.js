@@ -42,14 +42,5 @@ module.exports = stream => {
       status.innerHTML = '<span style="color:' + color + '">Status: ' + pass + '/' + (pass + fail) + '</span>';
     }
   });
-  stream.on('end', () => {
-    setTimeout(() => {
-      // location.reload();
-    }, 2000);
-  });
-  return function (name, fn) {
-    // TODO do something with the name
-    fn();
-  };
 };
 
