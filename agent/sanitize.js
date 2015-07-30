@@ -10,6 +10,26 @@
  */
 'use strict';
 
+/**
+ * Strip out complex data (instances, functions, and data nested > 2 levels
+ * deep). The paths of the stripped out objects are appended to the `cleaned`
+ * list. On the other side of the barrier, the cleaned list is used to
+ * "re-hydrate" the cleaned representation into an object with symbols as
+ * attributes, so that a sanitized object can be distinguished from a normal
+ * object.
+ *
+ * Input: {"some": {"attr": fn()}, "other": AnInstance}
+ * Output: {
+ *   "some": {
+ *     "attr": {"name": the fn.name, type: "function"}
+ *   },
+ *   "other": {
+ *     "name": "AnInstance",
+ *     "type": "object",
+ *   },
+ * }
+ * and cleaned = [["some", "attr"], ["other"]]
+ */
 function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   level = level || 0;
   path = path || [];

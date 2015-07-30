@@ -352,7 +352,6 @@ class Bridge {
       args: [result, cleaned, proto, protoclean],
     });
   }
-
 }
 
 function getIn(base, path) {
