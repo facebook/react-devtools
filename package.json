@@ -29,7 +29,7 @@
     "babel-loader": "^5.1.4",
     "eslint": "^0.24.1",
     "eslint-plugin-react": "^3.0.0",
-    "jest-cli": "^0.4.15",
+    "jest-cli": "facebook/jest#0.5.x",
     "json-loader": "^0.5.2",
     "node-libs-browser": "^0.5.2",
     "webpack": "^1.9.10"
