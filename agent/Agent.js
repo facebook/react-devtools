@@ -234,7 +234,6 @@ class Agent extends EventEmitter {
     if (!component) {
       return null;
     }
-    var data = this.elementData.get(id);
     var renderer = this.renderers.get(id);
     if (this.reactInternals[renderer].getNativeFromReactElement) {
       // $FlowFixMe I literally just checked this

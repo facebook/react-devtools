@@ -1,8 +1,11 @@
 sudo: false
 install:
   - npm install
+  - npm install -g flow-bin
 language: node_js
 node_js:
   - "iojs"
 script:
+  - npm run lint
+  - flow check
   - npm test

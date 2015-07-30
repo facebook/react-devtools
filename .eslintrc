@@ -42,6 +42,7 @@
     "setTimeout": false,
     "window": false,
     "XMLHttpRequest": false,
+    "performance": false,
   },
 
   "rules": {

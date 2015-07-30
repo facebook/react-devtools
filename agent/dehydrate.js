@@ -62,7 +62,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   }
   if (Array.isArray(data)) {
     // $FlowFixMe path is not undefined.
-    return data.map((item, i) => sanitize(item, cleaned, path.concat([i]), level + 1));
+    return data.map((item, i) => dehydrate(item, cleaned, path.concat([i]), level + 1));
   }
   // TODO when this is in the iframe window, we can just use Object
   if (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object') {
