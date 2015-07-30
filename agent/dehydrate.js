@@ -30,7 +30,7 @@
  * }
  * and cleaned = [["some", "attr"], ["other"]]
  */
-function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
+function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   level = level || 0;
   path = path || [];
   if (typeof data === 'function') {
@@ -74,9 +74,9 @@ function sanitize(data: Object, cleaned: Array<Array<string>>, path?: Array<stri
   }
   var res = {};
   for (var name in data) {
-    res[name] = sanitize(data[name], cleaned, path.concat([name]), level + 1);
+    res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);
   }
   return res;
 }
 
-module.exports = sanitize;
+module.exports = dehydrate;
