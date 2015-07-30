@@ -34,7 +34,7 @@ socket.onclose = function () {
 };
 
 function initialize() {
-  fs.readFile(path.join(__dirname, '/build/backend.js'), function (err, backendScript) {
+  fs.readFile(path.join(__dirname, '/../build/backend.js'), function (err, backendScript) {
     if (err) {
       return console.error('failed to load...', err);
     }

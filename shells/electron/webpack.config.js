@@ -12,9 +12,7 @@
 module.exports = {
   debug: true,
   devtool: 'source-map',
-  // devtool: 'cheap-module-eval-source-map',
   entry: {
-    panel: './panel/run.js',
     backend: './backend/run.js',
   },
   output: {

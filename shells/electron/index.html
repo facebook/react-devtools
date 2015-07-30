@@ -42,7 +42,10 @@
         <div id="container">
             <h2 id="waiting">Waiting for a connection from React Native</h2>
         </div>
-        <script src="node/index.js"></script>
-        <script src="build/panel.js"></script>
+        <script>
+            require('babel-core').register({stage: 0});
+            require('./node');
+            require('./panel/run');
+        </script>
     </body>
 </html>
