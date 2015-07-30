@@ -9,13 +9,13 @@
  */
 'use strict';
 
-jest.dontMock('../sanitize');
-var sanitize = require('../sanitize');
+jest.dontMock('../dehydrate');
+var dehydrate = require('../dehydrate');
 
-describe('sanitize', () => {
+describe('dehydrate', () => {
   it('leaves an empty object alone', () => {
     var cleaned = [];
-    var result = sanitize({}, cleaned);
+    var result = dehydrate({}, cleaned);
     expect(result).toEqual({});
   });
 
@@ -25,7 +25,7 @@ describe('sanitize', () => {
       b: ['h', 'i', 'j'],
     };
     var cleaned = [];
-    var result = sanitize(object, cleaned);
+    var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([]);
     expect(result).toEqual(object);
   });
@@ -33,7 +33,7 @@ describe('sanitize', () => {
   it('cleans a deeply nested object', () => {
     var object = {a: {b: {c: {d: 4}}}};
     var cleaned = [];
-    var result = sanitize(object, cleaned);
+    var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c']]);
     expect(result.a.b.c).toEqual({type: 'object', name: '', meta: {}});
   });
@@ -41,7 +41,7 @@ describe('sanitize', () => {
   it('cleans a deeply nested array', () => {
     var object = {a: {b: {c: [1, 3]}}};
     var cleaned = [];
-    var result = sanitize(object, cleaned);
+    var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c']]);
     expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
   });
@@ -50,7 +50,7 @@ describe('sanitize', () => {
     var Something = function () {};
     var object = {a: {b: {c: [1, 3], d: new Something()}}};
     var cleaned = [];
-    var result = sanitize(object, cleaned);
+    var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c'], ['a', 'b', 'd']]);
     expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
     expect(result.a.b.d).toEqual({type: 'object', name: 'Something', meta: {}});
