@@ -5,8 +5,11 @@ install:
 	done;
 
 test:
-	browserify -t babelify is-travis.js attach-0.11.js|tape-run
-	browserify -t babelify is-travis.js attach-0.12.js|tape-run
-	browserify -t babelify is-travis.js attach-0.13.js|tape-run
-	browserify -t babelify is-travis.js attach-0.14.js|tape-run
+	for source in attach-*; do\
+		browserify -t babelify is-travis.js $$source > tmp.js;\
+		echo "Built $$source";\
+		cat tmp.js | tape-run;\
+		echo "Ran $$source";\
+	done;
+	rm tmp.js
 
