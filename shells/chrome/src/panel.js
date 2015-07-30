@@ -52,7 +52,7 @@ var config = {
       chrome.devtools.network.onNavigated.removeListener(reload);
     };
   },
-  getNewSelectiong(bridge) {
+  getNewSelection(bridge) {
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = $0');
     bridge.send('checkSelection');
   },
@@ -117,10 +117,9 @@ var config = {
   },
 };
 
-
 var globalHook = require('../../../backend/GlobalHook');
 globalHook(window);
-var Panel = require('./magic');
+var Panel = require('../../../frontend/magic');
 var React = require('react');
 
 var node = document.getElementById('container');
@@ -134,6 +133,3 @@ function reload() {
 }
 
 React.render(<Panel alreadyFoundReact={true} {...config} />, node);
-
-
-

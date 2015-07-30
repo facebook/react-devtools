@@ -11,15 +11,17 @@
 'use strict';
 
 var React = require('react');
-var Bridge = require('../../../agent/Bridge');
-var Container = require('../../../frontend/Container');
-var NativeStyler = require('../../../plugins/ReactNativeStyle/ReactNativeStyle.js');
-var Store = require('../../../frontend/Store');
-var keyboardNav = require('../../../frontend/keyboardNav');
+var Container = require('./Container');
+var Store = require('./Store');
+var keyboardNav = require('./keyboardNav');
+var invariant = require('./invariant');
 
-var consts = require('../../../agent/consts');
+var Bridge = require('../agent/Bridge');
+var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 
-import type {DOMEvent} from '../../../frontend/types';
+var consts = require('../agent/consts');
+
+import type {DOMEvent} from './types';
 
 type Props = {
   alreadyFoundReact: boolean,
@@ -100,10 +102,12 @@ class Panel extends React.Component {
     if (!this._bridge || (!id && !this._store.selected)) {
       return;
     }
+    invariant(this.props.selectElement, 'cannot send selection if props.selectElement is not defined');
     this.props.selectElement(id || this._store.selected, this._bridge);
   }
 
   inspectComponent(vbl: string) {
+    invariant(this.props.showComponentSource, 'cannot inspect component if props.showComponentSource is not supplied');
     this.props.showComponentSource(vbl || '$r');
   }
 
@@ -113,6 +117,7 @@ class Panel extends React.Component {
     }
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
+      invariant(this.props.showComponentSource, 'cannot view source if props.showComponentSource is not supplied');
       this.props.showComponentSource('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst');
     }, 100);
   }
@@ -137,7 +142,6 @@ class Panel extends React.Component {
       this._teardownWall = teardown;
 
       this._bridge = new Bridge();
-      // $FlowFixMe flow thinks `this._bridge` might be null
       this._bridge.attach(wall);
 
       // xx FlowFixMe this._bridge is not null
@@ -193,7 +197,7 @@ class Panel extends React.Component {
     }
     return (
       <Container
-        reload={this.reload.bind(this)}
+        reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path, name) => {
             if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
@@ -201,9 +205,11 @@ class Panel extends React.Component {
             }
             return [this.props.showAttrSource && {
               title: 'Show Source',
+              // $FlowFixMe showAttrSource is provided
               action: () => this.props.showAttrSource(path),
             }, this.props.executeFn && {
               title: 'Execute function',
+              // $FlowFixMe executeFn is provided
               action: () => this.props.executeFn(path),
             }];
           },

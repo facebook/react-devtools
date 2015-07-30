@@ -13,16 +13,55 @@
 var Harness = require('./Harness');
 var Container = require('../../frontend/Container');
 var React = require('react');
+var globalHook = require('../../backend/GlobalHook');
 
 window.React = React;
 
-var node = document.createElement('div');
-document.body.appendChild(node);
-React.render(
-  <Harness backendSrc="./build/backend.js" targetSrc="../../test/example/build/target.js">
-    <Container/>
-  </Harness>,
-  node
-);
+var Panel = require('../../frontend/magic');
+
+var target = document.getElementById('target');
+function inject(src, done) {
+  var script = target.contentDocument.createElement('script');
+  script.src = src;
+  script.onload = done;
+  target.contentDocument.body.appendChild(script);
+  // script.parentNode.removeChild(script);
+}
+
+var win = target.contentWindow;
+globalHook(win);
+
+var config = {
+  alreadyFoundReact: true,
+  reload: null,
+  checkForReact: null,
+  reloadSubscribe: null,
+  getNewSelection: null,
+  selectElement: null,
+  showComponentSource: null,
+  showAttrSource: null,
+  executeFn: null,
+  inject(done) {
+    inject('./build/backend.js', () => {
+      var wall = {
+        listen(fn) {
+          win.parent.addEventListener('message', evt => fn(evt.data));
+        },
+        send(data) {
+          win.postMessage(data, '*');
+        },
+      };
+      done(wall, () => {});
+    });
+  },
+};
+
+inject('../../test/example/build/target.js', () => {
+  var node = document.getElementById('container');
+  React.render(
+    <Panel {...config} />,
+    node
+  );
+});
 
 

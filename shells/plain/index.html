@@ -3,8 +3,30 @@
     <head>
         <meta charset="utf8">
         <title>Container Example</title>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <style>
+            #target {
+                flex: 1;
+                border: none;
+            }
+            #container {
+                display: flex;
+                height: 500px;
+            }
+            body {
+                display: flex;
+                flex-direction: column;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+            }
+        </style>
     </head>
     <body>
+        <iframe id="target"></iframe>
+        <div id="container"></div>
         <script src="build/container.js"></script>
     </body>
 </html>
