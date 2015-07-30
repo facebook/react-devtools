@@ -1,10 +1,11 @@
+sudo: false
 install:
   - npm install
-  - cd backend/integration && npm install
+  - (cd backend/integration && npm install)
   - npm install -g browserify tape-run
 language: node_js
 node_js:
   - "iojs"
 script:
   - npm test
-  - cd backend/integration && make
+  - (cd backend/integration && make)
