@@ -46,13 +46,6 @@ const ReactPanel = Class({
     });
     worker.port.on('hasReact', function (hasReact) {
       addonSide.postMessage({hasReact});
-      /*
-      addonSide.postMessage({
-        type: 'event',
-        evt: 'hasReact',
-        data: hasReact,
-      });
-      */
     });
     worker.on('error', function (error) {
       console.log('More Error!!', error);
