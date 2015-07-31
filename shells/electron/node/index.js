@@ -9,28 +9,37 @@
  */
 'use strict';
 
-// this is not compiled by babel / webpack
 var ws = require('ws');
 var fs = require('fs');
 var path = require('path');
 
-var socket = ws.connect('ws://localhost:8081/devtools');
+var globalHook = require('../../../backend/GlobalHook');
+globalHook(window);
+var Panel = require('../../../frontend/Panel');
+var React = require('react');
 
-socket.onmessage = initialMessage;
+var node = document.getElementById('container');
+var wall = null;
 
-function initialMessage(evt) {
-  if (evt.data === 'attach:agent') {
-    initialize();
-  }
+var config = {
+  reload,
+  alreadyFoundReact: true,
+  inject(done) {
+    done(wall);
+  },
+};
+
+function reload() {
+  React.unmountComponentAtNode(node);
+  node.innerHTML = '';
+  setTimeout(() => {
+    React.render(<Panel {...config} />, node);
+  }, 100);
 }
 
-socket.onerror = function (err) {
-  window.onDisconnected();
-  console.log('error connection', err);
-};
-socket.onclose = function () {
-  window.onDisconnected();
-  console.log('error things');
+function onDisconnected() {
+  React.unmountComponentAtNode(node);
+  node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 };
 
 function initialize() {
@@ -39,13 +48,17 @@ function initialize() {
       return console.error('failed to load...', err);
     }
     socket.send('eval:' + backendScript.toString('utf8'));
+    var listeners = [];
     socket.onmessage = function (evt) {
-      // console.log('<<--', evt.data);
       var data = JSON.parse(evt.data);
       if (data.$close || data.$error) {
         console.log('Closing or Erroring');
-        window.onDisconnected();
-        socket.onmessage = initialMessage;
+        onDisconnected();
+        socket.onmessage = evt => {
+          if (evt.data === 'attach:agent') {
+            initialize(socket);
+          }
+        };
         return;
       }
       if (data.$open) {
@@ -53,15 +66,12 @@ function initialize() {
       }
       listeners.forEach(function (fn) {fn(data); });
     };
-    console.log('connected to react native');
-    var listeners = [];
 
-    var wall = {
+    wall = {
       listen(fn) {
         listeners.push(fn);
       },
       send(data) {
-        // console.log('-->>' + JSON.stringify(data));
         socket.send(JSON.stringify(data));
       },
       disconnect() {
@@ -69,13 +79,55 @@ function initialize() {
       },
     };
 
-    window.onConnected(wall);
+    console.log('connected');
+    reload();
   });
 }
 
-window.onConnected = function () {
-  console.error('No onConnected set');
+/**
+ * This is the normal mode, where it connects to the react native packager
+ */
+window.connectToSocket = function () {
+  var socket = ws.connect('ws://localhost:8081/devtools');
+  socket.onmessage = evt => {
+    if (evt.data === 'attach:agent') {
+      initialize(socket);
+    }
+  };
+  socket.onerror = function (err) {
+    onDisconnected();
+    console.log('Error with websocket connection', err);
+  };
+  socket.onclose = function () {
+    onDisconnected();
+    console.log('Connection to RN closed');
+  };
+}
+
+/**
+ * When the Electron app is running in "server mode"
+ */
+window.startServer = function () {
+  var server = new ws.Server({port: 8097})
+  var connected = false;
+  server.on('connection', function (socket) {
+    if (connected) {
+      console.warn('only one connection allowed at a time');
+      socket.close();
+      return;
+    }
+    connected = true;
+    socket.onerror = function (err) {
+      connected = false;
+      onDisconnected();
+      console.log('Error with websocket connection', err);
+    };
+    socket.onclose = function () {
+      connected = false;
+      onDisconnected();
+      console.log('Connection to RN closed');
+    };
+    initialize(socket);
+  });
 };
-window.onDisconnected = function () {
-  console.error('No onDisconnected set');
-};
+

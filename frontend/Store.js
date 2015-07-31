@@ -455,7 +455,9 @@ class Store extends EventEmitter {
 
   _removeFromNodesByName(id: ElementID) {
     var node = this._nodes.get(id);
-    this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
+    if (node) {
+      this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
+    }
   }
 }
 
