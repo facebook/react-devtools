@@ -1,6 +1,0 @@
-{
-  "main": "./index.js",
-  "dependencies": {
-    "ws": "^0.7.2"
-  }
-}
