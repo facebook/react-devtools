@@ -10,21 +10,53 @@
  */
 'use strict';
 
-var Panel = require('./Panel');
+var globalHook = require('../../../backend/GlobalHook');
+globalHook(window);
+
+var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
 var node = document.getElementById('container');
 node.innerHTML = '<h1>Connecting to devtools</h1>';
-var port;
+var port = {};
 
 function reload() {
   React.unmountComponentAtNode(node);
   node.innerHTML = '';
-  React.render(<Panel port={port} reload={reload} />, node);
+  React.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
 window.addEventListener('message', function (evt) {
   port = evt.ports[0];
-  React.render(<Panel port={port} reload={reload} />, node);
+  port.onmessage = evt => {
+    if (evt.data.hasReact === true) {
+      React.render(<Panel alreadyFoundReact={true} {...config} />, node);
+    } else {
+      node.innerHTML = '<h1>No react found on page...</h1>';
+    }
+  }
 });
+
+var config = {
+  reload,
+  // checkForReact,
+  inject(done) {
+    var disconnected = false;
+
+    var wall = {
+      listen(fn) {
+        port.onmessage = evt => {
+          fn(evt.data);
+        };
+      },
+      send(data) {
+        if (disconnected) {
+          return;
+        }
+        port.postMessage(data);
+      },
+    };
+    done(wall);
+  },
+};
 

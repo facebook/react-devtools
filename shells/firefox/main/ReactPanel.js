@@ -39,19 +39,20 @@ const ReactPanel = Class({
     const panelSide = channel.port2;
 
     addonSide.onmessage = function (evt) {
-      // console.log('from panel', evt.data);
       worker.port.emit('message', evt.data);
     };
     worker.port.on('message', function (data) {
-      // console.log('to panel', data);
       addonSide.postMessage(data);
     });
     worker.port.on('hasReact', function (hasReact) {
+      addonSide.postMessage({hasReact});
+      /*
       addonSide.postMessage({
         type: 'event',
         evt: 'hasReact',
         data: hasReact,
       });
+      */
     });
     worker.on('error', function (error) {
       console.log('More Error!!', error);
