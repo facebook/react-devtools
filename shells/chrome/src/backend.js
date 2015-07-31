@@ -12,7 +12,7 @@
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
-var Highlighter = require('../../../frontend/Highlighter/Highlighter');
+var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 
 var inject = require('../../../agent/inject');
@@ -71,31 +71,15 @@ function setup(hook) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
 
-  var hl;
   agent.on('shutdown', () => {
     hook.emit('shutdown');
     listeners.forEach(fn => {
       window.removeEventListener('message', fn);
     });
     listeners = [];
-    if (hl) {
-      hl.remove();
-    }
   });
 
   if (!isReactNative) {
-    hl = new Highlighter(window, node => {
-      agent.selectFromDOMNode(node);
-    });
-    // $FlowFixMe flow thinks hl might be undefined
-    agent.on('highlight', data => hl.highlight(data.node, data.name));
-    // $FlowFixMe flow thinks hl might be undefined
-    agent.on('highlightMany', nodes => hl.highlightMany(nodes));
-    // $FlowFixMe flow thinks hl might be undefined
-    agent.on('hideHighlight', () => hl.hideHighlight());
-    // $FlowFixMe flow thinks hl might be undefined
-    agent.on('startInspecting', () => hl.startInspecting());
-    // $FlowFixMe flow thinks hl might be undefined
-    agent.on('stopInspecting', () => hl.stopInspecting());
+    setupHighlighter(agent);
   }
 }

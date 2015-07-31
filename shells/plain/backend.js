@@ -12,7 +12,7 @@
 
 var Agent = require('../../agent/Agent');
 var Bridge = require('../../agent/Bridge');
-var Highlighter = require('../../frontend/Highlighter/Highlighter');
+var setupHighlighter = require('../../frontend/Highlighter/setup');
 
 var inject = require('../../agent/inject');
 
@@ -27,18 +27,9 @@ var wall = {
 
 var bridge = new Bridge();
 bridge.attach(wall);
-var backend = new Agent(window);
-backend.addBridge(bridge);
+var agent = new Agent(window);
+agent.addBridge(bridge);
 
-inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend);
+inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
 
-var hl = new Highlighter(window, node => {
-  backend.selectFromDOMNode(node);
-});
-hl.injectButton();
-backend.on('highlight', data => hl.highlight(data.node, data.name));
-backend.on('highlightMany', nodes => hl.highlightMany(nodes));
-backend.on('hideHighlight', () => hl.hideHighlight());
-
-backend.on('startInspecting', () => hl.startInspecting());
-backend.on('stopInspecting', () => hl.stopInspecting());
+setupHighlighter(agent);

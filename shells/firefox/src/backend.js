@@ -12,7 +12,7 @@
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
-var Highlighter = require('../../../frontend/Highlighter/Highlighter');
+var setupHighlighter = require('../../../frontend/Highlighter/setup');
 
 var inject = require('../../../agent/inject');
 
@@ -55,39 +55,27 @@ function setup() {
 
   var bridge = new Bridge();
   bridge.attach(wall);
-  var backend = new Agent(window);
-  backend.addBridge(bridge);
-  var hl;
+  var agent = new Agent(window);
+  agent.addBridge(bridge);
 
   var _connectTimeout = setTimeout(function () {
-    console.error('react-devtools backend got no connection');
+    console.error('react-devtools agent got no connection');
   }, 1000);
 
-  backend.once('connected', () => {
-    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, backend, /* lookForOldReact= */true);
+  agent.once('connected', () => {
+    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent, /* lookForOldReact= */true);
     clearTimeout(_connectTimeout);
   });
 
-  backend.on('shutdown', () => {
+  agent.on('shutdown', () => {
     listeners.forEach(fn => {
       window.removeEventListener('message', fn);
     });
     listeners = [];
-    if (hl) {
-      hl.remove();
-    }
   });
 
   if (window.document && window.document.createElement) {
-    hl = new Highlighter(window, node => {
-      backend.selectFromDOMNode(node);
-    });
-    // $FlowFixMe flow things hl might be undefined
-    backend.on('highlight', data => hl.highlight(data.node, data.name));
-    // $FlowFixMe flow things hl might be undefined
-    backend.on('highlightMany', nodes => hl.highlightMany(nodes));
-    // $FlowFixMe flow things hl might be undefined
-    backend.on('hideHighlight', () => hl.hideHighlight());
+    setupHighlighter(agent);
   }
 }
 
