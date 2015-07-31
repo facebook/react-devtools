@@ -17,7 +17,7 @@ type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
 }
 
-type Port = {
+type Port = { // eslint-disable-line no-unused-vars
   disconnect: () => void,
   onMessage: Listenable,
   onDisconnect: Listenable,
@@ -46,10 +46,10 @@ declare var chrome: {
 var config = {
   reload,
   checkForReact,
-  reloadSubscribe(reload) {
-    chrome.devtools.network.onNavigated.addListener(reload);
+  reloadSubscribe(reloadFn) {
+    chrome.devtools.network.onNavigated.addListener(reloadFn);
     return () => {
-      chrome.devtools.network.onNavigated.removeListener(reload);
+      chrome.devtools.network.onNavigated.removeListener(reloadFn);
     };
   },
   getNewSelection(bridge) {

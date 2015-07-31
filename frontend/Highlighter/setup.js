@@ -26,5 +26,5 @@ module.exports = function setup(agent: Agent) {
   agent.on('shutdown', () => {
     hl.remove();
   });
-}
+};
 

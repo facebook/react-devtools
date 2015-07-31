@@ -10,7 +10,6 @@
  */
 'use strict';
 
-var Container = require('../../frontend/Container');
 var React = require('react');
 var globalHook = require('../../backend/GlobalHook');
 

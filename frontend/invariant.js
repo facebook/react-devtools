@@ -19,6 +19,7 @@
  * The invariant message will be stripped in production, but the invariant
  * will remain to ensure logic does not differ in production.
  */
+var __DEV__ = process.env.NODE_ENV === 'development';
 
 var invariant = function(condition, format, a, b, c, d, e, f) {
   if (__DEV__) {

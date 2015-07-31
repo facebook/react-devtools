@@ -26,15 +26,15 @@ function reload() {
   React.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
-window.addEventListener('message', function (evt) {
-  port = evt.ports[0];
+window.addEventListener('message', function (event) {
+  port = event.ports[0];
   port.onmessage = evt => {
     if (evt.data.hasReact === true) {
       React.render(<Panel alreadyFoundReact={true} {...config} />, node);
     } else {
       node.innerHTML = '<h1>No react found on page...</h1>';
     }
-  }
+  };
 });
 
 var config = {
