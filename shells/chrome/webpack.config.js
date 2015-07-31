@@ -17,7 +17,7 @@ module.exports = {
     background: './src/background.js',
     inject: './src/GlobalHook.js',
     contentScript: './src/contentScript.js',
-    panel: './src/panel/run.js',
+    panel: './src/panel.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat

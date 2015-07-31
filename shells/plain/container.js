@@ -10,22 +10,20 @@
  */
 'use strict';
 
-var Harness = require('./Harness');
 var Container = require('../../frontend/Container');
 var React = require('react');
 var globalHook = require('../../backend/GlobalHook');
 
 window.React = React;
 
-var Panel = require('../../frontend/magic');
+var Panel = require('../../frontend/Panel');
 
-var target = document.getElementById('target');
+var target: Object = document.getElementById('target');
 function inject(src, done) {
   var script = target.contentDocument.createElement('script');
   script.src = src;
   script.onload = done;
   target.contentDocument.body.appendChild(script);
-  // script.parentNode.removeChild(script);
 }
 
 var win = target.contentWindow;
@@ -33,14 +31,6 @@ globalHook(win);
 
 var config = {
   alreadyFoundReact: true,
-  reload: null,
-  checkForReact: null,
-  reloadSubscribe: null,
-  getNewSelection: null,
-  selectElement: null,
-  showComponentSource: null,
-  showAttrSource: null,
-  executeFn: null,
   inject(done) {
     inject('./build/backend.js', () => {
       var wall = {
@@ -51,17 +41,13 @@ var config = {
           win.postMessage(data, '*');
         },
       };
-      done(wall, () => {});
+      done(wall);
     });
   },
 };
 
 inject('../../test/example/build/target.js', () => {
   var node = document.getElementById('container');
-  React.render(
-    <Panel {...config} />,
-    node
-  );
+  React.render(<Panel {...config} />, node);
 });
-
 

@@ -10,8 +10,8 @@
  */
 'use strict';
 
-var checkForReact = require('./panel/checkForReact');
-var inject = require('./panel/inject');
+var checkForReact = require('./checkForReact');
+var inject = require('./inject');
 
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
@@ -63,6 +63,8 @@ var config = {
     }, 100);
   },
   showComponentSource(vbl) {
+    // if it is an es6 class-based component, (isMounted throws), then inspect
+    // the constructor. Otherwise, inspect the render function.
     var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
       Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted').value ?
         inspect(window.${vbl}.render) : inspect(window.${vbl}.constructor)`;
@@ -119,7 +121,7 @@ var config = {
 
 var globalHook = require('../../../backend/GlobalHook');
 globalHook(window);
-var Panel = require('../../../frontend/magic');
+var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
 var node = document.getElementById('container');
