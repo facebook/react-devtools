@@ -10,7 +10,6 @@
  */
 'use strict';
 
-var nodePos = require('./nodePos');
 var setStyle = require('./setStyle');
 
 import type {DOMNode} from '../types';
@@ -30,12 +29,12 @@ class MultiOverlay {
     this.container.innerHTML = '';
     nodes.forEach(node => {
       var div = this.win.document.createElement('div');
-      var pos = nodePos(node);
+      var box = node.getBoundingClientRect();
       setStyle(div, {
-        top: pos.top + 'px',
-        left: pos.left + 'px',
-        width: node.offsetWidth + 'px',
-        height: node.offsetHeight + 'px',
+        top: box.top + 'px',
+        left: box.left + 'px',
+        width: box.width + 'px',
+        height: box.height + 'px',
         border: '2px dotted rgba(200, 100, 100, .8)',
         boxSizing: 'border-box',
         backgroundColor: 'rgba(200, 100, 100, .2)',

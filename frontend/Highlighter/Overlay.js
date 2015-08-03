@@ -10,7 +10,6 @@
  */
 'use strict';
 
-var nodePos = require('./nodePos');
 var setStyle = require('./setStyle');
 
 import type {DOMNode} from '../types';
@@ -86,7 +85,7 @@ class Overlay {
   }
 
   inspect(node: DOMNode, name?: ?string) {
-    var pos = nodePos(node);
+    var box = node.getBoundingClientRect();
     var dims = getElementDimensions(node);
 
     boxWrap(dims, 'margin', this.node);
@@ -94,23 +93,23 @@ class Overlay {
     boxWrap(dims, 'padding', this.padding);
 
     setStyle(this.content, {
-      height: node.offsetHeight - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
-      width: node.offsetWidth - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
+      height: box.height - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
+      width: box.width - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
     });
 
     setStyle(this.node, {
-      top: pos.top - dims.marginTop + 'px',
-      left: pos.left - dims.marginLeft + 'px',
+      top: box.top - dims.marginTop + 'px',
+      left: box.left - dims.marginLeft + 'px',
     });
 
     this.nameSpan.textContent = (name || node.nodeName.toLowerCase());
-    this.dimSpan.textContent = node.offsetWidth + 'px × ' + node.offsetHeight + 'px';
+    this.dimSpan.textContent = box.width + 'px × ' + box.height + 'px';
 
     var tipPos = findTipPos({
-      top: pos.top - dims.marginTop,
-      left: pos.left - dims.marginLeft,
-      height: node.offsetHeight + dims.marginTop + dims.marginBottom,
-      width: node.offsetWidth + dims.marginLeft + dims.marginRight,
+      top: box.top - dims.marginTop,
+      left: box.left - dims.marginLeft,
+      height: box.height + dims.marginTop + dims.marginBottom,
+      width: box.width + dims.marginLeft + dims.marginRight,
     }, this.win);
     setStyle(this.tip, tipPos);
   }
