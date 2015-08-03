@@ -13,7 +13,6 @@
 var React = require('react');
 var Simple = require('./Simple');
 
-var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 

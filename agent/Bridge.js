@@ -329,7 +329,7 @@ class Bridge {
         result[name] = dehydrate(val[name], cleaned, [name]);
       });
 
-      // eslint-disable no-proto
+      /* eslint-disable no-proto */
       if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
         proto = {};
         var pIsFn = typeof val.__proto__ === 'function';
@@ -341,7 +341,7 @@ class Bridge {
           proto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
         });
       }
-      // eslint-enable no-proto
+      /* eslint-enable no-proto */
     }
 
     this._wall.send({
