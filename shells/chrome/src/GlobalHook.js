@@ -15,13 +15,20 @@
 
 var globalHook = require('../../../backend/GlobalHook.js');
 
+// TODO: remove for release
+var checkForOld = `
+if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
+  console.error("REACT DEVTOOLS ERROR\\nYou need to disable the official version of React Devtools in order to use the beta.");
+}
+`
+
 var js = (
-  '(' + globalHook.toString() + '(window))'
+  ';(' + globalHook.toString() + '(window))'
 );
 
 // This script runs before the <head> element is created, so we add the script
 // to <html> instead.
 var script = document.createElement('script');
-script.textContent = js;
+script.textContent = checkForOld + js;
 document.documentElement.appendChild(script);
 script.parentNode.removeChild(script);
