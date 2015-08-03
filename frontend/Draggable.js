@@ -16,7 +16,12 @@ import type {DOMEvent} from './types';
 class Draggable {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
-  props: Object;
+  props: {
+    onMove: (x: number, y: number) => void,
+    onStart: () => void,
+    onStop: () => void,
+    style: Object,
+  };
 
   componentDidMount() {
     this._onMove = this.onMove.bind(this);
@@ -33,7 +38,7 @@ class Draggable {
 
   onMove(evt: DOMEvent) {
     evt.preventDefault();
-    this.props.onMove(evt.pageX);
+    this.props.onMove(evt.pageX, evt.pageY);
   }
 
   onUp(evt: DOMEvent) {

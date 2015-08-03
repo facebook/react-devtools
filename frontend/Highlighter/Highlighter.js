@@ -15,6 +15,10 @@ import type {DOMNode, DOMEvent} from '../types';
 var Overlay = require('./Overlay');
 var MultiOverlay = require('./MultiOverlay');
 
+/**
+ * Manages the highlighting of items on an html page, as well as
+ * hover-to-inspect.
+ */
 class Highlighter {
   _overlay: ?Overlay;
   _multiOverlay: ?MultiOverlay;

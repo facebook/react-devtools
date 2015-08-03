@@ -10,8 +10,7 @@
  */
 'use strict';
 
-var setStyle = require('./setStyle');
-
+var assign = require('object-assign');
 import type {DOMNode} from '../types';
 
 class Overlay {
@@ -38,14 +37,14 @@ class Overlay {
     this.padding.style.borderColor = overlayStyles.padding;
     this.content.style.backgroundColor = overlayStyles.background;
 
-    setStyle(this.node, {
+    assign(this.node.style, {
       borderColor: overlayStyles.margin,
       pointerEvents: 'none',
       position: 'fixed',
     });
 
     this.tip = doc.createElement('div');
-    setStyle(this.tip, {
+    assign(this.tip.style, {
       border: '1px solid #aaa',
       backgroundColor: 'rgb(255, 255, 178)',
       fontFamily: 'sans-serif',
@@ -57,13 +56,13 @@ class Overlay {
 
     this.nameSpan = doc.createElement('span');
     this.tip.appendChild(this.nameSpan);
-    setStyle(this.nameSpan, {
+    assign(this.nameSpan.style, {
       color:   'rgb(136, 18, 128)',
       marginRight: '5px',
     });
     this.dimSpan = doc.createElement('span');
     this.tip.appendChild(this.dimSpan);
-    setStyle(this.dimSpan, {
+    assign(this.dimSpan.style, {
       color: '#888',
     });
 
@@ -92,12 +91,12 @@ class Overlay {
     boxWrap(dims, 'border', this.border);
     boxWrap(dims, 'padding', this.padding);
 
-    setStyle(this.content, {
+    assign(this.content.style, {
       height: box.height - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
       width: box.width - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
     });
 
-    setStyle(this.node, {
+    assign(this.node.style, {
       top: box.top - dims.marginTop + 'px',
       left: box.left - dims.marginLeft + 'px',
     });
@@ -111,7 +110,7 @@ class Overlay {
       height: box.height + dims.marginTop + dims.marginBottom,
       width: box.width + dims.marginLeft + dims.marginRight,
     }, this.win);
-    setStyle(this.tip, tipPos);
+    assign(this.tip.style, tipPos);
   }
 }
 
@@ -138,10 +137,10 @@ function findTipPos(dims, win) {
   top += 'px';
 
   if (dims.left < 0) {
-    return {top, left: 0};
+    return {top, left: margin};
   }
   if (dims.left + 200 > win.innerWidth) {
-    return {top, right: 0};
+    return {top, right: margin};
   }
   return {top, left: dims.left + margin + 'px'};
 }
@@ -166,7 +165,7 @@ function getElementDimensions(element) {
 }
 
 function boxWrap(dims, what, node) {
-  setStyle(node, {
+  assign(node.style, {
     borderTopWidth: dims[what + 'Top'] + 'px',
     borderLeftWidth: dims[what + 'Left'] + 'px',
     borderRightWidth: dims[what + 'Right'] + 'px',
