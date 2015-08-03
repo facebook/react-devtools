@@ -194,6 +194,7 @@ class Store extends EventEmitter {
     this.searchText = text;
     this.emit('searchText');
     this.emit('searchRoots');
+    this.highlightSearchResults();
     if (this.searchRoots && !this.searchRoots.contains(this.selected)) {
       this.select(null, true);
     } else if (!this.searchRoots) {
@@ -202,6 +203,14 @@ class Store extends EventEmitter {
       } else {
         this.select(this.roots.get(0));
       }
+    }
+  }
+
+  highlightSearchResults() {
+    if (this.searchRoots && this.searchRoots.size) {
+      this._bridge.send('highlightMany', this.searchRoots.toArray());
+    } else {
+      this._bridge.send('hideHighlight');
     }
   }
 
