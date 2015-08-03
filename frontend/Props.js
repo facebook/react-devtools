@@ -34,13 +34,13 @@ class Props {
 
     var items = [];
     names.slice(0, 3).forEach(name => {
-      items.push((
+      items.push(
         <span key={name} style={styles.prop}>
           <span style={styles.propName}>{name}</span>
           =
           <PropVal val={props[name]}/>
         </span>
-      ));
+      );
     });
 
     if (names.length > 3) {

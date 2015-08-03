@@ -35,6 +35,7 @@ class SearchPane extends React.Component {
   componentDidMount() {
     this._key = this.onDocumentKeyDown.bind(this);
     var doc = React.findDOMNode(this).ownerDocument;
+    // capture=true is needed to prevent chrome devtools console popping up
     doc.addEventListener('keydown', this._key, true);
   }
 
@@ -65,9 +66,7 @@ class SearchPane extends React.Component {
 
   cancel() {
     this.props.onChangeSearch('');
-    setTimeout(() => {
-      React.findDOMNode(this.input).blur();
-    }, 100);
+    React.findDOMNode(this.input).blur();
   }
 
   onKeyDown(key) {

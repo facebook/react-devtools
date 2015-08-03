@@ -13,6 +13,7 @@
 var React = require('react');
 var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
+var invariant = require('./invariant');
 
 var decorate = require('./decorate');
 
@@ -146,6 +147,8 @@ var WrappedPropState = decorate({
           store.setState(store.selected, path.slice(1), val);
         } else if (path[0] === 'context') {
           store.setContext(store.selected, path.slice(1), val);
+        } else {
+          invariant(false, "the path to change() must start wth props, state, or context");
         }
       },
       showMenu(e, val, path, name) {
@@ -160,7 +163,8 @@ var styles = {
   container: {
     padding: 3,
     fontSize: '11px',
-    fontFamily: 'Menlo, monospace',
+    // TODO figure out what font Chrome devtools uses on Windows
+    fontFamily: 'Menlo, Consolas, monospace',
     overflow: 'auto',
     flex: 1,
     display: 'flex',

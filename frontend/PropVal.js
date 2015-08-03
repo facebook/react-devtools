@@ -7,8 +7,6 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @flow
- * $FLowFixMe
- * - thinks all react component classes must inherit from React.Component
  */
 'use strict';
 
