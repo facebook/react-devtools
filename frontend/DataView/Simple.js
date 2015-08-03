@@ -43,7 +43,7 @@ class Simple extends React.Component {
     }
   }
 
-  onSubmit(editing?: boolean) {
+  onSubmit(editing: boolean) {
     if (this.state.text === valueToText(this.props.data)) {
       this.setState({
         editing: editing,
@@ -97,7 +97,7 @@ class Simple extends React.Component {
           ref={i => this.input = i}
           style={styles.input}
           onChange={e => this.onChange(e)}
-          onBlur={() => this.onSubmit()}
+          onBlur={() => this.onSubmit(false)}
           onKeyDown={this.onKeyDown.bind(this)}
           value={this.state.text}
         />
@@ -112,14 +112,12 @@ class Simple extends React.Component {
       typeStyle = valueStyles.bool;
     } else if (!this.props.data) {
       typeStyle = valueStyles.empty;
-    }
-    if (type === 'string') {
+    } else if (type === 'string') {
       typeStyle = valueStyles.string;
       if (data.length > 200) {
         data = data.slice(0, 200) + '…';
       }
-    }
-    if (type === 'number') {
+    } else if (type === 'number') {
       typeStyle = valueStyles.number;
     }
     style = assign({}, style, typeStyle);

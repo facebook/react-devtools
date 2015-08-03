@@ -27,30 +27,34 @@ type EventLike = {
 class SearchPane extends React.Component {
   input: ReactElement;
   _key: (evt: EventLike) => void;
+  constructor(props) {
+    super(props);
+    this.state = {focused: false};
+  }
 
-  componentWillMount() {
-    this._key = this.onWindowKeyDown.bind(this);
-    var win = this.props.win || window;
-    win.addEventListener('keydown', this._key, true);
+  componentDidMount() {
+    this._key = this.onDocumentKeyDown.bind(this);
+    var doc = React.findDOMNode(this).ownerDocument;
+    doc.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    var win = this.props.win || window;
-    win.removeEventListener('keydown', this._key, true);
+    var doc = React.findDOMNode(this).ownerDocument;
+    doc.removeEventListener('keydown', this._key, true);
   }
 
-  onWindowKeyDown(e) {
+  onDocumentKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
       var node = React.findDOMNode(this.input);
-      var win = this.props.win || window;
-      if (win.document.activeElement === node) {
+      var doc = React.findDOMNode(this).ownerDocument;
+      if (doc.activeElement === node) {
         return;
       }
       node.focus();
       e.preventDefault();
     }
     if (e.keyCode === 27) { // escape
-      if (!this.props.searchText) {
+      if (!this.props.searchText && !this.state.focused) {
         return;
       }
       e.stopPropagation();
@@ -82,6 +86,8 @@ class SearchPane extends React.Component {
             style={styles.input}
             ref={i => this.input = i}
             value={this.props.searchText}
+            onFocus={() => this.setState({focused: true})}
+            onBlur={() => this.setState({focused: false})}
             onKeyDown={e => this.onKeyDown(e.key)}
             placeholder="Search by Component Name"
             onChange={e => this.props.onChangeSearch(e.target.value)}

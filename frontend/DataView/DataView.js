@@ -80,9 +80,7 @@ class DataItem extends React.Component {
 
   inspect() {
     this.setState({loading: true, open: true});
-    this.props.inspect(this.props.path, value => {
-      assign(this.props.value, value);
-      this.props.value[consts.inspected] = true;
+    this.props.inspect(this.props.path, () => {
       this.setState({loading: false});
     });
   }
@@ -107,7 +105,7 @@ class DataItem extends React.Component {
 
     var complex = true;
     var preview;
-    if (otype === 'number' || otype === 'string' || data === null || data === undefined || otype === 'boolean') {
+    if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean') {
       preview = (
         <Simple
           readOnly={this.props.readOnly}

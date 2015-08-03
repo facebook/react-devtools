@@ -25,9 +25,9 @@ class Draggable {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
-    var win = this.props.win || window;
-    win.addEventListener('mousemove', this._onMove);
-    win.addEventListener('mouseup', this._onUp);
+    var doc = React.findDOMNode(this).ownerDocument;
+    doc.addEventListener('mousemove', this._onMove);
+    doc.addEventListener('mouseup', this._onUp);
     this.props.onStart();
   }
 
@@ -38,9 +38,9 @@ class Draggable {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
-    var win = this.props.win || window;
-    win.removeEventListener('mousemove', this._onMove);
-    win.removeEventListener('mouseup', this._onUp);
+    var doc = React.findDOMNode(this).ownerDocument;
+    doc.removeEventListener('mousemove', this._onMove);
+    doc.removeEventListener('mouseup', this._onUp);
     this.props.onStop();
   }
 

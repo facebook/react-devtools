@@ -6,6 +6,8 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
+ * TODO: this is copied from fbjs because fbjs doesn't play well with
+ * non-haste module systems :/. Look into how to fix this.
  */
 'use strict';
 

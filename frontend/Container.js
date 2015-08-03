@@ -21,7 +21,6 @@ import type MenuItem from './ContextMenu';
 class Container extends React.Component {
   props: {
     reload: () => void,
-    win: Object,
     extraPanes: Array<(node: Object) => ReactElement>,
     menuItems: {
       tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
@@ -67,8 +66,7 @@ class Container extends React.Component {
       <div style={styles.container}>
         <SplitPane
           initialWidth={300}
-          win={this.props.win}
-          left={() => <SearchPane win={this.props.win} reload={this.props.reload} />}
+          left={() => <SearchPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
         />
         <ContextMenu itemSources={[defaultItems, this.props.menuItems]} />

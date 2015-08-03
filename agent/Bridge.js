@@ -329,17 +329,19 @@ class Bridge {
         result[name] = dehydrate(val[name], cleaned, [name]);
       });
 
-      if (!protod && val.__proto__ && val.constructor.name !== 'Object') { // eslint-disable-line no-proto
+      // eslint-disable no-proto
+      if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
         proto = {};
-        var pIsFn = typeof val.__proto__ === 'function'; // eslint-disable-line no-proto
-        Object.getOwnPropertyNames(val.__proto__).forEach(name => { // eslint-disable-line no-proto
+        var pIsFn = typeof val.__proto__ === 'function';
+        Object.getOwnPropertyNames(val.__proto__).forEach(name => {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
           // $FlowFixMe flow thinks proto (and val) might be null
-          proto[name] = dehydrate(val.__proto__[name], protoclean, [name]); // eslint-disable-line no-proto
+          proto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
         });
       }
+      // eslint-enable no-proto
     }
 
     this._wall.send({

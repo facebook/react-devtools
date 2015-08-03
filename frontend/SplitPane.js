@@ -44,7 +44,6 @@ class SplitPane extends React.Component {
       {/* $FlowFixMe the "extends React.Component" is just to help flow */}
       <Draggable
         style={dragStyle}
-        win={this.props.win}
         onStart={() => this.setState({moving: true})}
         onMove={x => this.onMove(x)}
         onStop={() => this.setState({moving: false})}

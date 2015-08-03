@@ -18,6 +18,8 @@ var {EventEmitter} = require('events');
 var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
+var consts = require('../agent/consts');
+var invariant = require('./invariant');
 
 import type * as Bridge from '../agent/Bridge';
 import type {DOMEvent, ElementID} from './types';
@@ -350,8 +352,18 @@ class Store extends EventEmitter {
     this.removeListener(evt, fn);
   }
 
-  inspect(id: ElementID, path: Array<string>, cb: (val: any) => void) {
-    this._bridge.inspect(id, path, cb);
+  inspect(id: ElementID, path: Array<string>, cb: () => void) {
+    invariant(path[0] === 'props' || path[0] === 'state' || path[0] === 'context',
+              'Inspected path must be one of props, state, or context');
+    this._bridge.inspect(id, path, value => {
+      var base = this.get(id).get(path[0]);
+      var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
+      if (inspected) {
+        assign(inspected, value);
+        inspected[consts.inspected] = true;
+      }
+      cb();
+    });
   }
 
   // Private stuff
