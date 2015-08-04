@@ -15,7 +15,7 @@ var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
 
 type AnyFn = (...x: any) => any;
-type Wall = {
+export type Wall = {
   listen: (fn: (data: PayloadType) => void) => void,
   send: (data: PayloadType) => void,
 };
