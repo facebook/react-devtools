@@ -98,6 +98,10 @@ class Panel extends React.Component {
     this.props.getNewSelection(this._bridge);
   }
 
+  hideHighlight() {
+    this._store.hideHighlight();
+  }
+
   sendSelection(id: string) {
     if (!this._bridge || (!id && !this._store.selected)) {
       return;

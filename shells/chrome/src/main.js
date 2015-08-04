@@ -11,6 +11,9 @@
 'use strict';
 
 type Panel = { // eslint-disable-line no-unused-vars
+  onHidden: {
+    addListener: (cb: (window: Object) => void) => void,
+  },
   onShown: {
     addListener: (cb: (window: Object) => void) => void,
   }
@@ -35,10 +38,17 @@ chrome.devtools.inspectedWindow.eval(`!!(
   }
 
   chrome.devtools.panels.create('React', '', 'panel.html', function (panel) {
+    var reactPanel = null;
     panel.onShown.addListener(function (window) {
       // when the user switches to the panel, check for an elements tab
       // selection
       window.panel.getNewSelection();
+      reactPanel = window.panel;
+    });
+    panel.onHidden.addListener(function () {
+      if (reactPanel) {
+        reactPanel.hideHighlight();
+      }
     });
   });
 });

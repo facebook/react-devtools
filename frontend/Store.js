@@ -288,11 +288,19 @@ class Store extends EventEmitter {
       this.emit('hover');
       this._bridge.send('highlight', id);
     } else if (this.hovered === id) {
-      this.hovered = null;
-      this.emit(id);
-      this.emit('hover');
-      this._bridge.send('hideHighlight');
+      this.hideHighlight();
     }
+  }
+
+  hideHighlight() {
+    this._bridge.send('hideHighlight');
+    if (!this.hovered) {
+      return;
+    }
+    var id = this.hovered;
+    this.hovered = null;
+    this.emit(id);
+    this.emit('hover');
   }
 
   selectTop(id: ?ElementID, noHighlight?: boolean) {
