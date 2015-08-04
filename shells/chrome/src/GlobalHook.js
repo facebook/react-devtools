@@ -22,6 +22,10 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
 }
 `
 
+var saveNativeObjectCreate = `
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate = Object.create;
+`;
+
 var js = (
   ';(' + globalHook.toString() + '(window))'
 );
@@ -29,6 +33,6 @@ var js = (
 // This script runs before the <head> element is created, so we add the script
 // to <html> instead.
 var script = document.createElement('script');
-script.textContent = checkForOld + js;
+script.textContent = checkForOld + js + saveNativeObjectCreate;
 document.documentElement.appendChild(script);
 script.parentNode.removeChild(script);

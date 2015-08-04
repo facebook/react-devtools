@@ -9,14 +9,20 @@
  */
 'use strict';
 
+var webpack = require('webpack');
+var fs = require('fs');
+var HELPERS_PATH = __dirname + '/custom-babel-helpers.js';
+
+var helpers = require("babel-core").buildExternalHelpers(null, 'var');
+helpers = helpers.replace(/Object\.create/g, '__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate');
+helpers = helpers + ';module.exports = babelHelpers;';
+
+fs.writeFileSync(HELPERS_PATH, helpers);
+
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
-    main: './src/main.js',
-    background: './src/background.js',
-    inject: './src/GlobalHook.js',
-    contentScript: './src/contentScript.js',
-    panel: './src/panel.js',
+    backend: './src/backend.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
@@ -26,11 +32,18 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.jsx?$/,
-      loader:  'babel-loader?stage=0',
+      loader:  'babel-loader?stage=0&externalHelpers=true',
       exclude: [
         'node_modules',
+        './helpers.js',
       ],
     }]
   },
+
+  plugins: [new webpack.ProvidePlugin({
+    babelHelpers: HELPERS_PATH,
+  })],
 };
+
+
 
