@@ -27,6 +27,7 @@
     "babel-eslint": "^3.1.23",
     "babel-jest": "^5.3.0",
     "babel-loader": "^5.1.4",
+    "babel-plugin-object-create-multiple-to-single-and-define-property": "^1.0.1",
     "eslint": "^0.24.1",
     "eslint-plugin-react": "^3.0.0",
     "jest-cli": "facebook/jest#0.5.x",
