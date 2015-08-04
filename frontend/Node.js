@@ -50,8 +50,8 @@ class Node {
     }
   }
 
-  componentDidUpdate() {
-    if (this.props.selected) {
+  componentDidUpdate(prevProps) {
+    if (this.props.selected && !prevProps.selected) {
       this.ensureInView();
     }
   }
