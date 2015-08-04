@@ -55,9 +55,9 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     return {
       type: Array.isArray(data) ? 'array' : 'object',
       name: data.constructor.name === 'Object' ? '' : data.constructor.name,
-      meta: {
+      meta: Array.isArray(data) ? {
         length: data.length,
-      },
+      } : null,
     };
   }
   if (Array.isArray(data)) {
