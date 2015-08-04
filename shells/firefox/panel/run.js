@@ -32,11 +32,13 @@ window.addEventListener('message', function (event) {
   metaPort.onmessage = evt => {
     if (evt.data === 'show') {
       reload();
+    } else if (evt.data === 'unload') {
+      node.innerHTML = '<h1 id="message">Looking for React</h1>';
     } else if (evt.data.type === 'hasReact') {
       if (evt.data.val) {
         React.render(<Panel alreadyFoundReact={true} {...config} />, node);
       } else {
-        node.innerHTML = '<h1>No react found on page...</h1>';
+        node.innerHTML = '<h1 id="message">No react found on page...</h1>';
       }
     }
   };

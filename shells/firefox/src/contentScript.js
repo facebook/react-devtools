@@ -22,6 +22,10 @@ if (Object.keys(unsafeWindow.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length) 
   self.port.emit('hasReact', false);
 }
 
+window.addEventListener('beforeunload', () => {
+  self.port.emit('unload');
+});
+
 function connectToBackend() {
   self.port.on('message', function (payload) {
     window.postMessage({

@@ -46,6 +46,9 @@ const ReactPanel = Class({
       worker.port.on('hasReact', function (hasReact) {
         metaAddonSide.postMessage({type: 'hasReact', val: hasReact});
       });
+      worker.port.on('unload', function () {
+        metaAddonSide.postMessage('unload');
+      });
       worker.on('error', function (error) {
         console.log('More Error!!', error);
       });
