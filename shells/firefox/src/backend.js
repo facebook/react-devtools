@@ -16,6 +16,13 @@ var setupHighlighter = require('../../../frontend/Highlighter/setup');
 
 var inject = require('../../../agent/inject');
 
+// This is the case when the page has been loaded from cache, and so there's
+// already a reactDevtoolsAgent active. We need to kill it before we start.
+if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent) {
+  window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('shutdown');
+  window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.emit('shutdown');
+}
+
 // TODO: check to see if we're in RN before doing this?
 setInterval(function () {
   // this is needed to force refresh on react native
