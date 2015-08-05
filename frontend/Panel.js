@@ -193,7 +193,7 @@ class Panel extends React.Component {
       );
     }
     if (!this.state.isReact) {
-      return <span>Looking for react...</span>;
+      return <div style={styles.loading}><h1>Looking for react...</h1></div>;
     }
     return (
       <Container
