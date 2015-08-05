@@ -20,7 +20,7 @@ var checkForOld = `
 if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
   console.error("REACT DEVTOOLS ERROR\\nYou need to disable the official version of React Devtools in order to use the beta.");
 }
-`
+`;
 
 var js = (
   ';(' + globalHook.toString() + '(window))'
