@@ -64,7 +64,7 @@ function setup(hook) {
   agent.addBridge(bridge);
 
   agent.once('connected', () => {
-    inject(hook, agent, /* lookForOldReact= */!isReactNative);
+    inject(hook, agent);
   });
 
   if (isReactNative) {

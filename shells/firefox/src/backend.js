@@ -63,7 +63,7 @@ function setup() {
   }, 1000);
 
   agent.once('connected', () => {
-    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent, /* lookForOldReact= */true);
+    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
     clearTimeout(_connectTimeout);
   });
 
