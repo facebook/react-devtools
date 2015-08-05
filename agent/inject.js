@@ -23,7 +23,7 @@ type Agent = {
   on: (evt: string, fn: (...args: Array<any>) => any) => any,
 };
 
-module.exports = function (hook: Hook, agent: Agent, lookForOldReact?: boolean) {
+module.exports = function (hook: Hook, agent: Agent) {
   var subs = [
     hook.sub('renderer-attached', ({id, renderer, helpers}) => {
       agent.setReactInternals(id, helpers);
@@ -35,7 +35,7 @@ module.exports = function (hook: Hook, agent: Agent, lookForOldReact?: boolean) 
     hook.sub('unmount', ({renderer, element}) => agent.onUnmounted(element)),
   ];
 
-  var success = setupBackend(hook, lookForOldReact);
+  var success = setupBackend(hook);
   if (!success) {
     return;
   }
