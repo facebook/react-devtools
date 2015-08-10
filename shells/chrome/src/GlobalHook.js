@@ -24,6 +24,9 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
 
 var saveNativeObjectCreate = `
 window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate = Object.create;
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeMap = Map;
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeWeakMap = WeakMap;
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet = Set;
 `;
 
 var js = (

@@ -42,6 +42,9 @@ module.exports = {
 
   plugins: [new webpack.ProvidePlugin({
     babelHelpers: HELPERS_PATH,
+    Map: __dirname + '/helpers/map.js',
+    WeakMap: __dirname + '/helpers/weak-map.js',
+    Set: __dirname + '/helpers/set.js',
   })],
 };
 
