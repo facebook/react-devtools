@@ -11,13 +11,6 @@
 
 var webpack = require('webpack');
 var fs = require('fs');
-var HELPERS_PATH = __dirname + '/custom-babel-helpers.js';
-
-var helpers = require("babel-core").buildExternalHelpers(null, 'var');
-helpers = helpers.replace(/Object\.create/g, '__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate');
-helpers = helpers + ';module.exports = babelHelpers;';
-
-fs.writeFileSync(HELPERS_PATH, helpers);
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
@@ -32,7 +25,7 @@ module.exports = {
   module: {
     loaders: [{
       test: /\.jsx?$/,
-      loader:  'babel-loader?stage=0&externalHelpers=true',
+      loader:  'babel-loader?stage=0',
       exclude: [
         'node_modules',
         './helpers.js',
@@ -41,7 +34,7 @@ module.exports = {
   },
 
   plugins: [new webpack.ProvidePlugin({
-    babelHelpers: HELPERS_PATH,
+    'Object.create': __dirname + '/helpers/object-create.js',
     Map: __dirname + '/helpers/map.js',
     WeakMap: __dirname + '/helpers/weak-map.js',
     Set: __dirname + '/helpers/set.js',
