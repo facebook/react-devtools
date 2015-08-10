@@ -21,9 +21,13 @@ declare var chrome: {
 module.exports = function (scriptName: string, done: () => void) {
   var src = `
   // the prototype stuff is in case document.createElement has been modified
-  var script = document.constructor.prototype.createElement.call(document, 'script');
+  var iframe = document.constructor.prototype.createElement.call(document, 'iframe');
+  iframe.style.display = 'none';
+  document.head.appendChild(iframe);
+  var doc = iframe.contentDocument;
+  var script = doc.createElement('script');
   script.src = "${scriptName}";
-  document.documentElement.appendChild(script);
+  doc.body.appendChild(script);
   script.parentNode.removeChild(script);
   `;
 

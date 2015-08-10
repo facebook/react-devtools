@@ -22,13 +22,17 @@ setInterval(function () {
   // this is needed to force refresh on react native
 }, 100);
 
-window.addEventListener('message', welcome);
+// main window
+var parent = window.parent;
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = parent.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
+parent.addEventListener('message', welcome);
 function welcome(evt) {
   if (evt.data.source !== 'react-devtools-content-script') {
     return;
   }
 
-  window.removeEventListener('message', welcome);
+  parent.removeEventListener('message', welcome);
   setup(window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 }
 
@@ -44,10 +48,10 @@ function setup(hook) {
         fn(evt.data.payload);
       };
       listeners.push(listener);
-      window.addEventListener('message', listener);
+      parent.addEventListener('message', listener);
     },
     send(data) {
-      window.postMessage({
+      parent.postMessage({
         source: 'react-devtools-bridge',
         payload: data,
       }, '*');
@@ -58,7 +62,7 @@ function setup(hook) {
 
   var bridge = new Bridge();
   bridge.attach(wall);
-  var agent = new Agent(window, {
+  var agent = new Agent(parent, {
     rnStyle: isReactNative,
   });
   agent.addBridge(bridge);
@@ -74,12 +78,12 @@ function setup(hook) {
   agent.on('shutdown', () => {
     hook.emit('shutdown');
     listeners.forEach(fn => {
-      window.removeEventListener('message', fn);
+      parent.removeEventListener('message', fn);
     });
     listeners = [];
   });
 
   if (!isReactNative) {
-    setupHighlighter(agent);
+    setupHighlighter(agent, parent);
   }
 }
