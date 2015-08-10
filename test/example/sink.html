@@ -7,6 +7,8 @@
     <body>
         <script src="build/sink.js"></script>
         <script>
+            // Test to make sure the backend doesn't depend on Object.create
+            // or ES6 globals
             Object.create = null;
             Map = null;
             Set = null;
