@@ -76,6 +76,10 @@ function previewProp(val: any, nested: boolean) {
     if (type === 'array') {
       return <span>Array[{val[consts.meta].length}]</span>;
     }
+    if (type === 'symbol') {
+      // the name is "Symbol(something)"
+      return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
+    }
   }
   if (nested) {
     return <span>{'{…}'}</span>;

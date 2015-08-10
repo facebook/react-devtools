@@ -26,6 +26,10 @@ module.exports = {
     color: 'rgb(0, 154, 190)',
   },
 
+  symbol: {
+    color: 'rgb(232, 98, 0)',
+  },
+
   number: {
     color: 'rgb(255, 0, 252)',
   },
