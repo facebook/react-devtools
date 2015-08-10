@@ -14,8 +14,8 @@ var Highlighter = require('./Highlighter');
 
 import type * as Agent from '../../agent/Agent';
 
-module.exports = function setup(agent: Agent) {
-  var hl = new Highlighter(window, node => {
+module.exports = function setup(agent: Agent, win?: Object) {
+  var hl = new Highlighter(win || window, node => {
     agent.selectFromDOMNode(node);
   });
   agent.on('highlight', data => hl.highlight(data.node, data.name));

@@ -34,7 +34,6 @@ declare var chrome: {
     },
   },
   runtime: {
-    getURL: (path: string) => string,
     connect: (config: Object) => Port,
   },
 };
