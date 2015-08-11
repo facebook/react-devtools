@@ -44,6 +44,16 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     if (typeof data === 'string' && data.length > 500) {
       return data.slice(0, 500) + '...';
     }
+    // We have to do this assignment b/c Flow doesn't think "symbol" is
+    // something typeof would return. Error 'unexpected predicate "symbol"'
+    var type = typeof data;
+    if (type === 'symbol') {
+      cleaned.push(path);
+      return {
+        type: 'symbol',
+        name: data.toString(),
+      };
+    }
     return data;
   }
   if (data._reactFragment) {

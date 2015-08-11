@@ -41,6 +41,12 @@ function previewComplex(data: Object) {
         {data[consts.name] + '{}'}
       </span>
     );
+  } else if (type === 'symbol') {
+    return (
+      <span style={valueStyles.symbol}>
+        {data[consts.name]}
+      </span>
+    );
   }
 }
 

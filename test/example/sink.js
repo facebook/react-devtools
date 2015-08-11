@@ -54,6 +54,17 @@ class Nester extends React.Component {
   }
 }
 
+class SymbolProp {
+  render() {
+    return (
+      <div sym={Symbol("name")}>
+        This tests that dehydration + inspection works with symbols
+        {Symbol("child")}
+      </div>
+    );
+  }
+}
+
 class BadUnmount {
   render() {
     return (
@@ -125,6 +136,7 @@ class LotsOfMounts {
 class Sink {
   render() {
     var examples = {
+      SymbolProp,
       LongRender,
       DeepTree,
       BadUnmount,
