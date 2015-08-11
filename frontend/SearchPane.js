@@ -77,12 +77,16 @@ class SearchPane extends React.Component {
   }
 
   render() {
+    var inputStyle = styles.input;
+    if (this.props.searchText || this.state.focused) {
+      inputStyle = {...inputStyle, ...styles.highlightedInput};
+    }
     return (
       <div style={styles.container}>
         <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
           <input
-            style={styles.input}
+            style={inputStyle}
             ref={i => this.input = i}
             value={this.props.searchText}
             onFocus={() => this.setState({focused: true})}
@@ -141,19 +145,26 @@ var styles = {
     height: '17px',
     position: 'absolute',
     cursor: 'pointer',
-    right: '2px',
-    top: '4px',
+    right: '7px',
+    top: '8px',
     color: 'white',
     backgroundColor: 'rgb(255, 137, 137)',
   },
 
   input: {
     flex: 1,
-    fontSize: '14px',
-    padding: '3px 5px',
+    fontSize: '18px',
+    padding: '5px 10px',
     border: 'none',
+    transition: 'border-top-color .2s ease, background-color .2s ease',
     borderTop: '1px solid #ccc',
+    borderTopColor: '#ccc',
     outline: 'none',
+  },
+
+  highlightedInput: {
+    borderTopColor: 'aqua',
+    backgroundColor: '#EEFFFE',
   },
 };
 
