@@ -9,14 +9,13 @@
  */
 'use strict';
 
+var webpack = require('webpack');
+var fs = require('fs');
+
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
-    main: './src/main.js',
-    background: './src/background.js',
-    inject: './src/GlobalHook.js',
-    contentScript: './src/contentScript.js',
-    panel: './src/panel.js',
+    backend: './src/backend.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
@@ -29,8 +28,18 @@ module.exports = {
       loader:  'babel-loader?stage=0',
       exclude: [
         'node_modules',
+        './helpers.js',
       ],
     }]
   },
+
+  plugins: [new webpack.DefinePlugin({
+    'Object.create': 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate',
+    WeakMap: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeWeakMap',
+    Map: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeMap',
+    Set: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet',
+  })],
 };
+
+
 
