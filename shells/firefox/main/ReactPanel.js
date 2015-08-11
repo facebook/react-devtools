@@ -28,33 +28,51 @@ const ReactPanel = Class({
     // this.debuggee = null;
   },
   onReady() {
-    var tabs = require('sdk/tabs');
-    var worker = tabs.activeTab.attach({
-      contentScriptFile: 'build/contentScript.js',
-    });
+    const tabs = require('sdk/tabs');
+    let worker = makeWorker();
 
     const { MessageChannel } = require('sdk/messaging');
     const channel = new MessageChannel();
     const addonSide = channel.port1;
     const panelSide = channel.port2;
 
+    function makeWorker() {
+      let worker = tabs.activeTab.attach({
+        contentScriptFile: 'build/contentScript.js',
+      });
+      worker.port.on('message', function (data) {
+        addonSide.postMessage(data);
+      });
+      worker.port.on('hasReact', function (hasReact) {
+        metaAddonSide.postMessage({type: 'hasReact', val: hasReact});
+      });
+      worker.port.on('unload', function () {
+        metaAddonSide.postMessage('unload');
+      });
+      worker.on('error', function (error) {
+        console.log('More Error!!', error);
+      });
+      worker.port.on('error', function (error) {
+        console.log('Error!!', error);
+      });
+      return worker;
+    }
+
     addonSide.onmessage = function (evt) {
       worker.port.emit('message', evt.data);
     };
-    worker.port.on('message', function (data) {
-      addonSide.postMessage(data);
-    });
-    worker.port.on('hasReact', function (hasReact) {
-      addonSide.postMessage({hasReact});
-    });
-    worker.on('error', function (error) {
-      console.log('More Error!!', error);
-    });
-    worker.port.on('error', function (error) {
-      console.log('Error!!', error);
+
+    const metaChannel = new MessageChannel();
+    const metaAddonSide = metaChannel.port1;
+    const metaPanelSide = metaChannel.port2;
+
+    let mainPort = this.port;
+    tabs.activeTab.on('pageshow', function () {
+      metaAddonSide.postMessage('show');
+      worker = makeWorker();
     });
 
-    this.postMessage('port', [panelSide]);
+    this.postMessage('port', [panelSide, metaPanelSide]);
     console.log('Panel ready');
   },
 });

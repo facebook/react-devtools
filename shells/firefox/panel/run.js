@@ -28,11 +28,18 @@ function reload() {
 
 window.addEventListener('message', function (event) {
   port = event.ports[0];
-  port.onmessage = evt => {
-    if (evt.data.hasReact === true) {
-      React.render(<Panel alreadyFoundReact={true} {...config} />, node);
-    } else {
-      node.innerHTML = '<h1>No react found on page...</h1>';
+  var metaPort = event.ports[1];
+  metaPort.onmessage = evt => {
+    if (evt.data === 'show') {
+      reload();
+    } else if (evt.data === 'unload') {
+      node.innerHTML = '<h1 id="message">Looking for React</h1>';
+    } else if (evt.data.type === 'hasReact') {
+      if (evt.data.val) {
+        React.render(<Panel alreadyFoundReact={true} {...config} />, node);
+      } else {
+        node.innerHTML = '<h1 id="message">No react found on page...</h1>';
+      }
     }
   };
 });
