@@ -1,1 +1,4 @@
-{"stage": 0}
+{
+  "stage": 0,
+  "plugins": ["object-create-multiple-to-single-and-define-property:after"]
+}
