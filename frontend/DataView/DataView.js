@@ -31,6 +31,7 @@ class DataView {
       return <div style={styles.missing}>null</div>;
     }
     var names = Object.keys(data);
+    names.sort();
     var path = this.props.path;
     if (!names.length) {
       return <span style={styles.empty}>Empty object</span>;
