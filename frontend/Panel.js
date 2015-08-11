@@ -22,20 +22,21 @@ var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var consts = require('../agent/consts');
 
 import type {DOMEvent} from './types';
+import type {Wall} from '../agent/Bridge';
 
-type Props = {
+export type Props = {
   alreadyFoundReact: boolean,
-  inject: () => void,
+  inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
   checkForReact: (cb: (isReact: boolean) => void) => void,
   reload: () => void,
 
   // optionals
   showComponentSource: ?() => void,
-  reloadSubscribe: ?() => () => void,
-  showAttrSource: ?() => void,
-  executeFn: ?() => void,
-  selectElement: ?() => void,
-  getNewSelection: ?() => void,
+  reloadSubscribe: ?(reloadFn: () => void) => () => void,
+  showAttrSource: ?(path: Array<string>) => void,
+  executeFn: ?(path: Array<string>) => void,
+  selectElement: ?(id: string, bridge: Bridge) => void,
+  getNewSelection: ?(bridge: Bridge) => void,
 };
 
 class Panel extends React.Component {
@@ -107,6 +108,7 @@ class Panel extends React.Component {
       return;
     }
     invariant(this.props.selectElement, 'cannot send selection if props.selectElement is not defined');
+    // $FlowFixMe either id or this._store.selected is a string
     this.props.selectElement(id || this._store.selected, this._bridge);
   }
 

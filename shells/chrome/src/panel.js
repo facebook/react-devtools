@@ -13,6 +13,8 @@
 var checkForReact = require('./checkForReact');
 var inject = require('./inject');
 
+import type {Props} from '../../../frontend/Panel';
+
 type Listenable = {
   addListener: (fn: (message: Object) => void) => void,
 }
@@ -43,9 +45,10 @@ declare var chrome: {
   },
 };
 
-var config = {
+var config: Props = {
   reload,
   checkForReact,
+  alreadyFoundReact: false,
   reloadSubscribe(reloadFn) {
     chrome.devtools.network.onNavigated.addListener(reloadFn);
     return () => {
@@ -56,7 +59,7 @@ var config = {
     chrome.devtools.inspectedWindow.eval('window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$0 = $0');
     bridge.send('checkSelection');
   },
-  selectElement(bridge, id) {
+  selectElement(id, bridge) {
     bridge.send('putSelectedNode', id);
     setTimeout(() => {
       chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$node)');
@@ -94,7 +97,7 @@ var config = {
   },
   inject(done) {
     inject(chrome.runtime.getURL('build/backend.js'), () => {
-      var port = this._port = chrome.runtime.connect({
+      var port = chrome.runtime.connect({
         name: '' + chrome.devtools.inspectedWindow.tabId,
       });
       var disconnected = false;
