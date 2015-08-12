@@ -310,12 +310,13 @@ class Store extends EventEmitter {
   selectBreadcrumb(id: ElementID) {
     this._revealDeep(id);
     this.changeSearch('');
-    this.selectTop(id, false, true);
+    this.isBottomTagSelected = false;
+    this.select(id, false, true);
   }
 
-  selectTop(id: ?ElementID, noHighlight?: boolean, keepBreadcrumb?: boolean) {
+  selectTop(id: ?ElementID, noHighlight?: boolean) {
     this.isBottomTagSelected = false;
-    this.select(id, noHighlight, keepBreadcrumb);
+    this.select(id, noHighlight);
   }
 
   selectBottom(id: ElementID) {

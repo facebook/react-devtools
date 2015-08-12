@@ -10,6 +10,9 @@
  */
 'use strict';
 
+import type Store from './Store';
+import type {ElementID} from './types';
+
 var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
@@ -68,11 +71,11 @@ var styles = {
   },
 };
 
-function getBreadcrumbPath(store) {
+function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
   var path = [];
   var current = store.breadcrumbHead;
   while (current) {
-    path.splice(0, 0, {
+    path.unshift({
       id: current,
       node: store.get(current),
     });
