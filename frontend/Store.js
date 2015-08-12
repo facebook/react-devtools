@@ -180,7 +180,7 @@ class Store extends EventEmitter {
           });
       } else {
         this.searchRoots = this._nodes.entrySeq()
-          .filter(([key, val]) => nodeMatchesText(val, needle))
+          .filter(([key, val]) => nodeMatchesText(val, needle, key, this))
           .map(([key, val]) => key)
           .toList();
       }
@@ -347,7 +347,7 @@ class Store extends EventEmitter {
     if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
       return id;
     }
-    if (nodeType === 'Native' && this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper') {
+    if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
       return id;
     }
     if (up) {
@@ -427,7 +427,7 @@ class Store extends EventEmitter {
     var curNodes = this._nodesByName.get(data.name) || new Set();
     this._nodesByName = this._nodesByName.set(data.name, curNodes.add(data.id));
     this.emit(data.id);
-    if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase())) {
+    if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase(), data.id, this)) {
       this.searchRoots = this.searchRoots.push(data.id);
       this.emit('searchRoots');
     }
