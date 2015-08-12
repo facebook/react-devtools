@@ -10,7 +10,6 @@
 'use strict';
 
 var webpack = require('webpack');
-var fs = require('fs');
 
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
