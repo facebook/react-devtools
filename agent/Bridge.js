@@ -153,7 +153,7 @@ class Bridge {
     });
   }
 
-  call(name: string, args: any | Array<any>, cb: (val: any) => any) {
+  call(name: string, args: Array<any>, cb: (val: any) => any) {
     var _cid = this._cid++;
     this._cbs.set(_cid, cb);
 

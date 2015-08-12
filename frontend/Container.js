@@ -34,6 +34,7 @@ class Container extends React.Component {
         store: Object
       ) => ?Array<MenuItem>,
     },
+    extraTabs: {[key: string]: () => ReactElement},
   };
 
   render(): ReactElement {
