@@ -37,25 +37,25 @@ const ReactPanel = Class({
     const panelSide = channel.port2;
 
     function makeWorker() {
-      let worker = tabs.activeTab.attach({
+      let tmpWorker = tabs.activeTab.attach({
         contentScriptFile: 'build/contentScript.js',
       });
-      worker.port.on('message', function (data) {
+      tmpWorker.port.on('message', function (data) {
         addonSide.postMessage(data);
       });
-      worker.port.on('hasReact', function (hasReact) {
+      tmpWorker.port.on('hasReact', function (hasReact) {
         metaAddonSide.postMessage({type: 'hasReact', val: hasReact});
       });
-      worker.port.on('unload', function () {
+      tmpWorker.port.on('unload', function () {
         metaAddonSide.postMessage('unload');
       });
-      worker.on('error', function (error) {
+      tmpWorker.on('error', function (error) {
         console.log('More Error!!', error);
       });
-      worker.port.on('error', function (error) {
+      tmpWorker.port.on('error', function (error) {
         console.log('Error!!', error);
       });
-      return worker;
+      return tmpWorker;
     }
 
     addonSide.onmessage = function (evt) {
@@ -66,7 +66,6 @@ const ReactPanel = Class({
     const metaAddonSide = metaChannel.port1;
     const metaPanelSide = metaChannel.port2;
 
-    let mainPort = this.port;
     tabs.activeTab.on('pageshow', function () {
       metaAddonSide.postMessage('show');
       worker = makeWorker();

@@ -57,9 +57,9 @@ class Nester extends React.Component {
 class SymbolProp {
   render() {
     return (
-      <div sym={Symbol("name")}>
+      <div sym={Symbol('name')}>
         This tests that dehydration + inspection works with symbols
-        {Symbol("child")}
+        {Symbol('child')}
       </div>
     );
   }
