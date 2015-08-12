@@ -353,11 +353,7 @@ class Store extends EventEmitter {
     if (up) {
       return this._parents.get(id);
     }
-    var children = node.get('children');
-    if ('string' === typeof children) {
-      return children;
-    }
-    return children[0];
+    return node.get('children')[0];
   }
 
   off(evt: string, fn: ListenerFunction): void {
