@@ -14,6 +14,7 @@ var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+var setupRelay = require('../../../plugins/Relay/backend');
 
 var inject = require('../../../agent/inject');
 
@@ -70,6 +71,8 @@ function setup(hook) {
   if (isReactNative) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
+
+  setupRelay(bridge, agent, hook);
 
   agent.on('shutdown', () => {
     hook.emit('shutdown');

@@ -19,6 +19,7 @@ var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
+var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 
 var consts = require('../agent/consts');
 
@@ -160,6 +161,10 @@ class Panel extends React.Component {
 
       this._store.on('connected', () => {
         this.setState({loading: false});
+        var refresh = () => this.forceUpdate();
+        this.plugins = [
+          new RelayPlugin(this._store, this._bridge, refresh),
+        ];
         this.getNewSelection();
       });
     });

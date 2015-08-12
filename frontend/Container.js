@@ -50,9 +50,7 @@ class Container extends React.Component {
     };
     return (
       <div style={styles.container}>
-        <TabbedPane
-          tabs={tabs}
-        />
+        <TabbedPane tabs={tabs} />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
       </div>
     );
