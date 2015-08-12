@@ -14,16 +14,24 @@ import type Bridge from '../../agent/Bridge';
 import type Store from '../../frontend/Store';
 
 var React = require('react');
+var provideStore = require('../../frontend/provideStore');
+
+var RelayStore = require('./Store');
+var QueryList = require('./QueryList');
+
+var StoreWrapper = provideStore('relayStore');
 
 class RelayPlugin {
   hasRelay: bool;
   bridge: Bridge;
   store: Store;
+  relayStore: RelayStore;
 
   constructor(store: Store, bridge: Bridge, refresh: () => void) {
     this.bridge = bridge;
     this.store = store;
     this.hasRelay = false;
+    this.relayStore = new RelayStore(bridge);
     bridge.call('relay:check', [], hasRelay => {
       this.hasRelay = hasRelay;
       refresh();
@@ -36,7 +44,15 @@ class RelayPlugin {
     }
     return {
       Relay: () => {
-        return <h1>Relay is the win</h1>;
+        return (
+          <StoreWrapper store={this.relayStore}>
+            {() => (
+              <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
+                <QueryList />
+              </div>
+            )}
+          </StoreWrapper>
+        );
       },
     };
   }

@@ -51,6 +51,7 @@ type Options = {
  * }, MyComp);
  */
 module.exports = function (options: Options, Component: any): any {
+  var storeKey = options.store || 'store';
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;
@@ -61,25 +62,25 @@ module.exports = function (options: Options, Component: any): any {
     }
 
     componentWillMount() {
-      if (!this.context.store) {
+      if (!this.context[storeKey]) {
         return console.warn('no store on context...');
       }
       this._update = () => this.forceUpdate();
       if (!options.listeners) {
         return;
       }
-      this._listeners = options.listeners(this.props, this.context.store);
+      this._listeners = options.listeners(this.props, this.context[storeKey]);
       this._listeners.forEach(evt => {
-        this.context.store.on(evt, this._update);
+        this.context[storeKey].on(evt, this._update);
       });
     }
 
     componentWillUnmount() {
-      if (!this.context.store) {
+      if (!this.context[storeKey]) {
         return console.warn('no store on context...');
       }
       this._listeners.forEach(evt => {
-        this.context.store.off(evt, this._update);
+        this.context[storeKey].off(evt, this._update);
       });
     }
 
@@ -94,32 +95,33 @@ module.exports = function (options: Options, Component: any): any {
     }
 
     componentWillUpdate(nextProps, nextState) {
-      if (!this.context.store) {
+      if (!this.context[storeKey]) {
         return console.warn('no store on context...');
       }
       if (!options.listeners) {
         return;
       }
-      var listeners = options.listeners(this.props, this.context.store);
+      var listeners = options.listeners(this.props, this.context[storeKey]);
       var diff = arrayDiff(listeners, this._listeners);
       diff.missing.forEach(name => {
-        this.context.store.off(name, this._update);
+        this.context[storeKey].off(name, this._update);
       });
       diff.newItems.forEach(name => {
-        this.context.store.on(name, this._update);
+        this.context[storeKey].on(name, this._update);
       });
       this._listeners = listeners;
     }
 
     render() {
-      var store = this.context.store;
+      var store = this.context[storeKey];
       var props = store && options.props(store, this.props);
       return <Component {...props} {...this.props} />;
     }
   }
 
   Wrapper.contextTypes = {
-    store: React.PropTypes.object,
+    // $FlowFixMe computed property
+    [storeKey]: React.PropTypes.object,
   };
 
   Wrapper.displayName = 'Wrapper(' + Component.name + ')';
