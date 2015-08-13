@@ -13,6 +13,7 @@
 var Agent = require('../../agent/Agent');
 var Bridge = require('../../agent/Bridge');
 var setupHighlighter = require('../../frontend/Highlighter/setup');
+var setupRelay = require('../../plugins/Relay/backend');
 
 var inject = require('../../agent/inject');
 
@@ -33,3 +34,4 @@ agent.addBridge(bridge);
 inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
 
 setupHighlighter(agent);
+setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
