@@ -10,20 +10,34 @@
  */
 'use strict';
 
+import type {OrderedMap} from 'immutable';
+
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 var Query = require('./Query');
+var QueryViewer = require('./QueryViewer');
 
 class QueryList {
-  props: Object;
+  props: {
+    queries: OrderedMap,
+    selectQuery: (id: string) => void,
+    selectedQuery: ?string,
+  };
 
   render() {
     return (
       <ul style={styles.list}>
-        {this.props.queries.map(q =>
+        {this.props.queries.valueSeq().map(q => (
         // $FlowFixMe react element
-          <Query data={q} />)}
-        {!this.props.queries.count() && <li style={styles.empty}>No Relay Queries logged</li>}
+          <Query
+            data={q}
+            key={q.get('id')}
+            isSelected={q.get('id') == this.props.selectedQuery}
+            onSelect={() => this.props.selectQuery(q.get('id'))}
+          />
+        )).toArray()}
+        {!this.props.queries.count() &&
+          <li style={styles.empty}>No Relay Queries logged</li>}
       </ul>
     );
   }
@@ -36,6 +50,7 @@ var styles = {
     margin: 0,
     overflow: 'auto',
     minHeight: 0,
+    flex: 1,
   },
 
   empty: {
@@ -46,10 +61,12 @@ var styles = {
 
 module.exports = decorate({
   store: 'relayStore',
-  listeners: () => ['queries'],
+  listeners: () => ['queries', 'selectedQuery'],
   props(store, props) {
     return {
       queries: store.queries,
+      selectQuery: id => store.selectQuery(id),
+      selectedQuery: store.selectedQuery,
     };
   },
 }, QueryList);

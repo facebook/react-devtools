@@ -10,29 +10,40 @@
  */
 'use strict';
 
+import type {Map} from 'immutable';
+
 var React = require('react');
 var assign = require('object-assign');
 
 class Query {
   props: {
     data: Map,
+    onSelect: () => void,
   };
   render(): ReactElement {
     var data = this.props.data;
+    var containerStyle = styles.container;
+    if (this.props.isSelected) {
+      containerStyle = {
+        ...styles.container,
+        ...styles.selectedContainer,
+      };
+    }
     var statusStyle = assign({}, styles.status, {
       backgroundColor: statusColors[data.get('status')] || statusColors.error
     });
+
     return (
-      <li style={styles.container}>
+      <li onClick={this.props.onSelect} style={containerStyle}>
         <div style={statusStyle} />
         <div style={styles.name}>
           {data.get('name')}
         </div>
-        <div style={styles.text}>
-          {JSON.stringify(data.get('variables'), null, 2)}
+        <div style={styles.time}>
+          {new Date(data.get('start')).toLocaleTimeString()}
         </div>
-        <div>
-          {data.get('text')}
+        <div style={styles.duration}>
+          {data.get('end') - data.get('start')}ms
         </div>
       </li>
     );
@@ -49,10 +60,27 @@ var statusColors = {
 var styles = {
   container: {
     padding: '10px 20px',
+    cursor: 'pointer',
     display: 'flex',
+    fontSize: 14,
+  },
+
+  selectedContainer: {
+    backgroundColor: '#eef',
   },
 
   name: {
+    flex: 1,
+    fontSize: 16,
+    padding: 10,
+  },
+
+  time: {
+    padding: 10,
+  },
+
+  duration: {
+    padding: 10,
   },
 
   status: {

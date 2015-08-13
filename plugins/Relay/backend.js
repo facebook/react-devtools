@@ -36,16 +36,19 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   var restore = [
     decorate(NetworkLayer, 'sendMutation', mut => {
       var id = makeId();
+      var start = Date.now();
       bridge.send('relay:pending', {
         id,
         type: 'mutation',
+        start,
+        mutation: mut._mutation,
         text: mut.getQueryString(),
         variables: mut.getVariables(),
         name: mut.getDebugName(),
       });
       mut.then(
-        val => bridge.send('relay:success', {id, val}),
-        err => bridge.send('relay:failure', {id, err})
+        response => bridge.send('relay:success', {id, response: response.response, end: Date.now()}),
+        error => bridge.send('relay:failure', {id, error, end: Date.now()})
       );
     }),
 
@@ -53,12 +56,14 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
       bridge.send('relay:pending', queries.map(q => {
         var id = makeId();
         q.then(
-          val => bridge.send('relay:success', {id, val}),
-          err => bridge.send('relay:failure', {id, err})
+          response => bridge.send('relay:success', {id, response: response.response, end: Date.now()}),
+          error => bridge.send('relay:failure', {id, error, end: Date.now()})
         );
         return {
           id,
           type: 'query',
+          start: Date.now(),
+          query: q._query,
           text: q.getQueryString(),
           variables: q.getVariables(),
           name: q.getDebugName(),

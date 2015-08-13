@@ -17,7 +17,7 @@ var React = require('react');
 var provideStore = require('../../frontend/provideStore');
 
 var RelayStore = require('./Store');
-var QueryList = require('./QueryList');
+var QueriesTab = require('./QueriesTab');
 
 var StoreWrapper = provideStore('relayStore');
 
@@ -38,6 +38,9 @@ class RelayPlugin {
     });
   }
 
+  teardown() {
+  }
+
   tabs(): ?{[key: string]: () => ReactElement} {
     if (!this.hasRelay) {
       return;
@@ -46,11 +49,7 @@ class RelayPlugin {
       Relay: () => {
         return (
           <StoreWrapper store={this.relayStore}>
-            {() => (
-              <div style={{flex: 1, display: 'flex', flexDirection: 'column'}}>
-                <QueryList />
-              </div>
-            )}
+            {() => <QueriesTab />}
           </StoreWrapper>
         );
       },
@@ -59,4 +58,3 @@ class RelayPlugin {
 }
 
 module.exports = RelayPlugin;
-
