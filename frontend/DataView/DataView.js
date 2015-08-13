@@ -10,6 +10,8 @@
  */
 'use strict';
 
+import type {DOMEvent} from '../types';
+
 var React = require('react');
 var Simple = require('./Simple');
 
@@ -20,8 +22,9 @@ class DataView {
   props: {
     data: Object,
     path: Array<string>,
-    inspect: () => void,
-    showMenu: () => void,
+    inspect: (path: Array<string>, cb: () => void) => void,
+    showMenu: (e: DOMEvent, val: any, path: Array<string>, name: string) => void,
+    noSort?: boolean,
     readOnly: boolean,
   };
 
@@ -31,7 +34,9 @@ class DataView {
       return <div style={styles.missing}>null</div>;
     }
     var names = Object.keys(data);
-    names.sort();
+    if (!this.props.noSort) {
+      names.sort();
+    }
     var path = this.props.path;
     if (!names.length) {
       return <span style={styles.empty}>Empty object</span>;
