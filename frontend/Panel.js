@@ -159,12 +159,13 @@ class Panel extends React.Component {
 
       window.addEventListener('keydown', this._keyListener);
 
+      var refresh = () => this.forceUpdate();
+      this.plugins = [
+        new RelayPlugin(this._store, this._bridge, refresh),
+      ];
+
       this._store.on('connected', () => {
         this.setState({loading: false});
-        var refresh = () => this.forceUpdate();
-        this.plugins = [
-          new RelayPlugin(this._store, this._bridge, refresh),
-        ];
         this.getNewSelection();
       });
     });
