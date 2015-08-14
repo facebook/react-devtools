@@ -44,10 +44,12 @@ chrome.devtools.inspectedWindow.eval(`!!(
       // selection
       window.panel.getNewSelection();
       reactPanel = window.panel;
+      reactPanel.resumeTransfer();
     });
     panel.onHidden.addListener(function () {
       if (reactPanel) {
         reactPanel.hideHighlight();
+        reactPanel.pauseTransfer();
       }
     });
   });

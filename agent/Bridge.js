@@ -45,6 +45,10 @@ type PayloadType = {
   type: 'callback',
   id: string,
   args: Array<any>,
+} | {
+  type: 'pause',
+} | {
+  type: 'resume',
 } | EventPayload;
 
 /**
@@ -113,6 +117,7 @@ class Bridge {
   _waiting: ?number;
   _wall: Wall;
   _callers: {[key: string]: AnyFn};
+  _paused: boolean;
 
   constructor() {
     this._cbs = new Map();
@@ -123,6 +128,7 @@ class Bridge {
     this._waiting = null;
     this._lastTime = 5;
     this._callers = {};
+    this._paused = false;
   }
 
   attach(wall: Wall) {
@@ -172,6 +178,18 @@ class Bridge {
     this._callers[name] = handler;
   }
 
+  pause() {
+    this._wall.send({
+      type: 'pause',
+    });
+  }
+
+  resume() {
+    this._wall.send({
+      type: 'resume',
+    });
+  }
+
   sendOne(evt: string, data: any) {
     var cleaned = [];
     var san = dehydrate(data, cleaned);
@@ -182,7 +200,7 @@ class Bridge {
   }
 
   send(evt: string, data: any) {
-    if (!this._waiting) {
+    if (!this._waiting && !this._paused) {
       this._buffer = [];
       var nextTime = this._lastTime * 3;
       if (nextTime > 500) {
@@ -245,6 +263,20 @@ class Bridge {
   }
 
   _handleMessage(payload: PayloadType) {
+    if (payload.type === 'resume') {
+      this._paused = false;
+      this._waiting = null;
+      this.flush();
+      return;
+    }
+
+    if (payload.type === 'pause') {
+      this._paused = true;
+      clearTimeout(this._waiting);
+      this._waiting = null;
+      return;
+    }
+
     if (payload.type === 'callback') {
       this._cbs.get(payload.id)(...payload.args);
       this._cbs.delete(payload.id);

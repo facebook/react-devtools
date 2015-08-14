@@ -85,6 +85,8 @@ class Store extends EventEmitter {
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
+  _eventQueue: Array<string>;
+  _eventTimer: ?number;
 
   // Public state
   contextMenu: ?ContextMenu;
@@ -141,6 +143,24 @@ class Store extends EventEmitter {
     });
 
     this._establishConnection();
+    this._eventQueue = [];
+    this._eventTimer = null;
+  }
+
+  emit(evt: string): boolean {
+    if (!this._eventTimer) {
+      this._eventTimer = setTimeout(() => {
+        this._eventQueue.forEach(evt => EventEmitter.prototype.emit.call(this, evt));
+        this._eventQueue = [];
+        this._eventTimer = null;
+      }, 50);
+      this._eventQueue = [];
+    }
+    if (this._eventQueue.indexOf(evt) === -1) {
+      this._eventQueue.push(evt);
+    }
+    // to appease flow
+    return true;
   }
 
   // Public actions
