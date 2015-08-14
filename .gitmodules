@@ -1,3 +1,0 @@
-[submodule "blink"]
-	path = blink
-	url = https://github.com/sebmarkbage/blink-devtools.git
