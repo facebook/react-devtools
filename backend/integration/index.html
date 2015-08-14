@@ -1,0 +1,44 @@
+<!doctype>
+<html>
+    <head>
+        <meta charset=utf8>
+        <title>React Tests</title>
+        <style>
+            body {
+                font-family: sans-serif;
+            }
+            .status {
+                font-size: 20px;
+            }
+            a {
+                display: block;
+                padding: 20px;
+            }
+        </style>
+    </head>
+    <body>
+        <h1 id="title">Home</h1>
+        <script src="http://localhost:8080/webpack-dev-server.js"></script>
+        <script>
+            var src = location.search.slice(1);
+            var link;
+            if (src.length) {
+                document.getElementById('title').textContent = src;
+                var script = document.createElement('script');
+                script.src = src;
+                document.body.appendChild(script);
+            } else {
+                for (var v = 11; v < 15; v++) {
+                    link = document.createElement('a');
+                    link.href = '?v0' + v + '.js';
+                    link.textContent = 'Version 0.' + v;
+                    document.body.appendChild(link);
+                }
+                link = document.createElement('a');
+                link.href = 'all.html';
+                link.textContent = 'All at once';
+                document.body.appendChild(link);
+            }
+        </script>
+    </body>
+</html>

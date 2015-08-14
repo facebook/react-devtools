@@ -1,0 +1,42 @@
+<!doctype>
+<html>
+    <head>
+        <meta charset=utf8>
+        <title>React Devtools</title>
+        <style>
+            html {
+                display: flex;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                flex: 1;
+                display: flex;
+            }
+            #container {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: white;
+                font-family: sans-serif;
+            }
+            #message {
+                margin: 20px auto;
+                color: #ccc;
+            }
+            #logs {
+                position: fixed;
+                top: 0;
+                left: 0;
+                white-space: pre;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container"></div>
+        <script src='build/panel.js'></script>
+    </body>
+</html>

@@ -1,0 +1,4 @@
+# node_modules ignored by default
+
+**/build/**
+**/node_modules/**

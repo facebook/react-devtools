@@ -1,0 +1,37 @@
+{
+  "dependencies": {
+    "classnames": "^2.1.2",
+    "es6-symbol": "^2.0.1",
+    "immutable": "^3.7.4",
+    "object-assign": "^3.0.0",
+    "react": "^0.13.3"
+  },
+  "scripts": {
+    "lint": "./node_modules/.bin/eslint .",
+    "test": "node --harmony ./node_modules/.bin/jest --verbose"
+  },
+  "jest": {
+    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
+    "testFileExtensions": [
+      "es6",
+      "js"
+    ],
+    "moduleFileExtensions": [
+      "js",
+      "json",
+      "es6"
+    ]
+  },
+  "devDependencies": {
+    "babel-core": "^5.5.8",
+    "babel-eslint": "^3.1.23",
+    "babel-jest": "^5.3.0",
+    "babel-loader": "^5.1.4",
+    "eslint": "^0.24.1",
+    "eslint-plugin-react": "^3.0.0",
+    "jest-cli": "facebook/jest#0.5.x",
+    "json-loader": "^0.5.2",
+    "node-libs-browser": "^0.5.2",
+    "webpack": "^1.9.10"
+  }
+}

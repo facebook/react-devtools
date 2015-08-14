@@ -1,0 +1,12 @@
+{
+  "title": "React Devtools",
+  "name": "react-devtools",
+  "version": "0.0.1",
+  "description": "Extend the devtools to help you debug and develop react apps",
+  "main": "main/index.js",
+  "author": "Facebook",
+  "engines": {
+    "firefox": ">=38.0a1"
+  },
+  "license": "BSD 2-clause"
+}
