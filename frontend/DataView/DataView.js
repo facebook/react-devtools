@@ -15,6 +15,7 @@ import type {DOMEvent} from '../types';
 var React = require('react');
 var Simple = require('./Simple');
 
+var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
@@ -24,6 +25,7 @@ class DataView {
     path: Array<string>,
     inspect: (path: Array<string>, cb: () => void) => void,
     showMenu: (e: DOMEvent, val: any, path: Array<string>, name: string) => void,
+    startOpen: boolean,
     noSort?: boolean,
     readOnly: boolean,
   };
@@ -49,6 +51,7 @@ class DataView {
             name={'__proto__'}
             path={path.concat(['__proto__'])}
             key={'__proto__'}
+            startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
@@ -60,6 +63,7 @@ class DataView {
             name={name}
             path={path.concat([name])}
             key={name}
+            startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
@@ -74,7 +78,13 @@ class DataView {
 class DataItem extends React.Component {
   constructor(props) {
     super(props);
-    this.state = {open: false, loading: false};
+    this.state = {open: this.props.startOpen, loading: false};
+  }
+
+  componentDidMount() {
+    if (this.state.open && this.props.value && this.props.value[consts.inspected] === false) {
+      this.inspect();
+    }
   }
 
   componentWillReceiveProps(nextProps) {
@@ -163,7 +173,8 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={styles.name}
+            style={assign({}, styles.name, complex && styles.complexName)}
+            onClick={this.toggleOpen.bind(this)}
           >
             {this.props.name}:
           </div>
@@ -222,6 +233,10 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 3px',
+  },
+
+  complexName: {
+    cursor: 'pointer',
   },
 
   preview: {

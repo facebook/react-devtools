@@ -155,14 +155,14 @@ class Panel extends React.Component {
       this._bridge.attach(wall);
 
       this._store = new Store(this._bridge);
-      this._keyListener = keyboardNav(this._store, window);
-
-      window.addEventListener('keydown', this._keyListener);
-
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
       ];
+      this._keyListener = keyboardNav(this._store, window);
+
+      window.addEventListener('keydown', this._keyListener);
+
 
       this._store.on('connected', () => {
         this.setState({loading: false});
@@ -208,6 +208,10 @@ class Panel extends React.Component {
       return <div style={styles.loading}><h1>Looking for react...</h1></div>;
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
+    var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
+    if (this._store.capabilities.rnStyle) {
+      extraPanes.push(panelRNStyle(this._bridge));
+    }
     return (
       <Container
         reload={this.props.reload && this.reload.bind(this)}
@@ -236,7 +240,7 @@ class Panel extends React.Component {
             }];
           },
         }}
-        extraPanes={this._store.capabilities.rnStyle && [panelRNStyle(this._bridge)]}
+        extraPanes={extraPanes}
         extraTabs={extraTabs}
       />
     );

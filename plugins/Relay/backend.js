@@ -33,6 +33,8 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
     return;
   }
   var NetworkLayer = hook._relayInternals.NetworkLayer;
+
+  bridge.send('relay:store', {id: 'relay:store', nodes: hook._relayInternals.DefaultStoreData.getNodeData()});
   var restore = [
     decorate(NetworkLayer, 'sendMutation', mut => {
       var id = makeId();

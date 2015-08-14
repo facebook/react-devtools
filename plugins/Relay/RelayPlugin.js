@@ -18,6 +18,8 @@ var provideStore = require('../../frontend/provideStore');
 
 var RelayStore = require('./Store');
 var QueriesTab = require('./QueriesTab');
+var StoreTab = require('./StoreTab');
+var ElementPanel = require('./ElementPanel');
 
 var StoreWrapper = provideStore('relayStore');
 
@@ -38,6 +40,16 @@ class RelayPlugin {
     });
   }
 
+  panes(): Array<(node: Object, id: string) => ReactElement> {
+    return [
+      (node, id) => (
+        <StoreWrapper store={this.relayStore}>
+          {() => <ElementPanel node={node} id={id} />}
+        </StoreWrapper>
+      ),
+    ];
+  }
+
   teardown() {
   }
 
@@ -46,13 +58,16 @@ class RelayPlugin {
       return;
     }
     return {
-      Relay: () => {
-        return (
-          <StoreWrapper store={this.relayStore}>
-            {() => <QueriesTab />}
-          </StoreWrapper>
-        );
-      },
+      Relay: () => (
+        <StoreWrapper store={this.relayStore}>
+          {() => <QueriesTab />}
+        </StoreWrapper>
+      ),
+      RelayStore: () => (
+        <StoreWrapper store={this.relayStore}>
+          {() => <StoreTab />}
+        </StoreWrapper>
+      )
     };
   }
 }
