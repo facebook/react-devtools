@@ -15,18 +15,25 @@ var decorate = require('../../frontend/decorate');
 
 class ElementPanel {
   render() {
+    if (!this.props.dataIDs.length) {
+      return <span/>;
+    }
     return (
       <div>
+        Relay Nodes
         <ul style={styles.dataIDs}>
         {this.props.dataIDs.map(({id, queries}) => (
-          <li>
-            ID: {id} <br/>
+          <li style={styles.dataNode}>
+            <div style={styles.dataID} onClick={() => this.props.jumpToData(id)}>
+              ID: {id}
+            </div>
             <ul style={styles.queries}>
               {queries.map(query => (
-                <li>
-                  Query: {query.get('name')}
+                <li style={styles.queryID} onClick={() => this.props.jumpToQuery(query.get('id'))}>
+                  {query.get('name')}
                 </li>
               ))}
+              {!queries.length && <li style={styles.noQueries}>No Queries</li>}
             </ul>
           </li>
         ))}
@@ -37,6 +44,10 @@ class ElementPanel {
 }
 
 var styles = {
+  dataNode: {
+    marginBottom: 5,
+    border: '1px solid #ccc',
+  },
   dataIDs: {
     listStyle: 'none',
     padding: 0,
@@ -46,6 +57,19 @@ var styles = {
     listStyle: 'none',
     padding: 0,
     margin: 0,
+  },
+  dataID: {
+    cursor: 'pointer',
+    padding: '2px 4px',
+    backgroundColor: '#ccc',
+  },
+  queryID: {
+    cursor: 'pointer',
+    padding: '2px 4px',
+  },
+  noQueries: {
+    color: '#999',
+    padding: '2px 4px',
   },
 };
 
@@ -69,7 +93,8 @@ module.exports = decorate({
     }
     return {
       dataIDs,
-      jumpTo: dataID => store.jumpToDataID(dataID),
+      jumpToData: dataID => store.jumpToDataID(dataID),
+      jumpToQuery: queryID => store.jumpToQuery(queryID),
     };
   },
 }, ElementPanel);

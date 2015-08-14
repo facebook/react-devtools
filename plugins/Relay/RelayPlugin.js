@@ -41,6 +41,9 @@ class RelayPlugin {
   }
 
   panes(): Array<(node: Object, id: string) => ReactElement> {
+    if (!this.hasRelay) {
+      return [];
+    }
     return [
       (node, id) => (
         <StoreWrapper store={this.relayStore}>

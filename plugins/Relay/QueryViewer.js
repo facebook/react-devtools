@@ -41,6 +41,12 @@ class QueryViewer {
     return (
       <div style={styles.container}>
         <div style={styles.title}>{data.get('name')}</div>
+        <div style={styles.time}>
+          {new Date(data.get('start')).toLocaleTimeString()}
+        </div>
+        <div style={styles.duration}>
+          {data.get('end') - data.get('start')}ms
+        </div>
         <div style={styles.dataView}>
           <DataView
             data={info}
@@ -80,6 +86,14 @@ var styles = {
   },
 
   name: {
+  },
+
+  time: {
+    padding: 10,
+  },
+
+  duration: {
+    padding: 10,
   },
 
   status: {

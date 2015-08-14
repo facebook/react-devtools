@@ -136,6 +136,13 @@ class Store extends EventEmitter {
     this.emit('selectedDataNode');
   }
 
+  jumpToQuery(queryID) {
+    this._mainStore.setSelectedTab('Relay');
+    this.selectedQuery = queryID;
+    this.emit('selectedQuery');
+    this.emit('queries');
+  }
+
   inspect(id: string, path: Array<string>, cb: () => void) {
     this._bridge.inspect(id, path, value => {
       var base;
