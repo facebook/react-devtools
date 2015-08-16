@@ -30,6 +30,9 @@
  * }
  * and cleaned = [["some", "attr"], ["other"]]
  */
+
+var immutableUtils = require('./immutableUtils');
+
 function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   level = level || 0;
   path = path || [];
@@ -77,9 +80,12 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   // TODO when this is in the iframe window, we can just use Object
   if (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object') {
     cleaned.push(path);
+    var name = immutableUtils.isImmutable(data) ?
+               immutableUtils.getImmutableName(data) :
+               data.constructor.name;
     return {
-      name: data.constructor.name,
-      type: 'object',
+      name: name,
+      type: 'object'
     };
   }
   var res = {};

@@ -13,6 +13,7 @@
 var consts = require('./consts');
 var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
+var immutableUtils = require('../agent/immutableUtils');
 
 type AnyFn = (...x: any) => any;
 export type Wall = {
@@ -103,6 +104,7 @@ type PayloadType = {
  * determined that an object is no longer needed, call `.forget(id)` to clean
  * up.
  */
+
 class Bridge {
   _buffer: Array<{evt: string, data: any}>;
   _cbs: Map;
@@ -318,6 +320,11 @@ class Bridge {
     if (val) {
       var protod = false;
       var isFn = typeof val === 'function';
+
+      if (immutableUtils.isImmutable(val)) {
+        val = immutableUtils.shallowToJS(val);
+      }
+
       Object.getOwnPropertyNames(val).forEach(name => {
         if (name === '__proto__') {
           protod = true;
@@ -354,7 +361,11 @@ class Bridge {
 
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
+    var alt;
+    if (immutableUtils.isImmutable(obj)) {
+      alt = obj.get(attr);
+    }
+    return obj ? alt || obj[attr] : null;
   }, base);
 }
 
