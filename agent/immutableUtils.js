@@ -18,7 +18,7 @@ var types = ['OrderedMap', 'OrderedSet',
 
 module.exports = {
   isImmutable: Immutable.Iterable.isIterable,
-  getImmutableName(data) {
+  getImmutableName(data: any): string {
     if (Immutable.Iterable.isIterable(data)) {
       var name = 'Immutable.',
           typelen = types.length;
@@ -33,7 +33,7 @@ module.exports = {
       return data.constructor.name;
     }
   },
-  shallowToJS(dataStructure) {
+  shallowToJS(dataStructure: any): any {
     if (!Immutable.Iterable.isIterable(dataStructure)) {
       return dataStructure;
     }

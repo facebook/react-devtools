@@ -380,7 +380,7 @@ function randid() {
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
     var alt;
-    if (immutableUtils.isImmutable(obj)) {
+    if (obj !== null && immutableUtils.isImmutable(obj) && obj.get) {
       alt = obj.get(attr);
     }
     return obj ? alt || obj[attr] : null;
