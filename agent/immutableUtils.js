@@ -14,8 +14,7 @@ var Immutable = require('immutable');
 
 var types = ['OrderedMap', 'OrderedSet',
              'Map', 'Set', 'List', 'Stack',
-             'Seq',
-             'Iterable'];
+             'Seq'];
 
 module.exports = {
   isImmutable: Immutable.Iterable.isIterable,

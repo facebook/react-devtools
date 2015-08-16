@@ -63,11 +63,16 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     // React Fragments error if you try to inspect them.
     return 'A react fragment';
   }
+
+  var name = immutableUtils.isImmutable(data) ?
+             immutableUtils.getImmutableName(data) :
+             data.constructor.name;
+
   if (level > 2) {
     cleaned.push(path);
     return {
       type: Array.isArray(data) ? 'array' : 'object',
-      name: data.constructor.name === 'Object' ? '' : data.constructor.name,
+      name: data.constructor.name === 'Object' ? '' : name,
       meta: Array.isArray(data) ? {
         length: data.length,
       } : null,
@@ -80,9 +85,6 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   // TODO when this is in the iframe window, we can just use Object
   if (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object') {
     cleaned.push(path);
-    var name = immutableUtils.isImmutable(data) ?
-               immutableUtils.getImmutableName(data) :
-               data.constructor.name;
     return {
       name: name,
       type: 'object'
