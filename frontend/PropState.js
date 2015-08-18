@@ -170,6 +170,7 @@ var styles = {
     display: 'flex',
     flexDirection: 'column',
 
+    cursor: 'default',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     MsUserSelect: 'none',
@@ -182,6 +183,12 @@ var styles = {
     flex: 1,
     fontSize: 16,
     color: 'rgb(184, 0, 161)',
+
+    cursor: 'text',
+    WebkitUserSelect: 'text',
+    MozUserSelect: 'text',
+    MsUserSelect: 'text',
+    userSelect: 'text',
   },
   section: {
     marginBottom: 10,
