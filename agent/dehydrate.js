@@ -30,6 +30,9 @@
  * }
  * and cleaned = [["some", "attr"], ["other"]]
  */
+
+var immutableUtils = require('./immutableUtils');
+
 function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   level = level || 0;
   path = path || [];
@@ -60,11 +63,16 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     // React Fragments error if you try to inspect them.
     return 'A react fragment';
   }
+
+  var name = immutableUtils.isImmutable(data) ?
+             immutableUtils.getImmutableName(data) :
+             data.constructor.name;
+
   if (level > 2) {
     cleaned.push(path);
     return {
       type: Array.isArray(data) ? 'array' : 'object',
-      name: data.constructor.name === 'Object' ? '' : data.constructor.name,
+      name: data.constructor.name === 'Object' ? '' : name,
       meta: Array.isArray(data) ? {
         length: data.length,
       } : null,
@@ -78,8 +86,8 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   if (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object') {
     cleaned.push(path);
     return {
-      name: data.constructor.name,
-      type: 'object',
+      name: name,
+      type: 'object'
     };
   }
   var res = {};

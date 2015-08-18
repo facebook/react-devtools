@@ -12,6 +12,7 @@
 
 var {EventEmitter} = require('events');
 var assign = require('object-assign');
+var immutableUtils = require('./immutableUtils');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -378,7 +379,11 @@ function randid() {
 
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
+    var alt;
+    if (obj !== null && immutableUtils.isImmutable(obj) && obj.get) {
+      alt = obj.get(attr);
+    }
+    return obj ? alt || obj[attr] : null;
   }, base);
 }
 
