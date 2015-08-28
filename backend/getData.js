@@ -81,6 +81,13 @@ function getData(element: Object): DataType {
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
     };
     publicInstance = inst;
+
+    // TODO: React ART currently falls in this bucket, but this doesn't
+    // actually make sense and we should clean this up after stabilizing our
+    // API for backends
+    if (inst._renderedChildren) {
+      children = childrenList(inst._renderedChildren);
+    }
   }
 
   return {
