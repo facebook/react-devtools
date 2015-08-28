@@ -21,6 +21,11 @@ type Panel = { // eslint-disable-line no-unused-vars
 
 declare var chrome: {
   devtools: {
+    network: {
+      onNavigated: {
+        addListener: (cb: (url: string) => void) => void,
+      },
+    },
     panels: {
       create: (title: string, icon: string, filename: string, cb: (panel: Panel) => void) => void,
     },
@@ -30,26 +35,46 @@ declare var chrome: {
   },
 };
 
-chrome.devtools.inspectedWindow.eval(`!!(
-  Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length || window.React || (window.require && (require('react') || require('React')))
-)`, function (pageHasReact, err) {
-  if (!pageHasReact) {
+var panelCreated = false;
+
+function createPanelIfReactLoaded() {
+  if (panelCreated) {
     return;
   }
+  chrome.devtools.inspectedWindow.eval(`!!(
+    Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length || window.React
+  )`, function (pageHasReact, err) {
+    if (!pageHasReact || panelCreated) {
+      return;
+    }
 
-  chrome.devtools.panels.create('React', '', 'panel.html', function (panel) {
-    var reactPanel = null;
-    panel.onShown.addListener(function (window) {
-      // when the user switches to the panel, check for an elements tab
-      // selection
-      window.panel.getNewSelection();
-      reactPanel = window.panel;
-    });
-    panel.onHidden.addListener(function () {
-      if (reactPanel) {
-        reactPanel.hideHighlight();
-      }
+    clearInterval(loadCheckInterval);
+    panelCreated = true;
+    chrome.devtools.panels.create('React', '', 'panel.html', function (panel) {
+      var reactPanel = null;
+      panel.onShown.addListener(function (window) {
+        // when the user switches to the panel, check for an elements tab
+        // selection
+        window.panel.getNewSelection();
+        reactPanel = window.panel;
+      });
+      panel.onHidden.addListener(function () {
+        if (reactPanel) {
+          reactPanel.hideHighlight();
+        }
+      });
     });
   });
+}
+
+chrome.devtools.network.onNavigated.addListener(function() {
+  createPanelIfReactLoaded();
 });
 
+// Check to see if React has loaded once per second in case React is added
+// after page load
+var loadCheckInterval = setInterval(function() {
+  createPanelIfReactLoaded();
+}, 1000);
+
+createPanelIfReactLoaded();
