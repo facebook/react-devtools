@@ -16,7 +16,7 @@ var Simple = require('./Simple');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
-class DataView {
+class DataView extends React.Component {
   props: {
     data: Object,
     path: Array<string>,
@@ -136,7 +136,6 @@ class DataItem extends React.Component {
       // TODO path
       children = (
         <div style={styles.children}>
-          {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
           <DataView
             data={this.props.value}
             path={this.props.path}
