@@ -19,7 +19,7 @@ const ReactPanel = Class({
   extends: Panel,
   label: 'React',
   tooltip: 'Debug & Develop React Apps',
-  icon: './icon.png',
+  icon: './tool-react.png',
   url: './panel.html',
   setup(options) {
     // this.debuggee = options.debuggee;
