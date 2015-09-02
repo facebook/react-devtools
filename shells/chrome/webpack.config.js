@@ -9,8 +9,10 @@
  */
 'use strict';
 
+var __DEV__ = process.env.NODE_ENV !== 'production';
+
 module.exports = {
-  devtool: 'cheap-module-eval-source-map',
+  devtool: __DEV__ ? 'cheap-module-eval-source-map' : false,
   entry: {
     main: './src/main.js',
     background: './src/background.js',

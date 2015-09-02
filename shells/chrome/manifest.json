@@ -1,9 +1,11 @@
 {
   "manifest_version": 2,
-  "name": "New React Developer Tools",
+  "name": "React Developer Tools",
   "description": "Adds React debugging tools to the Chrome Developer Tools.",
   "version": "0.14",
   "icons": {
+    "48": "icons/icon48.png",
+    "128": "icons/icon128.png"
   },
 
   "devtools_page": "main.html",
@@ -18,8 +20,7 @@
 
   "permissions": [
     "http://*/",
-    "https://*/*",
-    "file://*"
+    "https://*/*"
   ],
 
   "content_scripts": [
