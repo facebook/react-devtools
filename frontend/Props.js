@@ -13,7 +13,7 @@
 var React = require('react');
 var PropVal = require('./PropVal');
 
-class Props {
+class Props extends React.Component {
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
     if (nextProps === this.props) {

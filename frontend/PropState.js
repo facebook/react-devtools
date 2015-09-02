@@ -81,7 +81,6 @@ class PropState extends React.Component {
         <div style={styles.section}>
           <strong>Props</strong>
           {propsReadOnly && <em> read-only</em>}
-          {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
           <DataView
             path={['props']}
             readOnly={propsReadOnly}
@@ -94,7 +93,6 @@ class PropState extends React.Component {
         {state &&
           <div style={styles.section}>
             <strong>State</strong>
-            {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
             <DataView
               data={state}
               path={['state']}
@@ -106,7 +104,6 @@ class PropState extends React.Component {
         {context &&
           <div style={styles.section}>
             <strong>Context</strong>
-            {/* $FlowFixMe flow thinks DataView must subclass React.Component */}
             <DataView
               data={context}
               path={['context']}

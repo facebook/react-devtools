@@ -45,7 +45,6 @@ class DisplayDeps {
     return (
       <div style={styles.container}>
         <div style={styles.scrollParent}>
-          {/* $FlowFixMe doesn't need to inherit from React.Component */}
           <SvgGraph
             onHover={this.props.onHover}
             onClick={this.props.onClick}
@@ -61,7 +60,7 @@ class DisplayDeps {
   }
 }
 
-class SvgGraph {
+class SvgGraph extends React.Component {
   props: Object;
   render() {
     var graph = this.props.graph;

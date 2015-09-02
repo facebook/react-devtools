@@ -13,7 +13,7 @@
 var React = require('react');
 import type {DOMEvent} from './types';
 
-class Draggable {
+class Draggable extends React.Component {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
   props: {

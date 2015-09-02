@@ -41,7 +41,6 @@ class SplitPane extends React.Component {
       <div style={styles.leftPane}>
         {this.props.left()}
       </div>
-      {/* $FlowFixMe the "extends React.Component" is just to help flow */}
       <Draggable
         style={dragStyle}
         onStart={() => this.setState({moving: true})}
