@@ -50,7 +50,6 @@ export type ReactRenderer = {
   Component?: {
     Mixin: Object,
   },
-  // $ FlowFixMe flow doesn't understand this tagged union
   Mount: {
     // React Native
     nativeTagToRootNodeID: (tag: ?NativeType) => string,

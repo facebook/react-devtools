@@ -7,10 +7,6 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  *
  * @flow
- *
- * flow disabled because of the following bug:
- * possibly undefined value
- * https://github.com/facebook/flow/issues/603
  */
 'use strict';
 
