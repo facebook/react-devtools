@@ -23,6 +23,9 @@ class TabbedPane {
 
   render() {
     var tabs = Object.keys(this.props.tabs);
+    if (tabs.length === 1) {
+      return this.props.tabs[tabs[0]]();
+    }
     return (
       <div style={styles.container}>
         <ul style={styles.tabs}>
