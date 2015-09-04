@@ -23,6 +23,7 @@ class Container extends React.Component {
   props: {
     reload: () => void,
     extraPanes: Array<(node: Object) => ReactElement>,
+    extraTabs: ?{[key: string]: () => ReactElement},
     menuItems: {
       tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
       attr?: (
