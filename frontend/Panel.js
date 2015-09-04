@@ -150,7 +150,6 @@ class Panel extends React.Component {
       this._bridge = new Bridge();
       this._bridge.attach(wall);
 
-      // xx FlowFixMe this._bridge is not null
       if (this._bridge) {
         this._store = new Store(this._bridge);
       }
