@@ -192,7 +192,7 @@ class Panel extends React.Component {
     if (this.state.loading) {
       return (
         <div style={styles.loading}>
-          <h1>Connecting to react...</h1>
+          <h1>Connecting to React...</h1>
           <br/>
           If this is React Native, you need to interact with the app (just tap the screen) in order to establish the bridge.
         </div>
