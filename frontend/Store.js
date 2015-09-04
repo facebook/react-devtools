@@ -89,6 +89,7 @@ class Store extends EventEmitter {
   roots: List;
   searchRoots: ?List;
   searchText: string;
+  selectedTab: string;
   selected: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -108,6 +109,7 @@ class Store extends EventEmitter {
     this.searchRoots = null;
     this.hovered = null;
     this.selected = null;
+    this.selectedTab = 'Elements'
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
@@ -134,6 +136,7 @@ class Store extends EventEmitter {
     this._bridge.on('select', ({id, quiet}) => {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
+      this.setSelectedTab('Elements');
     });
 
     this._establishConnection();
@@ -142,6 +145,14 @@ class Store extends EventEmitter {
   // Public actions
   scrollToNode(id: ElementID): void {
     this._bridge.send('scrollToNode', id);
+  }
+
+  setSelectedTab(name: string): void {
+    if (this.selectedTab === name) {
+      return;
+    }
+    this.selectedTab = name;
+    this.emit('selectedTab');
   }
 
   // TODO(jared): get this working for react native
