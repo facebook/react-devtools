@@ -109,7 +109,7 @@ class Store extends EventEmitter {
     this.searchRoots = null;
     this.hovered = null;
     this.selected = null;
-    this.selectedTab = 'Elements'
+    this.selectedTab = 'Elements';
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};

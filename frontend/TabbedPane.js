@@ -94,6 +94,6 @@ module.exports = decorate({
     return {
       selected: store.selectedTab,
       setSelectedTab: name => store.setSelectedTab(name),
-    }
+    };
   },
 }, TabbedPane);
