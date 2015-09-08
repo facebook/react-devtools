@@ -46,11 +46,13 @@ class Nester extends React.Component {
     if (depth > 10) {
       return <span>bottom</span>;
     }
-    return <div>
-      <button onClick={() => this.setState({click: 1})}>Rerender</button>
-      <Nester depth={depth + 1} />
-      <Nester depth={depth + 1} />
-    </div>;
+    return (
+      <div>
+        <button onClick={() => this.setState({click: 1})}>Rerender</button>
+        <Nester depth={depth + 1} />
+        <Nester depth={depth + 1} />
+      </div>
+    );
   }
 }
 

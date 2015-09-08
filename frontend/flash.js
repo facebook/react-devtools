@@ -22,7 +22,7 @@ function flash(node: DOMElement, flashColor: string, baseColor: string, duration
   node.style.transition = 'none';
   node.style.backgroundColor = flashColor;
   // force recalc
-  node.offsetTop;
+  node.offsetTop; // eslint-disable-line no-unused-expressions
   node.style.transition = `background-color ${duration}s ease`;
   node.style.backgroundColor = baseColor;
 }

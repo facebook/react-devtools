@@ -42,7 +42,9 @@ var invariant = function(condition, format, a, b, c, d, e, f) {
       var argIndex = 0;
       error = new Error(
         'Invariant Violation: ' +
-        format.replace(/%s/g, function() { return args[argIndex++]; })
+        format.replace(/%s/g, function() {
+          return args[argIndex++];
+        })
       );
     }
 
