@@ -33,7 +33,7 @@ class RelayPlugin {
     this.bridge = bridge;
     this.store = store;
     this.hasRelay = false;
-    this.relayStore = new RelayStore(bridge);
+    this.relayStore = new RelayStore(bridge, store);
     bridge.call('relay:check', [], hasRelay => {
       this.hasRelay = hasRelay;
       refresh();

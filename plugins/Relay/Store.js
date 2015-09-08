@@ -29,7 +29,16 @@ function getDataIDs(obj, collector) {
 
 class Store extends EventEmitter {
   queries: OrderedMap;
-  storeData: Object;
+  storeData: ?{
+    nodes: any,
+  };
+  dataIDsToNodes: Map;
+  selectedDataNode: string;
+  nodesToDataIDs: Map;
+  _bridge: Bridge;
+  _mainStore: Object;
+  queriesByDataID: {[id: string]: Array<string>};
+  selectedQuery: ?string;
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -37,7 +46,7 @@ class Store extends EventEmitter {
     this.selectedQuery = null;
     this.queries = new OrderedMap();
     this._bridge = bridge;
-    this._mainStore = store;
+    this._mainStore = mainStore;
     // initial population of the store
     bridge.on('relay:store', data => {
       this.storeData = data;
@@ -130,13 +139,13 @@ class Store extends EventEmitter {
     });
   }
 
-  jumpToDataID(dataID) {
+  jumpToDataID(dataID: string) {
     this._mainStore.setSelectedTab('RelayStore');
     this.selectedDataNode = dataID;
     this.emit('selectedDataNode');
   }
 
-  jumpToQuery(queryID) {
+  jumpToQuery(queryID: string) {
     this._mainStore.setSelectedTab('Relay');
     this.selectedQuery = queryID;
     this.emit('selectedQuery');
@@ -147,6 +156,10 @@ class Store extends EventEmitter {
     this._bridge.inspect(id, path, value => {
       var base;
       if (id === 'relay:store') {
+        invariant(
+          this.storeData,
+          'RelayStore.inspect: this.storeData should be defined.'
+        );
         base = this.storeData.nodes;
       } else {
         base = this.queries.get(id).get(path[0]);

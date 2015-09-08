@@ -20,6 +20,7 @@ var DataView = require('../../frontend/DataView/DataView');
 class QueryViewer {
   props: {
     data: Map,
+    inspect: (path: Array<string>, cb: () => void) => void,
   };
   render(): ReactElement {
     var data = this.props.data;
@@ -47,16 +48,14 @@ class QueryViewer {
         <div style={styles.duration}>
           {data.get('end') - data.get('start')}ms
         </div>
-        <div style={styles.dataView}>
-          <DataView
-            data={info}
-            noSort={true}
-            readOnly={true}
-            showMenu={false}
-            inspect={this.props.inspect}
-            path={[]}
-          />
-        </div>
+        <DataView
+          data={info}
+          noSort={true}
+          readOnly={true}
+          showMenu={false}
+          inspect={this.props.inspect}
+          path={[]}
+        />
       </div>
     );
   }

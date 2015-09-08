@@ -14,6 +14,12 @@ var React = require('react');
 var decorate = require('../../frontend/decorate');
 
 class ElementPanel {
+  props: {
+    dataIDs: Array<{id: string, queries: Array<Map>}>,
+    jumpToData: (id: string) => void,
+    jumpToQuery: (queryID: string) => void,
+  };
+
   render() {
     if (!this.props.dataIDs.length) {
       return <span/>;

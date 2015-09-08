@@ -20,6 +20,7 @@ var decorate = require('../../frontend/decorate');
 class StoreTab {
   props: {
     data: Map,
+    inspect: (path: Array<string>, cb: () => void) => void,
   };
   render(): ReactElement {
     if (!this.props.storeData) {
