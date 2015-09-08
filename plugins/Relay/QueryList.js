@@ -15,7 +15,6 @@ import type {OrderedMap} from 'immutable';
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 var Query = require('./Query');
-var QueryViewer = require('./QueryViewer');
 
 class QueryList {
   props: {
@@ -32,7 +31,7 @@ class QueryList {
           <Query
             data={q}
             key={q.get('id')}
-            isSelected={q.get('id') == this.props.selectedQuery}
+            isSelected={q.get('id') === this.props.selectedQuery}
             onSelect={() => this.props.selectQuery(q.get('id'))}
           />
         )).toArray()}

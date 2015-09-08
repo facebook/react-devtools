@@ -58,7 +58,7 @@ class RelayPlugin {
 
   tabs(): ?{[key: string]: () => ReactElement} {
     if (!this.hasRelay) {
-      return;
+      return null;
     }
     return {
       Relay: () => (
@@ -70,7 +70,7 @@ class RelayPlugin {
         <StoreWrapper store={this.relayStore}>
           {() => <StoreTab />}
         </StoreWrapper>
-      )
+      ),
     };
   }
 }

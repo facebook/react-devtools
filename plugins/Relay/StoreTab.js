@@ -13,7 +13,6 @@
 import type {Map} from 'immutable';
 
 var React = require('react');
-var assign = require('object-assign');
 var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
 
@@ -59,7 +58,7 @@ var styles = {
   loading: {
     textAlign: 'center',
     color: '#aaa',
-  }
+  },
 };
 
 module.exports = decorate({

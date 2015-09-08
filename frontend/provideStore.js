@@ -12,7 +12,7 @@
 
 var React = require('react');
 
-module.exports = function (name: string): Object {
+module.exports = function(name: string): Object {
   class Wrapper extends React.Component {
     props: {
       children: () => ReactElement,

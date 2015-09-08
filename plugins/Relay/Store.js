@@ -16,12 +16,13 @@ var {EventEmitter} = require('events');
 var {OrderedMap, Map} = require('immutable');
 var assign = require('object-assign');
 var consts = require('../../agent/consts');
+var invariant = require('../../frontend/invariant');
 
 function getDataIDs(obj, collector) {
   for (var name in obj) {
-    if (name === 'id' && 'string' === typeof obj[name]) {
+    if (name === 'id' && typeof obj[name] === 'string') {
       collector.push(obj[name]);
-    } else if (typeof obj[name] == 'object') {
+    } else if (typeof obj[name] === 'object') {
       getDataIDs(obj[name], collector);
     }
   }

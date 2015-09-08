@@ -61,7 +61,7 @@ function injectMany(sources, done) {
   if (sources.length === 1) {
     return inject(sources[0], done);
   }
-  inject(sources[0], () => injectMany(sources.slice(1), done))
+  inject(sources[0], () => injectMany(sources.slice(1), done));
 }
 
 var sources = appSrc.split('|');

@@ -13,7 +13,6 @@
 import type {Map} from 'immutable';
 
 var React = require('react');
-var assign = require('object-assign');
 var decorate = require('../../frontend/decorate');
 var DataView = require('../../frontend/DataView/DataView');
 
@@ -60,13 +59,6 @@ class QueryViewer {
     );
   }
 }
-
-var statusColors = {
-  pending: 'orange',
-  success: 'green',
-  failure: 'red',
-  error: '#aaa',
-};
 
 var styles = {
   container: {

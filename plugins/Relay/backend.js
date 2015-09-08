@@ -15,7 +15,7 @@ import type Agent from '../../agent/Agent';
 
 function decorate(obj, attr, fn) {
   var old = obj[attr];
-  obj[attr] = function () {
+  obj[attr] = function() {
     var res = old.apply(this, arguments);
     fn.apply(this, arguments);
     return res;
@@ -69,9 +69,9 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
           text: q.getQueryString(),
           variables: q.getVariables(),
           name: q.getDebugName(),
-        }
+        };
       }));
-    })
+    }),
   ];
   hook.on('shutdown', () => {
     restore.forEach(fn => fn());

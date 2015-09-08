@@ -30,7 +30,7 @@ class Query {
       };
     }
     var statusStyle = assign({}, styles.status, {
-      backgroundColor: statusColors[data.get('status')] || statusColors.error
+      backgroundColor: statusColors[data.get('status')] || statusColors.error,
     });
 
     return (
