@@ -81,6 +81,8 @@ class Store extends EventEmitter {
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
+  _eventQueue: Array<string>;
+  _eventTimer: ?number;
 
   // Public state
   contextMenu: ?ContextMenu;
@@ -90,6 +92,7 @@ class Store extends EventEmitter {
   searchRoots: ?List;
   searchText: string;
   selected: ?ElementID;
+  breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
@@ -108,6 +111,7 @@ class Store extends EventEmitter {
     this.searchRoots = null;
     this.hovered = null;
     this.selected = null;
+    this.breadcrumbHead = null;
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
@@ -123,7 +127,9 @@ class Store extends EventEmitter {
       this.roots = this.roots.push(id);
       if (!this.selected) {
         this.selected = this.skipWrapper(id);
+        this.breadcrumbHead = this.selected;
         this.emit('selected');
+        this.emit('breadcrumbHead');
         this._bridge.send('selected', this.selected);
       }
       this.emit('roots');
@@ -137,6 +143,24 @@ class Store extends EventEmitter {
     });
 
     this._establishConnection();
+    this._eventQueue = [];
+    this._eventTimer = null;
+  }
+
+  emit(evt: string): boolean {
+    if (!this._eventTimer) {
+      this._eventTimer = setTimeout(() => {
+        this._eventQueue.forEach(evt => EventEmitter.prototype.emit.call(this, evt));
+        this._eventQueue = [];
+        this._eventTimer = null;
+      }, 50);
+      this._eventQueue = [];
+    }
+    if (this._eventQueue.indexOf(evt) === -1) {
+      this._eventQueue.push(evt);
+    }
+    // to appease flow
+    return true;
   }
 
   // Public actions
@@ -299,6 +323,13 @@ class Store extends EventEmitter {
     this.emit('hover');
   }
 
+  selectBreadcrumb(id: ElementID) {
+    this._revealDeep(id);
+    this.changeSearch('');
+    this.isBottomTagSelected = false;
+    this.select(id, false, true);
+  }
+
   selectTop(id: ?ElementID, noHighlight?: boolean) {
     this.isBottomTagSelected = false;
     this.select(id, noHighlight);
@@ -309,7 +340,7 @@ class Store extends EventEmitter {
     this.select(id);
   }
 
-  select(id: ?ElementID, noHighlight?: boolean) {
+  select(id: ?ElementID, noHighlight?: boolean, keepBreadcrumb?: boolean) {
     var oldSel = this.selected;
     this.selected = id;
     if (oldSel) {
@@ -317,6 +348,10 @@ class Store extends EventEmitter {
     }
     if (id) {
       this.emit(id);
+    }
+    if (!keepBreadcrumb) {
+      this.breadcrumbHead = id;
+      this.emit('breadcrumbHead');
     }
     this.emit('selected');
     this._bridge.send('selected', id);

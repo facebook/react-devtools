@@ -82,6 +82,18 @@ class Panel extends React.Component {
     }
   }
 
+  pauseTransfer() {
+    if (this._bridge) {
+      this._bridge.pause();
+    }
+  }
+
+  resumeTransfer() {
+    if (this._bridge) {
+      this._bridge.resume();
+    }
+  }
+
   reload() {
     if (this._unsub) {
       this._unsub();
