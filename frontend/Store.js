@@ -147,17 +147,19 @@ class Store extends EventEmitter {
     this._eventTimer = null;
   }
 
-  emit(evt: string): boolean {
+  emit(event: string): boolean {
     if (!this._eventTimer) {
       this._eventTimer = setTimeout(() => {
-        this._eventQueue.forEach(evt => EventEmitter.prototype.emit.call(this, evt));
+        this._eventQueue.forEach(evt => {
+          EventEmitter.prototype.emit.call(this, evt);
+        });
         this._eventQueue = [];
         this._eventTimer = null;
       }, 50);
       this._eventQueue = [];
     }
-    if (this._eventQueue.indexOf(evt) === -1) {
-      this._eventQueue.push(evt);
+    if (this._eventQueue.indexOf(event) === -1) {
+      this._eventQueue.push(event);
     }
     // to appease flow
     return true;
