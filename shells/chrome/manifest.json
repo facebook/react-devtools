@@ -14,7 +14,7 @@
   "web_accessible_resources": [ "main.html", "panel.html", "build/backend.js"],
 
   "background": {
-    "scripts": [ "./build/background.js" ],
+    "scripts": [ "build/background.js" ],
     "persistent": false
   },
 
@@ -26,7 +26,7 @@
   "content_scripts": [
     {
       "matches": ["<all_urls>"],
-      "js": ["./build/inject.js"],
+      "js": ["build/inject.js"],
       "run_at": "document_start"
     }
   ]
