@@ -14,7 +14,7 @@ Atom/Nuclide, and as a standalone Electron app.
 The official extensions represent the current stable release.
 
 - [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
-- Firefox extension (coming soon)
+- [Firefox extension](https://addons.mozilla.org/firefox/addon/react-devtools/)
 - Standalone app (coming soon)
 
 If you inspect an element or launch the developer tools on a React page, you
