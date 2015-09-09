@@ -268,7 +268,7 @@ class Agent extends EventEmitter {
       try {
         // $FlowFixMe possibly null - it's not null
         component = this.reactInternals[renderer].getReactElementFromNative(node);
-      } catch (e){}
+      } catch (e) {}
       if (component) {
         return this.getId(component);
       }

@@ -307,21 +307,23 @@ someVal.awesome = 2;
 
 class Wrap extends React.Component {
   render() {
-    return <div>
-      <div style={styles.iframeWatermark}>
-        this is an iframe
+    return (
+      <div>
+        <div style={styles.iframeWatermark}>
+          this is an iframe
+        </div>
+        {/* for testing highlighing in the presence of multiple scrolls
+        {long(long(long()))} {/* */}
+        <Todos/>
+        {/*<span thing={someVal}/>
+        <Target count={1}/>
+        <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
+        <span val={null}/>
+        <span val={undefined}/>
+        <div>&lt;</div>*/}
+        <OldStyle awesome={2}/>
       </div>
-      {/* for testing highlighing in the presence of multiple scrolls
-      {long(long(long()))} {/* */}
-      <Todos/>
-      {/*<span thing={someVal}/>
-      <Target count={1}/>
-      <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
-      <span val={null}/>
-      <span val={undefined}/>
-      <div>&lt;</div>*/}
-     <OldStyle awesome={2}/>
-    </div>;
+    );
   }
 }
 
@@ -332,27 +334,29 @@ var OldStyle = React.createClass({
 });
 
 function long(children) { // eslint-disable-line no-unused-vars
-  return <div style={styles.longStyle}>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    <div>Hello</div>
-    {children}
-  </div>;
+  return (
+    <div style={styles.longStyle}>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      <div>Hello</div>
+      {children}
+    </div>
+  );
 }
 
 class Target extends React.Component {
@@ -366,26 +370,30 @@ class Target extends React.Component {
 
   render() {
     if (this.state.num === 1) {
-      return <div onClick={() => this.setState({awesome: !this.state.awesome})}>
-        {'' + !!this.state.awesome}
-      </div>;
+      return (
+        <div onClick={() => this.setState({awesome: !this.state.awesome})}>
+          {'' + !!this.state.awesome}
+        </div>
+      );
     }
     var count = this.state.num;
     var children = [];
     for (var i = 0; i < count; i++) {
       children.push(<Target key={Math.random()} count={count - 1}/>);
     }
-    return <div style={{
-      margin: 5,
-      marginLeft: 10,
-      border: '2px solid #ccc',
-    }}>
-      {count} : {this.state.num} / {'' + !!this.state.awesome}
-      {children}
-    </div>;
+    return (
+      <div style={{
+        margin: 5,
+        marginLeft: 10,
+        border: '2px solid #ccc',
+      }}>
+        {count} : {this.state.num} / {'' + !!this.state.awesome}
+        {children}
+      </div>
+    );
   }
 }
 
 var node = document.createElement('div');
 document.body.appendChild(node);
-React.render(<Wrap more={['a',2,'c',4]} str="thing" awesome={1}/>, node);
+React.render(<Wrap more={['a', 2, 'c', 4]} str="thing" awesome={1} />, node);
