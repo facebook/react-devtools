@@ -6,7 +6,7 @@
 .*node_modules/webpack.*
 
 [libs]
-agent/flow.js
+flow
 
 [options]
 suppress_type=$FlowIssue
