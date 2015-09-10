@@ -357,7 +357,6 @@ class Bridge {
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        // $FlowFixMe flow thinks `val` might be null
         result[name] = dehydrate(val[name], cleaned, [name]);
       });
 
