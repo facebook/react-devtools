@@ -27,7 +27,9 @@ function getData(element: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
-  if (element._renderedComponent) {
+  if (element._currentElement === null || element._currentElement === false) {
+    nodeType = 'Empty';
+  } else if (element._renderedComponent) {
     nodeType = 'NativeWrapper';
     children = [element._renderedComponent];
     props = element._instance.props;

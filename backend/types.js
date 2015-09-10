@@ -11,7 +11,7 @@
 'use strict';
 
 export type DataType = {
-  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text',
+  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Empty',
   type: ?(string | AnyFn),
   name: ?string,
   props: ?Object,
