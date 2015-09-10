@@ -101,33 +101,44 @@ class Node {
       onMouseDown: this.props.onSelect,
     };
 
-    if (node.get('name') === null) {
-      var content = children || node.get('text');
+    var nodeType = node.get('nodeType');
+    if (nodeType === 'Text' || nodeType === 'Empty') {
+      var tag;
+      if (nodeType === 'Text') {
+        var content = node.get('text');
+        tag =
+          <span style={styles.tagText}>
+            <span style={styles.openTag}>
+              "
+            </span>
+            <span style={styles.textContent}>{content}</span>
+            <span style={styles.closeTag}>
+              "
+            </span>
+          </span>;
+      } else if (nodeType === 'Empty') {
+        tag =
+          <span style={styles.tagText}>
+            <span style={styles.falseyLiteral}>null</span>
+          </span>;
+      }
       return (
         <div style={styles.container}>
           <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
-            <span style={styles.tagText}>
-              <span style={styles.openTag}>
-                "
-              </span>
-              <span style={styles.textContent}>{content}</span>
-              <span style={styles.closeTag}>
-                "
-              </span>
-            </span>
+            {tag}
           </div>
         </div>
       );
     }
 
-    var isCustom = node.get('nodeType') === 'Composite';
+    var isCustom = nodeType === 'Composite';
 
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
       var name = node.get('name');
-      var content = children || node.get('text');
+      var content = children;
       return (
         <div style={styles.container}>
           <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
@@ -278,6 +289,10 @@ var styles = {
   },
 
   textContent: {
+  },
+
+  falseyLiteral: {
+    fontStyle: 'italic',
   },
 
   closeTag: {

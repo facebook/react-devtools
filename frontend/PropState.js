@@ -50,6 +50,8 @@ class PropState extends React.Component {
           Text node (no props/state)
         </div>
       );
+    } else if (nodeType === 'Empty') {
+      return <div style={styles.container}>Empty node (no props/state)</div>;
     }
 
     var editTextContent = null;
