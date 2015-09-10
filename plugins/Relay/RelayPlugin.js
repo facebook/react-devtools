@@ -34,10 +34,15 @@ class RelayPlugin {
     this.store = store;
     this.hasRelay = false;
     this.relayStore = new RelayStore(bridge, store);
-    bridge.call('relay:check', [], hasRelay => {
-      this.hasRelay = hasRelay;
-      refresh();
-    });
+    // TODO (kassens): There's a race condition here. The Relay backend
+    // implements this call and is initialized from the injected script whereas
+    // this file is called from the Panel.
+    setTimeout(() => {
+      bridge.call('relay:check', [], hasRelay => {
+        this.hasRelay = hasRelay;
+        refresh();
+      });
+    }, 1000);
   }
 
   panes(): Array<(node: Object, id: string) => ReactElement> {
