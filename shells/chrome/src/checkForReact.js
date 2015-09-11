@@ -10,13 +10,7 @@
  */
 'use strict';
 
-declare var chrome: {
-  devtools: {
-    inspectedWindow: {
-      eval: (code: string, cb?: (res: any, err: ?Object) => any) => void,
-    },
-  },
-};
+/* global chrome */
 
 module.exports = function (done: (pageHasReact: boolean) => void) {
   chrome.devtools.inspectedWindow.eval(`!!(

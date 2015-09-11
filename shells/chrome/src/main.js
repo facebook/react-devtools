@@ -10,30 +10,7 @@
  */
 'use strict';
 
-type Panel = { // eslint-disable-line no-unused-vars
-  onHidden: {
-    addListener: (cb: (window: Object) => void) => void,
-  },
-  onShown: {
-    addListener: (cb: (window: Object) => void) => void,
-  }
-};
-
-declare var chrome: {
-  devtools: {
-    network: {
-      onNavigated: {
-        addListener: (cb: (url: string) => void) => void,
-      },
-    },
-    panels: {
-      create: (title: string, icon: string, filename: string, cb: (panel: Panel) => void) => void,
-    },
-    inspectedWindow: {
-      eval: (code: string, cb?: (res: any, err: ?Object) => any) => void,
-    },
-  },
-};
+/* global chrome */
 
 var panelCreated = false;
 

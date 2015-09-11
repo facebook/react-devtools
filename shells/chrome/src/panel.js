@@ -10,40 +10,12 @@
  */
 'use strict';
 
+/* global chrome */
+
 var checkForReact = require('./checkForReact');
 var inject = require('./inject');
 
 import type {Props} from '../../../frontend/Panel';
-
-type Listenable = {
-  addListener: (fn: (message: Object) => void) => void,
-}
-
-type Port = { // eslint-disable-line no-unused-vars
-  disconnect: () => void,
-  onMessage: Listenable,
-  onDisconnect: Listenable,
-  postMessage: (data: Object) => void,
-};
-
-declare var chrome: {
-  devtools: {
-    network: {
-      onNavigated: {
-        addListener: (fn: () => void) => void,
-        removeListener: (fn: () => void) => void,
-      },
-    },
-    inspectedWindow: {
-      eval: (code: string, cb?: (res: any, err: ?Object) => any) => void,
-      tabId: number,
-    },
-  },
-  runtime: {
-    getURL: (path: string) => string,
-    connect: (config: Object) => Port,
-  },
-};
 
 var config: Props = {
   reload,
