@@ -10,25 +10,7 @@
  */
 'use strict';
 
-type Port = { // eslint-disable-line no-unused-vars
-  name: string,
-  sender: {
-    tab: {
-      id: number,
-    },
-  },
-};
-
-declare var chrome: {
-  tabs: {
-    executeScript: (tabId: number, options: Object, fn: () => void) => void,
-  },
-  runtime: {
-    onConnect: {
-      addListener: (fn: (port: Port) => void) => void,
-    },
-  },
-};
+/* global chrome */
 
 var ports = {};
 

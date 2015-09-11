@@ -16,12 +16,10 @@ var HighlightHover = require('./HighlightHover');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
-type MenuItem = {
+export type MenuItem = {
   title: string,
   action: () => void
 };
-
-export type MenuItem = MenuItem;
 
 class ContextMenu {
   _clickout: (evt: Object) => void;

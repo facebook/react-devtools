@@ -12,6 +12,7 @@
 
 var React = require('react');
 var Node = require('./Node');
+var Breadcrumb = require('./Breadcrumb');
 
 var decorate = require('./decorate');
 
@@ -72,9 +73,12 @@ class TreeView extends React.Component {
 
     return (
       <div style={styles.container}>
-        {this.props.roots.map(id => (
-          <Node key={id} id={id} depth={0} />
-        )).toJS()}
+        <div style={styles.scroll}>
+          {this.props.roots.map(id => (
+            <Node key={id} id={id} depth={0} />
+          )).toJS()}
+        </div>
+        <Breadcrumb />
       </div>
     );
   }
@@ -86,16 +90,23 @@ TreeView.childContextTypes = {
 
 var styles = {
   container: {
-    padding: 3,
-    overflow: 'auto',
     fontFamily: 'Menlo, monospace',
     fontSize: '11px',
     flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    minHeight: 0,
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     MsUserSelect: 'none',
     userSelect: 'none',
+  },
+  scroll: {
+    padding: 3,
+    overflow: 'auto',
+    minHeight: 0,
+    flex: 1,
   },
 };
 

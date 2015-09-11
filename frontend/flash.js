@@ -22,7 +22,7 @@ function flash(node: DOMElement, flashColor: string, baseColor: string, duration
   node.style.transition = 'none';
   node.style.backgroundColor = flashColor;
   // force recalc
-  node.offsetTop;
+  void node.offsetTop;
   node.style.transition = `background-color ${duration}s ease`;
   node.style.backgroundColor = baseColor;
 }

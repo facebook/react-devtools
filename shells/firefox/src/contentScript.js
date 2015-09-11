@@ -9,6 +9,7 @@
  * @flow
  */
 'use strict';
+
 /* global self */
 
 declare var unsafeWindow: {
