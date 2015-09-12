@@ -34,8 +34,8 @@ chrome.runtime.onConnect.addListener(function(port) {
   }
   ports[tab][name] = port;
 
-  if (ports[tab]['devtools'] && ports[tab]['content-script']) {
-    doublePipe(ports[tab]['devtools'], ports[tab]['content-script']);
+  if (ports[tab].devtools && ports[tab]['content-script']) {
+    doublePipe(ports[tab].devtools, ports[tab]['content-script']);
   }
 });
 
@@ -68,4 +68,3 @@ function doublePipe(one, two) {
   one.onDisconnect.addListener(shutdown);
   two.onDisconnect.addListener(shutdown);
 }
-
