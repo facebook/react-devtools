@@ -37,7 +37,7 @@ const ReactPanel = Class({
     const panelSide = channel.port2;
 
     function makeWorker() {
-      let tmpWorker = tabs.activeTab.attach({
+      const tmpWorker = tabs.activeTab.attach({
         contentScriptFile: 'build/contentScript.js',
       });
       tmpWorker.port.on('message', function(data) {

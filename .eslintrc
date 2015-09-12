@@ -51,4 +51,4 @@ rules:
   consistent-return: 2
   no-redeclare: 2
   dot-notation: 2
-  prefer-const: 0
+  prefer-const: 2

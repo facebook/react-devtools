@@ -34,7 +34,7 @@ function trackSelection() {
 }
 
 function passSelectedNode(jsterm) {
-  let inspectorSelection = jsterm.hud.owner.getInspectorSelection();
+  const inspectorSelection = jsterm.hud.owner.getInspectorSelection();
   let selectedNodeActor = null;
   if (inspectorSelection && inspectorSelection.nodeFront) {
     selectedNodeActor = inspectorSelection.nodeFront.actorID;
