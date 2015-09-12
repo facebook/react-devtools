@@ -332,7 +332,7 @@ class Bridge {
       result = this._callers[name].apply(null, args);
     } catch (e) {
       console.error('Failed to call', e);
-      return;
+      return undefined;
     }
     this._wall.send({
       type: 'callback',

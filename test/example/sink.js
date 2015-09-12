@@ -101,7 +101,7 @@ class LotsOfMounts {
   make(name) {
     var node = React.findDOMNode(this.node);
     if (!node) {
-      return;
+      return null;
     }
     var val = Math.random().toString(0x0f).slice(0, 20);
     var div = document.createElement('div');

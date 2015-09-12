@@ -66,7 +66,7 @@ module.exports = function(options: Options, Component: any): any {
       }
       this._update = () => this.forceUpdate();
       if (!options.listeners) {
-        return;
+        return undefined;
       }
       this._listeners = options.listeners(this.props, this.context.store);
       this._listeners.forEach(evt => {
@@ -98,7 +98,7 @@ module.exports = function(options: Options, Component: any): any {
         return console.warn('no store on context...');
       }
       if (!options.listeners) {
-        return;
+        return undefined;
       }
       var listeners = options.listeners(this.props, this.context.store);
       var diff = arrayDiff(listeners, this._listeners);
@@ -153,4 +153,3 @@ function setToArray(set) {
   }
   return res;
 }
-

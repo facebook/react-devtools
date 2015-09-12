@@ -218,7 +218,7 @@ class Panel extends React.Component {
         menuItems={{
           attr: (id, node, val, path, name) => {
             if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
-              return;
+              return undefined;
             }
             return [this.props.showAttrSource && {
               title: 'Show Source',
@@ -279,4 +279,3 @@ var styles = {
 };
 
 module.exports = Panel;
-
