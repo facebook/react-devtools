@@ -153,7 +153,7 @@ class Node {
                 <span key="content" style={styles.textContent}>{content}</span>,
                 <span key="close" style={styles.closeTag}>
                   <span style={tagStyle}>&lt;/{name}&gt;</span>
-                </span>
+                </span>,
               ]}
             </span>
           </div>
@@ -325,7 +325,7 @@ var styles = {
   },
 
   headSelect: {
-    backgroundColor: '#ccc'
+    backgroundColor: '#ccc',
   },
 
   collapser: {
@@ -342,7 +342,7 @@ var styles = {
   },
 
   headHover: {
-    backgroundColor: '#eee'
+    backgroundColor: '#eee',
   },
 };
 

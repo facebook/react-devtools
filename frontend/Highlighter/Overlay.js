@@ -160,7 +160,7 @@ function getElementDimensions(element) {
     paddingLeft: +calculatedStyle.paddingLeft.match(/[0-9]*/)[0],
     paddingRight: +calculatedStyle.paddingRight.match(/[0-9]*/)[0],
     paddingTop: +calculatedStyle.paddingTop.match(/[0-9]*/)[0],
-    paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0]
+    paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0],
   };
 }
 

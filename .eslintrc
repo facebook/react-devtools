@@ -47,7 +47,7 @@ rules:
 
   # TODO: we might want these, but currently have multiple warnings
   space-before-function-paren: 2
-  comma-dangle: 0
+  comma-dangle: 2
   consistent-return: 0
   no-redeclare: 0
   dot-notation: 0

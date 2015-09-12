@@ -29,7 +29,7 @@ window.postMessage({
 function handleMessageFromDevtools(message) {
   window.postMessage({
     source: 'react-devtools-content-script',
-    payload: message
+    payload: message,
   }, '*');
 }
 
@@ -50,4 +50,3 @@ function handleDisconnect() {
     },
   }, '*');
 }
-

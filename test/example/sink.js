@@ -191,7 +191,7 @@ class HighlightHover extends React.Component {
     var style = this.props.style;
     if (this.state.hover) {
       style = assign({}, style, {
-        backgroundColor: '#eee'
+        backgroundColor: '#eee',
       });
     }
 

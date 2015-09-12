@@ -31,7 +31,7 @@ function connectToBackend() {
   self.port.on('message', function(payload) {
     window.postMessage({
       source: 'react-devtools-reporter',
-      payload: payload
+      payload: payload,
     }, '*');
   });
 

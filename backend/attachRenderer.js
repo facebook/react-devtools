@@ -114,7 +114,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       unmountComponent(element) {
         hook.emit('unmount', {element, renderer: rid});
         rootNodeIDMap.delete(element._rootNodeID, element);
-      }
+      },
     });
   }
 

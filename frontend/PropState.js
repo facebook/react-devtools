@@ -22,7 +22,7 @@ class PropState extends React.Component {
     return {
       onChange: (path, val) => {
         this.props.onChange(path, val);
-      }
+      },
     };
   }
 
@@ -155,7 +155,7 @@ var WrappedPropState = decorate({
       },
       inspect: store.inspect.bind(store, store.selected),
     };
-  }
+  },
 }, PropState);
 
 var styles = {

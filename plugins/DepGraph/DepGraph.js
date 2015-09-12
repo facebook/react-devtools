@@ -171,7 +171,7 @@ function dagrize(graph) {
       label: name,
       count: graph.nodes[name],
       width: name.length * 7 + 20,
-      height: 20
+      height: 20,
     });
   }
   if (!hasNodes) {
@@ -207,7 +207,7 @@ var DepWrapper = decorate({
       onHover: name => store.hoverClass(name),
       onClick: name => store.selectFirstOfClass(name),
     };
-  }
+  },
 }, DisplayDeps);
 
 module.exports = DepGraph;
