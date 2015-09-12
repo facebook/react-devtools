@@ -18,7 +18,7 @@ const { gDevTools } = Cu.import('resource:///modules/devtools/gDevTools.jsm', {}
  */
 function trackSelection() {
   var wc;
-  gDevTools.on('webconsole-init', function (_, toolbox, panelFrame) {
+  gDevTools.on('webconsole-init', function(_, toolbox, panelFrame) {
     toolbox.once('webconsole-ready', (eid, panel) => {
       wc = panel;
     });

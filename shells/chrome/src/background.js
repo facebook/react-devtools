@@ -14,7 +14,7 @@
 
 var ports = {};
 
-chrome.runtime.onConnect.addListener(function (port) {
+chrome.runtime.onConnect.addListener(function(port) {
   var tab = null;
   var name = null;
   if (isNumeric(port.name)) {
@@ -44,7 +44,7 @@ function isNumeric(str: string): boolean {
 }
 
 function installContentScript(tabId: number) {
-  chrome.tabs.executeScript(tabId, {file: '/build/contentScript.js'}, function () {
+  chrome.tabs.executeScript(tabId, {file: '/build/contentScript.js'}, function() {
   });
 }
 

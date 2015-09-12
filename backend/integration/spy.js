@@ -10,7 +10,7 @@
 'use strict';
 
 module.exports = function spy() {
-  var fn = function () {
+  var fn = function() {
     fn.callCount += 1;
     fn.calledOnce = fn.callCount === 1;
     fn.called = true;

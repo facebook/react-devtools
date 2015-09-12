@@ -30,7 +30,7 @@ var keyCodes = {
 
 module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) => void {
   win = win || window;
-  return function (e: DOMEvent) {
+  return function(e: DOMEvent) {
     if (win.document.activeElement !== win.document.body) {
       return;
     }

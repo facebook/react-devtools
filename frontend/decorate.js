@@ -50,7 +50,7 @@ type Options = {
  *   },
  * }, MyComp);
  */
-module.exports = function (options: Options, Component: any): any {
+module.exports = function(options: Options, Component: any): any {
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;

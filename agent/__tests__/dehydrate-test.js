@@ -47,7 +47,7 @@ describe('dehydrate', () => {
   });
 
   it('cleans multiple things', () => {
-    var Something = function () {};
+    var Something = function() {};
     var object = {a: {b: {c: [1, 3], d: new Something()}}};
     var cleaned = [];
     var result = dehydrate(object, cleaned);

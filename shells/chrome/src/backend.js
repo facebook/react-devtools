@@ -18,7 +18,7 @@ var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var inject = require('../../../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
-setInterval(function () {
+setInterval(function() {
   // this is needed to force refresh on react native
 }, 100);
 

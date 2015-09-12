@@ -46,7 +46,7 @@ rules:
   react/wrap-multilines: [2, {declaration: false, assignment: false}]
 
   # TODO: we might want these, but currently have multiple warnings
-  space-before-function-paren: 0
+  space-before-function-paren: 2
   comma-dangle: 0
   consistent-return: 0
   no-redeclare: 0

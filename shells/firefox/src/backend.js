@@ -24,7 +24,7 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent) {
 }
 
 // TODO: check to see if we're in RN before doing this?
-setInterval(function () {
+setInterval(function() {
   // this is needed to force refresh on react native
 }, 100);
 
@@ -65,7 +65,7 @@ function setup() {
   var agent = new Agent(window);
   agent.addBridge(bridge);
 
-  var _connectTimeout = setTimeout(function () {
+  var _connectTimeout = setTimeout(function() {
     console.error('react-devtools agent got no connection');
   }, 1000);
 

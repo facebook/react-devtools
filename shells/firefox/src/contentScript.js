@@ -28,14 +28,14 @@ window.addEventListener('beforeunload', () => {
 });
 
 function connectToBackend() {
-  self.port.on('message', function (payload) {
+  self.port.on('message', function(payload) {
     window.postMessage({
       source: 'react-devtools-reporter',
       payload: payload
     }, '*');
   });
 
-  window.addEventListener('message', function (evt) {
+  window.addEventListener('message', function(evt) {
     if (!evt.data || evt.data.source !== 'react-devtools-bridge') {
       return;
     }
@@ -47,7 +47,7 @@ function connectToBackend() {
 function injectBackend() {
   var node = document.createElement('script');
 
-  node.onload = function () {
+  node.onload = function() {
     window.postMessage({source: 'react-devtools-reporter'}, '*');
 
     connectToBackend();
@@ -57,4 +57,3 @@ function injectBackend() {
   node.src = 'resource://react-devtools/data/build/backend.js';
   document.documentElement.appendChild(node);
 }
-
