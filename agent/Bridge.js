@@ -323,13 +323,10 @@ class Bridge {
     if (!this._callers[name]) {
       return console.warn('unknown call');
     }
-    var args = args;
-    if (!Array.isArray(args)) {
-      args = [args];
-    }
+    var preparedArgs = !Array.isArray(args) ? [args] : args;
     var result;
     try {
-      result = this._callers[name].apply(null, args);
+      result = this._callers[name].apply(null, preparedArgs);
     } catch (e) {
       console.error('Failed to call', e);
       return undefined;

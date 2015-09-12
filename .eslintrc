@@ -49,6 +49,6 @@ rules:
   space-before-function-paren: 2
   comma-dangle: 2
   consistent-return: 2
-  no-redeclare: 0
+  no-redeclare: 2
   dot-notation: 0
   prefer-const: 0

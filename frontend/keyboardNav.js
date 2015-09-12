@@ -158,11 +158,11 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (pix === 0) {
       return getNewSelection('parent', store);
     }
-    var cid = store.skipWrapper(pchildren[pix - 1]);
-    if (cid && store.hasBottom(cid)) {
+    var prevCid = store.skipWrapper(pchildren[pix - 1]);
+    if (prevCid && store.hasBottom(prevCid)) {
       store.isBottomTagSelected = true;
     }
-    return cid;
+    return prevCid;
   }
   if (dest === 'nextSibling') {
     if (pix === pchildren.length - 1) {

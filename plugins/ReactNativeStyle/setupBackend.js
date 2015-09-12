@@ -53,9 +53,10 @@ function renameStyle(agent, id, oldName, newName, val) {
     return;
   }
   var style = data.props && data.props.style;
+  var customStyle;
   if (Array.isArray(style)) {
     if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-      var customStyle = shallowClone(style[style.length - 1]);
+      customStyle = shallowClone(style[style.length - 1]);
       delete customStyle[oldName];
       customStyle[newName] = val;
       // $FlowFixMe we know that updater is not null here
@@ -67,7 +68,7 @@ function renameStyle(agent, id, oldName, newName, val) {
     }
   } else {
     if (typeof style === 'object') {
-      var customStyle = shallowClone(style);
+      customStyle = shallowClone(style);
       delete customStyle[oldName];
       customStyle[newName] = val;
       // $FlowFixMe we know that updater is not null here

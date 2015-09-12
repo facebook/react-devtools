@@ -105,13 +105,13 @@ class Node {
     if (nodeType === 'Text' || nodeType === 'Empty') {
       var tag;
       if (nodeType === 'Text') {
-        var content = node.get('text');
+        var text = node.get('text');
         tag =
           <span style={styles.tagText}>
             <span style={styles.openTag}>
               "
             </span>
-            <span style={styles.textContent}>{content}</span>
+            <span style={styles.textContent}>{text}</span>
             <span style={styles.closeTag}>
               "
             </span>
