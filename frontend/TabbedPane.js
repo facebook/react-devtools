@@ -14,7 +14,7 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
-class TabbedPane {
+class TabbedPane extends React.Component {
   props: {
     tabs: {[key: string]: () => ReactElement},
     selected: string,

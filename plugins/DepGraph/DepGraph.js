@@ -34,7 +34,7 @@ class DepGraph extends React.Component {
   }
 }
 
-class DisplayDeps {
+class DisplayDeps extends React.Component {
   props: Object;
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected !== this.props.selected) {

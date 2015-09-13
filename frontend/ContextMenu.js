@@ -21,7 +21,7 @@ export type MenuItem = {
   action: () => void
 };
 
-class ContextMenu {
+class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
   props: {

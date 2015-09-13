@@ -32,7 +32,7 @@ type PropsType = {
   onSelect: () => void,
 };
 
-class Node {
+class Node extends React.Component {
   _head: Object;
   _tail: Object;
 
