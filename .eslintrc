@@ -10,8 +10,6 @@ plugins:
 globals:
   ReactElement: false
 
-# We're stricter than the default config, mostly. We'll override a few rules and
-# then enable some React specific ones.
 rules:
   brace-style: [2, 1tbs]
   comma-dangle: [2, always-multiline]
@@ -21,19 +19,16 @@ rules:
   eol-last: 2
   indent: [2, 2, {SwitchCase: 1}]
   no-multi-spaces: 2
+  no-redeclare: 2
   no-shadow: 2
   no-unused-expressions: 2
   no-unused-vars: [2, {args: none}]
+  prefer-const: 2
   quotes: [2, single, avoid-escape]
   space-after-keywords: 2
   space-before-blocks: 2
-  strict: [2, global]
   space-before-function-paren: 2
-  comma-dangle: 2
-  consistent-return: 2
-  no-redeclare: 2
-  dot-notation: 2
-  prefer-const: 2
+  strict: [2, global]
 
   # JSX
   # Our transforms set this automatically
@@ -41,7 +36,6 @@ rules:
   react/jsx-boolean-value: [2, always]
   react/jsx-no-undef: 2
   react/jsx-quotes: [2, double]
-  # We don't care to do this
   react/jsx-sort-prop-types: 0
   react/jsx-sort-props: 0
   react/jsx-uses-react: 2
