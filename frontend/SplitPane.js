@@ -35,7 +35,7 @@ class SplitPane extends React.Component {
       dragStyle = assign({}, dragStyle, styles.draggerMoving);
     }
     var rightStyle = assign({}, styles.rightPane, {
-      width: this.state.width
+      width: this.state.width,
     });
     return (
       <div style={styles.container}>

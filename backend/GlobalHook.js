@@ -24,17 +24,17 @@ module.exports = function globalHook(window: Object) {
           this.emit('renderer', {id, renderer});
         },
         _listeners: {},
-        sub: function (evt, fn) {
+        sub: function(evt, fn) {
           this.on(evt, fn);
           return () => this.off(evt, fn);
         },
-        on: function (evt, fn) {
+        on: function(evt, fn) {
           if (!this._listeners[evt]) {
             this._listeners[evt] = [];
           }
           this._listeners[evt].push(fn);
         },
-        off: function (evt, fn) {
+        off: function(evt, fn) {
           if (!this._listeners[evt]) {
             return;
           }
@@ -46,7 +46,7 @@ module.exports = function globalHook(window: Object) {
             this._listeners[evt] = null;
           }
         },
-        emit: function (evt, data) {
+        emit: function(evt, data) {
           if (this._listeners[evt]) {
             this._listeners[evt].map(fn => fn(data));
           }

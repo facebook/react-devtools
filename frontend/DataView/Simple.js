@@ -38,7 +38,7 @@ class Simple extends React.Component {
     }
     if (e.key === 'Escape') {
       this.setState({
-        editing: false
+        editing: false,
       });
     }
   }

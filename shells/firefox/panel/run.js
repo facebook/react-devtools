@@ -26,7 +26,7 @@ function reload() {
   React.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
-window.addEventListener('message', function (event) {
+window.addEventListener('message', function(event) {
   port = event.ports[0];
   var metaPort = event.ports[1];
   metaPort.onmessage = evt => {

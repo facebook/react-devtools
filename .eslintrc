@@ -28,6 +28,12 @@ rules:
   space-after-keywords: 2
   space-before-blocks: 2
   strict: [2, global]
+  space-before-function-paren: 2
+  comma-dangle: 2
+  consistent-return: 2
+  no-redeclare: 2
+  dot-notation: 2
+  prefer-const: 2
 
   # JSX
   # Our transforms set this automatically
@@ -44,11 +50,3 @@ rules:
   react/react-in-jsx-scope: 2
   react/self-closing-comp: 2
   react/wrap-multilines: [2, {declaration: false, assignment: false}]
-
-  # TODO: we might want these, but currently have multiple warnings
-  space-before-function-paren: 0
-  comma-dangle: 0
-  consistent-return: 0
-  no-redeclare: 0
-  dot-notation: 0
-  prefer-const: 0

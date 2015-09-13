@@ -30,7 +30,7 @@ var keyCodes = {
 
 module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) => void {
   win = win || window;
-  return function (e: DOMEvent) {
+  return function(e: DOMEvent) {
     if (win.document.activeElement !== win.document.body) {
       return;
     }
@@ -57,7 +57,7 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
 function getDest(dir: Dir, store: Store): ?Dest {
   var id = store.selected;
   if (!id) {
-    return;
+    return null;
   }
   var bottom = store.isBottomTagSelected;
   var node = store.get(id);
@@ -74,7 +74,7 @@ function getDest(dir: Dir, store: Store): ?Dest {
 function getNewSelection(dest: Dest, store: Store): ?ElementID {
   var id = store.selected;
   if (!id) {
-    return;
+    return undefined;
   }
   var node = store.get(id);
   var pid = store.skipWrapper(store.getParent(id), true);
@@ -96,7 +96,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
       store.isBottomTagSelected = false;
     }
     store.toggleCollapse(id);
-    return;
+    return undefined;
   }
 
   var children = node.get('children');
@@ -158,11 +158,11 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (pix === 0) {
       return getNewSelection('parent', store);
     }
-    var cid = store.skipWrapper(pchildren[pix - 1]);
-    if (cid && store.hasBottom(cid)) {
+    var prevCid = store.skipWrapper(pchildren[pix - 1]);
+    if (prevCid && store.hasBottom(prevCid)) {
       store.isBottomTagSelected = true;
     }
-    return cid;
+    return prevCid;
   }
   if (dest === 'nextSibling') {
     if (pix === pchildren.length - 1) {
@@ -173,4 +173,3 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
   return null;
 }
-

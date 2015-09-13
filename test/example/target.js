@@ -76,7 +76,7 @@ class Todos extends React.Component {
 
   changeFilter(val) {
     this.setState({
-      filter: val
+      filter: val,
     });
   }
 
@@ -293,7 +293,7 @@ var styles = {
     backgroundColor: 'rgba(100, 100, 200, .3)',
     height: 200,
     overflow: 'auto',
-  }
+  },
 };
 
 class Something {
@@ -330,7 +330,7 @@ class Wrap extends React.Component {
 var OldStyle = React.createClass({
   render() {
     return <span>OldStyle {this.props.awesome}</span>;
-  }
+  },
 });
 
 function long(children) { // eslint-disable-line no-unused-vars

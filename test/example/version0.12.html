@@ -12,10 +12,10 @@
       parent.React = React;
       var App = React.createClass({
         displayName: 'Things are great',
-        getInitialState: function () {
+        getInitialState: function() {
           return {awesome: true};
         },
-        onClick: function () {
+        onClick: function() {
           this.setState({awesome: !this.state.awesome});
         },
         render: function() {

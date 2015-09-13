@@ -28,23 +28,23 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
 
   // React Native
   if (renderer.Mount.findNodeHandle && renderer.Mount.nativeTagToRootNodeID) {
-    extras.getNativeFromReactElement = function (component) {
+    extras.getNativeFromReactElement = function(component) {
       return renderer.Mount.findNodeHandle(component);
     };
 
-    extras.getReactElementFromNative = function (nativeTag) {
+    extras.getReactElementFromNative = function(nativeTag) {
       var id = renderer.Mount.nativeTagToRootNodeID(nativeTag);
       return rootNodeIDMap.get(id);
     };
   // React DOM
   } else if (renderer.Mount.getID && renderer.Mount.getNode) {
-    extras.getNativeFromReactElement = function (component) {
+    extras.getNativeFromReactElement = function(component) {
       try {
         return renderer.Mount.getNode(component._rootNodeID);
       } catch (e) {}
     };
 
-    extras.getReactElementFromNative = function (node) {
+    extras.getReactElementFromNative = function(node) {
       var id = renderer.Mount.getID(node);
       while (node && node.parentNode && !id) {
         node = node.parentNode;
@@ -114,11 +114,11 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       unmountComponent(element) {
         hook.emit('unmount', {element, renderer: rid});
         rootNodeIDMap.delete(element._rootNodeID, element);
-      }
+      },
     });
   }
 
-  extras.walkTree = function (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) {
+  extras.walkTree = function(visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) {
     var onMount = (component, data) => {
       rootNodeIDMap.set(component._rootNodeID, component);
       visit(component, data);
@@ -126,7 +126,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot, isPre013);
   };
 
-  extras.cleanup = function () {
+  extras.cleanup = function() {
     if (oldMethods) {
       if (renderer.Component) {
         restoreMany(renderer.Component.Mixin, oldMethods);
@@ -165,7 +165,7 @@ function walkNode(element, onMount, isPre013) {
 
 function decorateResult(obj, attr, fn) {
   var old = obj[attr];
-  obj[attr] = function (instance: NodeLike) {
+  obj[attr] = function(instance: NodeLike) {
     var res = old.apply(this, arguments);
     fn(res);
     return res;
@@ -175,7 +175,7 @@ function decorateResult(obj, attr, fn) {
 
 function decorate(obj, attr, fn) {
   var old = obj[attr];
-  obj[attr] = function (instance: NodeLike) {
+  obj[attr] = function(instance: NodeLike) {
     var res = old.apply(this, arguments);
     fn.apply(this, arguments);
     return res;

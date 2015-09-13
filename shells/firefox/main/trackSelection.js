@@ -18,7 +18,7 @@ const { gDevTools } = Cu.import('resource:///modules/devtools/gDevTools.jsm', {}
  */
 function trackSelection() {
   var wc;
-  gDevTools.on('webconsole-init', function (_, toolbox, panelFrame) {
+  gDevTools.on('webconsole-init', function(_, toolbox, panelFrame) {
     toolbox.once('webconsole-ready', (eid, panel) => {
       wc = panel;
     });
@@ -34,7 +34,7 @@ function trackSelection() {
 }
 
 function passSelectedNode(jsterm) {
-  let inspectorSelection = jsterm.hud.owner.getInspectorSelection();
+  const inspectorSelection = jsterm.hud.owner.getInspectorSelection();
   let selectedNodeActor = null;
   if (inspectorSelection && inspectorSelection.nodeFront) {
     selectedNodeActor = inspectorSelection.nodeFront.actorID;

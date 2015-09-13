@@ -50,7 +50,7 @@ type Options = {
  *   },
  * }, MyComp);
  */
-module.exports = function (options: Options, Component: any): any {
+module.exports = function(options: Options, Component: any): any {
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;
@@ -66,7 +66,7 @@ module.exports = function (options: Options, Component: any): any {
       }
       this._update = () => this.forceUpdate();
       if (!options.listeners) {
-        return;
+        return undefined;
       }
       this._listeners = options.listeners(this.props, this.context.store);
       this._listeners.forEach(evt => {
@@ -98,7 +98,7 @@ module.exports = function (options: Options, Component: any): any {
         return console.warn('no store on context...');
       }
       if (!options.listeners) {
-        return;
+        return undefined;
       }
       var listeners = options.listeners(this.props, this.context.store);
       var diff = arrayDiff(listeners, this._listeners);
@@ -133,11 +133,11 @@ function arrayDiff(array, oldArray) {
   for (var i = 0; i < array.length; i++) {
     names.add(array[i]);
   }
-  for (var i = 0; i < oldArray.length; i++) {
-    if (!names.has(oldArray[i])) {
-      missing.push(oldArray[i]);
+  for (var j = 0; j < oldArray.length; j++) {
+    if (!names.has(oldArray[j])) {
+      missing.push(oldArray[j]);
     } else {
-      names.delete(oldArray[i]);
+      names.delete(oldArray[j]);
     }
   }
   return {
@@ -153,4 +153,3 @@ function setToArray(set) {
   }
   return res;
 }
-

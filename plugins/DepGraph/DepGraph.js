@@ -165,25 +165,25 @@ function dagrize(graph) {
   });
   g.setDefaultEdgeLabel(() => ({}));
   var hasNodes = false;
-  for (var name in graph.nodes) {
+  for (var nodeName in graph.nodes) {
     hasNodes = true;
-    g.setNode(name, {
-      label: name,
-      count: graph.nodes[name],
-      width: name.length * 7 + 20,
-      height: 20
+    g.setNode(nodeName, {
+      label: nodeName,
+      count: graph.nodes[nodeName],
+      width: nodeName.length * 7 + 20,
+      height: 20,
     });
   }
   if (!hasNodes) {
     return false;
   }
 
-  for (var name in graph.edges) {
-    var parts = name.split('\x1f');
+  for (var edgeName in graph.edges) {
+    var parts = edgeName.split('\x1f');
     if (parts[0] === '$root') {
       continue;
     }
-    g.setEdge(parts[0], parts[1], {label: graph[name]});
+    g.setEdge(parts[0], parts[1], {label: graph[edgeName]});
   }
 
   dagre.layout(g);
@@ -207,7 +207,7 @@ var DepWrapper = decorate({
       onHover: name => store.hoverClass(name),
       onClick: name => store.selectFirstOfClass(name),
     };
-  }
+  },
 }, DisplayDeps);
 
 module.exports = DepGraph;

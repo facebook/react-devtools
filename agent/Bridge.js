@@ -255,7 +255,7 @@ class Bridge {
 
   once(evt: string, fn: AnyFn) {
     var self = this;
-    var listener = function () {
+    var listener = function() {
       fn.apply(this, arguments);
       self.off(evt, listener);
     };
@@ -323,16 +323,13 @@ class Bridge {
     if (!this._callers[name]) {
       return console.warn('unknown call');
     }
-    var args = args;
-    if (!Array.isArray(args)) {
-      args = [args];
-    }
+    args = !Array.isArray(args) ? [args] : args;
     var result;
     try {
       result = this._callers[name].apply(null, args);
     } catch (e) {
       console.error('Failed to call', e);
-      return;
+      return undefined;
     }
     this._wall.send({
       type: 'callback',

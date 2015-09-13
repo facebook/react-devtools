@@ -124,7 +124,7 @@ var Wrapped = decorate({
       hideContextMenu: () => store.hideContextMenu(),
       items,
     };
-  }
+  },
 }, ContextMenu);
 
 var styles = {

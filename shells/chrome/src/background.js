@@ -14,7 +14,7 @@
 
 var ports = {};
 
-chrome.runtime.onConnect.addListener(function (port) {
+chrome.runtime.onConnect.addListener(function(port) {
   var tab = null;
   var name = null;
   if (isNumeric(port.name)) {
@@ -34,8 +34,8 @@ chrome.runtime.onConnect.addListener(function (port) {
   }
   ports[tab][name] = port;
 
-  if (ports[tab]['devtools'] && ports[tab]['content-script']) {
-    doublePipe(ports[tab]['devtools'], ports[tab]['content-script']);
+  if (ports[tab].devtools && ports[tab]['content-script']) {
+    doublePipe(ports[tab].devtools, ports[tab]['content-script']);
   }
 });
 
@@ -44,7 +44,7 @@ function isNumeric(str: string): boolean {
 }
 
 function installContentScript(tabId: number) {
-  chrome.tabs.executeScript(tabId, {file: '/build/contentScript.js'}, function () {
+  chrome.tabs.executeScript(tabId, {file: '/build/contentScript.js'}, function() {
   });
 }
 
@@ -68,4 +68,3 @@ function doublePipe(one, two) {
   one.onDisconnect.addListener(shutdown);
   two.onDisconnect.addListener(shutdown);
 }
-

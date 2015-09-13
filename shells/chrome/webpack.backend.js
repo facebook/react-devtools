@@ -31,7 +31,7 @@ module.exports = {
         'node_modules',
         './helpers.js',
       ],
-    }]
+    }],
   },
 
   plugins: [new webpack.DefinePlugin({
@@ -41,6 +41,3 @@ module.exports = {
     Set: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet',
   })],
 };
-
-
-

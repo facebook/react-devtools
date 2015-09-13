@@ -20,23 +20,23 @@ function createPanelIfReactLoaded() {
   }
   chrome.devtools.inspectedWindow.eval(`!!(
     Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length || window.React
-  )`, function (pageHasReact, err) {
+  )`, function(pageHasReact, err) {
     if (!pageHasReact || panelCreated) {
       return;
     }
 
     clearInterval(loadCheckInterval);
     panelCreated = true;
-    chrome.devtools.panels.create('React', '', 'panel.html', function (panel) {
+    chrome.devtools.panels.create('React', '', 'panel.html', function(panel) {
       var reactPanel = null;
-      panel.onShown.addListener(function (window) {
+      panel.onShown.addListener(function(window) {
         // when the user switches to the panel, check for an elements tab
         // selection
         window.panel.getNewSelection();
         reactPanel = window.panel;
         reactPanel.resumeTransfer();
       });
-      panel.onHidden.addListener(function () {
+      panel.onHidden.addListener(function() {
         if (reactPanel) {
           reactPanel.hideHighlight();
           reactPanel.pauseTransfer();
