@@ -130,14 +130,14 @@ module.exports = function(options: Options, Component: any): any {
 function arrayDiff(array, oldArray) {
   var names = new Set();
   var missing = [];
-  for (var ai = 0; ai < array.length; ai++) {
-    names.add(array[ai]);
+  for (var i = 0; i < array.length; i++) {
+    names.add(array[i]);
   }
-  for (var aoi = 0; aoi < oldArray.length; aoi++) {
-    if (!names.has(oldArray[aoi])) {
-      missing.push(oldArray[aoi]);
+  for (var j = 0; j < oldArray.length; j++) {
+    if (!names.has(oldArray[j])) {
+      missing.push(oldArray[j]);
     } else {
-      names.delete(oldArray[aoi]);
+      names.delete(oldArray[j]);
     }
   }
   return {
