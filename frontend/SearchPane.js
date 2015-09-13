@@ -13,6 +13,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
 
@@ -25,7 +26,7 @@ type EventLike = {
 };
 
 class SearchPane extends React.Component {
-  input: ReactElement;
+  input: ?HTMLElement;
   _key: (evt: EventLike) => void;
   constructor(props) {
     super(props);
@@ -34,24 +35,23 @@ class SearchPane extends React.Component {
 
   componentDidMount() {
     this._key = this.onDocumentKeyDown.bind(this);
-    var doc = React.findDOMNode(this).ownerDocument;
+    var doc = ReactDOM.findDOMNode(this).ownerDocument;
     // capture=true is needed to prevent chrome devtools console popping up
     doc.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    var doc = React.findDOMNode(this).ownerDocument;
+    var doc = ReactDOM.findDOMNode(this).ownerDocument;
     doc.removeEventListener('keydown', this._key, true);
   }
 
   onDocumentKeyDown(e) {
     if (e.keyCode === 191) { // forward slash
-      var node = React.findDOMNode(this.input);
-      var doc = React.findDOMNode(this).ownerDocument;
-      if (doc.activeElement === node) {
+      var doc = ReactDOM.findDOMNode(this).ownerDocument;
+      if (!this.input || doc.activeElement === this.input) {
         return;
       }
-      node.focus();
+      this.input.focus();
       e.preventDefault();
     }
     if (e.keyCode === 27) { // escape
@@ -66,12 +66,13 @@ class SearchPane extends React.Component {
 
   cancel() {
     this.props.onChangeSearch('');
-    React.findDOMNode(this.input).blur();
+    if (this.input) {
+      this.input.blur();
+    }
   }
 
   onKeyDown(key) {
-    if (key === 'Enter') {
-      React.findDOMNode(this.input).blur();
+    if (key === 'Enter' && this.input) {
       this.props.selectFirstSearchResult();
     }
   }

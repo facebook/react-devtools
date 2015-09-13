@@ -11,14 +11,15 @@
  */
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var ReactDOM = require('react-dom');
 
 var assign = require('object-assign');
 var guid = require('../../utils/guid');
 
 // Different test things
 
-class LongRender {
+class LongRender extends React.Component {
   render() {
     var t = Date.now();
     while (Date.now() - t < 50) {
@@ -27,7 +28,7 @@ class LongRender {
   }
 }
 
-class DeepTree {
+class DeepTree extends React.Component {
   render() {
     var child = <span>At the bottom</span>;
     for (var i = 0; i < 20; i++) {
@@ -58,7 +59,7 @@ class Nester extends React.Component {
   }
 }
 
-class SymbolProp {
+class SymbolProp extends React.Component {
   render() {
     return (
       <div sym={Symbol('name')}>
@@ -69,7 +70,7 @@ class SymbolProp {
   }
 }
 
-class BadUnmount {
+class BadUnmount extends React.Component {
   render() {
     return (
       <div>
@@ -80,13 +81,13 @@ class BadUnmount {
   }
 }
 
-class Mounty {
+class Mounty extends React.Component {
   render() {
     return <h1>{this.props.name} {this.props.val}</h1>;
   }
 }
 
-class LotsOfMounts {
+class LotsOfMounts extends React.Component {
   componentDidMount() {
     this.roots = [];
     this.make('Rock');
@@ -97,11 +98,11 @@ class LotsOfMounts {
   }
 
   componentWillUnmount() {
-    this.roots.forEach(div => React.unmountComponentAtNode(div));
+    this.roots.forEach(div => ReactDOM.unmountComponentAtNode(div));
   }
 
   make(name) {
-    var node = React.findDOMNode(this.node);
+    var node = this.node;
     if (!node) {
       return null;
     }
@@ -110,7 +111,7 @@ class LotsOfMounts {
 
     node.appendChild(div);
     this.roots.push(div);
-    React.render(<Mounty name={name} val={val} />, div);
+    ReactDOM.render(<Mounty name={name} val={val} />, div);
     return div;
   }
 
@@ -123,7 +124,7 @@ class LotsOfMounts {
       if (this.roots.indexOf(div) === -1) {
         return;
       }
-      React.unmountComponentAtNode(div);
+      ReactDOM.unmountComponentAtNode(div);
       var ix = this.roots.indexOf(div);
       this.roots.splice(ix, 1);
       this.mounty(name);
@@ -137,7 +138,7 @@ class LotsOfMounts {
 
 // Render the list of tests
 
-class Sink {
+class Sink extends React.Component {
   render() {
     var examples = {
       SymbolProp,
@@ -153,7 +154,7 @@ class Sink {
     return (
       <ul style={styles.sinkList}>
         {Object.keys(examples).map(name => (
-          <li onClick={() => view(examples[name])}>
+          <li key={name} onClick={() => view(examples[name])}>
             <HighlightHover style={styles.sinkItem}>
               {name}
             </HighlightHover>
@@ -171,7 +172,7 @@ class HighlightHover extends React.Component {
   }
 
   isMe(evt) {
-    var node = React.findDOMNode(this.node);
+    var node = this.node;
     return evt.target === node;
   }
 
@@ -210,7 +211,7 @@ class HighlightHover extends React.Component {
   }
 }
 
-class View {
+class View extends React.Component {
   render() {
     var Comp = this.props.Comp;
     return (
@@ -224,8 +225,8 @@ class View {
 
 function run(Comp, props) {
   props = props || {};
-  React.unmountComponentAtNode(node);
-  React.render(<Comp {...props} />, node);
+  ReactDOM.unmountComponentAtNode(node);
+  ReactDOM.render(<Comp {...props} />, node);
 }
 
 var node = document.createElement('div');

@@ -12,6 +12,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var assign = require('object-assign');
 var guid = require('../../utils/guid');
@@ -137,7 +138,7 @@ class NewTodo extends React.Component {
   }
 }
 
-class TodoItems {
+class TodoItems extends React.Component {
   render() {
     var filterFn = {
       All: () => true,
@@ -158,7 +159,7 @@ class TodoItems {
   }
 }
 
-class TodoItem {
+class TodoItem extends React.Component {
   render() {
     return (
       <li onClick={this.props.onToggle}>
@@ -196,7 +197,7 @@ class HoverHighlight extends React.Component {
   }
 }
 
-class Filter {
+class Filter extends React.Component {
   render() {
     var options = ['All', 'Completed', 'Remaining'];
     return (
@@ -398,4 +399,4 @@ class Target extends React.Component {
 
 var node = document.createElement('div');
 document.body.appendChild(node);
-React.render(<Wrap more={['a', 2, 'c', 4]} str="thing" awesome={1} />, node);
+ReactDOM.render(<Wrap more={['a', 2, 'c', 4]} str="thing" awesome={1} />, node);

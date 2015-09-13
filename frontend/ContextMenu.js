@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var HighlightHover = require('./HighlightHover');
 
 var assign = require('object-assign');
@@ -52,7 +53,7 @@ class ContextMenu extends React.Component {
 
   onMouseDown(evt) {
     var n = evt.target;
-    var container = React.findDOMNode(this);
+    var container = ReactDOM.findDOMNode(this);
     while (n) {
       if (n === container) {
         return;

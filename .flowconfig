@@ -1,4 +1,5 @@
 [ignore]
+.*/react/node_modules/.*
 .*node_modules/babel.*
 .*node_modules/classnames.*
 .*node_modules/json-loader.*

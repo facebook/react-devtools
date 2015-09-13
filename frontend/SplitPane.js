@@ -11,7 +11,9 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 var Draggable = require('./Draggable');
+
 var assign = require('object-assign');
 
 type Props = {
@@ -31,7 +33,7 @@ class SplitPane extends React.Component {
   }
 
   onMove(x: number) {
-    var node = React.findDOMNode(this);
+    var node = ReactDOM.findDOMNode(this);
     this.setState({
       width: (node.offsetLeft + node.offsetWidth) - x,
     });
