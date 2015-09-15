@@ -28,8 +28,13 @@ function makeId() {
 }
 
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
-  bridge.onCall('relay:check', () => !!hook._relayInternals);
-  if (!hook._relayInternals) {
+  var shouldEnable = !!(
+    hook._relayInternals &&
+    window.location.hash.indexOf('relaydevtools') >= 0
+  );
+
+  bridge.onCall('relay:check', () => shouldEnable);
+  if (!shouldEnable) {
     return;
   }
   var NetworkLayer = hook._relayInternals.NetworkLayer;
