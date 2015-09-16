@@ -27,7 +27,6 @@ type EventPayload = {
   data: any,
 };
 
-// $FlowFixMe disjoint unions don't seem to be working
 type PayloadType = {
   type: 'inspect',
   id: string,
@@ -43,7 +42,7 @@ type PayloadType = {
   callback: number,
 } | {
   type: 'callback',
-  id: string,
+  id: number,
   args: Array<any>,
 } | {
   type: 'pause',
@@ -299,9 +298,9 @@ class Bridge {
         hydrate(payload.data, payload.cleaned);
       }
       var fns = this._listeners[payload.evt];
+      var data = payload.data;
       if (fns) {
-        // $FlowFixMe tagged unions not valid inside function?
-        fns.forEach(fn => fn(payload.data));
+        fns.forEach(fn => fn(data));
       }
     }
 
@@ -359,15 +358,15 @@ class Bridge {
 
       /* eslint-disable no-proto */
       if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
-        proto = {};
+        var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
-          // $FlowFixMe flow thinks proto (and val) might be null
-          proto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
+          newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
         });
+        proto = newProto;
       }
       /* eslint-enable no-proto */
     }
