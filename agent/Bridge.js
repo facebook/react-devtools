@@ -118,7 +118,7 @@ class Bridge {
   _callers: {[key: string]: AnyFn};
   _paused: boolean;
 
-  constructor() {
+  constructor(wall: Wall) {
     this._cbs = new Map();
     this._inspectables = new Map();
     this._cid = 0;
@@ -128,11 +128,9 @@ class Bridge {
     this._lastTime = 5;
     this._callers = {};
     this._paused = false;
-  }
-
-  attach(wall: Wall) {
     this._wall = wall;
-    this._wall.listen(this._handleMessage.bind(this));
+
+    wall.listen(this._handleMessage.bind(this));
   }
 
   inspect(id: string, path: Array<string>, cb: (val: any) => any) {
