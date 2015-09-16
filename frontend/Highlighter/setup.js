@@ -27,4 +27,3 @@ module.exports = function setup(agent: Agent) {
     hl.remove();
   });
 };
-

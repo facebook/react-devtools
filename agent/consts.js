@@ -19,4 +19,3 @@ module.exports = {
   meta: Symbol('meta'),
   proto: Symbol('proto'),
 };
-

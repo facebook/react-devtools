@@ -74,7 +74,6 @@ export type Helpers = {
 
 export type Handler = (data: any) => void;
 
-
 export type Hook = {
   _renderers: {[key: string]: ReactRenderer},
   _listeners: {[key: string]: Array<Handler>},

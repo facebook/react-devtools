@@ -28,4 +28,3 @@ function flash(node: DOMElement, flashColor: string, baseColor: string, duration
 }
 
 module.exports = flash;
-

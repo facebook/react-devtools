@@ -18,5 +18,3 @@ const ReactDevtools = new Tool({ // eslint-disable-line no-unused-vars
     react: ReactPanel,
   },
 });
-
-

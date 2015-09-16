@@ -53,5 +53,3 @@ export type DOMEvent = {
   cancelBubble: boolean,
   keyCode: number,
 };
-
-

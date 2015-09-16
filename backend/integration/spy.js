@@ -20,4 +20,3 @@ module.exports = function spy() {
   fn.callCount = 0;
   return fn;
 };
-

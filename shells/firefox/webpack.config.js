@@ -18,7 +18,7 @@ module.exports = {
     GlobalHook: './src/GlobalHook.js',
   },
   output: {
-    path: __dirname + '/data/build', // eslint-disable-line no-path-concat
+    path: __dirname + '/data/build',
     filename: '[name].js',
   },
 

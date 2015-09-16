@@ -49,4 +49,3 @@ inject('../../test/example/build/target.js', () => {
   var node = document.getElementById('container');
   React.render(<Panel {...config} />, node);
 });
-

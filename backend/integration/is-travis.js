@@ -10,4 +10,3 @@
 'use strict';
 
 window.IS_TRAVIS = true;
-

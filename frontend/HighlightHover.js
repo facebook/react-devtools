@@ -34,4 +34,3 @@ class HighlightHover extends React.Component {
 }
 
 module.exports = HighlightHover;
-

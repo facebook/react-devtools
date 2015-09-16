@@ -16,7 +16,7 @@ module.exports = {
     container: './container.js',
   },
   output: {
-    path: __dirname + '/build', // eslint-disable-line no-path-concat
+    path: __dirname + '/build',
     filename: '[name].js',
   },
 
