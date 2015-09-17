@@ -12,4 +12,3 @@ test:
 		echo "Ran $$source";\
 	done;
 	rm tmp.js
-

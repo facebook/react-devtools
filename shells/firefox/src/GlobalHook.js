@@ -17,4 +17,3 @@ var script = document.createElement('script');
 script.textContent = source;
 document.documentElement.appendChild(script);
 script.parentNode.removeChild(script);
-

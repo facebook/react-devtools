@@ -50,4 +50,3 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
     return null;
   }
 };
-

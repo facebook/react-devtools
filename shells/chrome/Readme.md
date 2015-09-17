@@ -43,4 +43,3 @@ chrome` is enabled.
 To deal with this, [`src/inject.js`](src/inject.js) calls
 `document.constructor.prototype.createElement` when it needs to create a
 `<script>` tag.
-

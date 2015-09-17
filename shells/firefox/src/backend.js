@@ -85,4 +85,3 @@ function setup() {
     setupHighlighter(agent);
   }
 }
-

@@ -28,4 +28,3 @@ module.exports = function(scriptName: string, done: () => void) {
     done();
   });
 };
-

@@ -66,4 +66,3 @@ var config = {
     done(wall);
   },
 };
-

@@ -19,4 +19,3 @@ module.exports = function(done: (pageHasReact: boolean) => void) {
     done(pageHasReact);
   });
 };
-

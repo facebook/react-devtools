@@ -17,4 +17,3 @@ pageMod.PageMod({
   contentScriptFile: './build/GlobalHook.js',
   contentScriptWhen: 'start',
 });
-

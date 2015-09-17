@@ -8,9 +8,9 @@
  *
  * @flow
  */
+
 'use strict';
 
-declare var performance: { // eslint-disable-line no-unused-vars
+declare var performance: {
   now: () => number,
 };
-

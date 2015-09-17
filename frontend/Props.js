@@ -60,5 +60,4 @@ var styles = {
   },
 };
 
-
 module.exports = Props;
