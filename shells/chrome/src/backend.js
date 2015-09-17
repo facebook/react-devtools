@@ -56,8 +56,7 @@ function setup(hook) {
 
   var isReactNative = !!hook.resolveRNStyle;
 
-  var bridge = new Bridge();
-  bridge.attach(wall);
+  var bridge = new Bridge(wall);
   var agent = new Agent(window, {
     rnStyle: isReactNative,
   });

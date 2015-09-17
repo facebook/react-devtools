@@ -60,8 +60,7 @@ function setup() {
     },
   };
 
-  var bridge = new Bridge();
-  bridge.attach(wall);
+  var bridge = new Bridge(wall);
   var agent = new Agent(window);
   agent.addBridge(bridge);
 

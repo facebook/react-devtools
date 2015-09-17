@@ -159,8 +159,7 @@ class Panel extends React.Component {
     this.props.inject((wall, teardown) => {
       this._teardownWall = teardown;
 
-      this._bridge = new Bridge();
-      this._bridge.attach(wall);
+      this._bridge = new Bridge(wall);
 
       if (this._bridge) {
         this._store = new Store(this._bridge);
