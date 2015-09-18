@@ -7,6 +7,8 @@
     "object-assign": "^3.0.0",
     "react": "^0.13.3"
   },
+  "license": "BSD-3-Clause",
+  "repository": "facebook/react-devtools",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
     "test": "node --harmony ./node_modules/.bin/jest --verbose"
