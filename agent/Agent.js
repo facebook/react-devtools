@@ -17,11 +17,7 @@ import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '
 
 type ElementID = string;
 
-type Bridge = {
-  send: (evt: string, data?: any) => void,
-  on: (evt: string, fn: (data: any) => any) => void,
-  forget: (id: string) => void,
-};
+import type Bridge from './Bridge';
 
 /**
  * The agent lives on the page in the same context as React, observes events
