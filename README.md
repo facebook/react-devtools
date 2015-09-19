@@ -1,4 +1,4 @@
-# React Developer Tools
+# React Developer Tools [![Build Status](https://travis-ci.org/facebook/react-devtools.svg?branch=master)](https://travis-ci.org/facebook/react-devtools)
 
 React Developer Tools is a system that allows you to inspect a React Renderer,
 including the Component hierarchy, props, state, and more.
