@@ -11,7 +11,7 @@
   "repository": "facebook/react-devtools",
   "scripts": {
     "lint": "./node_modules/.bin/eslint .",
-    "test": "jest --verbose",
+    "test": "node --harmony ./node_modules/.bin/jest --verbose",
     "typecheck": "flow check"
   },
   "jest": {
