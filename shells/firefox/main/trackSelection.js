@@ -10,7 +10,16 @@
 'use strict';
 
 const { Cu } = require('chrome');
-const { gDevTools } = Cu.import('resource:///modules/devtools/gDevTools.jsm', {});
+
+// The path to this file was moved in Firefox 44 and later.
+// See https://bugzil.la/912121 for more details.
+let gDevTools;
+try {
+  ({ gDevTools } = Cu.import('resource:///modules/devtools/client/framework/' +
+                             'gDevTools.jsm', {}));
+} catch (e) {
+  ({ gDevTools } = Cu.import('resource:///modules/devtools/gDevTools.jsm', {}));
+}
 
 /**
  * Whenever the devtools inspector panel selection changes, pass that node to
