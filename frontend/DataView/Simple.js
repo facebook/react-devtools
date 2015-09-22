@@ -141,7 +141,7 @@ Simple.propTypes = {
 };
 
 Simple.contextTypes = {
-  onChange: React.PropTypes.func.isRequired,
+  onChange: React.PropTypes.func,
 };
 
 var styles = {

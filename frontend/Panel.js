@@ -15,9 +15,11 @@ var Container = require('./Container');
 var Store = require('./Store');
 var keyboardNav = require('./keyboardNav');
 var invariant = require('./invariant');
+var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
+var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 
 var consts = require('../agent/consts');
 
@@ -44,7 +46,7 @@ class Panel extends React.Component {
   _keyListener: ?(e: DOMEvent) => void;
   _checkTimeout: ?number;
   _unMounted: boolean;
-  _bridge: ?Bridge;
+  _bridge: Bridge;
   _store: Store;
   _unsub: ?() => void;
 
@@ -55,6 +57,7 @@ class Panel extends React.Component {
     this.state = {loading: true, isReact: this.props.alreadyFoundReact};
     this._unMounted = false;
     window.panel = this;
+    this.plugins = [];
   }
 
   getChildContext(): Object {
@@ -141,6 +144,8 @@ class Panel extends React.Component {
   }
 
   teardown() {
+    this.plugins.forEach(p => p.teardown());
+    this.plugins = [];
     if (this._keyListener) {
       window.removeEventListener('keydown', this._keyListener);
       this._keyListener = null;
@@ -152,7 +157,6 @@ class Panel extends React.Component {
       this._teardownWall();
       this._teardownWall = null;
     }
-    this._bridge = null;
   }
 
   inject() {
@@ -161,12 +165,15 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge(wall);
 
-      if (this._bridge) {
-        this._store = new Store(this._bridge);
-      }
+      this._store = new Store(this._bridge);
+      var refresh = () => this.forceUpdate();
+      this.plugins = [
+        new RelayPlugin(this._store, this._bridge, refresh),
+      ];
       this._keyListener = keyboardNav(this._store, window);
 
       window.addEventListener('keydown', this._keyListener);
+
 
       this._store.on('connected', () => {
         this.setState({loading: false});
@@ -211,6 +218,11 @@ class Panel extends React.Component {
     if (!this.state.isReact) {
       return <div style={styles.loading}><h1>Looking for react...</h1></div>;
     }
+    var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
+    var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
+    if (this._store.capabilities.rnStyle) {
+      extraPanes.push(panelRNStyle(this._bridge));
+    }
     return (
       <Container
         reload={this.props.reload && this.reload.bind(this)}
@@ -239,7 +251,8 @@ class Panel extends React.Component {
             }];
           },
         }}
-        extraPanes={this._store.capabilities.rnStyle && [panelRNStyle(this._bridge)]}
+        extraPanes={extraPanes}
+        extraTabs={extraTabs}
       />
     );
   }

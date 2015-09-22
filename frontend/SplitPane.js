@@ -14,8 +14,16 @@ var React = require('react');
 var Draggable = require('./Draggable');
 var assign = require('object-assign');
 
+type Props = {
+  style: ?{[key: string]: any},
+  left: () => ReactElement,
+  right: () => ReactElement,
+  initialWidth: number,
+};
+
 class SplitPane extends React.Component {
-  constructor(props: Object) {
+  props: Props;
+  constructor(props: Props) {
     super(props);
     this.state = {
       width: props.initialWidth,
@@ -59,7 +67,6 @@ class SplitPane extends React.Component {
 var styles = {
   container: {
     display: 'flex',
-    fontFamily: 'sans-serif',
     minWidth: 0,
     flex: 1,
   },

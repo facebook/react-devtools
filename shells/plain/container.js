@@ -18,20 +18,22 @@ window.React = React;
 var Panel = require('../../frontend/Panel');
 
 var target: Object = document.getElementById('target');
-function inject(src, done) {
-  var script = target.contentDocument.createElement('script');
-  script.src = src;
-  script.onload = done;
-  target.contentDocument.body.appendChild(script);
-}
+
+var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
+var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
 
 var win = target.contentWindow;
 globalHook(win);
 
+var iframeSrc = document.getElementById('iframe-src');
+if (iframeSrc) {
+  win.document.documentElement.innerHTML = iframeSrc.textContent.replace(/&gt;/g, '>');
+}
+
 var config = {
   alreadyFoundReact: true,
   inject(done) {
-    inject('./build/backend.js', () => {
+    inject(devtoolsSrc, () => {
       var wall = {
         listen(fn) {
           win.parent.addEventListener('message', evt => fn(evt.data));
@@ -45,7 +47,26 @@ var config = {
   },
 };
 
-inject('../../test/example/build/target.js', () => {
+function inject(src, done) {
+  if (!src || src === 'false') {
+    return done();
+  }
+  var script = target.contentDocument.createElement('script');
+  script.src = src;
+  script.onload = done;
+  target.contentDocument.body.appendChild(script);
+}
+
+function injectMany(sources, done) {
+  if (sources.length === 1) {
+    return inject(sources[0], done);
+  }
+  inject(sources[0], () => injectMany(sources.slice(1), done));
+}
+
+var sources = appSrc.split('|');
+
+injectMany(sources, () => {
   var node = document.getElementById('container');
   React.render(<Panel {...config} />, node);
 });

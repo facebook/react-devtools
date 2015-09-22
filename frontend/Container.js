@@ -35,6 +35,7 @@ class Container extends React.Component {
         store: Object
       ) => ?Array<MenuItem>,
     },
+    extraTabs: {[key: string]: () => ReactElement},
   };
 
   render(): ReactElement {
@@ -50,9 +51,7 @@ class Container extends React.Component {
     };
     return (
       <div style={styles.container}>
-        <TabbedPane
-          tabs={tabs}
-        />
+        <TabbedPane tabs={tabs} />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
       </div>
     );

@@ -156,7 +156,7 @@ class Bridge {
     });
   }
 
-  call(name: string, args: any | Array<any>, cb: (val: any) => any) {
+  call(name: string, args: Array<any>, cb: (val: any) => any) {
     var _cid = this._cid++;
     this._cbs.set(_cid, cb);
 
@@ -187,11 +187,20 @@ class Bridge {
     });
   }
 
+  setInspectable(id: string, data: Object) {
+    var prev = this._inspectables.get(id);
+    if (!prev) {
+      this._inspectables.set(id, data);
+      return;
+    }
+    this._inspectables.set(id, {...prev, ...data});
+  }
+
   sendOne(evt: string, data: any) {
     var cleaned = [];
     var san = dehydrate(data, cleaned);
     if (cleaned.length) {
-      this._inspectables.set(data.id, data);
+      this.setInspectable(data.id, data);
     }
     this._wall.send({type: 'event', evt, data: san, cleaned});
   }
@@ -218,7 +227,7 @@ class Bridge {
       var cleaned = [];
       var san = dehydrate(data, cleaned);
       if (cleaned.length) {
-        this._inspectables.set(data.id, data);
+        this.setInspectable(data.id, data);
       }
       return {type: 'event', evt, data: san, cleaned};
     });

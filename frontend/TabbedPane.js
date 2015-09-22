@@ -38,7 +38,7 @@ class TabbedPane extends React.Component {
               style = assign({}, style, styles.lastTab);
             }
             return (
-              <li style={style} onClick={() => this.props.setSelectedTab(name)}>
+              <li key={name + i} style={style} onClick={() => this.props.setSelectedTab(name)}>
                 {name}
               </li>
             );
@@ -90,6 +90,14 @@ var styles = {
 
 module.exports = decorate({
   listeners: () => ['selectedTab'],
+  shouldUpdate: (props, prevProps) => {
+    for (var name in props) {
+      if (props[name] !== prevProps[name]) {
+        return true;
+      }
+    }
+    return false;
+  },
   props(store) {
     return {
       selected: store.selectedTab,
