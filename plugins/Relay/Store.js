@@ -70,13 +70,11 @@ class Store extends EventEmitter {
       });
     });
     bridge.on('relay:success', ({id, response, end}) => {
-      console.log('response', id, response);
       this.queries = this.queries.mergeIn([id], new Map({status: 'success', response, end}));
       this.emit('queries');
       this.emit(id);
     });
     bridge.on('relay:failure', ({id, error, end}) => {
-      console.log('error', id, error);
       this.queries = this.queries.mergeIn([id], new Map({status: 'failure', error, end}));
       this.emit('queries');
       this.emit(id);
