@@ -37,7 +37,7 @@ class DataView extends React.Component {
     }
     var names = Object.keys(data);
     if (!this.props.noSort) {
-      names.sort();
+      names.sort(alphanumericSort);
     }
     var path = this.props.path;
     if (!names.length) {
@@ -188,6 +188,17 @@ class DataItem extends React.Component {
       </li>
     );
   }
+}
+
+function alphanumericSort(a, b) {
+  if ('' + (+a) === a) {
+    if ('' + (+b) !== b) {
+      return -1;
+    }
+    a = +a;
+    b = +b;
+  }
+  return (a < b) ? -1 : 1;
 }
 
 var styles = {
