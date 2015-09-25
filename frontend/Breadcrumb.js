@@ -32,6 +32,7 @@ class Breadcrumb extends React.Component {
           return (
             <li
               style={style}
+              key={id}
               onMouseOver={() => this.props.hover(id, true)}
               onMouseOut={() => this.props.hover(id, false)}
               onClick={isSelected ? null : () => this.props.select(id)}
