@@ -71,7 +71,7 @@ function previewProp(val: any, nested: boolean) {
       );
     }
     if (type === 'object') {
-      return <span>{val[consts.name] + '{}'}</span>;
+      return <span>{val[consts.name] + '{…}'}</span>;
     }
     if (type === 'array') {
       return <span>Array[{val[consts.meta].length}]</span>;
