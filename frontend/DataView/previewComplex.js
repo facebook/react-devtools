@@ -38,7 +38,7 @@ function previewComplex(data: Object) {
   } else if (type === 'object') {
     return (
       <span style={valueStyles.object}>
-        {data[consts.name] + '{}'}
+        {data[consts.name] + '{…}'}
       </span>
     );
   } else if (type === 'symbol') {
