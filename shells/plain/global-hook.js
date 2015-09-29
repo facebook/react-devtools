@@ -12,4 +12,3 @@
 
 var globalHook = require('../../backend/GlobalHook');
 globalHook(window);
-

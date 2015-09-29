@@ -33,4 +33,3 @@ module.exports = function(name: string): Object {
   Wrapper.displayName = 'StoreProvider(' + name + ')';
   return Wrapper;
 };
-
