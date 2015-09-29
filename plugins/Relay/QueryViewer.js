@@ -23,16 +23,13 @@ class QueryViewer {
   };
   render(): ReactElement {
     var data = this.props.data;
-    var info = {
-    };
-    var type = data.get('type');
-    if (type === 'mutation') {
-      info.mutation = data.get('mutation');
-    } else {
-      info.query = data.get('query');
-    }
-    info.variables = data.get('variables');
     var status = data.get('status');
+    var info: {[key: string]: any} = {
+      text: data.get('text'),
+      variables: data.get('variables'),
+      type: data.get('type'),
+      status: status,
+    };
     if (status === 'success') {
       info.response = data.get('response');
     } else if (status === 'failure') {
