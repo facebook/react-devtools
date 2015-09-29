@@ -38,7 +38,8 @@ window.addEventListener('message', function(event) {
       if (evt.data.val) {
         React.render(<Panel alreadyFoundReact={true} {...config} />, node);
       } else {
-        node.innerHTML = '<h1 id="message">No react found on page...</h1>';
+        node.innerHTML =
+          '<h1 id="message">Unable to find React on the page.</h1>';
       }
     }
   };
