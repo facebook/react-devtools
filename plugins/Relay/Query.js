@@ -15,7 +15,7 @@ import type {Map} from 'immutable';
 var React = require('react');
 var assign = require('object-assign');
 
-class Query {
+class Query extends React.Component {
   props: {
     data: Map,
     onSelect: () => void,

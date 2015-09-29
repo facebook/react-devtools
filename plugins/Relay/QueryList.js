@@ -27,7 +27,6 @@ class QueryList {
     return (
       <ul style={styles.list}>
         {this.props.queries.valueSeq().map(q => (
-        // $FlowFixMe react element
           <Query
             data={q}
             key={q.get('id')}
