@@ -10,12 +10,13 @@
  */
 'use strict';
 
-var React = require('react');
 var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
-var invariant = require('./invariant');
+var DetailPane = require('./detail_pane/DetailPane');
+var React = require('react');
 
 var decorate = require('./decorate');
+var invariant = require('./invariant');
 
 class PropState extends React.Component {
   getChildContext() {
@@ -37,21 +38,17 @@ class PropState extends React.Component {
     if (nodeType === 'Text') {
       if (this.props.canEditTextContent) {
         return (
-          <div style={styles.container}>
+          <DetailPane>
             <BlurInput
               value={this.props.node.get('text')}
               onChange={this.props.onChangeText}
             />
-          </div>
+          </DetailPane>
         );
       }
-      return (
-        <div style={styles.container}>
-          Text node (no props/state)
-        </div>
-      );
+      return <DetailPane header="Text Node">No props/state.</DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <div style={styles.container}>Empty node (no props/state)</div>;
+      return <DetailPane header="Empty Node">No props/state.</DetailPane>;
     }
 
     var editTextContent = null;
@@ -71,14 +68,9 @@ class PropState extends React.Component {
     var propsReadOnly = !this.props.node.get('canUpdate');
 
     return (
-      <div style={styles.container}>
-        <div style={styles.header}>
-          <span style={styles.headerName}>
-            &lt;{this.props.node.get('name')}&gt;
-          </span>
-          {nodeType === 'Composite' &&
-            <span style={styles.consoleHint}>($r in the console)</span>}
-        </div>
+      <DetailPane
+        header={'<' + this.props.node.get('name') + '>'}
+        hint="($r in the console)">
         {editTextContent}
         <div style={styles.section}>
           <strong>Props</strong>
@@ -116,7 +108,7 @@ class PropState extends React.Component {
           </div>}
         {this.props.extraPanes &&
           this.props.extraPanes.map(fn => fn && fn(this.props.node, this.props.id))}
-      </div>
+      </DetailPane>
     );
   }
 }
@@ -159,46 +151,12 @@ var WrappedPropState = decorate({
 }, PropState);
 
 var styles = {
-  container: {
-    padding: 3,
-    fontSize: '11px',
-    // TODO figure out what font Chrome devtools uses on Windows
-    fontFamily: 'Menlo, Consolas, monospace',
-    overflow: 'auto',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-
-    cursor: 'default',
-    WebkitUserSelect: 'none',
-    MozUserSelect: 'none',
-    MsUserSelect: 'none',
-    userSelect: 'none',
-  },
-  header: {
-    flexShrink: 0,
-  },
-  headerName: {
-    flex: 1,
-    fontSize: 16,
-    color: 'rgb(184, 0, 161)',
-
-    cursor: 'text',
-    WebkitUserSelect: 'text',
-    MozUserSelect: 'text',
-    MsUserSelect: 'text',
-    userSelect: 'text',
-  },
   section: {
     marginBottom: 10,
     flexShrink: 0,
   },
   globalButton: {
     cursor: 'pointer',
-  },
-  consoleHint: {
-    float: 'right',
-    fontSize: 11,
   },
 };
 
