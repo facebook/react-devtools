@@ -18,7 +18,12 @@ var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var invariant = require('../../frontend/invariant');
 
-function getDataIDs(obj, collector) {
+function getDataIDs(obj): Array<string> {
+  var collector = [];
+  getDataIDsInternal(obj, collector);
+  return collector;
+}
+function getDataIDsInternal(obj, collector) {
   for (var name in obj) {
     if (name === 'id' && typeof obj[name] === 'string') {
       collector.push(obj[name]);
@@ -55,18 +60,21 @@ class Store extends EventEmitter {
     });
     this.queriesByDataID = {};
     // queries and mutations
-    bridge.on('relay:pending', data => {
-      this.queries = this.queries.set(data.id, new Map(data).set('status', 'pending'));
-      this.emit('queries');
-      this.emit(data.id);
-      var dataIDs = [];
-      getDataIDs(data.variables, dataIDs);
-      dataIDs.forEach(id => {
-        if (!this.queriesByDataID[id]) {
-          this.queriesByDataID[id] = [data.id];
-        } else {
-          this.queriesByDataID[id].push(data.id);
-        }
+    bridge.on('relay:pending', pendingQueries => {
+      pendingQueries.forEach(pendingQuery => {
+        this.queries = this.queries.set(
+          pendingQuery.id,
+          new Map(pendingQuery).set('status', 'pending')
+        );
+        this.emit('queries');
+        this.emit(pendingQuery.id);
+        getDataIDs(pendingQuery.variables).forEach(id => {
+          if (!this.queriesByDataID[id]) {
+            this.queriesByDataID[id] = [pendingQuery.id];
+          } else {
+            this.queriesByDataID[id].push(pendingQuery.id);
+          }
+        });
       });
     });
     bridge.on('relay:success', ({id, response, end}) => {
