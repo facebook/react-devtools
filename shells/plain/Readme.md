@@ -13,7 +13,7 @@ open `index.html`.
 Here's an overview of how things work:
 
 - the devtools ui loads
-- an iframe is greated, and the global (`__REACT_DEVTOOLS_GLOBAL_HOOK__`) is
+- an iframe is created, and the global (`__REACT_DEVTOOLS_GLOBAL_HOOK__`) is
   setup.
 - the inspection target script is added to the iframe (from `/test/example/`)
 - the devtools backend is added to the iframe
