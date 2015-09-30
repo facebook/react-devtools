@@ -27,9 +27,9 @@ class QueryViewer {
     var data = this.props.data;
     var status = data.get('status');
     var info: {[key: string]: any} = {
-      variables: data.get('variables'),
-      type: data.get('type'),
       status: status,
+      type: data.get('type'),
+      variables: data.get('variables'),
     };
     if (status === 'success') {
       info.response = data.get('response');
