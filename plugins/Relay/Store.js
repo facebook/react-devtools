@@ -88,7 +88,7 @@ class Store extends EventEmitter {
       }
       this.nodesToDataIDs[data.id] = new window.Set();
       for (var name in data.props) {
-        var id = data.props[name].__dataID__;
+        var id = data.props[name] && data.props[name].__dataID__;
         if (!id) {
           continue;
         }
@@ -105,7 +105,7 @@ class Store extends EventEmitter {
       }
       var newIds = new window.Set();
       for (var name in data.props) {
-        var id = data.props[name].__dataID__;
+        var id = data.props[name] && data.props[name].__dataID__;
         if (!id) {
           continue;
         }
