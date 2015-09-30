@@ -13,6 +13,7 @@
 var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
+var DetailPaneSection = require('./detail_pane/DetailPaneSection');
 var React = require('react');
 
 var decorate = require('./decorate');
@@ -27,7 +28,7 @@ class PropState extends React.Component {
     };
   }
 
-  render() {
+  render(): React.Element {
     if (!this.props.node) {
       // TODO(jared): style this
       return <span>No selection</span>;
@@ -72,9 +73,9 @@ class PropState extends React.Component {
         header={'<' + this.props.node.get('name') + '>'}
         hint="($r in the console)">
         {editTextContent}
-        <div style={styles.section}>
-          <strong>Props</strong>
-          {propsReadOnly && <em> read-only</em>}
+        <DetailPaneSection
+          hint={propsReadOnly ? 'read-only' : null}
+          title="Props">
           <DataView
             path={['props']}
             readOnly={propsReadOnly}
@@ -83,10 +84,10 @@ class PropState extends React.Component {
             key={this.props.id + '-props'}
             data={this.props.node.get('props')}
           />
-        </div>
+        </DetailPaneSection>
+
         {state &&
-          <div style={styles.section}>
-            <strong>State</strong>
+          <DetailPaneSection title="State">
             <DataView
               data={state}
               path={['state']}
@@ -94,10 +95,9 @@ class PropState extends React.Component {
               showMenu={this.props.showMenu}
               key={this.props.id + '-state'}
             />
-          </div>}
+          </DetailPaneSection>}
         {context &&
-          <div style={styles.section}>
-            <strong>Context</strong>
+          <DetailPaneSection title="Context">
             <DataView
               data={context}
               path={['context']}
@@ -105,7 +105,7 @@ class PropState extends React.Component {
               showMenu={this.props.showMenu}
               key={this.props.id + '-context'}
             />
-          </div>}
+          </DetailPaneSection>}
         {this.props.extraPanes &&
           this.props.extraPanes.map(fn => fn && fn(this.props.node, this.props.id))}
       </DetailPane>
@@ -149,15 +149,5 @@ var WrappedPropState = decorate({
     };
   },
 }, PropState);
-
-var styles = {
-  section: {
-    marginBottom: 10,
-    flexShrink: 0,
-  },
-  globalButton: {
-    cursor: 'pointer',
-  },
-};
 
 module.exports = WrappedPropState;
