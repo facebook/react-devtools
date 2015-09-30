@@ -12,9 +12,11 @@
 
 import type {Map} from 'immutable';
 
-var React = require('react');
-var decorate = require('../../frontend/decorate');
-var DataView = require('../../frontend/DataView/DataView');
+import DataView from '../../frontend/DataView/DataView';
+import React from 'react';
+
+import decorate from '../../frontend/decorate';
+import tidyGraphQL from './tidyGraphQL';
 
 class QueryViewer {
   props: {
@@ -23,16 +25,12 @@ class QueryViewer {
   };
   render(): ReactElement {
     var data = this.props.data;
-    var info = {
-    };
-    var type = data.get('type');
-    if (type === 'mutation') {
-      info.mutation = data.get('mutation');
-    } else {
-      info.query = data.get('query');
-    }
-    info.variables = data.get('variables');
     var status = data.get('status');
+    var info: {[key: string]: any} = {
+      status: status,
+      type: data.get('type'),
+      variables: data.get('variables'),
+    };
     if (status === 'success') {
       info.response = data.get('response');
     } else if (status === 'failure') {
@@ -46,6 +44,9 @@ class QueryViewer {
         </div>
         <div style={styles.duration}>
           {data.get('end') - data.get('start')}ms
+        </div>
+        <div style={styles.text}>
+          {tidyGraphQL(data.get('text'))}
         </div>
         <DataView
           data={info}
