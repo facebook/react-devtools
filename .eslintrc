@@ -18,6 +18,7 @@ rules:
   dot-notation: 2
   eol-last: 2
   indent: [2, 2, {SwitchCase: 1}]
+  jsx-quotes: 2
   no-multi-spaces: 2
   no-redeclare: 2
   no-shadow: 2
@@ -35,7 +36,6 @@ rules:
   react/display-name: 0
   react/jsx-boolean-value: [2, always]
   react/jsx-no-undef: 2
-  react/jsx-quotes: [2, double]
   react/jsx-sort-prop-types: 0
   react/jsx-sort-props: 0
   react/jsx-uses-react: 2
