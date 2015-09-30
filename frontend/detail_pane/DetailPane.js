@@ -43,7 +43,6 @@ var styles = {
     cursor: 'default',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
-    MsUserSelect: 'none',
     userSelect: 'none',
   },
   header: {
@@ -57,7 +56,6 @@ var styles = {
     cursor: 'text',
     WebkitUserSelect: 'text',
     MozUserSelect: 'text',
-    MsUserSelect: 'text',
     userSelect: 'text',
   },
   consoleHint: {

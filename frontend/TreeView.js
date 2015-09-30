@@ -99,7 +99,6 @@ var styles = {
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
-    MsUserSelect: 'none',
     userSelect: 'none',
   },
   scroll: {
