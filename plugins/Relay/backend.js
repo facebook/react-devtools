@@ -43,15 +43,14 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   var restore = [
     decorate(NetworkLayer, 'sendMutation', mut => {
       var id = makeId();
-      var start = Date.now();
-      bridge.send('relay:pending', {
+      bridge.send('relay:pending', [{
         id,
         type: 'mutation',
-        start,
+        start: Date.now(),
         text: mut.getQueryString(),
         variables: mut.getVariables(),
         name: mut.getDebugName(),
-      });
+      }]);
       mut.then(
         response => bridge.send('relay:success', {id, response: response.response, end: Date.now()}),
         error => bridge.send('relay:failure', {id, error, end: Date.now()})
