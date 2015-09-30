@@ -30,16 +30,16 @@ function tidyGraphQL(input: String): string {
 
     if (c == '{') {
       indent += '  ';
-      lastWasNewline = true
+      lastWasNewline = true;
 
-      head.push(line + '{')
+      head.push(line + '{');
       line = indent;
-      head = []
-      stack.push(head)
+      head = [];
+      stack.push(head);
     } else if (c == ',' && parenCount == 0) {
-      head.push(line)
+      head.push(line);
 
-      lastWasNewline = true
+      lastWasNewline = true;
       line = indent;
     } else if (c == '}') {
       indent = indent.substr(2);
