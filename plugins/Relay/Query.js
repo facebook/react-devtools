@@ -13,39 +13,43 @@
 import type {Map} from 'immutable';
 
 var React = require('react');
-var assign = require('object-assign');
 
 class Query extends React.Component {
   props: {
     data: Map,
+    oddRow: boolean,
     onSelect: () => void,
   };
   render(): ReactElement {
     var data = this.props.data;
     var containerStyle = styles.container;
     if (this.props.isSelected) {
-      containerStyle = {
-        ...styles.container,
-        ...styles.selectedContainer,
-      };
+      containerStyle = styles.containerSelected;
+    } else if (this.props.oddRow) {
+      containerStyle = styles.containeroOddRow;
     }
-    var statusStyle = assign({}, styles.status, {
-      backgroundColor: statusColors[data.get('status')] || statusColors.error,
-    });
+
+    var status = data.get('status');
+    var statusStyle = {
+      ...styles.status,
+      backgroundColor: statusColors[status] || statusColors.error,
+    };
 
     return (
-      <li onClick={this.props.onSelect} style={containerStyle}>
-        <div style={statusStyle} />
-        <div style={styles.name}>
+      <tr onClick={this.props.onSelect} style={containerStyle}>
+        <td style={styles.tdFirst}>
+          <span style={statusStyle} title={status} />
+        </td>
+        <td style={styles.tdName}>
           {data.get('name')}
-        </div>
-        <div style={styles.time}>
+        </td>
+        <td style={styles.td}>
           {new Date(data.get('start')).toLocaleTimeString()}
-        </div>
-        <div style={styles.duration}>
+        </td>
+        <td style={styles.td}>
           {data.get('end') - data.get('start')}ms
-        </div>
-      </li>
+        </td>
+      </tr>
     );
   }
 }
@@ -57,44 +61,53 @@ var statusColors = {
   error: '#aaa',
 };
 
+var baseContainer = {
+  cursor: 'pointer',
+  fontSize: 11,
+  height: 21,
+  lineHeight: '21px',
+  fontFamily: "'Lucida Grande', sans-serif",
+};
+
+var baseTD = {
+  whiteSpace: 'nowrap',
+  'padding': '1px 4px',
+  'lineHeight': '17px',
+  'borderLeft': '1px solid #e1e1e1',
+};
+
 var styles = {
-  container: {
-    padding: '10px 20px',
-    cursor: 'pointer',
-    display: 'flex',
-    fontSize: 14,
+  container: baseContainer,
+
+  containerSelected: {
+    ...baseContainer,
+    backgroundColor: '#3879d9',
+    color: 'white',
   },
 
-  selectedContainer: {
-    backgroundColor: '#eef',
+  containeroOddRow: {
+    ...baseContainer,
+    backgroundColor: '#f5f5f5',
   },
 
-  name: {
-    flex: 1,
-    fontSize: 16,
-    padding: 10,
+  td: baseTD,
+
+  tdFirst: {
+    ...baseTD,
+    borderLeft: '',
   },
 
-  time: {
-    padding: 10,
-  },
-
-  duration: {
-    padding: 10,
+  tdName: {
+    ...baseTD,
+    width: '100%',
   },
 
   status: {
-    width: 20,
-    height: 20,
-    margin: 10,
-    borderRadius: 25,
+    display: 'inline-block',
+    width: 11,
+    height: 11,
+    borderRadius: 6,
     backgroundColor: '#aaa',
-  },
-
-  text: {
-    whiteSpace: 'pre',
-    fontFamily: 'monospace',
-    flex: 1,
   },
 };
 
