@@ -12,7 +12,9 @@
 'use strict';
 
 var React = require('react/addons');
+
 var assign = require('object-assign');
+var guid = require('../../utils/guid');
 
 // Different test things
 
@@ -103,7 +105,7 @@ class LotsOfMounts {
     if (!node) {
       return null;
     }
-    var val = Math.random().toString(0x0f).slice(0, 20);
+    var val = guid();
     var div = document.createElement('div');
 
     node.appendChild(div);
