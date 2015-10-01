@@ -16,7 +16,7 @@ import type {Hook} from './types';
  * NOTE: This file cannot `require` any other modules. We `.toString()` the
  *       function in some places and inject the source into the page.
  */
-module.exports = function globalHook(window: Object) {
+function installGlobalHook(window: Object) {
   if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
     Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
       value: ({
@@ -59,3 +59,5 @@ module.exports = function globalHook(window: Object) {
     });
   }
 };
+
+module.exports = installGlobalHook;

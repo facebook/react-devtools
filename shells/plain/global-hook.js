@@ -10,5 +10,5 @@
  */
 'use strict';
 
-var globalHook = require('../../backend/GlobalHook');
-globalHook(window);
+var installGlobalHook = require('../../backend/installGlobalHook');
+installGlobalHook(window);

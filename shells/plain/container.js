@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react');
-var globalHook = require('../../backend/GlobalHook');
+var installGlobalHook = require('../../backend/installGlobalHook');
 
 window.React = React;
 
@@ -23,7 +23,7 @@ var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/ta
 var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
 
 var win = target.contentWindow;
-globalHook(win);
+installGlobalHook(win);
 
 var iframeSrc = document.getElementById('iframe-src');
 if (iframeSrc) {

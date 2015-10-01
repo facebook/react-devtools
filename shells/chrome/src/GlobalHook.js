@@ -13,7 +13,7 @@
 // Inject a `__REACT_DEVTOOLS_GLOBAL_HOOK__` global so that React can detect that the
 // devtools are installed (and skip its suggestion to install the devtools).
 
-var globalHook = require('../../../backend/GlobalHook.js');
+var installGlobalHook = require('../../../backend/installGlobalHook.js');
 
 var saveNativeValues = `
 window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate = Object.create;
@@ -23,7 +23,7 @@ window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet = Set;
 `;
 
 var js = (
-  ';(' + globalHook.toString() + '(window))'
+  ';(' + installGlobalHook.toString() + '(window))'
 );
 
 // This script runs before the <head> element is created, so we add the script

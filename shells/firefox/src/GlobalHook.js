@@ -10,8 +10,8 @@
  */
 'use strict';
 
-var globalHook = require('../../../backend/GlobalHook.js');
-var source = ';(' + globalHook.toString() + ')(window);';
+var installGlobalHook = require('../../../backend/installGlobalHook.js');
+var source = ';(' + installGlobalHook.toString() + ')(window);';
 
 var script = document.createElement('script');
 script.textContent = source;
