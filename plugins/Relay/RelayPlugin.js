@@ -51,7 +51,7 @@ class RelayPlugin {
     }
     return [
       (node, id) => (
-        <StoreWrapper store={this.relayStore}>
+        <StoreWrapper store={this.relayStore} key="relay">
           {() => <ElementPanel node={node} id={id} />}
         </StoreWrapper>
       ),
