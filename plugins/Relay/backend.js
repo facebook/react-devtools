@@ -13,6 +13,8 @@
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+import guid from '../../utils/guid';
+
 function decorate(obj, attr, fn) {
   var old = obj[attr];
   obj[attr] = function() {
@@ -21,10 +23,6 @@ function decorate(obj, attr, fn) {
     return res;
   };
   return () => (obj[attr] = old);
-}
-
-function makeId() {
-  return Math.random().toString(16);
 }
 
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
@@ -42,7 +40,7 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   bridge.send('relay:store', {id: 'relay:store', nodes: hook._relayInternals.DefaultStoreData.getNodeData()});
   var restore = [
     decorate(NetworkLayer, 'sendMutation', mut => {
-      var id = makeId();
+      var id = guid();
       bridge.send('relay:pending', [{
         id,
         type: 'mutation',
@@ -59,7 +57,7 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
 
     decorate(NetworkLayer, 'sendQueries', queries => {
       bridge.send('relay:pending', queries.map(q => {
-        var id = makeId();
+        var id = guid();
         q.then(
           response => bridge.send('relay:success', {id, response: response.response, end: Date.now()}),
           error => bridge.send('relay:failure', {id, error, end: Date.now()})

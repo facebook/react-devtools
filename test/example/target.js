@@ -12,7 +12,9 @@
 'use strict';
 
 var React = require('react');
+
 var assign = require('object-assign');
+var guid = require('../../utils/guid');
 
 class Todos extends React.Component {
   constructor(props) {
@@ -379,7 +381,7 @@ class Target extends React.Component {
     var count = this.state.num;
     var children = [];
     for (var i = 0; i < count; i++) {
-      children.push(<Target key={Math.random()} count={count - 1}/>);
+      children.push(<Target key={guid()} count={count - 1}/>);
     }
     return (
       <div style={{

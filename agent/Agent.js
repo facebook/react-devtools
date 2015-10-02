@@ -11,7 +11,9 @@
 'use strict';
 
 var {EventEmitter} = require('events');
+
 var assign = require('object-assign');
+var guid = require('../utils/guid');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -314,7 +316,7 @@ class Agent extends EventEmitter {
       return element;
     }
     if (!this.ids.has(element)) {
-      this.ids.set(element, randid());
+      this.ids.set(element, guid());
       this.reactElements.set(this.ids.get(element), element);
     }
     return this.ids.get(element);
@@ -365,10 +367,6 @@ class Agent extends EventEmitter {
     this.emit('unmount', id);
     this.ids.delete(component);
   }
-}
-
-function randid() {
-  return Math.random().toString(16).slice(2);
 }
 
 function getIn(base, path) {

@@ -12,6 +12,10 @@
 
 import type {Hook} from './types';
 
+/**
+ * NOTE: This file cannot `require` any other modules. We `.toString()` the
+ *       function in some places and inject the source into the page.
+ */
 module.exports = function globalHook(window: Object) {
   if (!window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
     Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
@@ -19,7 +23,7 @@ module.exports = function globalHook(window: Object) {
         _renderers: {},
         helpers: {},
         inject: function(renderer) {
-          var id = Math.random().toString(15).slice(10, 20);
+          var id = Math.random().toString(16).slice(2);
           this._renderers[id] = renderer;
           this.emit('renderer', {id, renderer});
         },
