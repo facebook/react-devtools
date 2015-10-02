@@ -94,8 +94,6 @@ var config: Props = {
   },
 };
 
-var globalHook = require('../../../backend/GlobalHook');
-globalHook(window);
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
