@@ -13,6 +13,8 @@
 import type {Map} from 'immutable';
 
 import DataView from '../../frontend/DataView/DataView';
+import DetailPane from '../../frontend/detail_pane/DetailPane';
+import DetailPaneSection from '../../frontend/detail_pane/DetailPaneSection';
 import React from 'react';
 
 import decorate from '../../frontend/decorate';
@@ -26,82 +28,70 @@ class QueryViewer {
   render(): ReactElement {
     var data = this.props.data;
     var status = data.get('status');
-    var info: {[key: string]: any} = {
-      status: status,
-      type: data.get('type'),
-      variables: data.get('variables'),
-    };
+
+    var resultBlock = null;
     if (status === 'success') {
-      info.response = data.get('response');
+      resultBlock =
+        <DetailPaneSection title="Response">
+          <DataView
+            data={data.get('response')}
+            readOnly={true}
+            showMenu={false}
+            inspect={this.props.inspect}
+            path={['response']}
+          />
+        </DetailPaneSection>;
     } else if (status === 'failure') {
-      info.error = data.get('error');
+      resultBlock =
+        <DetailPaneSection title="Error">
+          <DataView
+            data={data.get('error')}
+            readOnly={true}
+            showMenu={false}
+            inspect={this.props.inspect}
+            path={['error']}
+          />
+        </DetailPaneSection>;
     }
+
     return (
-      <div style={styles.container}>
-        <div style={styles.title}>{data.get('name')}</div>
-        <div style={styles.time}>
-          {new Date(data.get('start')).toLocaleTimeString()}
-        </div>
-        <div style={styles.duration}>
-          {data.get('end') - data.get('start')}ms
-        </div>
-        <div style={styles.text}>
-          {tidyGraphQL(data.get('text'))}
-        </div>
-        <DataView
-          data={info}
-          noSort={true}
-          readOnly={true}
-          showMenu={false}
-          inspect={this.props.inspect}
-          path={[]}
-        />
-      </div>
+      <DetailPane header={data.get('type') + ': ' + data.get('name')}>
+        <DetailPaneSection title="Start">
+          <div>
+            {new Date(data.get('start')).toLocaleTimeString()}
+          </div>
+        </DetailPaneSection>
+        <DetailPaneSection title="Status">
+          <div>
+            {status}
+          </div>
+        </DetailPaneSection>
+        <DetailPaneSection title="Duration">
+          <div>
+            {data.get('end') - data.get('start')}ms
+          </div>
+        </DetailPaneSection>
+        <DetailPaneSection title="Query">
+          <div style={styles.text}>
+            {tidyGraphQL(data.get('text'))}
+          </div>
+        </DetailPaneSection>
+        <DetailPaneSection title="Variables">
+          <DataView
+            data={data.get('variables')}
+            readOnly={true}
+            showMenu={false}
+            inspect={this.props.inspect}
+            path={['variables']}
+          />
+        </DetailPaneSection>
+        {resultBlock}
+      </DetailPane>
     );
   }
 }
 
 var styles = {
-  container: {
-    padding: '10px 20px',
-    display: 'flex',
-    flexDirection: 'column',
-    overflow: 'auto',
-    minHeight: 0,
-    flex: 1,
-  },
-
-  title: {
-    fontSize: 20,
-    color: '#666',
-    marginBottom: 15,
-  },
-
-  name: {
-  },
-
-  time: {
-    padding: 10,
-  },
-
-  duration: {
-    padding: 10,
-  },
-
-  status: {
-    width: 20,
-    height: 20,
-    margin: 10,
-    borderRadius: 25,
-    backgroundColor: '#aaa',
-  },
-
-  variables: {
-    whiteSpace: 'pre',
-    fontFamily: 'monospace',
-    wordWrap: 'break-word',
-  },
-
   text: {
     whiteSpace: 'pre',
     fontFamily: 'monospace',
