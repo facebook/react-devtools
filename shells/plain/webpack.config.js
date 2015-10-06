@@ -14,7 +14,6 @@ module.exports = {
   entry: {
     backend: './backend.js',
     container: './container.js',
-    globalHook: './global-hook.js',
   },
   output: {
     path: __dirname + '/build',
