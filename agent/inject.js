@@ -10,18 +10,10 @@
  */
 'use strict';
 
-import type {DataType, RendererID, OpaqueNodeHandle, Helpers, Hook} from '../backend/types';
+import type {Hook} from '../backend/types';
+import type Agent from './Agent';
 
 var setupBackend = require('../backend/backend');
-
-type Agent = {
-  addRoot: (renderer: RendererID, el: OpaqueNodeHandle) => void,
-  onMounted: (renderer: RendererID, el: OpaqueNodeHandle, data: DataType) => void,
-  onUpdated: (el: OpaqueNodeHandle, data: DataType) => void,
-  onUnmounted: (el: OpaqueNodeHandle) => void,
-  setReactInternals: (renderer: RendererID, internals: Helpers) => void,
-  on: (evt: string, fn: (...args: Array<any>) => any) => any,
-};
 
 module.exports = function(hook: Hook, agent: Agent) {
   var subs = [
