@@ -22,11 +22,9 @@ module.exports = {
 
   module: {
     loaders: [{
-      test: /\.jsx?$/,
+      test: /\.js$/,
       loader:  'babel-loader?stage=0',
-      exclude: [
-        'node_modules',
-      ],
+      exclude: /node_modules/,
     }],
   },
 };
