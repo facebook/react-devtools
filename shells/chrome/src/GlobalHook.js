@@ -14,6 +14,7 @@
 // devtools are installed (and skip its suggestion to install the devtools).
 
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
+var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
 
 var saveNativeValues = `
 window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate = Object.create;
@@ -23,7 +24,9 @@ window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet = Set;
 `;
 
 var js = (
-  ';(' + installGlobalHook.toString() + '(window))'
+  ';(' + installGlobalHook.toString() + '(window))' +
+  ';(' + installRelayHook.toString() + '(window))' +
+  saveNativeValues
 );
 
 // This script runs before the <head> element is created, so we add the script
