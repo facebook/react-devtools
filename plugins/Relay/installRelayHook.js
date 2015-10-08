@@ -15,6 +15,8 @@
  *       function in some places and inject the source into the page.
  */
 function installRelayHook(window: Object) {
+  const TEXT_CHUNK_LENGTH = 500;
+
   var hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
   if (!hook) {
     return;
@@ -74,11 +76,17 @@ function installRelayHook(window: Object) {
         });
       },
     );
+    const textChunks = [];
+    let text = request.getQueryString();
+    while (text.length > 0) {
+      textChunks.push(text.substr(0, TEXT_CHUNK_LENGTH));
+      text = text.substr(TEXT_CHUNK_LENGTH);
+    }
     return {
       id: id,
       name: request.getDebugName(),
       start: performance.now(),
-      text: request.getQueryString(),
+      text: textChunks,
       type: type,
       variables: request.getVariables(),
     };

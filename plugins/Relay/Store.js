@@ -64,7 +64,11 @@ class Store extends EventEmitter {
       pendingQueries.forEach(pendingQuery => {
         this.queries = this.queries.set(
           pendingQuery.id,
-          new Map(pendingQuery).set('status', 'pending')
+          new Map({
+            ...pendingQuery,
+            status: 'pending',
+            text: pendingQuery.text.join(''),
+          })
         );
         this.emit('queries');
         this.emit(pendingQuery.id);
