@@ -20,6 +20,7 @@ const ReactPanel = Class({
   label: 'React',
   tooltip: 'Debug & Develop React Apps',
   icon: './tool-react.png',
+  invertIconForLightTheme: true,
   url: './panel.html',
   setup(options) {
     // this.debuggee = options.debuggee;
