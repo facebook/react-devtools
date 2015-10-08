@@ -24,34 +24,46 @@ class QueryList {
   };
 
   render() {
+    if (!this.props.queries.count()) {
+      return <div style={styles.empty}>No Relay Queries logged</div>;
+    }
+    var rows = this.props.queries.valueSeq().map((q, i) => (
+      <Query
+        data={q}
+        isSelected={q.get('id') === this.props.selectedQuery}
+        key={q.get('id')}
+        oddRow={(i % 2) === 1}
+        onSelect={() => this.props.selectQuery(q.get('id'))}
+      />
+    )).toArray();
+
     return (
-      <ul style={styles.list}>
-        {this.props.queries.valueSeq().map(q => (
-          <Query
-            data={q}
-            key={q.get('id')}
-            isSelected={q.get('id') === this.props.selectedQuery}
-            onSelect={() => this.props.selectQuery(q.get('id'))}
-          />
-        )).toArray()}
-        {!this.props.queries.count() &&
-          <li style={styles.empty}>No Relay Queries logged</li>}
-      </ul>
+      <div style={styles.container}>
+      <table style={styles.table}>
+        <tbody>
+          {rows}
+        </tbody>
+      </table>
+      </div>
     );
   }
 }
 
 var styles = {
-  list: {
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    overflow: 'auto',
-    minHeight: 0,
+  container: {
+    position: 'relative',
     flex: 1,
+    overflow: 'scroll',
+  },
+
+  table: {
+    flex: 1,
+    borderCollapse: 'collapse',
+    width: '100%',
   },
 
   empty: {
+    flex: 1,
     padding: 50,
     textAlign: 'center',
   },
