@@ -76,11 +76,11 @@ function installRelayHook(window: Object) {
     );
     return {
       id: id,
-      type: type,
+      name: request.getDebugName(),
       start: Date.now(),
       text: request.getQueryString(),
+      type: type,
       variables: request.getVariables(),
-      name: request.getDebugName(),
     };
   }
 
