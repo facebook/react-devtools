@@ -60,6 +60,7 @@ function installRelayHook(window: Object) {
 
   function recordRequest(
     type: 'mutation' | 'query',
+    start: number,
     request,
     requestNumber: number,
   ) {
@@ -90,7 +91,7 @@ function installRelayHook(window: Object) {
       id: id,
       name: request.getDebugName(),
       requestNumber: requestNumber,
-      start: performance.now(),
+      start: start,
       text: textChunks,
       type: type,
       variables: request.getVariables(),
@@ -106,15 +107,16 @@ function installRelayHook(window: Object) {
       requestNumber++;
       emit(
         'relay:pending',
-        [recordRequest('mutation', mutation, requestNumber)]
+        [recordRequest('mutation', performance.now(), mutation, requestNumber)]
       );
     });
 
     decorate(NetworkLayer, 'sendQueries', queries => {
       requestNumber++;
+      const start = performance.now();
       emit(
         'relay:pending',
-        queries.map(query => recordRequest('query', query, requestNumber))
+        queries.map(query => recordRequest('query', start, query, requestNumber))
       );
     });
 
