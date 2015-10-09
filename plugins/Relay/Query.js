@@ -46,9 +46,6 @@ class Query extends React.Component {
         <td style={styles.tdName}>
           {data.get('name')}
         </td>
-        <td style={styles.tdName}>
-          {data.get('requestNumber')}
-        </td>
         <td style={styles.td}>
           {Math.round(start) / 1000}s
         </td>

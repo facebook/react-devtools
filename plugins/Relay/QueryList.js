@@ -27,15 +27,34 @@ class QueryList extends React.Component {
     if (!this.props.queries.count()) {
       return <div style={styles.empty}>No Relay Queries logged</div>;
     }
-    var rows = this.props.queries.valueSeq().map((q, i) => (
-      <Query
-        data={q}
-        isSelected={q.get('id') === this.props.selectedQuery}
-        key={q.get('id')}
-        oddRow={(i % 2) === 1}
-        onSelect={() => this.props.selectQuery(q.get('id'))}
-      />
-    )).toArray();
+
+    const rows = [];
+    let odd = false;
+    let lastRequestNumber = -1;
+    this.props.queries.forEach(query => {
+      const requestNumber = query.get('requestNumber');
+      if (lastRequestNumber !== requestNumber) {
+        lastRequestNumber = requestNumber
+        rows.push(
+          <tr key={'request' + requestNumber}>
+            <td colSpan="4" style={styles.grouper}>
+              Request {requestNumber}
+            </td>
+          </tr>
+        );
+        odd = false;
+      }
+      rows.push(
+        <Query
+          data={query}
+          isSelected={query.get('id') === this.props.selectedQuery}
+          key={query.get('id')}
+          oddRow={odd}
+          onSelect={() => this.props.selectQuery(query.get('id'))}
+        />
+      );
+      odd = !odd;
+    });
 
     return (
       <div style={styles.container}>
@@ -60,6 +79,11 @@ var styles = {
     flex: 1,
     borderCollapse: 'collapse',
     width: '100%',
+  },
+
+  grouper: {
+    fontWeight: 'bold',
+    fontSize: 10,
   },
 
   empty: {
