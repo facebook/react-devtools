@@ -13,6 +13,18 @@
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+function decorate(obj, attr, fn) {
+  var old = obj[attr];
+  obj[attr] = function() {
+    var res = old.apply(this, arguments);
+    fn.apply(this, arguments);
+    return res;
+  };
+  return () => {
+    obj[attr] = old;
+  };
+}
+
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   var shouldEnable = !!(
     hook._relayInternals &&
@@ -28,7 +40,17 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
     setRequestListener,
   } = hook._relayInternals;
 
-  bridge.send('relay:store', {id: 'relay:store', nodes: DefaultStoreData.getNodeData()});
+  function sendStoreData() {
+    bridge.send('relay:store', {
+      id: 'relay:store',
+      nodes: DefaultStoreData.getNodeData(),
+    });
+  }
+
+  sendStoreData();
+  decorate(DefaultStoreData, 'handleUpdatePayload', sendStoreData);
+  decorate(DefaultStoreData, 'handleQueryPayload', sendStoreData);
+
   var removeListener = setRequestListener((event, data) => {
     bridge.send(event, data);
   });
