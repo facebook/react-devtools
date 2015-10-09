@@ -35,6 +35,9 @@ class Query extends React.Component {
       backgroundColor: statusColors[status] || statusColors.error,
     };
 
+    const start = data.get('start');
+    const end = data.get('end');
+
     return (
       <tr onClick={this.props.onSelect} style={containerStyle}>
         <td style={styles.tdFirst}>
@@ -44,10 +47,10 @@ class Query extends React.Component {
           {data.get('name')}
         </td>
         <td style={styles.td}>
-          {new Date(data.get('start')).toLocaleTimeString()}
+          {Math.round(start) / 1000}s
         </td>
         <td style={styles.td}>
-          {data.get('end') - data.get('start')}ms
+          {Math.round(end - start)}ms
         </td>
       </tr>
     );

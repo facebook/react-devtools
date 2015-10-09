@@ -62,14 +62,14 @@ function installRelayHook(window: Object) {
       response => {
         emit('relay:success', {
           id: id,
-          end: Date.now(),
+          end: performance.now(),
           response: response.response,
         });
       },
       error => {
         emit('relay:failure', {
           id: id,
-          end: Date.now(),
+          end: performance.now(),
           error: error,
         });
       },
@@ -77,7 +77,7 @@ function installRelayHook(window: Object) {
     return {
       id: id,
       name: request.getDebugName(),
-      start: Date.now(),
+      start: performance.now(),
       text: request.getQueryString(),
       type: type,
       variables: request.getVariables(),

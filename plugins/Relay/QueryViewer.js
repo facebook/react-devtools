@@ -54,11 +54,14 @@ class QueryViewer {
         </DetailPaneSection>;
     }
 
+    const start = data.get('start');
+    const end = data.get('end');
+
     return (
       <DetailPane header={data.get('type') + ': ' + data.get('name')}>
         <DetailPaneSection title="Start">
           <div>
-            {new Date(data.get('start')).toLocaleTimeString()}
+            {Math.round(start) / 1000}s since page load
           </div>
         </DetailPaneSection>
         <DetailPaneSection title="Status">
@@ -68,7 +71,7 @@ class QueryViewer {
         </DetailPaneSection>
         <DetailPaneSection title="Duration">
           <div>
-            {data.get('end') - data.get('start')}ms
+            {Math.round(end - start)}ms
           </div>
         </DetailPaneSection>
         <DetailPaneSection title="Query">
