@@ -25,6 +25,8 @@ function decorate(obj, attr, fn) {
   };
 }
 
+let subscriptionEnabled = false;
+
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   var shouldEnable = !!(
     hook._relayInternals &&
@@ -41,11 +43,22 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   } = hook._relayInternals;
 
   function sendStoreData() {
-    bridge.send('relay:store', {
-      id: 'relay:store',
-      nodes: DefaultStoreData.getNodeData(),
-    });
+    if (subscriptionEnabled) {
+      bridge.send('relay:store', {
+        id: 'relay:store',
+        nodes: DefaultStoreData.getNodeData(),
+      });
+    }
   }
+
+  bridge.onCall('relay:store:enable', () => {
+    subscriptionEnabled = true;
+    sendStoreData();
+  });
+
+  bridge.onCall('relay:store:disable', () => {
+    subscriptionEnabled = false;
+  });
 
   sendStoreData();
   decorate(DefaultStoreData, 'handleUpdatePayload', sendStoreData);

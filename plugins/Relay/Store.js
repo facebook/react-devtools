@@ -38,6 +38,7 @@ class Store extends EventEmitter {
   storeData: ?{
     nodes: any,
   };
+  storeDateSubscriptionCount: number;
   dataIDsToNodes: Map;
   selectedDataNode: string;
   nodesToDataIDs: Map;
@@ -49,6 +50,7 @@ class Store extends EventEmitter {
   constructor(bridge: Bridge, mainStore: Object) {
     super();
     this.storeData = null;
+    this.storeDateSubscriptionCount = 0;
     this.selectedQuery = null;
     this.queries = new OrderedMap();
     this._bridge = bridge;
@@ -184,7 +186,23 @@ class Store extends EventEmitter {
     });
   }
 
-  off(evt: string, fn: () => void) {
+  on(evt: string, fn: () => void): any {
+    if (evt === 'storeData') {
+      this.storeDateSubscriptionCount++;
+      if (this.storeDateSubscriptionCount === 1) {
+        this._bridge.call('relay:store:enable', [], () => {});
+      }
+    }
+    this.addListener(evt, fn);
+  }
+
+  off(evt: string, fn: () => void): void {
+    if (evt === 'storeData') {
+      this.storeDateSubscriptionCount--;
+      if (this.storeDateSubscriptionCount === 0) {
+        this._bridge.call('relay:store:disable', [], () => {});
+      }
+    }
     this.removeListener(evt, fn);
   }
 
