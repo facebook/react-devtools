@@ -49,7 +49,10 @@
             var fs = require('fs');
             var path = require('path');
             var backendScript = fs.readFileSync(path.join(__dirname, 'build', 'backend.js'), 'utf8')
-            require('./node').startServer(backendScript);
+            require('./node')
+                .setContentDOMNode(document.getElementById('container'))
+                .setBackendScript(backendScript)
+                .startServer();
         </script>
     </body>
 </html>

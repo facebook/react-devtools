@@ -16,7 +16,8 @@ installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
-var node = document.getElementById('container');
+var node = null;
+var backendScript = null;
 var wall = null;
 
 var config = {
@@ -40,7 +41,7 @@ function onDisconnected() {
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 }
 
-function initialize(socket, backendScript) {
+function initialize(socket) {
   socket.send('eval:' + backendScript);
   var listeners = [];
   socket.onmessage = (evt) => {
@@ -53,7 +54,7 @@ function initialize(socket, backendScript) {
       onDisconnected();
       socket.onmessage = (msg) => {
         if (msg.data === 'attach:agent') {
-          initialize(socket, backendScript);
+          initialize(socket);
         }
       };
       return;
@@ -83,11 +84,11 @@ function initialize(socket, backendScript) {
 /**
  * This is the normal mode, where it connects to the react native packager
  */
-function connectToSocket(backendScript) {
+function connectToSocket() {
   var socket = ws.connect('ws://localhost:8081/devtools');
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
-      initialize(socket, backendScript);
+      initialize(socket);
     }
   };
   socket.onerror = (err) => {
@@ -103,7 +104,7 @@ function connectToSocket(backendScript) {
 /**
  * When the Electron app is running in "server mode"
  */
-function startServer(backendScript) {
+function startServer() {
   var server = new ws.Server({port: 8097});
   var connected = false;
   server.on('connection', (socket) => {
@@ -123,11 +124,23 @@ function startServer(backendScript) {
       onDisconnected();
       console.log('Connection to RN closed');
     };
-    initialize(socket, backendScript);
+    initialize(socket);
   });
 }
 
-module.exports = {
+var DevtoolsUI = {
+  setBackendScript(_backendScript) {
+    backendScript = _backendScript;
+    return DevtoolsUI;
+  },
+
+  setContentDOMNode(_node) {
+    node = _node;
+    return DevtoolsUI;
+  },
+
   startServer,
   connectToSocket,
 };
+
+module.exports = DevtoolsUI;
