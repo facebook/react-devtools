@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>React Electron App</title>
+        <meta charset=utf8>
+        <style>
+            html {
+                display: flex;
+                font-family: sans-serif;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                flex: 1;
+                display: flex;
+            }
+            #container {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: white;
+            }
+            #logs {
+                position: fixed;
+                top: 0;
+                left: 0;
+                white-space: pre;
+            }
+            #waiting {
+                text-align: center;
+                font-family: sans-serif;
+                flex: 1;
+                padding: 30px;
+                color: #aaa;
+            }
+        </style>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <div id="container">
+            <h2 id="waiting">Waiting for a connection from React Native</h2>
+        </div>
+        <script>
+            require('babel-core').register({stage: 0});
+            require('./node');
+        </script>
+    </body>
+</html>
