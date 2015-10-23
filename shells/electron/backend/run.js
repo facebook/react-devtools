@@ -6,14 +6,14 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * global: FOR_BACKEND
  * @flow
  */
+
 'use strict';
 
 declare var FOR_BACKEND: {
-  wall: Object,
-  resolveRNStyle: () => void,
+  wall: Object;
+  resolveRNStyle: () => void;
 };
 
 window.performance = {
@@ -47,11 +47,11 @@ if (FOR_BACKEND.resolveRNStyle) {
   setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
 }
 
-var _connectTimeout = setTimeout(function () {
-  console.error('react-devtools agent got no connection');
+var _connectTimeout = setTimeout(() => {
+  console.warn('react-devtools agent got no connection');
 }, 20000);
 
-agent.once('connected', function () {
+agent.once('connected', () => {
   if (!agent) {
     return;
   }

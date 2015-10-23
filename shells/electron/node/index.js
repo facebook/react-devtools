@@ -40,22 +40,22 @@ function reload() {
 function onDisconnected() {
   React.unmountComponentAtNode(node);
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
-};
+}
 
 function initialize(socket) {
-  fs.readFile(path.join(__dirname, '/../build/backend.js'), function (err, backendScript) {
+  fs.readFile(path.join(__dirname, '/../build/backend.js'), (err, backendScript) => {
     if (err) {
       return console.error('failed to load...', err);
     }
     socket.send('eval:' + backendScript.toString('utf8'));
     var listeners = [];
-    socket.onmessage = function (evt) {
+    socket.onmessage = (evt) => {
       var data = JSON.parse(evt.data);
       if (data.$close || data.$error) {
         console.log('Closing or Erroring');
         onDisconnected();
-        socket.onmessage = evt => {
-          if (evt.data === 'attach:agent') {
+        socket.onmessage = (msg) => {
+          if (msg.data === 'attach:agent') {
             initialize(socket);
           }
         };
@@ -64,7 +64,7 @@ function initialize(socket) {
       if (data.$open) {
         return; // ignore
       }
-      listeners.forEach(function (fn) {fn(data); });
+      listeners.forEach((fn) => fn(data));
     };
 
     wall = {
@@ -87,42 +87,42 @@ function initialize(socket) {
 /**
  * This is the normal mode, where it connects to the react native packager
  */
-window.connectToSocket = function () {
+window.connectToSocket = () => {
   var socket = ws.connect('ws://localhost:8081/devtools');
-  socket.onmessage = evt => {
+  socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
       initialize(socket);
     }
   };
-  socket.onerror = function (err) {
+  socket.onerror = (err) => {
     onDisconnected();
     console.log('Error with websocket connection', err);
   };
-  socket.onclose = function () {
+  socket.onclose = () => {
     onDisconnected();
     console.log('Connection to RN closed');
   };
-}
+};
 
 /**
  * When the Electron app is running in "server mode"
  */
-window.startServer = function () {
-  var server = new ws.Server({port: 8097})
+window.startServer = () => {
+  var server = new ws.Server({port: 8097});
   var connected = false;
-  server.on('connection', function (socket) {
+  server.on('connection', (socket) => {
     if (connected) {
       console.warn('only one connection allowed at a time');
       socket.close();
       return;
     }
     connected = true;
-    socket.onerror = function (err) {
+    socket.onerror = (err) => {
       connected = false;
       onDisconnected();
       console.log('Error with websocket connection', err);
     };
-    socket.onclose = function () {
+    socket.onclose = () => {
       connected = false;
       onDisconnected();
       console.log('Connection to RN closed');
