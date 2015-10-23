@@ -13,8 +13,8 @@ var ws = require('ws');
 var fs = require('fs');
 var path = require('path');
 
-var globalHook = require('../../../backend/GlobalHook');
-globalHook(window);
+var installGlobalHook = require('../../../backend/installGlobalHook');
+installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
@@ -42,7 +42,7 @@ function onDisconnected() {
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 };
 
-function initialize() {
+function initialize(socket) {
   fs.readFile(path.join(__dirname, '/../build/backend.js'), function (err, backendScript) {
     if (err) {
       return console.error('failed to load...', err);
@@ -131,3 +131,4 @@ window.startServer = function () {
   });
 };
 
+window.startServer();

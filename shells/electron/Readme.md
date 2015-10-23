@@ -6,6 +6,7 @@ websocket.
 
 You'll need webpack, and [electron](http://electron.atom.io/#get-started) (`npm install electron-prebuilt -g`).
 
+- `npm install`
 - `webpack`
 - `electron .`
 

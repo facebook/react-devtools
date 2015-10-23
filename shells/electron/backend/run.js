@@ -19,9 +19,9 @@ declare var FOR_BACKEND: {
 window.performance = {
   now: () => Date.now(),
 };
-var globalHook = require('../../../backend/GlobalHook.js');
 
-globalHook(window);
+var installGlobalHook = require('../../../backend/installGlobalHook.js');
+installGlobalHook(window);
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
@@ -37,8 +37,7 @@ FOR_BACKEND.wall.onClose(() => {
   console.log('closing devtools');
 });
 
-var bridge = new Bridge();
-bridge.attach(FOR_BACKEND.wall);
+var bridge = new Bridge(FOR_BACKEND.wall);
 var agent = new Agent(window, {
   rnStyle: !!FOR_BACKEND.resolveRNStyle,
 });
