@@ -44,15 +44,21 @@
             <h2 id="waiting">Waiting for a connection from React Native</h2>
         </div>
         <script>
+            /*
             require('babel-core').register({stage: 0});
 
             var fs = require('fs');
             var path = require('path');
-            var backendScript = fs.readFileSync(path.join(__dirname, 'build', 'backend.js'), 'utf8')
+            var backendScript = fs.readFileSync(path.join(__dirname, 'build', 'backend.js'), 'utf8');
             require('./node')
                 .setContentDOMNode(document.getElementById('container'))
                 .setBackendScript(backendScript)
                 .startServer();
+            /*/
+            require('./build/standalone.js')
+                .setContentDOMNode(document.getElementById('container'))
+                .startServer();
+            //*/
         </script>
     </body>
 </html>
