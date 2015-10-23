@@ -10,8 +10,6 @@
 'use strict';
 
 var ws = require('ws');
-var fs = require('fs');
-var path = require('path');
 
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
@@ -42,56 +40,54 @@ function onDisconnected() {
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 }
 
-function initialize(socket) {
-  fs.readFile(path.join(__dirname, '/../build/backend.js'), (err, backendScript) => {
-    if (err) {
-      return console.error('failed to load...', err);
+function initialize(socket, backendScript) {
+  socket.send('eval:' + backendScript);
+  var listeners = [];
+  socket.onmessage = (evt) => {
+    if (evt.data === 'attach:agent') {
+      return;
     }
-    socket.send('eval:' + backendScript.toString('utf8'));
-    var listeners = [];
-    socket.onmessage = (evt) => {
-      var data = JSON.parse(evt.data);
-      if (data.$close || data.$error) {
-        console.log('Closing or Erroring');
-        onDisconnected();
-        socket.onmessage = (msg) => {
-          if (msg.data === 'attach:agent') {
-            initialize(socket);
-          }
-        };
-        return;
-      }
-      if (data.$open) {
-        return; // ignore
-      }
-      listeners.forEach((fn) => fn(data));
-    };
+    var data = JSON.parse(evt.data);
+    if (data.$close || data.$error) {
+      console.log('Closing or Erroring');
+      onDisconnected();
+      socket.onmessage = (msg) => {
+        if (msg.data === 'attach:agent') {
+          initialize(socket, backendScript);
+        }
+      };
+      return;
+    }
+    if (data.$open) {
+      return; // ignore
+    }
+    listeners.forEach((fn) => fn(data));
+  };
 
-    wall = {
-      listen(fn) {
-        listeners.push(fn);
-      },
-      send(data) {
-        socket.send(JSON.stringify(data));
-      },
-      disconnect() {
-        socket.close();
-      },
-    };
+  wall = {
+    listen(fn) {
+      listeners.push(fn);
+    },
+    send(data) {
+      socket.send(JSON.stringify(data));
+    },
+    disconnect() {
+      socket.close();
+    },
+  };
 
-    console.log('connected');
-    reload();
-  });
+  console.log('connected');
+  reload();
 }
 
 /**
  * This is the normal mode, where it connects to the react native packager
  */
-window.connectToSocket = () => {
+window.connectToSocket = (backendScript) => {
   var socket = ws.connect('ws://localhost:8081/devtools');
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
-      initialize(socket);
+      initialize(socket, backendScript);
     }
   };
   socket.onerror = (err) => {
@@ -107,7 +103,7 @@ window.connectToSocket = () => {
 /**
  * When the Electron app is running in "server mode"
  */
-window.startServer = () => {
+window.startServer = (backendScript) => {
   var server = new ws.Server({port: 8097});
   var connected = false;
   server.on('connection', (socket) => {
@@ -127,8 +123,6 @@ window.startServer = () => {
       onDisconnected();
       console.log('Connection to RN closed');
     };
-    initialize(socket);
+    initialize(socket, backendScript);
   });
 };
-
-window.startServer();

@@ -46,6 +46,11 @@
         <script>
             require('babel-core').register({stage: 0});
             require('./node');
+
+            var fs = require('fs');
+            var path = require('path');
+            var backendScript = fs.readFileSync(path.join(__dirname, 'build', 'backend.js'), 'utf8')
+            startServer(backendScript);
         </script>
     </body>
 </html>
