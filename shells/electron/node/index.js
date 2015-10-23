@@ -83,7 +83,7 @@ function initialize(socket, backendScript) {
 /**
  * This is the normal mode, where it connects to the react native packager
  */
-window.connectToSocket = (backendScript) => {
+function connectToSocket(backendScript) {
   var socket = ws.connect('ws://localhost:8081/devtools');
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
@@ -98,12 +98,12 @@ window.connectToSocket = (backendScript) => {
     onDisconnected();
     console.log('Connection to RN closed');
   };
-};
+}
 
 /**
  * When the Electron app is running in "server mode"
  */
-window.startServer = (backendScript) => {
+function startServer(backendScript) {
   var server = new ws.Server({port: 8097});
   var connected = false;
   server.on('connection', (socket) => {
@@ -125,4 +125,9 @@ window.startServer = (backendScript) => {
     };
     initialize(socket, backendScript);
   });
+}
+
+module.exports = {
+  startServer,
+  connectToSocket,
 };
