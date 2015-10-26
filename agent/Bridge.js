@@ -13,6 +13,7 @@
 var consts = require('./consts');
 var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
+var performanceNow = require('fbjs/lib/performanceNow');
 
 type AnyFn = (...x: any) => any;
 export type Wall = {
@@ -222,7 +223,7 @@ class Bridge {
   }
 
   flush() {
-    var start = performance.now();
+    var start = performanceNow();
     var events = this._buffer.map(({evt, data}) => {
       var cleaned = [];
       var san = dehydrate(data, cleaned);
@@ -234,7 +235,7 @@ class Bridge {
     this._wall.send({type: 'many-events', events});
     this._buffer = [];
     this._waiting = null;
-    this._lastTime = performance.now() - start;
+    this._lastTime = performanceNow() - start;
   }
 
   forget(id: string) {

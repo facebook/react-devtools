@@ -5,7 +5,8 @@
     "fbjs-scripts": "0.2.1",
     "immutable": "^3.7.4",
     "object-assign": "^3.0.0",
-    "react": "^0.13.3"
+    "react": "^0.13.3",
+    "fbjs": "^0.4.0"
   },
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
