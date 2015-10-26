@@ -75,7 +75,7 @@ class QueryViewer {
           </div>
         </DetailPaneSection>
         <DetailPaneSection title="Query">
-          <div style={styles.text}>
+          <div style={styles.query}>
             {tidyGraphQL(data.get('text'))}
           </div>
         </DetailPaneSection>
@@ -95,9 +95,13 @@ class QueryViewer {
 }
 
 var styles = {
-  text: {
-    whiteSpace: 'pre',
+  query: {
+    cursor: 'text',
     fontFamily: 'monospace',
+    userSelect: 'text',
+    MozUserSelect: 'text',
+    WebkitUserSelect: 'text',
+    whiteSpace: 'pre',
     wordWrap: 'break-word',
   },
 };
