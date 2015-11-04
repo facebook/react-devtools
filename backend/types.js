@@ -63,6 +63,10 @@ export type ReactRenderer = {
     _instancesByReactRootID: Object,
     _renderNewRootComponent: AnyFn,
   },
+  ComponentTree: {
+    getNodeFromInstance: (component: OpaqueNodeHandle) => ?NativeType,
+    getClosestInstanceFromNode: (component: NativeType) => ?OpaqueNodeHandle,
+  },
 };
 
 export type Helpers = {
