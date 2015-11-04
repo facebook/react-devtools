@@ -206,6 +206,10 @@ class Panel extends React.Component {
 
   render() {
     if (this.state.loading) {
+      // TODO: This currently shows in the Firefox shell when navigating from a
+      // React page to a non-React page. We should show a better message but
+      // properly doing so probably requires refactoring how we load the panel
+      // and communicate with the bridge.
       return (
         <div style={styles.loading}>
           <h1>Connecting to React...</h1>
@@ -215,7 +219,7 @@ class Panel extends React.Component {
       );
     }
     if (!this.state.isReact) {
-      return <div style={styles.loading}><h1>Looking for react...</h1></div>;
+      return <div style={styles.loading}><h1>Looking for React...</h1></div>;
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));

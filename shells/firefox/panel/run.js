@@ -17,12 +17,11 @@ var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
 var node = document.getElementById('container');
-node.innerHTML = '<h1>Connecting to devtools</h1>';
+React.render(<h1 id="message">Looking for React...</h1>, node);
 var port = {};
 
 function reload() {
   React.unmountComponentAtNode(node);
-  node.innerHTML = '';
   React.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
@@ -33,13 +32,18 @@ window.addEventListener('message', function(event) {
     if (evt.data === 'show') {
       reload();
     } else if (evt.data === 'unload') {
-      node.innerHTML = '<h1 id="message">Looking for React</h1>';
+      React.render(<h1 id="message">Looking for React...</h1>, node);
     } else if (evt.data.type === 'hasReact') {
       if (evt.data.val) {
         React.render(<Panel alreadyFoundReact={true} {...config} />, node);
       } else {
-        node.innerHTML =
-          '<h1 id="message">Unable to find React on the page.</h1>';
+        // TODO: Does this actually show up? It seems like either the "Looking
+        // for React..." at the top of this file shows, or (when navigating
+        // from a React page to a non-React one) Panel renders the same text.
+        React.render(
+          <h1 id="message">Unable to find React on the page.</h1>,
+          node
+        );
       }
     }
   };
