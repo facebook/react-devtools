@@ -36,6 +36,15 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       var id = renderer.Mount.nativeTagToRootNodeID(nativeTag);
       return rootNodeIDMap.get(id);
     };
+  // React DOM 15+
+  } else if (renderer.ComponentTree) {
+    extras.getNativeFromReactElement = function(component) {
+      return renderer.ComponentTree.getNodeFromInstance(component);
+    };
+
+    extras.getReactElementFromNative = function(node) {
+      return renderer.ComponentTree.getClosestInstanceFromNode(node);
+    };
   // React DOM
   } else if (renderer.Mount.getID && renderer.Mount.getNode) {
     extras.getNativeFromReactElement = function(component) {
