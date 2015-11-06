@@ -16,9 +16,11 @@ declare var FOR_BACKEND: {
   resolveRNStyle: () => void;
 };
 
-window.performance = {
-  now: () => Date.now(),
-};
+if (!window.performance) {
+  window.performance = {
+    now: () => Date.now(),
+  };
+}
 
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
 installGlobalHook(window);
