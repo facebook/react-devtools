@@ -96,15 +96,16 @@ var config: Props = {
 
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var node = document.getElementById('container');
 
 function reload() {
   setTimeout(() => {
-    React.unmountComponentAtNode(node);
+    ReactDOM.unmountComponentAtNode(node);
     node.innerHTML = '';
-    React.render(<Panel {...config} />, node);
+    ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
-React.render(<Panel alreadyFoundReact={true} {...config} />, node);
+ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);

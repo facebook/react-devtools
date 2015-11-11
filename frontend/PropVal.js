@@ -10,10 +10,13 @@
  */
 'use strict';
 
-var React = require('react/addons');
+var React = require('react');
+var ReactDOM = require('react-dom');
+
 var consts = require('../agent/consts');
-var valueStyles = require('./value-styles');
+var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
+var valueStyles = require('./value-styles');
 
 class PropVal extends React.Component {
   props: {
@@ -27,7 +30,7 @@ class PropVal extends React.Component {
     if (this.props.val && prevProps.val && typeof this.props.val === 'object' && typeof prevProps.val === 'object') {
       return;
     }
-    var node = React.findDOMNode(this);
+    var node = ReactDOM.findDOMNode(this);
     flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
   }
 
@@ -100,7 +103,7 @@ function previewArray(val) {
   }
   return (
     <span style={valueStyles.array}>
-      [{React.addons.createFragment(items)}]
+      [{createFragment(items)}]
     </span>
   );
 }
@@ -121,7 +124,7 @@ function previewObject(val) {
   }
   return (
     <span style={valueStyles.object}>
-      {'{'}{React.addons.createFragment(items)}{'}'}
+      {'{'}{createFragment(items)}{'}'}
     </span>
   );
 }

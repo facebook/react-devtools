@@ -11,6 +11,8 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
+
 var installGlobalHook = require('../../backend/installGlobalHook');
 var installRelayHook = require('../../plugins/Relay/installRelayHook');
 
@@ -70,5 +72,5 @@ var sources = appSrc.split('|');
 
 injectMany(sources, () => {
   var node = document.getElementById('container');
-  React.render(<Panel {...config} />, node);
+  ReactDOM.render(<Panel {...config} />, node);
 });

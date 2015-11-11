@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var assign = require('object-assign');
 var flash = require('../flash');
@@ -75,9 +76,9 @@ class Simple extends React.Component {
   }
 
   selectAll() {
-    var node = React.findDOMNode(this.input);
-    node.selectionStart = 0;
-    node.selectionEnd = node.value.length;
+    const input = this.input;
+    input.selectionStart = 0;
+    input.selectionEnd = input.value.length;
   }
 
   componentDidUpdate(prevProps: Object, prevState: Object) {
@@ -85,7 +86,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
-      flash(React.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
+      flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
     }
   }
 

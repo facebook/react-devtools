@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var ReactDOM = require('react-dom');
 import type {DOMEvent} from './types';
 
 class Draggable extends React.Component {
@@ -30,7 +31,7 @@ class Draggable extends React.Component {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
-    var doc = React.findDOMNode(this).ownerDocument;
+    var doc = ReactDOM.findDOMNode(this).ownerDocument;
     doc.addEventListener('mousemove', this._onMove);
     doc.addEventListener('mouseup', this._onUp);
     this.props.onStart();
@@ -43,7 +44,7 @@ class Draggable extends React.Component {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
-    var doc = React.findDOMNode(this).ownerDocument;
+    var doc = ReactDOM.findDOMNode(this).ownerDocument;
     doc.removeEventListener('mousemove', this._onMove);
     doc.removeEventListener('mouseup', this._onUp);
     this.props.onStop();

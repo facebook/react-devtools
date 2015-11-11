@@ -11,8 +11,8 @@
 'use strict';
 
 var React = require('react');
-var assign = require('object-assign');
 
+var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
 
@@ -33,8 +33,8 @@ type PropsType = {
 };
 
 class Node extends React.Component {
-  _head: Object;
-  _tail: Object;
+  _head: ?HTMLElement;
+  _tail: ?HTMLElement;
 
   context: Object;
   props: PropsType;
@@ -61,8 +61,7 @@ class Node extends React.Component {
     if (!node) {
       return;
     }
-    var domnode = React.findDOMNode(node);
-    this.context.scrollTo(domnode.offsetTop, domnode.offsetHeight);
+    this.context.scrollTo(node.offsetTop, node.offsetHeight);
   }
 
   render(): ReactElement {

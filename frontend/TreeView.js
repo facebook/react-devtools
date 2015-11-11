@@ -10,9 +10,10 @@
  */
 'use strict';
 
-var React = require('react');
-var Node = require('./Node');
 var Breadcrumb = require('./Breadcrumb');
+var Node = require('./Node');
+var React = require('react');
+var ReactDOM = require('react-dom');
 
 var decorate = require('./decorate');
 
@@ -26,7 +27,7 @@ class TreeView extends React.Component {
   }
 
   scrollTo(val, height) {
-    var node = React.findDOMNode(this);
+    var node = ReactDOM.findDOMNode(this);
     var top = node.scrollTop;
     var rel = val - node.offsetTop;
     var margin = 40;
