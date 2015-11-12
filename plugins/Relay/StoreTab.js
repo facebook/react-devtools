@@ -16,7 +16,7 @@ var React = require('react');
 var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
 
-class StoreTab {
+class StoreTab extends React.Component {
   props: {
     data: Map,
     inspect: (path: Array<string>, cb: () => void) => void,

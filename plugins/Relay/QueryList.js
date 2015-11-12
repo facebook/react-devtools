@@ -16,7 +16,7 @@ var React = require('react');
 var decorate = require('../../frontend/decorate');
 var Query = require('./Query');
 
-class QueryList {
+class QueryList extends React.Component {
   props: {
     queries: OrderedMap,
     selectQuery: (id: string) => void,

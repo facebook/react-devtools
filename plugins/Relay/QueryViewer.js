@@ -20,7 +20,7 @@ import React from 'react';
 import decorate from '../../frontend/decorate';
 import tidyGraphQL from './tidyGraphQL';
 
-class QueryViewer {
+class QueryViewer extends React.Component {
   props: {
     data: Map,
     inspect: (path: Array<string>, cb: () => void) => void,
