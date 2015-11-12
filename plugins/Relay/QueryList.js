@@ -34,7 +34,7 @@ class QueryList extends React.Component {
     this.props.queries.forEach(query => {
       const requestNumber = query.get('requestNumber');
       if (lastRequestNumber !== requestNumber) {
-        lastRequestNumber = requestNumber
+        lastRequestNumber = requestNumber;
         rows.push(
           <tr key={'request' + requestNumber}>
             <td colSpan="4" style={styles.grouper}>
