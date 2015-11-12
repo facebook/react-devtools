@@ -16,7 +16,7 @@ var QueryList = require('./QueryList');
 var QueryViewer = require('./QueryViewer');
 var SplitPane = require('../../frontend/SplitPane');
 
-class QueriesTab {
+class QueriesTab extends React.Component {
   props: {
     isSplit: boolean,
   };

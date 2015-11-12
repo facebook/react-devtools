@@ -13,7 +13,7 @@
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 
-class ElementPanel {
+class ElementPanel extends React.Component {
   props: {
     dataIDs: Array<{id: string, queries: Array<Map>}>,
     jumpToData: (id: string) => void,
