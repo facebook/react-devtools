@@ -2,7 +2,9 @@
 set -ex
 
 SHELL_DIR=$PWD
-PACKAGE_TMP=$(mktemp -d -t devtools)
+
+# GNU mktemp requires the XXXX placeholder
+PACKAGE_TMP=$(mktemp -d -t devtools.XXXX)
 
 NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js
 NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js
