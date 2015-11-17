@@ -2,7 +2,7 @@
 set -ex
 
 SHELL_DIR=$PWD
-PACKAGE_TMP=$(mktemp -d -t devtools)
+PACKAGE_TMP=$(mktemp -d -t devtools.XXX)
 
 NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js
 NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js
