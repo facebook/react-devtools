@@ -67,6 +67,18 @@ or by inspecting [Facebook](https://www.facebook.com/).
 
 Currently iframes and Chrome apps/extensions are not inspectable.
 
+### How do I use this for React < 0.13?
+
+Download and manually install [an older version of the Chrome extension](https://github.com/facebook/react-devtools/releases/tag/v0.13.1).
+
+If you try to open the downloaded `crx` file directly in Chrome, you will see
+the following message:
+
+> Apps, extensions and user scripts cannot be added from this website.
+
+Instead, follow [these instructions](http://stackoverflow.com/a/11879334/349353)
+to install the extension manually.
+
 ### ProTips
 
 If you inspect a React element on the page using the regular **Elements** tab,
