@@ -41,6 +41,17 @@ function onDisconnected() {
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 }
 
+function onError(e) {
+  React.unmountComponentAtNode(node);
+  var message;
+  if (e.code === 'EADDRINUSE') {
+    message = 'Another instance of DevTools is running';
+  } else {
+    message = `Unknown error (${e.message})`;
+  }
+  node.innerHTML = `<h2 id="waiting">${message}</h2>`;
+}
+
 function initialize(socket) {
   socket.send('eval:' + backendScript);
   var listeners = [];
@@ -111,6 +122,7 @@ function connectToSocket(port = 8081) {
 /**
  * When the Electron app is running in "server mode"
  */
+var restartTimeout = null;
 function startServer(port = 8097) {
   var server = new ws.Server({port});
   var connected = false;
@@ -134,10 +146,17 @@ function startServer(port = 8097) {
     initialize(socket);
   });
 
+  server.on('error', (e) => {
+    onError(e);
+    console.error('Failed to start the DevTools server', e);
+    restartTimeout = setTimeout(() => startServer(port), 1000);
+  });
+
   return {
     close: function() {
       connected = false;
       onDisconnected();
+      clearTimeout(restartTimeout);
       server.close();
     },
   };
