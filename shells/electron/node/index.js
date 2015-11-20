@@ -84,8 +84,8 @@ function initialize(socket) {
 /**
  * This is the normal mode, where it connects to the react native packager
  */
-function connectToSocket() {
-  var socket = ws.connect('ws://localhost:8081/devtools');
+function connectToSocket(port = 8081) {
+  var socket = ws.connect(`ws://localhost:${port}/devtools`);
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
       initialize(socket);
@@ -99,13 +99,20 @@ function connectToSocket() {
     onDisconnected();
     console.log('Connection to RN closed');
   };
+
+  return {
+    close: function() {
+      onDisconnected();
+      socket.close();
+    },
+  };
 }
 
 /**
  * When the Electron app is running in "server mode"
  */
-function startServer() {
-  var server = new ws.Server({port: 8097});
+function startServer(port = 8097) {
+  var server = new ws.Server({port});
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
@@ -126,6 +133,14 @@ function startServer() {
     };
     initialize(socket);
   });
+
+  return {
+    close: function() {
+      connected = false;
+      onDisconnected();
+      server.close();
+    },
+  };
 }
 
 var DevtoolsUI = {

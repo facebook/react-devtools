@@ -50,12 +50,12 @@
             var fs = require('fs');
             var path = require('path');
             var backendScript = fs.readFileSync(path.join(__dirname, 'build', 'backend.js'), 'utf8');
-            require('./node')
+            window.server = require('./node')
                 .setContentDOMNode(document.getElementById('container'))
                 .setBackendScript(backendScript)
                 .startServer();
             /*/
-            require('./build/standalone.js')
+            window.server = require('./build/standalone.js')
                 .setContentDOMNode(document.getElementById('container'))
                 .startServer();
             //*/
