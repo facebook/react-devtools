@@ -67,7 +67,7 @@ or by inspecting [Facebook](https://www.facebook.com/).
 
 Currently iframes and Chrome apps/extensions are not inspectable.
 
-### How do I use this for React < 0.13?
+### How do I use this for React < 0.13? (Chrome only)
 
 Download and manually install [an older version of the Chrome extension](https://github.com/facebook/react-devtools/releases/tag/v0.13.1).
 
@@ -78,6 +78,9 @@ the following message:
 
 Instead, follow [these instructions](http://stackoverflow.com/a/11879334/349353)
 to install the extension manually.
+
+**Note**: The older version is for Chrome only. Firefox support was introduced
+in [a newer release](https://github.com/facebook/react-devtools/releases/tag/v2-beta1).
 
 ### ProTips
 
