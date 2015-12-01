@@ -82,15 +82,18 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       type: 'object',
     };
   }
-  var res = {},
-    names = Object.getOwnPropertyNames(data);
-    
-  for (var name in data) {
-    if (names.indexOf(name) === -1) {
-      names.push(name);
+  var res = {};
+  // retrieving all own properties, including non-enumerables
+  var names = Object.getOwnPropertyNames(data);
+
+  // adding properties in the prototype chain
+  for (var otherName in data) {
+    if (names.indexOf(otherName) === -1) {
+      names.push(otherName);
     }
   }
-  
+
+  // all properties now added to res
   names.forEach((name) => {
     res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);
   });
