@@ -88,7 +88,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   Object.getOwnPropertyNames(data).forEach((name) => {
     res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);
   });
-  
+
   return res;
 }
 
