@@ -41,7 +41,6 @@ function shallowClone(obj) {
 
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
-  // $FlowFixMe "computed property keys not supported"
   var newStyle = {[newName]: val};
   if (!data.updater || !data.updater.setInProps) {
     var el:Object = agent.reactElements.get(id);
@@ -83,7 +82,6 @@ function renameStyle(agent, id, oldName, newName, val) {
 
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
-  // $FlowFixMe "computed property keys not supported"
   var newStyle = {[attr]: val};
   if (!data.updater || !data.updater.setInProps) {
     var el:Object = agent.reactElements.get(id);

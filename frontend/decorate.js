@@ -120,7 +120,6 @@ module.exports = function(options: Options, Component: any): any {
   }
 
   Wrapper.contextTypes = {
-    // $FlowFixMe computed property
     [storeKey]: React.PropTypes.object,
   };
 
