@@ -17,7 +17,7 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 
-import type * as Bridge from '../agent/Bridge';
+import type Bridge from '../agent/Bridge';
 import type {DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;

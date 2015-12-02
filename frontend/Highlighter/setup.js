@@ -12,7 +12,7 @@
 
 var Highlighter = require('./Highlighter');
 
-import type * as Agent from '../../agent/Agent';
+import type Agent from '../../agent/Agent';
 
 module.exports = function setup(agent: Agent) {
   var hl = new Highlighter(window, node => {
