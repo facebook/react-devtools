@@ -42,16 +42,16 @@ function shallowClone(obj) {
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[newName]: val};
-  if (!data.updater || !data.updater.setInProps) {
-    var el:Object = agent.reactElements.get(id);
-    if (el.setNativeProps) {
+  if (!data || !data.updater || !data.updater.setInProps) {
+    var el = agent.reactElements.get(id);
+    if (el && el.setNativeProps) {
       el.setNativeProps(newStyle);
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
     }
     return;
   }
-  var style = data.props && data.props.style;
+  var style = data && data.props && data.props.style;
   var customStyle;
   if (Array.isArray(style)) {
     if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
@@ -83,9 +83,9 @@ function renameStyle(agent, id, oldName, newName, val) {
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
-  if (!data.updater || !data.updater.setInProps) {
-    var el:Object = agent.reactElements.get(id);
-    if (el.setNativeProps) {
+  if (!data || !data.updater || !data.updater.setInProps) {
+    var el = agent.reactElements.get(id);
+    if (el && el.setNativeProps) {
       el.setNativeProps(newStyle);
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
