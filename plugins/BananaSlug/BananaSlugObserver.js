@@ -8,13 +8,13 @@
  */
 
 const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
-const BananaSlugUtils = require('./BananaSlugUtils');
 const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
+const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
+const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
 const Map = require('fbjs/lib/Map');
 const ReactDOM = require('react-dom');
 
 const NODE_TYPE_COMPOSITE = 'Composite';
-const {canUseWebDOM} = BananaSlugUtils;
 
 class BananaSlugObserver {
   static observe(agent: Agent) {
@@ -24,17 +24,21 @@ class BananaSlugObserver {
   constructor(agent: Agent) {
     this._onMeasureNode = this._onMeasureNode.bind(this);
 
-    this._measurer = canUseWebDOM() ?
+    var useDOM = agent.capabilities.dom;
+
+    this._measurer = useDOM ?
       new BananaSlugWebNodeMeasurer() :
       new BananaSlugAbstractNodeMeasurer();
+
+    this._presenter = useDOM ?
+      new BananaSlugWebNodePresenter() :
+      new BananaSlugAbstractNodePresenter();
 
     this._subscriptions = [
       agent.on('mount', this._onMount.bind(this, agent)),
       agent.on('update', this._onUpdate.bind(this, agent)),
       agent.on('unmount', this._onUnmount.bind(this, agent)),
     ];
-
-    this._nodes = new Map();
   }
 
   _onMount(agent: Agent, obj: any) {
@@ -55,20 +59,15 @@ class BananaSlugObserver {
       return;
     }
 
-    this._nodes.set(obj.id, node);
     this._measurer.request(node, this._onMeasureNode);
   }
 
   _onUnmount(agent: Agent, id: string) {
-    if (!this._nodes.has(id)) {
-      return;
-    }
-    var node = this._nodes.get(id);
-    this._nodes.delete(id);
+
   }
 
-  _onMeasureNode(info: Object) {
-    console.log(info);
+  _onMeasureNode(measurement: Object) {
+    this._presenter.present(measurement);
   }
 }
 

@@ -14,23 +14,38 @@ class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
     super();
   }
 
-  __measureImpl(node): ?Object {
+  measureImpl(node): ?Object {
     if (!node || typeof node.getBoundingClientRect !== 'function') {
       return {
         bottom: 0,
         height: 0,
         left: 0,
+        right: 0,
         top: 0,
         width: 0,
       };
     }
 
     var rect = node.getBoundingClientRect();
+    var scrollX = Math.max(
+      document.body ? document.body.scrollLeft : 0,
+      document.documentElement.scrollLeft,
+      window.pageXOffset || 0,
+      window.scrollX || 0,
+    );
+
+    var scrollY = Math.max(
+      document.body ? document.body.scrollTop : 0,
+      document.documentElement.scrollTop,
+      window.pageYOffset || 0,
+      window.scrollY || 0,
+    );
     return {
-      bottom: rect.bottom,
+      bottom: rect.bottom + scrollY,
       height: rect.height,
-      left: rect.left,
-      top: rect.top,
+      left: rect.left + scrollX,
+      right: rect.right + scrollX,
+      top: rect.top + scrollY,
       width: rect.width,
     };
   }
