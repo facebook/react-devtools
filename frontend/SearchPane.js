@@ -14,6 +14,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
 
@@ -84,6 +85,7 @@ class SearchPane extends React.Component {
     }
     return (
       <div style={styles.container}>
+        <SettingsPane />
         <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
           <input
