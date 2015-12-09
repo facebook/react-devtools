@@ -76,7 +76,6 @@ class BananaSlugObserver {
 
   _onBananaSlugChange(agent: Agent, value: Object) {
     this._presenter.setEnabled(value.enabled);
-    // debugger;
   }
 }
 
