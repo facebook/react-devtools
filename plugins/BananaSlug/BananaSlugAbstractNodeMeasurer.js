@@ -44,8 +44,9 @@ class BananaSlugAbstractNodeMeasurer {
     // callbacks for pending nodes.
     this._callbacks = new Map();
 
-    this._queues = [];
     this._isRequesting = false;
+
+    // non-auto-binds.
     this._measureNodes = this._measureNodes.bind(this);
   }
 
@@ -77,22 +78,19 @@ class BananaSlugAbstractNodeMeasurer {
   }
 
   _measureNodes(): void {
-    var results = new Map();
     var now = Date.now();
 
-    results = results.withMutations(_results => {
-      this._measurements = this._measurements.withMutations(_measurements => {
-        for (let [node, requestID] of this._nodes.entries()) {
-          let measurement = this._measureNode(now, node);
-          // cache measurement.
-          _measurements.set(node, measurement);
-          _results.set(node, measurement);
-        }
-      });
+    this._measurements = this._measurements.withMutations(_measurements => {
+      for (let [node, requestID] of this._nodes.entries()) {
+        let measurement = this._measureNode(now, node);
+        // cache measurement.
+        _measurements.set(node, measurement);
+      }
     });
 
     // execute callbacks.
-    for (let [node, measurement] of results.entries()) {
+    for (let [node, requestID] of this._nodes.entries()) {
+      let measurement = this._measurements.get(node);
       this._callbacks.get(node).forEach(callback => callback(measurement));
     }
 
@@ -105,9 +103,9 @@ class BananaSlugAbstractNodeMeasurer {
       }
     });
 
-    this._ids = new Map();
-    this._nodes = new Map();
-    this._callbacks = new Map();
+    this._ids = this._ids.clear();
+    this._nodes = this._nodes.clear();
+    this._callbacks = this._callbacks.clear();
     this._isRequesting = false;
   }
 
@@ -130,7 +128,7 @@ class BananaSlugAbstractNodeMeasurer {
       measurement = new Measurement({
         ...data,
         expiration: timestamp + DURATION,
-        id: 'measurement_' + String(_id++),
+        id: 'm_' + String(_id++),
       });
     }
     return measurement;
