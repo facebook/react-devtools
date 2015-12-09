@@ -12,7 +12,7 @@ const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 const immutable = require('immutable');
 
 // How long the measurement should be presented for.
-const DURATION = 500;
+const DURATION = 250;
 
 const MetaData = immutable.Record({
   expiration: 0,

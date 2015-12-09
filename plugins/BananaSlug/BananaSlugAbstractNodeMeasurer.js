@@ -26,7 +26,7 @@ const Measurement = immutable.Record({
   width: 0,
 });
 
-var _id = 1;
+var _id = 100;
 
 class BananaSlugAbstractNodeMeasurer {
   constructor() {

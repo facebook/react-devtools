@@ -11,7 +11,7 @@
 'use strict';
 
 /* global chrome */
-
+//
 var ports = {};
 
 chrome.runtime.onConnect.addListener(function(port) {

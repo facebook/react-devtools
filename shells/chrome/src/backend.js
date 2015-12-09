@@ -11,17 +11,18 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
+var BananaSlugObserver = require('../../../plugins/BananaSlug/BananaSlugObserver');
 var Bridge = require('../../../agent/Bridge');
+var inject = require('../../../agent/inject');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
-
-var inject = require('../../../agent/inject');
 
 // TODO: check to see if we're in RN before doing this?
 setInterval(function() {
   // this is needed to force refresh on react native
 }, 100);
+
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
@@ -84,4 +85,6 @@ function setup(hook) {
   if (!isReactNative) {
     setupHighlighter(agent);
   }
+
+  BananaSlugObserver.observe(agent);
 }
