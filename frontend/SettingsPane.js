@@ -21,10 +21,7 @@ class SearchPane extends React.Component {
   render() {
     return (
       <div style={styles.container}>
-        <BananaSlugControl
-          enabled={this.props.isBananaSlugEnabled}
-          onToggle={this.props.onBananaSlugToggle}
-        />
+        <BananaSlugControl {...this.props} />
       </div>
     );
   }
@@ -41,13 +38,13 @@ var styles = {
 };
 
 var Wrapped = decorate({
-  listeners(props) {
-    return ['isBananaSlugEnabled'];
+  listeners() {
+    return ['bananaslugchange'];
   },
   props(store) {
     return {
-      isBananaSlugEnabled: store.isBananaSlugEnabled,
-      onBananaSlugToggle: enabled => store.setBananaSlugEnabled(enabled),
+      value: store.bananaslugValue,
+      onChange: value => store.changeBananaSlug(value),
     };
   },
 }, SearchPane);

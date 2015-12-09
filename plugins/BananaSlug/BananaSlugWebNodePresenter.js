@@ -89,27 +89,51 @@ class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
     }
   }
 
-  _ensureCanvas(): void {
-    if (this._canvas !== null) {
+  clearImpl(): void {
+    var canvas = this._canvas;
+    if (canvas === null) {
       return;
     }
-    var node = window.document.createElement('canvas');
-    node.width = window.screen.availWidth;
-    node.height = window.screen.availHeight;
-    node.style.cssText = `
-      x-background-color: red;
-      x-opacity: 0.1;
-      bottom: 0;
-      left: 0;
-      pointer-events: none;
-      position: fixed;
-      right: 0;
-      top: 0;
-      z-index: 1000000000;
-    `;
-    var root = window.document.documentElement;
-    root.insertBefore(node, root.firstChild);
-    this._canvas = node;
+
+    if (!canvas.parentNode) {
+      return;
+    }
+
+    var ctx = canvas.getContext('2d');
+    ctx.clearRect(
+      0,
+      0,
+      canvas.width,
+      canvas.height
+    );
+
+    canvas.parentNode.removeChild(canvas);
+  }
+
+  _ensureCanvas(): void {
+    var canvas = this._canvas;
+    if (canvas === null) {
+      canvas = window.document.createElement('canvas');
+      canvas.width = window.screen.availWidth;
+      canvas.height = window.screen.availHeight;
+      canvas.style.cssText = `
+        x-background-color: red;
+        x-opacity: 0.1;
+        bottom: 0;
+        left: 0;
+        pointer-events: none;
+        position: fixed;
+        right: 0;
+        top: 0;
+        z-index: 1000000000;
+      `;
+    }
+
+    if (!canvas.parentNode) {
+      var root = window.document.documentElement;
+      root.insertBefore(canvas, root.firstChild);
+    }
+    this._canvas = canvas;
   }
 }
 

@@ -85,9 +85,9 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
+  bananaslugValue: ?Object;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
-  isBananaSlugEnabled: boolean;
   isBottomTagSelected: boolean;
   roots: List;
   searchRoots: ?List;
@@ -118,7 +118,7 @@ class Store extends EventEmitter {
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
-    this.isBananaSlugEnabled = true;
+    this.bananaslugValue = null;
 
     // for debugging
     window.store = this;
@@ -420,9 +420,10 @@ class Store extends EventEmitter {
     });
   }
 
-  setBananaSlugEnabled(enabled: boolean) {
-    this.isBananaSlugEnabled = enabled;
-    this.emit('isBananaSlugEnabled');
+  changeBananaSlug(value: Object) {
+    this.bananaslugValue = value;
+    this.emit('bananaslugchange');
+    this._bridge.send('bananaslugchange', value.toJS());
   }
 
   // Private stuff

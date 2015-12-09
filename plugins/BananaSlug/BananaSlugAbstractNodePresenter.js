@@ -25,6 +25,7 @@ class BananaSlugAbstractNodePresenter {
     this._pool = new Map();
     this._drawing = false;
     this._clearTimer = 0;
+    this._enabled = false;
 
     this._draw = this._draw.bind(this);
     this._redraw = this._redraw.bind(this);
@@ -53,19 +54,47 @@ class BananaSlugAbstractNodePresenter {
     requestAnimationFrame(this._draw);
   }
 
+  setEnabled(enabled: boolean): void {
+    // console.log('setEnabled', enabled);
+    if (this._enabled === enabled) {
+      return;
+    }
+
+    this._enabled = enabled;
+
+    if (enabled) {
+      return;
+    }
+
+    this._clearTimer && clearTimeout(this._clearTimer);
+    this._clearTimer = 0;
+    this._pool = this._pool.clear();
+    this._drawing = false;
+
+    this.clearImpl();
+  }
+
   drawImpl(info: Object): void {
-    // sub-class must implement this.
+    // sub-class should implement this.
+  }
+
+  clearImpl(): void {
+    // sub-class should implement this.
   }
 
   _redraw(): void {
     this._clearTimer = null;
     if (!this._drawing && this._pool.size > 0) {
+      this._drawing = true;
       this._draw();
     }
   }
 
   _draw(): void {
-    this._drawing = true;
+    if (!this._enabled) {
+      this._drawing = false;
+      return;
+    }
 
     var now = Date.now();
     var minExpiration = Number.MAX_VALUE;

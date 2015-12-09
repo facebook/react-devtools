@@ -41,6 +41,7 @@ class BananaSlugObserver {
       agent.on('mount', this._onMount.bind(this, agent)),
       agent.on('update', this._onUpdate.bind(this, agent)),
       agent.on('unmount', this._onUnmount.bind(this, agent)),
+      agent.on('bananaslugchange', this._onBananaSlugChange.bind(this, agent)),
     ];
   }
 
@@ -71,6 +72,11 @@ class BananaSlugObserver {
 
   _onMeasureNode(measurement: Object) {
     this._presenter.present(measurement);
+  }
+
+  _onBananaSlugChange(agent: Agent, value: Object) {
+    this._presenter.setEnabled(value.enabled);
+    // debugger;
   }
 }
 

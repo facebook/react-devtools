@@ -9,14 +9,38 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var {PropTypes} = React;
+const ReactDOM = require('react-dom');
+const React = require('react');
+
+const immutable = require('immutable');
+
+const  {PropTypes} = React;
+
+const Value = immutable.Record({
+  enabled: false,
+});
 
 class BananaSlugControl extends React.Component {
   constructor(props) {
     super(props);
+
+    this.state = {
+      value: new Value(),
+    };
+
     this._toogle = this._toogle.bind(this);
+  }
+
+  componentDidMount(): void {
+    this.props.onChange(this.state.value);
+  }
+
+  componentWillReceiveProps(nextProps: Object): void {
+    this.setState({
+      value: nextProps.value ?
+        this.state.value.merge(nextProps.value) :
+        new Value(),
+    });
   }
 
   render() {
@@ -25,7 +49,7 @@ class BananaSlugControl extends React.Component {
         <input
           style={styles.checkbox}
           type="checkbox"
-          checked={this.props.enabled}
+          checked={this.state.value.enabled}
           readOnly={true}
         />
         <span>bananaslug</span>
@@ -34,7 +58,13 @@ class BananaSlugControl extends React.Component {
   }
 
   _toogle() {
-    this.props.onToggle(!this.props.enabled);
+    var value = this.state.value;
+
+    var nextValue = value.merge({
+      enabled: !value.enabled,
+    });
+
+    this.props.onChange(nextValue);
   }
 }
 
