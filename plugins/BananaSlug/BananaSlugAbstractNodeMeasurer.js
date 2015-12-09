@@ -13,7 +13,9 @@ const immutable = require('immutable');
 // How long the measurement can be cached in ms.
 const DURATION = 800;
 
-const Measurement = immutable.Record({
+const {Record, Map, Set} = immutable;
+
+const Measurement = Record({
   bottom: 0,
   expiration: 0,
   height: 0,
@@ -30,9 +32,16 @@ var _id = 100;
 
 class BananaSlugAbstractNodeMeasurer {
   constructor() {
+    // pending nodes to measure.
     this._nodes = new Map();
+
+    // ids of pending nodes.
     this._ids = new Map();
+
+    // cached measurements.
     this._measurements = new Map();
+
+    // callbacks for pending nodes.
     this._callbacks = new Map();
 
     this._queues = [];
@@ -45,14 +54,15 @@ class BananaSlugAbstractNodeMeasurer {
       this._nodes.get(node) :
       String(_id++);
 
-    this._nodes.set(node, requestID);
-    this._ids.set(requestID, node);
+    this._nodes = this._nodes.set(node, requestID);
+    this._ids = this._ids.set(requestID, node);
 
-    if (this._callbacks.has(node)) {
-      this._callbacks.get(node).add(callback);
-    } else {
-      this._callbacks.set(node, new Set([callback]));
-    }
+    var callbacks = this._callbacks.has(node) ?
+      this._callbacks.get(node) :
+      new Set();
+
+    callbacks = callbacks.add(callback);
+    this._callbacks = this._callbacks.set(node, callbacks);
 
     if (this._isRequesting) {
       return;
@@ -60,16 +70,6 @@ class BananaSlugAbstractNodeMeasurer {
 
     this._isRequesting = true;
     requestAnimationFrame(this._measureNodes);
-  }
-
-  cancel(id: string): void {
-    if (this._ids.has(id)) {
-      var node = this._ids.get(id);
-      this._ids.delete(id);
-      this._callbacks.delete(node);
-      this._measurements.delete(node);
-      this._nodes.delete(node);
-    }
   }
 
   measureImpl(node: any): void {
@@ -80,25 +80,34 @@ class BananaSlugAbstractNodeMeasurer {
     var results = new Map();
     var now = Date.now();
 
-    for (let [node, requestID] of this._nodes.entries()) {
-      this._nodes.delete(node);
-      this._ids.delete(requestID);
-      results.set(node, this._measureNode(now, node));
+    results = results.withMutations(_results => {
+      this._measurements = this._measurements.withMutations(_measurements => {
+        for (let [node, requestID] of this._nodes.entries()) {
+          let measurement = this._measureNode(now, node);
+          // cache measurement.
+          _measurements.set(node, measurement);
+          _results.set(node, measurement);
+        }
+      });
+    });
+
+    // execute callbacks.
+    for (let [node, measurement] of results.entries()) {
+      this._callbacks.get(node).forEach(callback => callback(measurement));
     }
 
-    for (let [node, info] of results.entries()) {
-      // execute callbacks.
-      this._callbacks.get(node).forEach(callback => callback(info));
-      this._callbacks.delete(node);
-    }
-
-    for (let [node, measurement] of this._measurements.entries()) {
-      if (measurement.expiration < now) {
-        // clear stale measurement.
-        this._measurements.delete(node);
+    // clear stale measurement.
+    this._measurements = this._measurements.withMutations(_measurements => {
+      for (let [node, measurement] of _measurements.entries()) {
+        if (measurement.expiration < now) {
+          _measurements.delete(node);
+        }
       }
-    }
+    });
 
+    this._ids = new Map();
+    this._nodes = new Map();
+    this._callbacks = new Map();
     this._isRequesting = false;
   }
 
@@ -124,9 +133,6 @@ class BananaSlugAbstractNodeMeasurer {
         id: 'measurement_' + String(_id++),
       });
     }
-
-
-    this._measurements.set(node, measurement);
     return measurement;
   }
 }

@@ -37,5 +37,3 @@ setupHighlighter(agent);
 setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
 BananaSlugObserver.observe(agent);
-
-

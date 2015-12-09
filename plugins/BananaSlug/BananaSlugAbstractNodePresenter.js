@@ -7,14 +7,15 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
-const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
-
 const immutable = require('immutable');
+const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 
 // How long the measurement should be presented for.
 const DURATION = 250;
 
-const MetaData = immutable.Record({
+const {Record, Map, Set} = immutable;
+
+const MetaData = Record({
   expiration: 0,
   hit: 0,
 });
@@ -42,7 +43,7 @@ class BananaSlugAbstractNodePresenter {
       hit: data.hit + 1,
     });
 
-    this._pool.set(measurement, data);
+    this._pool = this._pool.set(measurement, data);
 
     if (this._drawing) {
       return;
@@ -67,22 +68,23 @@ class BananaSlugAbstractNodePresenter {
     this._drawing = true;
 
     var now = Date.now();
-    var pool = new Map();
     var minExpiration = Number.MAX_VALUE;
 
-    for (let [measurement, data] of this._pool.entries()) {
-      if (data.expiration < now) {
-        // already passed the expiration time.
-        this._pool.delete(measurement);
-      } else {
-        minExpiration = Math.min(data.expiration, minExpiration);
-        pool.set(measurement, data);
+    this._pool = this._pool.withMutations(_pool => {
+      for (let [measurement, data] of _pool.entries()) {
+        if (data.expiration < now) {
+          // already passed the expiration time.
+          _pool.delete(measurement);
+        } else {
+          minExpiration = Math.min(data.expiration, minExpiration);
+        }
       }
-    }
+    });
 
-    this.drawImpl(pool);
 
-    if (pool.size > 0) {
+    this.drawImpl(this._pool);
+
+    if (this._pool.size > 0) {
       clearTimeout(this._clearTimer);
       this._clearTimer = setTimeout(this._redraw, minExpiration - now);
     }

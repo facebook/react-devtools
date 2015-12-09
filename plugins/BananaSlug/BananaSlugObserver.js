@@ -8,13 +8,16 @@
  */
 
 const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
+const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
 const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
 const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
-const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
-const Map = require('fbjs/lib/Map');
 const ReactDOM = require('react-dom');
 
+const immutable = require('immutable');
+
 const NODE_TYPE_COMPOSITE = 'Composite';
+
+const {Record, Map, Set} = immutable;
 
 class BananaSlugObserver {
   static observe(agent: Agent) {
