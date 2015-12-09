@@ -9,6 +9,17 @@
 
 const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
 
+const DUMMY = {
+  bottom: 0,
+  height: 0,
+  left: 0,
+  right: 0,
+  scrollX: 0,
+  scrollY: 0,
+  top: 0,
+  width: 0,
+};
+
 class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
   constructor() {
     super();
@@ -16,14 +27,7 @@ class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
 
   measureImpl(node): ?Object {
     if (!node || typeof node.getBoundingClientRect !== 'function') {
-      return {
-        bottom: 0,
-        height: 0,
-        left: 0,
-        right: 0,
-        top: 0,
-        width: 0,
-      };
+      return DUMMY;
     }
 
     var rect = node.getBoundingClientRect();
@@ -40,13 +44,16 @@ class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
       window.pageYOffset || 0,
       window.scrollY || 0,
     );
+
     return {
-      bottom: rect.bottom + scrollY,
+      bottom: rect.bottom,
       height: rect.height,
-      left: rect.left + scrollX,
-      right: rect.right + scrollX,
-      top: rect.top + scrollY,
+      left: rect.left,
+      right: rect.right,
+      top: rect.top,
       width: rect.width,
+      scrollY,
+      scrollX,
     };
   }
 }

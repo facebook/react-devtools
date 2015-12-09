@@ -34,7 +34,7 @@ function drawBorder(ctx, measurement, borderWidth, borderColor) {
     measurement.left- 1,
     measurement.top - 1,
     measurement.width + 2,
-    measurement.height + 2
+    measurement.height + 2,
   );
 
   // inset
@@ -43,8 +43,8 @@ function drawBorder(ctx, measurement, borderWidth, borderColor) {
   ctx.strokeRect(
     measurement.left + borderWidth,
     measurement.top + borderWidth,
-    measurement.width - borderWidth ,
-    measurement.height - borderWidth
+    measurement.width - borderWidth,
+    measurement.height - borderWidth,
   );
   ctx.strokeStyle = borderColor;
 

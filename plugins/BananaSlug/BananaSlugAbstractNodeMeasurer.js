@@ -14,12 +14,14 @@ const immutable = require('immutable');
 const DURATION = 800;
 
 const Measurement = immutable.Record({
-  id: '',
   bottom: 0,
   expiration: 0,
   height: 0,
+  id: '',
   left: 0,
   right: 0,
+  scrollX: 0,
+  scrollY: 0,
   top: 0,
   width: 0,
 });
