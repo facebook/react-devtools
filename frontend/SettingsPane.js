@@ -12,7 +12,7 @@
  */
 'use strict';
 
-var BananaSlugControl = require('../plugins/BananaSlug/BananaSlugControl')
+var BananaSlugFrontendControl = require('../plugins/BananaSlug/BananaSlugFrontendControl');
 var React = require('react');
 
 var decorate = require('./decorate');
@@ -21,7 +21,7 @@ class SearchPane extends React.Component {
   render() {
     return (
       <div style={styles.container}>
-        <BananaSlugControl {...this.props} />
+        <BananaSlugFrontendControl {...this.props} />
       </div>
     );
   }
@@ -43,8 +43,8 @@ var Wrapped = decorate({
   },
   props(store) {
     return {
-      value: store.bananaslugValue,
-      onChange: value => store.changeBananaSlug(value),
+      state: store.bananaslugState,
+      onChange: state => store.changeBananaSlug(state),
     };
   },
 }, SearchPane);

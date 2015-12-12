@@ -11,9 +11,8 @@
 'use strict';
 
 var Agent = require('../../agent/Agent');
-var BananaSlugObserver = require('../../plugins/BananaSlug/BananaSlugObserver');
+var BananaSlugBackendManager = require('../../plugins/BananaSlug/BananaSlugBackendManager');
 var Bridge = require('../../agent/Bridge');
-
 var setupHighlighter = require('../../frontend/Highlighter/setup');
 var setupRelay = require('../../plugins/Relay/backend');
 var inject = require('../../agent/inject');
@@ -36,4 +35,4 @@ inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
 setupHighlighter(agent);
 setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
-BananaSlugObserver.observe(agent);
+BananaSlugBackendManager.init(agent);
