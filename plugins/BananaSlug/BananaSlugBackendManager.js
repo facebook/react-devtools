@@ -1,0 +1,82 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ */
+
+const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
+const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
+const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
+const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
+const ReactDOM = require('react-dom');
+
+const immutable = require('immutable');
+
+const NODE_TYPE_COMPOSITE = 'Composite';
+
+const {Record, Map, Set} = immutable;
+
+class BananaSlugBackendManager {
+  static observe(agent: Agent) {
+    return new BananaSlugBackendManager(agent);
+  }
+
+  constructor(agent: Agent) {
+    this._onMeasureNode = this._onMeasureNode.bind(this);
+
+    var useDOM = agent.capabilities.dom;
+
+    this._measurer = useDOM ?
+      new BananaSlugWebNodeMeasurer() :
+      new BananaSlugAbstractNodeMeasurer();
+
+    this._presenter = useDOM ?
+      new BananaSlugWebNodePresenter() :
+      new BananaSlugAbstractNodePresenter();
+
+    this._isActive = false;
+    agent.on('bananaslugchange', this._onBananaSlugChange.bind(this));
+    agent.on('update', this._onUpdate.bind(this, agent));
+    agent.on('shutdown', this._shutdown.bind(this));
+  }
+
+  _onUpdate(agent: Agent, obj: any) {
+    if (
+      !obj.publicInstance ||
+      !obj.id ||
+      obj.nodeType !== NODE_TYPE_COMPOSITE
+    ) {
+      return;
+    }
+
+    var node = agent.getNodeForID(obj.id);
+    if (!node) {
+      return;
+    }
+
+    this._measurer.request(node, this._onMeasureNode);
+  }
+
+  _onMeasureNode(measurement: Object): void {
+    this._presenter.present(measurement);
+  }
+
+  _onBananaSlugChange(state: Object): void {
+    this._presenter.setEnabled(state.enabled);
+  }
+
+  _shutdown(): void {
+    this._presenter.setEnabled(false);
+  }
+}
+
+function init(agent: Agent): void {
+  new BananaSlugBackendManager(agent);
+}
+
+module.exports = {
+  init,
+};
