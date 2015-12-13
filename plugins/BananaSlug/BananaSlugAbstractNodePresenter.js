@@ -32,6 +32,9 @@ class BananaSlugAbstractNodePresenter {
   }
 
   present(measurement: Object): void {
+    if (!this._enabled) {
+      return;
+    }
     var data;
     if (this._pool.has(measurement)) {
       data = this._pool.get(measurement);

@@ -67,6 +67,8 @@ function drawBorder(ctx, measurement, borderWidth, borderColor) {
   ctx.setLineDash([0]);
 }
 
+const CANVAS_NODE_ID = 'BananaSlugWebNodePresenter';
+
 class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
   constructor() {
     super();
@@ -108,17 +110,22 @@ class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
     );
 
     canvas.parentNode.removeChild(canvas);
+    this._canvas = null;
   }
 
   _ensureCanvas(): void {
     var canvas = this._canvas;
     if (canvas === null) {
-      canvas = window.document.createElement('canvas');
+      canvas =
+        window.document.getElementById(CANVAS_NODE_ID) ||
+        window.document.createElement('canvas');
+
+      canvas.id = CANVAS_NODE_ID;
       canvas.width = window.screen.availWidth;
       canvas.height = window.screen.availHeight;
       canvas.style.cssText = `
-        x-background-color: red;
-        x-opacity: 0.1;
+        xx-background-color: red;
+        xx-opacity: 0.5;
         bottom: 0;
         left: 0;
         pointer-events: none;
