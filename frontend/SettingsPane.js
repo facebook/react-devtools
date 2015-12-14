@@ -6,9 +6,6 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
- * $FLowFixMe
- * - thinks all react component classes must inherit from React.Component
  */
 'use strict';
 
@@ -17,7 +14,7 @@ var React = require('react');
 
 var decorate = require('./decorate');
 
-class SearchPane extends React.Component {
+class SettingsPane extends React.Component {
   render() {
     return (
       <div style={styles.container}>
@@ -47,6 +44,6 @@ var Wrapped = decorate({
       onChange: state => store.changeBananaSlug(state),
     };
   },
-}, SearchPane);
+}, SettingsPane);
 
 module.exports = Wrapped;
