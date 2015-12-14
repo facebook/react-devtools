@@ -3,7 +3,7 @@
 ![](/demo/demo.gif)
 
  1. Remove the current react-dev tool if you have installed any.
- 2. Download the custom build "chrome.crx" from https://github.com/hedgerwang/react-devtools/blob/banana_slug/demo/chrome.crx
+ 2. Download the custom build **chrome.crx** from **/react-devtools/demo/chrome.crx**
  3. Open "chrome://extensions/", then drag & drop the "chrome.crx" file
  4. Go to http://todomvc.com/examples/react
  5. Open the React inspector, find the checkbox **trace react updates** and select it.
