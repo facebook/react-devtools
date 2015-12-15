@@ -5,16 +5,13 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
- *
  */
+
 'use strict';
 
-const ReactDOM = require('react-dom');
 const React = require('react');
 
 const immutable = require('immutable');
-
-const  {PropTypes} = React;
 
 const State = immutable.Record({
   enabled: false,
@@ -34,7 +31,7 @@ class BananaSlugFrontendControl extends React.Component {
   }
 
   render() {
-    var state = this.props.state || this._defaultState ;
+    var state = this.props.state || this._defaultState;
     return (
       <div style={styles.container} onClick={this._toogle} tabIndex={0}>
         <input

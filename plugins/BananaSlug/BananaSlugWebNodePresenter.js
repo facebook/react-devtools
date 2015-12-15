@@ -7,6 +7,8 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+'use strict';
+
 const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
 
 const OUTLINE_COLOR = '#f0f0f0';
@@ -20,7 +22,7 @@ const COLORS = [
   '#f6a555',
   '#f66855',
   // hottest
-  '#ff0000'
+  '#ff0000',
 ];
 
 const HOTTEST_COLOR = COLORS[COLORS.length - 1];
@@ -85,8 +87,8 @@ class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
       canvas.width,
       canvas.height
     );
-    for (let [measurement, data] of pool.entries()) {
-      let color = COLORS[data.hit - 1] || HOTTEST_COLOR;
+    for (const [measurement, data] of pool.entries()) {
+      const color = COLORS[data.hit - 1] || HOTTEST_COLOR;
       drawBorder(ctx, measurement, 1, color);
     }
   }

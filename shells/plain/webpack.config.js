@@ -10,7 +10,7 @@
 'use strict';
 
 module.exports = {
-  devtool: false,//'cheap-module-eval-source-map',
+  devtool: false, //'cheap-module-eval-source-map',
   entry: {
     backend: './backend.js',
     container: './container.js',

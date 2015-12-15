@@ -7,17 +7,16 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+'use strict';
+
 const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
 const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
 const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
 const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
-const ReactDOM = require('react-dom');
-
-const immutable = require('immutable');
 
 const NODE_TYPE_COMPOSITE = 'Composite';
 
-const {Record, Map, Set} = immutable;
+type Agent = any;
 
 class BananaSlugBackendManager {
   static observe(agent: Agent) {
@@ -73,8 +72,8 @@ class BananaSlugBackendManager {
   }
 }
 
-function init(agent: Agent): void {
-  new BananaSlugBackendManager(agent);
+function init(agent: Agent): BananaSlugBackendManager {
+  return new BananaSlugBackendManager(agent);
 }
 
 module.exports = {

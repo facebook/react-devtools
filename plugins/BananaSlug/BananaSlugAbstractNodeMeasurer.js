@@ -6,6 +6,7 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  */
+'use strict';
 
 const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 const immutable = require('immutable');
@@ -81,22 +82,22 @@ class BananaSlugAbstractNodeMeasurer {
     var now = Date.now();
 
     this._measurements = this._measurements.withMutations(_measurements => {
-      for (let [node, requestID] of this._nodes.entries()) {
-        let measurement = this._measureNode(now, node);
+      for (const node of this._nodes.keys()) {
+        const measurement = this._measureNode(now, node);
         // cache measurement.
         _measurements.set(node, measurement);
       }
     });
 
     // execute callbacks.
-    for (let [node, requestID] of this._nodes.entries()) {
-      let measurement = this._measurements.get(node);
+    for (const node of this._nodes.keys()) {
+      const measurement = this._measurements.get(node);
       this._callbacks.get(node).forEach(callback => callback(measurement));
     }
 
     // clear stale measurement.
     this._measurements = this._measurements.withMutations(_measurements => {
-      for (let [node, measurement] of _measurements.entries()) {
+      for (const [node, measurement] of _measurements.entries()) {
         if (measurement.expiration < now) {
           _measurements.delete(node);
         }

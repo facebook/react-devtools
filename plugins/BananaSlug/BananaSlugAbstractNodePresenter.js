@@ -7,13 +7,15 @@
  * of patent rights can be found in the PATENTS file in the same directory.
  */
 
+'use strict';
+
 const immutable = require('immutable');
 const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 
 // How long the measurement should be presented for.
 const DURATION = 250;
 
-const {Record, Map, Set} = immutable;
+const {Record, Map} = immutable;
 
 const MetaData = Record({
   expiration: 0,
@@ -69,11 +71,13 @@ class BananaSlugAbstractNodePresenter {
       return;
     }
 
-    this._clearTimer && clearTimeout(this._clearTimer);
-    this._clearTimer = 0;
+    if (this._clearTimer) {
+      clearTimeout(this._clearTimer);
+      this._clearTimer = null;
+    }
+
     this._pool = this._pool.clear();
     this._drawing = false;
-
     this.clearImpl();
   }
 
@@ -103,7 +107,7 @@ class BananaSlugAbstractNodePresenter {
     var minExpiration = Number.MAX_VALUE;
 
     this._pool = this._pool.withMutations(_pool => {
-      for (let [measurement, data] of _pool.entries()) {
+      for (const [measurement, data] of _pool.entries()) {
         if (data.expiration < now) {
           // already passed the expiration time.
           _pool.delete(measurement);
@@ -112,7 +116,6 @@ class BananaSlugAbstractNodePresenter {
         }
       }
     });
-
 
     this.drawImpl(this._pool);
 
