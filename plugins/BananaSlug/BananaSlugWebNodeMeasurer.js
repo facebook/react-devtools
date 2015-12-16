@@ -23,11 +23,7 @@ const DUMMY = {
 };
 
 class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
-  constructor() {
-    super();
-  }
-
-  measureImpl(node): ?Object {
+  measureImpl(node): Object {
     if (!node || typeof node.getBoundingClientRect !== 'function') {
       return DUMMY;
     }
