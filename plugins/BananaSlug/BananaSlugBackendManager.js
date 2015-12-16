@@ -19,10 +19,6 @@ const NODE_TYPE_COMPOSITE = 'Composite';
 type Agent = any;
 
 class BananaSlugBackendManager {
-  static observe(agent: Agent) {
-    return new BananaSlugBackendManager(agent);
-  }
-
   constructor(agent: Agent) {
     this._onMeasureNode = this._onMeasureNode.bind(this);
 
