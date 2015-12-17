@@ -18,7 +18,7 @@ var provideStore = require('../../frontend/provideStore');
 
 var RelayStore = require('./Store');
 var QueriesTab = require('./QueriesTab');
-var StoreTab = require('./StoreTab');
+// var StoreTab = require('./StoreTab');
 var ElementPanel = require('./ElementPanel');
 
 var StoreWrapper = provideStore('relayStore');
@@ -71,11 +71,11 @@ class RelayPlugin {
           {() => <QueriesTab />}
         </StoreWrapper>
       ),
-      RelayStore: () => (
-        <StoreWrapper store={this.relayStore}>
-          {() => <StoreTab />}
-        </StoreWrapper>
-      ),
+      // RelayStore: () => (
+      //   <StoreWrapper store={this.relayStore}>
+      //     {() => <StoreTab />}
+      //   </StoreWrapper>
+      // ),
     };
   }
 }
