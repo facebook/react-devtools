@@ -58,7 +58,12 @@ function installRelayHook(window: Object) {
     };
   }
 
-  function recordRequest(type: 'mutation' | 'query', request) {
+  function recordRequest(
+    type: 'mutation' | 'query',
+    start: number,
+    request,
+    requestNumber: number,
+  ) {
     var id = Math.random().toString(16).substr(2);
     request.then(
       response => {
@@ -85,22 +90,34 @@ function installRelayHook(window: Object) {
     return {
       id: id,
       name: request.getDebugName(),
-      start: performance.now(),
+      requestNumber: requestNumber,
+      start: start,
       text: textChunks,
       type: type,
       variables: request.getVariables(),
     };
   }
 
+  let requestNumber = 0;
+
   function instrumentRelayRequests(relayInternals: Object) {
     var NetworkLayer = relayInternals.NetworkLayer;
 
     decorate(NetworkLayer, 'sendMutation', mutation => {
-      emit('relay:pending', [recordRequest('mutation', mutation)]);
+      requestNumber++;
+      emit(
+        'relay:pending',
+        [recordRequest('mutation', performance.now(), mutation, requestNumber)]
+      );
     });
 
     decorate(NetworkLayer, 'sendQueries', queries => {
-      emit('relay:pending', queries.map(query => recordRequest('query', query)));
+      requestNumber++;
+      const start = performance.now();
+      emit(
+        'relay:pending',
+        queries.map(query => recordRequest('query', start, query, requestNumber))
+      );
     });
 
     var instrumented = {};
