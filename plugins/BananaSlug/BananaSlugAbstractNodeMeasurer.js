@@ -5,18 +5,22 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
  */
 'use strict';
 
 const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 const immutable = require('immutable');
 
+import type {Measurement} from './BananaSlugTypes';
+
 // How long the measurement can be cached in ms.
 const DURATION = 800;
 
 const {Record, Map, Set} = immutable;
 
-const Measurement = Record({
+const MeasurementRecord = Record({
   bottom: 0,
   expiration: 0,
   height: 0,
@@ -32,6 +36,13 @@ const Measurement = Record({
 var _id = 100;
 
 class BananaSlugAbstractNodeMeasurer {
+  _callbacks: Map<Node, (v: Measurement) => void>;
+  _ids: Map<string, Node>;
+  _isRequesting: boolean;
+  _measureNodes: () => void;
+  _measurements: Map<Node, Measurement>;
+  _nodes: Map<string, Node>;
+
   constructor() {
     // pending nodes to measure.
     this._nodes = new Map();
@@ -51,7 +62,7 @@ class BananaSlugAbstractNodeMeasurer {
     this._measureNodes = this._measureNodes.bind(this);
   }
 
-  request(node, callback): string {
+  request(node: Node, callback: (v: Measurement) => void): string {
     var requestID = this._nodes.has(node) ?
       this._nodes.get(node) :
       String(_id++);
@@ -67,15 +78,26 @@ class BananaSlugAbstractNodeMeasurer {
     this._callbacks = this._callbacks.set(node, callbacks);
 
     if (this._isRequesting) {
-      return;
+      return requestID;
     }
 
     this._isRequesting = true;
     requestAnimationFrame(this._measureNodes);
+    return requestID;
   }
 
-  measureImpl(node: any): void {
-    // sub-class must implement this.
+  cancel(requestID: string): void {
+    if (this._ids.has(requestID)) {
+      var node = this._ids.get(requestID);
+      this._ids = this._ids.delete(requestID);
+      this._nodes = this._nodes.delete(node);
+      this._callbacks = this._callbacks.delete(node);
+    }
+  }
+
+  measureImpl(node: Node): Measurement {
+    // sub-class must overwrite this.
+    return new MeasurementRecord();
   }
 
   _measureNodes(): void {
@@ -110,7 +132,7 @@ class BananaSlugAbstractNodeMeasurer {
     this._isRequesting = false;
   }
 
-  _measureNode(timestamp: number, node: any): Measurement {
+  _measureNode(timestamp: number, node: Node): Measurement {
     var measurement;
     var data;
 
@@ -126,7 +148,7 @@ class BananaSlugAbstractNodeMeasurer {
       }
     } else {
       data = this.measureImpl(node);
-      measurement = new Measurement({
+      measurement = new MeasurementRecord({
         ...data,
         expiration: timestamp + DURATION,
         id: 'm_' + String(_id++),

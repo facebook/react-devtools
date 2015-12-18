@@ -5,6 +5,8 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
  */
 
 'use strict';
@@ -72,6 +74,8 @@ function drawBorder(ctx, measurement, borderWidth, borderColor) {
 const CANVAS_NODE_ID = 'BananaSlugWebNodePresenter';
 
 class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
+  _canvas: any;
+
   constructor() {
     super();
     this._canvas = null;

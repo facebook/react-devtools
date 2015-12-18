@@ -5,6 +5,8 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
  */
 
 'use strict';
@@ -14,11 +16,21 @@ const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresent
 const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
 const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
 
+import type {
+  Agent,
+  Measurement,
+  Measurer,
+  Presenter,
+} from './BananaSlugTypes';
+
 const NODE_TYPE_COMPOSITE = 'Composite';
 
-type Agent = any;
-
 class BananaSlugBackendManager {
+  _onMeasureNode: () => void;
+  _measurer: Measurer;
+  _presenter: Presenter;
+  _isActive: boolean;
+
   constructor(agent: Agent) {
     this._onMeasureNode = this._onMeasureNode.bind(this);
 
@@ -55,7 +67,7 @@ class BananaSlugBackendManager {
     this._measurer.request(node, this._onMeasureNode);
   }
 
-  _onMeasureNode(measurement: Object): void {
+  _onMeasureNode(measurement: Measurement): void {
     this._presenter.present(measurement);
   }
 

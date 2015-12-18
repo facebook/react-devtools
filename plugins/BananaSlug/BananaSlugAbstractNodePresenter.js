@@ -5,12 +5,17 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
  */
-
 'use strict';
 
 const immutable = require('immutable');
 const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
+
+import type {
+  Measurement,
+} from './BananaSlugTypes';
 
 // How long the measurement should be presented for.
 const DURATION = 250;
@@ -23,6 +28,13 @@ const MetaData = Record({
 });
 
 class BananaSlugAbstractNodePresenter {
+  _clearTimer: number;
+  _draw: () => void;
+  _drawing: boolean;
+  _enabled: boolean;
+  _pool: Map<Measurement, MetaData>;
+  _redraw: () => void;
+
   constructor() {
     this._pool = new Map();
     this._drawing = false;
@@ -33,7 +45,7 @@ class BananaSlugAbstractNodePresenter {
     this._redraw = this._redraw.bind(this);
   }
 
-  present(measurement: Object): void {
+  present(measurement: Measurement): void {
     if (!this._enabled) {
       return;
     }
@@ -73,7 +85,7 @@ class BananaSlugAbstractNodePresenter {
 
     if (this._clearTimer) {
       clearTimeout(this._clearTimer);
-      this._clearTimer = null;
+      this._clearTimer = 0;
     }
 
     this._pool = this._pool.clear();
@@ -81,7 +93,7 @@ class BananaSlugAbstractNodePresenter {
     this.clearImpl();
   }
 
-  drawImpl(info: Object): void {
+  drawImpl(measurements: Map<Measurement, MetaData>): void {
     // sub-class should implement this.
   }
 
@@ -90,7 +102,7 @@ class BananaSlugAbstractNodePresenter {
   }
 
   _redraw(): void {
-    this._clearTimer = null;
+    this._clearTimer = 0;
     if (!this._drawing && this._pool.size > 0) {
       this._drawing = true;
       this._draw();

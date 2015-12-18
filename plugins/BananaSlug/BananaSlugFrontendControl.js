@@ -5,23 +5,40 @@
  * This source code is licensed under the BSD-style license found in the
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
  */
 
 'use strict';
 
 const React = require('react');
-
 const immutable = require('immutable');
 
-const State = immutable.Record({
+import type {
+  ControlState,
+} from './BananaSlugTypes';
+
+type Props = {
+  onChange: (v: ControlState) => void,
+};
+
+type State = {};
+
+type DefaultProps = {};
+
+const StateRecord = immutable.Record({
   enabled: false,
 });
 
-class BananaSlugFrontendControl extends React.Component {
-  constructor(props) {
+class BananaSlugFrontendControl extends
+  React.Component<DefaultProps, Props, State> {
+  _defaultState: ControlState;
+  _toogle: (b: boolean) => void;
+
+  constructor(props: Props) {
     super(props);
     this._toogle = this._toogle.bind(this);
-    this._defaultState = new State();
+    this._defaultState = new StateRecord();
   }
 
   componentDidMount(): void {
@@ -30,7 +47,7 @@ class BananaSlugFrontendControl extends React.Component {
     }
   }
 
-  render() {
+  render(): ReactElement {
     var state = this.props.state || this._defaultState;
     return (
       <div style={styles.container} onClick={this._toogle} tabIndex={0}>
