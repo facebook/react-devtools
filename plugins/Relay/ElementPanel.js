@@ -35,7 +35,12 @@ class ElementPanel extends React.Component {
             </div>
             <ul style={styles.queries}>
               {queries.map(query => (
-                <li style={styles.queryID} onClick={() => this.props.jumpToQuery(query.get('id'))}>
+                <li style={styles.queryID} onClick={() => {
+                  var queryID = query.get('id');
+                  if (queryID) {
+                    this.props.jumpToQuery(queryID);
+                  }
+                }}>
                   {query.get('name')}
                 </li>
               ))}

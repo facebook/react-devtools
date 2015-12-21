@@ -19,7 +19,6 @@ module.exports = function(name: string): Object {
       store: Object,
     };
     getChildContext() {
-      // $FlowFixMe computed property
       return {[name]: this.props.store};
     }
     render() {
@@ -27,7 +26,6 @@ module.exports = function(name: string): Object {
     }
   }
   Wrapper.childContextTypes = {
-    // $FlowFixMe computed property
     [name]: React.PropTypes.object,
   };
   Wrapper.displayName = 'StoreProvider(' + name + ')';

@@ -285,8 +285,11 @@ class Bridge {
     }
 
     if (payload.type === 'callback') {
-      this._cbs.get(payload.id)(...payload.args);
-      this._cbs.delete(payload.id);
+      var callback = this._cbs.get(payload.id);
+      if (callback) {
+        callback(...payload.args);
+        this._cbs.delete(payload.id);
+      }
       return;
     }
 
@@ -346,12 +349,14 @@ class Bridge {
   }
 
   _inspectResponse(id: string, path: Array<string>, callback: number) {
-    var val = getIn(this._inspectables.get(id), path);
+    var inspectable = this._inspectables.get(id);
+
     var result = {};
     var cleaned = [];
     var proto = null;
     var protoclean = [];
-    if (val) {
+    if (inspectable) {
+      var val = getIn(inspectable, path);
       var protod = false;
       var isFn = typeof val === 'function';
       Object.getOwnPropertyNames(val).forEach(name => {

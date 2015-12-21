@@ -62,7 +62,6 @@ class Highlighter {
     if (!this._overlay) {
       this._overlay = new Overlay(this._win);
     }
-    // $FlowFixMe this._overlay is clearly not null at this point
     this._overlay.inspect(node, name);
   }
 
@@ -71,7 +70,6 @@ class Highlighter {
     if (!this._multiOverlay) {
       this._multiOverlay = new MultiOverlay(this._win);
     }
-    // $FlowFixMe this._multiOverlay is clearly not null at this point
     this._multiOverlay.highlightMany(nodes);
   }
 
