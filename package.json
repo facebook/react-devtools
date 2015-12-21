@@ -5,13 +5,13 @@
     "babel-preset-stage-0": "^6.1.18",
     "classnames": "^2.1.2",
     "es6-symbol": "^2.0.1",
-    "fbjs": "^0.4.0",
+    "fbjs": "0.5.1",
     "fbjs-scripts": "0.5.0",
     "immutable": "^3.7.4",
     "object-assign": "^3.0.0",
-    "react": "^0.14.2",
-    "react-addons-create-fragment": "^0.14.2",
-    "react-dom": "^0.14.2"
+    "react": "0.14.3",
+    "react-addons-create-fragment": "0.14.3",
+    "react-dom": "0.14.3"
   },
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
