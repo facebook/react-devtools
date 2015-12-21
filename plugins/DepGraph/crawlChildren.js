@@ -15,7 +15,7 @@ var sep = '\x1f'; // separator
 
 function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map>, depth: number, graph: Object) {
   var descendents = [];
-  var keepCrawling = true;//depth < MAX_DEPTH;
+  var keepCrawling = true; // depth < MAX_DEPTH;
   children.forEach(cid => {
     var child = nodes.get(cid);
     var isCustom = child.get('nodeType') === 'Composite';
