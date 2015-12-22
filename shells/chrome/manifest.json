@@ -20,7 +20,8 @@
   },
 
   "permissions": [
-    "http://*/",
+    "file:///*",
+    "http://*/*",
     "https://*/*"
   ],
 
