@@ -11,9 +11,14 @@
 'use strict';
 
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
-var source = ';(' + installGlobalHook.toString() + ')(window);';
+var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
+
+var js = (
+  ';(' + installGlobalHook.toString() + '(window))' +
+  ';(' + installRelayHook.toString() + '(window))'
+);
 
 var script = document.createElement('script');
-script.textContent = source;
+script.textContent = js;
 document.documentElement.appendChild(script);
 script.parentNode.removeChild(script);

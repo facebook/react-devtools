@@ -15,12 +15,18 @@ var sep = '\x1f'; // separator
 
 function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map>, depth: number, graph: Object) {
   var descendents = [];
-  var keepCrawling = true;//depth < MAX_DEPTH;
+  var keepCrawling = true; // depth < MAX_DEPTH;
   children.forEach(cid => {
     var child = nodes.get(cid);
+    if (!child) {
+      return;
+    }
     var isCustom = child.get('nodeType') === 'Composite';
     if (isCustom) {
       var name = child.get('name');
+      if (!name) {
+        return;
+      }
       if (!graph.nodes[name]) {
         graph.nodes[name] = 1;
       } else {
@@ -33,7 +39,7 @@ function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string
         graph.edges[key] = 1;
       }
     }
-    if (keepCrawling) {
+    if (keepCrawling && name) {
       var grandChildren = child.get('children');
       if (grandChildren && Array.isArray(grandChildren)) {
         if (isCustom) {

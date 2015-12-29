@@ -190,13 +190,12 @@ class DataItem extends React.Component {
   }
 }
 
-function alphanumericSort(a, b) {
+function alphanumericSort(a: string, b: string): number {
   if ('' + (+a) === a) {
     if ('' + (+b) !== b) {
       return -1;
     }
-    a = +a;
-    b = +b;
+    return (+a < +b) ? -1 : 1;
   }
   return (a < b) ? -1 : 1;
 }

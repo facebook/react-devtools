@@ -160,7 +160,7 @@ class Agent extends EventEmitter {
     // used to "view source in Sources pane"
     bridge.on('putSelectedInstance', id => {
       var node = this.elementData.get(id);
-      if (node.publicInstance) {
+      if (node && node.publicInstance) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.publicInstance;
       } else {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = null;
@@ -210,7 +210,7 @@ class Agent extends EventEmitter {
   highlight(id: ElementID) {
     var data = this.elementData.get(id);
     var node = this.getNodeForID(id);
-    if (node) {
+    if (data && node) {
       this.emit('highlight', {node, name: data.name, props: data.props});
     }
   }
@@ -234,7 +234,7 @@ class Agent extends EventEmitter {
       return null;
     }
     var renderer = this.renderers.get(id);
-    if (this.reactInternals[renderer].getNativeFromReactElement) {
+    if (renderer && this.reactInternals[renderer].getNativeFromReactElement) {
       return this.reactInternals[renderer].getNativeFromReactElement(component);
     }
   }
@@ -275,7 +275,7 @@ class Agent extends EventEmitter {
 
   _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data.updater && data.updater.setInProps) {
+    if (data && data.updater && data.updater.setInProps) {
       data.updater.setInProps(path, value);
     } else {
       console.warn("trying to set props on a component that doesn't support it");
@@ -284,7 +284,7 @@ class Agent extends EventEmitter {
 
   _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data.updater && data.updater.setInState) {
+    if (data && data.updater && data.updater.setInState) {
       data.updater.setInState(path, value);
     } else {
       console.warn("trying to set state on a component that doesn't support it");
@@ -293,7 +293,7 @@ class Agent extends EventEmitter {
 
   _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data.updater && data.updater.setInContext) {
+    if (data && data.updater && data.updater.setInContext) {
       data.updater.setInContext(path, value);
     } else {
       console.warn("trying to set state on a component that doesn't support it");
@@ -302,6 +302,9 @@ class Agent extends EventEmitter {
 
   _makeGlobal({id, path}: {id: ElementID, path: Array<string>}) {
     var data = this.elementData.get(id);
+    if (!data) {
+      return;
+    }
     var value;
     if (path === 'instance') {
       value = data.publicInstance;

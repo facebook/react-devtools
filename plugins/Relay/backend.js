@@ -28,10 +28,7 @@ function decorate(obj, attr, fn) {
 let subscriptionEnabled = false;
 
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
-  var shouldEnable = !!(
-    hook._relayInternals &&
-    window.location.hash.indexOf('relaydevtools') >= 0
-  );
+  var shouldEnable = !!hook._relayInternals;
 
   bridge.onCall('relay:check', () => shouldEnable);
   if (!shouldEnable) {

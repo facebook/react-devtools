@@ -219,7 +219,6 @@ class Store extends EventEmitter {
           .map(([key, val]) => key)
           .toList();
       }
-      // $FlowFixMe this.searchRoots is not falsey
       this.searchRoots.forEach(id => {
         if (this.hasBottom(id)) {
           this._nodes = this._nodes.setIn([id, 'collapsed'], true);
