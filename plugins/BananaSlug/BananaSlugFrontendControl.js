@@ -33,11 +33,11 @@ const StateRecord = immutable.Record({
 class BananaSlugFrontendControl extends
   React.Component<DefaultProps, Props, State> {
   _defaultState: ControlState;
-  _toogle: (b: boolean) => void;
+  _toggle: (b: boolean) => void;
 
   constructor(props: Props) {
     super(props);
-    this._toogle = this._toogle.bind(this);
+    this._toggle = this._toggle.bind(this);
     this._defaultState = new StateRecord();
   }
 
@@ -50,7 +50,7 @@ class BananaSlugFrontendControl extends
   render(): ReactElement {
     var state = this.props.state || this._defaultState;
     return (
-      <div style={styles.container} onClick={this._toogle} tabIndex={0}>
+      <div style={styles.container} onClick={this._toggle} tabIndex={0}>
         <input
           style={styles.checkbox}
           type="checkbox"
@@ -62,7 +62,7 @@ class BananaSlugFrontendControl extends
     );
   }
 
-  _toogle() {
+  _toggle() {
     var state = this.props.state || this._defaultState;
     var nextState = state.merge({
       enabled: !state.enabled,
