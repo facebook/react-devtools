@@ -11,9 +11,11 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
+var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBackendManager');
 var Bridge = require('../../../agent/Bridge');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRelay = require('../../../plugins/Relay/backend');
+
 
 var inject = require('../../../agent/inject');
 
@@ -86,4 +88,6 @@ function setup() {
   if (window.document && window.document.createElement) {
     setupHighlighter(agent);
   }
+
+  BananaSlugBackendManager.init(agent);
 }
