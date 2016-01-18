@@ -31,10 +31,10 @@ module.exports = {
     }],
   },
 
-  plugins: [new webpack.DefinePlugin({
-    'Object.create': 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeObjectCreate',
-    WeakMap: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeWeakMap',
-    Map: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeMap',
-    Set: 'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet',
+  plugins: [new webpack.ProvidePlugin({
+    'Object.create': __dirname + '/helpers/object-create.js',
+    Map: __dirname + '/helpers/map.js',
+    WeakMap: __dirname + '/helpers/weak-map.js',
+    Set: __dirname + '/helpers/set.js',
   })],
 };
