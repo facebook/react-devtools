@@ -13,7 +13,6 @@
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
-var ReactDOM = require('react-dom');
 
 var decorate = require('./decorate');
 
@@ -27,14 +26,16 @@ class TreeView extends React.Component {
   }
 
   scrollTo(val, height) {
-    var node = ReactDOM.findDOMNode(this);
-    var top = node.scrollTop;
-    var rel = val - node.offsetTop;
+    if (!this.node) {
+      return;
+    }
+    var top = this.node.scrollTop;
+    var rel = val - this.node.offsetTop;
     var margin = 40;
     if (top > rel - margin) {
-      node.scrollTop = rel - margin;
-    } else if (top + node.offsetHeight < rel + height + margin) {
-      node.scrollTop = rel - node.offsetHeight + height + margin;
+      this.node.scrollTop = rel - margin;
+    } else if (top + this.node.offsetHeight < rel + height + margin) {
+      this.node.scrollTop = rel - this.node.offsetHeight + height + margin;
     }
   }
 
@@ -74,7 +75,7 @@ class TreeView extends React.Component {
 
     return (
       <div style={styles.container}>
-        <div style={styles.scroll}>
+        <div ref={n => this.node = n} style={styles.scroll}>
           {this.props.roots.map(id => (
             <Node key={id} id={id} depth={0} />
           )).toJS()}
