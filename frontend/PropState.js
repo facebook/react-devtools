@@ -64,6 +64,8 @@ class PropState extends React.Component {
       }
     }
 
+    var key = this.props.node.get('key');
+    var ref = this.props.node.get('ref');
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
@@ -72,6 +74,8 @@ class PropState extends React.Component {
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
         hint="($r in the console)">
+        {key && <DetailPaneSection title="Key" hint={key}/>}
+        {ref && <DetailPaneSection title="Ref" hint={ref}/>}
         {editTextContent}
         <DetailPaneSection
           hint={propsReadOnly ? 'read-only' : null}
