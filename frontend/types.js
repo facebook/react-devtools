@@ -52,4 +52,5 @@ export type DOMEvent = {
   stopPropagation: () => void,
   cancelBubble: boolean,
   keyCode: number,
+  key: string,
 };
