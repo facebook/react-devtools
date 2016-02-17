@@ -57,7 +57,7 @@ class BananaSlugFrontendControl extends
           checked={state.enabled}
           readOnly={true}
         />
-        <span>trace react updates</span>
+        <span>Trace React updates</span>
       </div>
     );
   }
