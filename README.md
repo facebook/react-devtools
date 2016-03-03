@@ -67,6 +67,17 @@ or by inspecting [Facebook](https://www.facebook.com/).
 
 Currently iframes and Chrome apps/extensions are not inspectable.
 
+### Does "Trace React Updates" trace renders?
+
+Yes, but it's also tracing if a component *may* render.
+In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
+![](https://facebook.github.io/react/img/docs/should-component-update.png)
+
+Here "Trace React Updates" will draw a border around every node but C4 and C5.
+Why is other stuff than just renders traced?
+If not careful, the checks done in shouldComponentUpdate can sometimes take longer than the render operation itself.
+By tracing sCU, renders and other internal operations that may lead to an update, it allows you to figure out what the "hot paths" of your UI is and what parts you should focus on optimizing.
+
 ### ProTips
 
 If you inspect a React element on the page using the regular **Elements** tab,
