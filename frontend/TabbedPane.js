@@ -58,6 +58,7 @@ var styles = {
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
+    maxWidth: '100%',
   },
   tabs: {
     display: 'flex',
