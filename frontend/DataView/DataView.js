@@ -41,7 +41,11 @@ class DataView extends React.Component {
     }
     var path = this.props.path;
     if (!names.length) {
-      return <span style={styles.empty}>Empty object</span>;
+      return (
+        <span style={styles.empty}>
+          {Array.isArray(data) ? 'Empty array' : 'Empty object'}
+        </span>
+      );
     }
 
     return (
