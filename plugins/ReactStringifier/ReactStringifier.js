@@ -18,20 +18,28 @@ var consts = require('../../agent/consts');
 
 type ReactProps = {[key: string]: any};
 
+const USE_RENDERED_CHILDREN = true;
+
 function indent(depth: number): string {
   return new Array(depth + 1).join('  ');
 }
 
 class ReactStringifier {
   _bridge: Bridge;
+  _store: Store;
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, store: Store) {
     this._bridge = bridge;
+    this._store = store;
   }
 
   stringify(node: Object): Promise<string> {
+    let objectNode = {};
+    for (let [key, value] of node.entries()) {
+      objectNode[key] = value;
+    }
     return this._stringifyComponentWrapper(
-      new ComponentWrapper(this._bridge, node, []),
+      new ComponentWrapper(this._bridge, this._store, objectNode, []),
       0 // depth
     );
   }
@@ -190,15 +198,17 @@ class ReactStringifier {
  */
 class ValueWrapper {
   _bridge: Bridge;
+  _store: Store;
   _rootNode: Object;
   _rootNodeId: string;
   _valuePath: Array<string>;
 
-  constructor(bridge: Bridge, rootNode: Object, valuePath: Array<string>) {
+  constructor(bridge: Bridge, store: Store, rootNode: Object, valuePath: Array<string>) {
     this._bridge = bridge;
+    this._store = store;
     this._rootNode = rootNode;
     this._valuePath = valuePath;
-    this._rootNodeId = rootNode.get('id');
+    this._rootNodeId = rootNode.id;
   }
 
   _isComponent(value: Object): boolean {
@@ -218,13 +228,13 @@ class ValueWrapper {
       return value;
     } else if (typeof value === 'object') {
       if (this._isComponent(value)) {
-        return new ComponentWrapper(this._bridge, this._rootNode, valuePath);
+        return new ComponentWrapper(this._bridge, this._store, this._rootNode, valuePath);
       } else if (this._isElement(value)) {
-        return new ElementWrapper(this._bridge, this._rootNode, valuePath, value[consts.name]);
+        return new ElementWrapper(this._bridge, this._store, this._rootNode, valuePath, value[consts.name]);
       } else if (this._isObjectInstance(value)) {
-        return new ObjectInstanceWrapper(this._bridge, this._rootNode, valuePath, value[consts.name]);
+        return new ObjectInstanceWrapper(this._bridge, this._store, this._rootNode, valuePath, value[consts.name]);
       } else {
-        return new ValueWrapper(this._bridge, this._rootNode, valuePath);
+        return new ValueWrapper(this._bridge, this._store, this._rootNode, valuePath);
       }
     } else {
       return value;
@@ -284,6 +294,7 @@ class ComponentWrapper extends ValueWrapper {
       this._bridge.inspect(this._rootNodeId, this._valuePath, value => {
         var name = value.name;
         var props = value.props;
+        var children = value.children;
 
         // For some reason root elements that do not have "complex types" do
         // not get anything from the bridge... In this situation we can only
@@ -292,35 +303,79 @@ class ComponentWrapper extends ValueWrapper {
           readDataFromRootNode = true;
         }
         if (readDataFromRootNode) {
-          name = this._rootNode.get('name');
-          props = this._rootNode.get('props');
+          name = this._rootNode.name;
+          props = this._rootNode.props;
+          children = this._rootNode.children;
         }
 
         // type == string => span, div, etc.
         if (name || typeof value.type === 'string') {
-          resolve({name: name || value.type, props: props});
+          resolve({
+            name: name || value.type,
+            props: props,
+            renderedChildren: children,
+          });
         } else {
           this._bridge.inspect(this._rootNodeId, this._valuePath.concat('type'), type => {
             // name: ES6 class component
             // displayName: React.createClass component
-            resolve({name: type.name || type.displayName, props: props});
+            resolve({
+              name: type.name || type.displayName,
+              props: props,
+              renderedChildren: children,
+            });
           });
         }
       });
-    }).then(nameAndProps => {
-      var { children, ...props } = nameAndProps.props;
+    }).then(({name, props, renderedChildren}) => {
+      var {children, ...props} = props;
 
       return {
-        name: nameAndProps.name,
+        name: name,
         props: readDataFromRootNode
           ? props
           : this._wrapObjectValues(props, this._valuePath.concat('props')),
-        children: this._wrapChildrenValues(children)
+        children: USE_RENDERED_CHILDREN
+          ? this._wrapRenderedChildren(renderedChildren)
+          : this._wrapPropsChildren(children)
       }
     })
   }
 
-  _wrapChildrenValues(propsChildren: ?Object): Array<any> {
+  _wrapRenderedChildren(renderedChildren: ?Object): Array<any> {
+    if (Array.isArray(renderedChildren)) {
+      return renderedChildren.map((childId, childIndex) => {
+        let node = this._store.get(childId);
+
+        if (node.get('nodeType') === 'Text') {
+          return this._wrapValue(
+            node.get('text'),
+            this._valuePath.concat('children', childIndex)
+          );
+        } else {
+          let objectNode = {};
+          for (let [key, value] of node.entries()) {
+            objectNode[key] = value;
+          }
+          return new ComponentWrapper(
+            this._bridge,
+            this._store,
+            objectNode,
+            [],
+          );
+        }
+      });
+    } else {
+      return renderedChildren
+        ? [this._wrapValue(
+            renderedChildren,
+            this._valuePath.concat('children')
+          )]
+        : [];
+    }
+  }
+
+  _wrapPropsChildren(propsChildren: ?Object): Array<any> {
     var children;
 
     if (Array.isArray(propsChildren)) {
@@ -345,8 +400,8 @@ class ComponentWrapper extends ValueWrapper {
 class ObjectInstanceWrapper extends ValueWrapper {
   _objectName: string;
 
-  constructor(bridge: Bridge, rootNode: Object, valuePath: Array<string>, objectName: string) {
-    super(bridge, rootNode, valuePath);
+  constructor(bridge: Bridge, store: Store, rootNode: Object, valuePath: Array<string>, objectName: string) {
+    super(bridge, store, rootNode, valuePath);
     this._objectName = objectName;
   }
 
@@ -369,8 +424,8 @@ class ObjectInstanceWrapper extends ValueWrapper {
 class ElementWrapper extends ValueWrapper {
   _elementName: string;
 
-  constructor(bridge: Bridge, rootNode: Object, valuePath: Array<string>, elementName: string) {
-    super(bridge, rootNode, valuePath);
+  constructor(bridge: Bridge, store: Store, rootNode: Object, valuePath: Array<string>, elementName: string) {
+    super(bridge, store, rootNode, valuePath);
     this._elementName = elementName;
   }
 

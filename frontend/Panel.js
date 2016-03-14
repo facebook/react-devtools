@@ -145,7 +145,8 @@ class Panel extends React.Component {
   }
 
   copyNodeUsageToClipboard(node: Object) {
-    new ReactStringifier(this._bridge).stringify(node).then(stringification => {
+    new ReactStringifier(this._bridge, this._store)
+      .stringify(node).then(stringification => {
       var fiddle =
         'ReactDOM.render(\n' +
         stringification + ',\n' +
