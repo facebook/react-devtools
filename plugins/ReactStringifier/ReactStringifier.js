@@ -434,19 +434,4 @@ class ElementWrapper extends ValueWrapper {
   }
 }
 
-
-function copyToClipboard(text: string) {
-  var root = document.body;
-  var textarea = document.createElement('textarea');
-
-  root.appendChild(textarea);
-  textarea.value = text;
-  textarea.select();
-  try {
-    document.execCommand('copy');
-  } catch (e) { console.error(e) }
-  root.removeChild(textarea);
-}
-
 module.exports = ReactStringifier;
-module.exports.copyToClipboard = copyToClipboard;

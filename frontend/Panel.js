@@ -40,6 +40,7 @@ export type Props = {
   executeFn: ?(path: Array<string>) => void,
   selectElement: ?(id: string, bridge: Bridge) => void,
   getNewSelection: ?(bridge: Bridge) => void,
+  copyToClipboard: ?(text: string) => void,
 };
 
 class Panel extends React.Component {
@@ -144,15 +145,33 @@ class Panel extends React.Component {
     }, 100);
   }
 
+  copyToClipboard(text: string) {
+    if (this.props.copyToClipboard) {
+      this.props.copyToClipboard(text);
+      return;
+    }
+
+    var root = document.body;
+    var textarea = document.createElement('textarea');
+
+    root.appendChild(textarea);
+    textarea.value = text;
+    textarea.select();
+    try {
+      document.execCommand('copy');
+    } catch (e) { console.error(e) }
+    root.removeChild(textarea);
+  }
+
   copyNodeUsageToClipboard(node: Object) {
     new ReactStringifier(this._bridge, this._store)
       .stringify(node).then(stringification => {
-      var fiddle =
+      var text =
         'ReactDOM.render(\n' +
         stringification + ',\n' +
         'document.body\n' +
         ');';
-      ReactStringifier.copyToClipboard(fiddle);
+      this.copyToClipboard(text);
     }).catch(e => console.error(e));
   }
 
