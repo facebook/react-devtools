@@ -126,7 +126,7 @@ class ReactStringifier {
 
   _stringifyValue(value: any, depth: number): Promise<string> {
     // infinite loop safeguard
-    if (depth > 10) {
+    if (depth > 100) {
       return Promise.resolve("(depth > " + depth + ")");
     }
 
