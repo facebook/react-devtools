@@ -20,6 +20,7 @@ var assign = require('object-assign');
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
+var ReactStringifier = require('../plugins/ReactStringifier/ReactStringifier.js')
 
 var consts = require('../agent/consts');
 
@@ -143,6 +144,17 @@ class Panel extends React.Component {
     }, 100);
   }
 
+  copyNodeUsageToClipboard(node: Object) {
+    new ReactStringifier(this._bridge).stringify(node).then(stringification => {
+      var fiddle =
+        'ReactDOM.render(\n' +
+        stringification + ',\n' +
+        'document.body\n' +
+        ');';
+      ReactStringifier.copyToClipboard(fiddle);
+    }).catch(e => console.error(e));
+  }
+
   teardown() {
     this.plugins.forEach(p => p.teardown());
     this.plugins = [];
@@ -251,6 +263,9 @@ class Panel extends React.Component {
             }, this.props.selectElement && this._store.capabilities.dom && {
               title: 'Show in Elements Pane',
               action: () => this.sendSelection(id),
+            }, {
+              title: 'Copy ' + node.get('name') + ' usage to clipboard',
+              action: () => this.copyNodeUsageToClipboard(node),
             }];
           },
         }}
