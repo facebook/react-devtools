@@ -142,7 +142,7 @@ class ReactStringifier {
     } else if (value instanceof ComponentWrapper) {
       return this._stringifyComponentWrapper(value, depth + 1)
         .then(stringified => '\n' + stringified);
-    } else if (value instanceof ObjectInstanceWrapper) {
+    } else if (value instanceof ObjectInstanceWrapper || value instanceof ElementWrapper) {
       return value.getValue();
     } else if (value instanceof ValueWrapper) {
       return value.getValue().then(value => {
@@ -209,12 +209,18 @@ class ValueWrapper {
     return value[consts.type] === 'object' && !(value[consts.name] in {'Function': 1, 'RegExp': 1});
   }
 
+  _isElement(value: Object): boolean {
+    return value[consts.type] === 'object' && /^HTML.*Element$/.test(value[consts.name]);
+  }
+
   _wrapValue(value: any, valuePath: Array<string>): any {
     if (value == null) {
       return value;
     } else if (typeof value === 'object') {
       if (this._isComponent(value)) {
         return new ComponentWrapper(this._bridge, this._rootNode, valuePath);
+      } else if (this._isElement(value)) {
+        return new ElementWrapper(this._bridge, this._rootNode, valuePath, value[consts.name]);
       } else if (this._isObjectInstance(value)) {
         return new ObjectInstanceWrapper(this._bridge, this._rootNode, valuePath, value[consts.name]);
       } else {
@@ -359,6 +365,20 @@ class ObjectInstanceWrapper extends ValueWrapper {
     });
   }
 }
+
+class ElementWrapper extends ValueWrapper {
+  _elementName: string;
+
+  constructor(bridge: Bridge, rootNode: Object, valuePath: Array<string>, elementName: string) {
+    super(bridge, rootNode, valuePath);
+    this._elementName = elementName;
+  }
+
+  getValue(): Promise<string> {
+    return Promise.resolve("document.create('" + this._elementName + "')");
+  }
+}
+
 
 function copyToClipboard(text: string) {
   var root = document.body;
