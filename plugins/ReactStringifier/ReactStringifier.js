@@ -135,7 +135,8 @@ class ReactStringifier {
     } else if (value instanceof RegExp) {
       return value.toString();
     } else if (typeof value === 'function') {
-      return Promise.resolve('function() {}');
+      let functionName = value.displayName || '';
+      return Promise.resolve('function ' + functionName + '() {}');
     } else if (Array.isArray(value)) {
       return this._stringifyArray(value, depth);
     } else if (value instanceof ComponentWrapper) {
