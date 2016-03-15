@@ -30,7 +30,7 @@ function getData(element: Object): DataType {
   // If the parent is a native node without rendered children, but with
   // multiple string children, then the `element` that gets passed in here is
   // a plain value -- a string or number.
-  if (typeof element !== "object") {
+  if (typeof element !== 'object') {
     nodeType = 'Text';
     text = element + '';
   } else if (element._currentElement === null || element._currentElement === false) {
