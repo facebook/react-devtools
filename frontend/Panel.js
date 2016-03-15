@@ -20,7 +20,7 @@ var assign = require('object-assign');
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
-var ReactStringifier = require('../plugins/ReactStringifier/ReactStringifier.js')
+var ReactStringifier = require('../plugins/ReactStringifier/ReactStringifier.js');
 
 var consts = require('../agent/consts');
 
@@ -40,7 +40,7 @@ export type Props = {
   executeFn: ?(path: Array<string>) => void,
   selectElement: ?(id: string, bridge: Bridge) => void,
   getNewSelection: ?(bridge: Bridge) => void,
-  copyToClipboard: ?(text: string) => void,
+  copyToClipboard?: (text: string) => void,
 };
 
 class Panel extends React.Component {
@@ -159,20 +159,22 @@ class Panel extends React.Component {
     textarea.select();
     try {
       document.execCommand('copy');
-    } catch (e) { console.error(e) }
+    } catch (e) {
+      console.error(e);
+    }
     root.removeChild(textarea);
   }
 
   copyNodeUsageToClipboard(node: Object) {
     new ReactStringifier(this._bridge, this._store)
       .stringify(node).then(stringification => {
-      var text =
-        'ReactDOM.render(\n' +
-        stringification + ',\n' +
-        'document.body\n' +
-        ');';
-      this.copyToClipboard(text);
-    }).catch(e => console.error(e));
+        var text =
+          'ReactDOM.render(\n' +
+          stringification + ',\n' +
+          'document.body\n' +
+          ');';
+        this.copyToClipboard(text);
+      }).catch(e => console.error(e));
   }
 
   teardown() {

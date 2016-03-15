@@ -16,8 +16,6 @@ import type Store from '../../frontend/Store';
 var Symbol = require('es6-symbol');
 var consts = require('../../agent/consts');
 
-type ReactProps = {[key: string]: any};
-
 const USE_RENDERED_CHILDREN = true;
 
 function indent(depth: number): string {
@@ -34,8 +32,8 @@ class ReactStringifier {
   }
 
   stringify(node: Object): Promise<string> {
-    let objectNode = {};
-    for (let [key, value] of node.entries()) {
+    const objectNode = {};
+    for (const [key, value] of node.entries()) {
       objectNode[key] = value;
     }
     return this._stringifyComponentWrapper(
@@ -53,7 +51,7 @@ class ReactStringifier {
 
       return Promise.all([
         this._stringifyChildren(children, depth),
-        this._stringifyProps(props, depth + 1)
+        this._stringifyProps(props, depth + 1),
       ]).then(([serializedChildren, serializedProps]: [string, string]) => {
         return (
           indent(depth) +
@@ -127,7 +125,7 @@ class ReactStringifier {
             serializedValue +
             (object instanceof ComponentWrapper ? '\n' + indent(depth) : '') +
             '}'
-          )
+          );
         }
       });
   }
@@ -135,7 +133,7 @@ class ReactStringifier {
   _stringifyValue(value: any, depth: number): Promise<string> {
     // infinite loop safeguard
     if (depth > 100) {
-      return Promise.resolve("(depth > " + depth + ")");
+      return Promise.resolve('(depth > ' + depth + ')');
     }
 
     if (value == null || typeof value in {'undefined': 1, 'string': 1, 'number': 1, 'boolean': 1}) {
@@ -143,7 +141,7 @@ class ReactStringifier {
     } else if (value instanceof RegExp) {
       return value.toString();
     } else if (typeof value === 'function') {
-      let functionName = value.displayName || '';
+      const functionName = value.displayName || '';
       return Promise.resolve('function ' + functionName + '() {}');
     } else if (Array.isArray(value)) {
       return this._stringifyArray(value, depth);
@@ -153,8 +151,8 @@ class ReactStringifier {
     } else if (value instanceof ObjectInstanceWrapper || value instanceof ElementWrapper) {
       return value.getValue();
     } else if (value instanceof ValueWrapper) {
-      return value.getValue().then(value => {
-        return this._stringifyValue(value, depth)
+      return value.getValue().then(unwrappedValue => {
+        return this._stringifyValue(unwrappedValue, depth);
       });
     } else {
       return this._stringifyObject(value, depth);
@@ -266,12 +264,13 @@ class ValueWrapper {
         if (type === 'Array') {
           value = this._wrapArrayValues(value, this._valuePath);
         } else if (type === 'Function') {
-          var funktion = function(){};
+          var funktion = function() {};
           funktion.displayName = value.name;
           value = funktion;
         } else if (type === 'RegExp') {
           value = new RegExp(
             value.source,
+            // $FlowIssue - flow is only able to accept string literals 
             (value.global ? 'g' : '') +
             (value.ignoreCase ? 'i' : '') +
             (value.multiline ? 'm' : '')
@@ -328,24 +327,24 @@ class ComponentWrapper extends ValueWrapper {
         }
       });
     }).then(({name, props, renderedChildren}) => {
-      var {children, ...props} = props;
+      var {children, ...propsWithoutChildren} = props;
 
       return {
         name: name,
         props: readDataFromRootNode
-          ? props
-          : this._wrapObjectValues(props, this._valuePath.concat('props')),
+          ? propsWithoutChildren
+          : this._wrapObjectValues(propsWithoutChildren, this._valuePath.concat('props')),
         children: USE_RENDERED_CHILDREN
           ? this._wrapRenderedChildren(renderedChildren)
-          : this._wrapPropsChildren(children)
-      }
-    })
+          : this._wrapPropsChildren(children),
+      };
+    });
   }
 
   _wrapRenderedChildren(renderedChildren: ?Object): Array<any> {
     if (Array.isArray(renderedChildren)) {
       return renderedChildren.map((childId, childIndex) => {
-        let node = this._store.get(childId);
+        const node = this._store.get(childId);
 
         if (node.get('nodeType') === 'Text') {
           return this._wrapValue(
@@ -353,8 +352,8 @@ class ComponentWrapper extends ValueWrapper {
             this._valuePath.concat('children', childIndex)
           );
         } else {
-          let objectNode = {};
-          for (let [key, value] of node.entries()) {
+          const objectNode = {};
+          for (const [key, value] of node.entries()) {
             objectNode[key] = value;
           }
           return new ComponentWrapper(
@@ -406,15 +405,13 @@ class ObjectInstanceWrapper extends ValueWrapper {
   }
 
   getValue(): Promise<string> {
-    var value;
-
     return new Promise((resolve, reject) => {
       this._bridge.inspect(this._rootNodeId, this._valuePath, value => {
         // Special cases reside here.
         if (value.$FbtResult_contents) {
           resolve(JSON.stringify(value.props.translation));
         } else {
-          resolve("new " + this._objectName + "()")
+          resolve('new ' + this._objectName + '()');
         }
       });
     });
