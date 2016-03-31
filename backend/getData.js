@@ -78,7 +78,7 @@ function getData(element: Object): DataType {
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
-      setInProps: inst.forceUpdate && setInProps.bind(null, inst),
+      setInProps: inst.forceUpdate && setInProps.bind(null, element),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
     };
@@ -106,9 +106,13 @@ function getData(element: Object): DataType {
   };
 }
 
-function setInProps(inst, path: Array<string | number>, value: any) {
-  inst.props = copyWithSet(inst.props, path, value);
-  inst.forceUpdate();
+function setInProps(internalInst, path: Array<string | number>, value: any) {
+  var element = internalInst._currentElement;
+  internalInst._currentElement = {
+    ...element,
+    props: copyWithSet(element.props, path, value),
+  };
+  internalInst._instance.forceUpdate();
 }
 
 function setInState(inst, path: Array<string | number>, value: any) {
