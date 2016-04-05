@@ -94,12 +94,12 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
         // (do we have access to DOMComponent here?) so that we don't have to
         // setTimeout.
         setTimeout(() => {
-          hook.emit('mount', {element: this, data: getData012(this, {}), renderer: rid});
+          hook.emit('mount', {element: this, data: getData012(this), renderer: rid});
         }, 0);
       },
       updateComponent() {
         setTimeout(() => {
-          hook.emit('update', {element: this, data: getData012(this, {}), renderer: rid});
+          hook.emit('update', {element: this, data: getData012(this), renderer: rid});
         }, 0);
       },
       unmountComponent() {
@@ -110,15 +110,15 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   } else if (renderer.Reconciler) {
     oldMethods = decorateMany(renderer.Reconciler, {
       mountComponent(element, rootID, transaction, context) {
-        var data = getData(element, context);
+        var data = getData(element);
         rootNodeIDMap.set(element._rootNodeID, element);
         hook.emit('mount', {element, data, renderer: rid});
       },
       performUpdateIfNecessary(element, nextChild, transaction, context) {
-        hook.emit('update', {element, data: getData(element, context), renderer: rid});
+        hook.emit('update', {element, data: getData(element), renderer: rid});
       },
       receiveComponent(element, nextChild, transaction, context) {
-        hook.emit('update', {element, data: getData(element, context), renderer: rid});
+        hook.emit('update', {element, data: getData(element), renderer: rid});
       },
       unmountComponent(element) {
         hook.emit('unmount', {element, renderer: rid});
