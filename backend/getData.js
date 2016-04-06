@@ -50,7 +50,8 @@ function getData(element: Object): DataType {
     props = element._currentElement.props;
   }
 
-  if (element._currentElement) {
+  // != used deliberately here to catch undefined and null
+  if (element._currentElement != null) {
     type = element._currentElement.type;
     if (typeof type === 'string') {
       name = type;
