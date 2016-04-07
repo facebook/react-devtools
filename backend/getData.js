@@ -70,7 +70,7 @@ function getData(element: Object): DataType {
       nodeType = 'Text';
       text = element._stringText;
     } else {
-      name = type.displayName || type.name || 'Unknown';
+      name = type ? type.displayName || type.name : 'Unknown';
     }
   }
 
