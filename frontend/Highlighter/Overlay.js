@@ -84,6 +84,11 @@ class Overlay {
   }
 
   inspect(node: DOMNode, name?: ?string) {
+    // We can't get the size of text nodes or comment nodes. React as of v15
+    // heavily uses comment nodes to delimit text.
+    if (node.nodeType !== Node.ELEMENT_NODE) {
+      return;
+    }
     var box = node.getBoundingClientRect();
     var dims = getElementDimensions(node);
 
