@@ -28,6 +28,7 @@ export type DOMNode = {
   innerHTML: string,
   innerText: string,
   nodeName: string,
+  nodeType: number,
   offsetHeight: number,
   offsetLeft: number,
   offsetParent: ?DOMNode,
