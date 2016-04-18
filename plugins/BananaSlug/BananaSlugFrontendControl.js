@@ -19,10 +19,11 @@ import type {
 } from './BananaSlugTypes';
 
 type Props = {
+  state: any,
   onChange: (v: ControlState) => void,
 };
 
-type State = {};
+type State = StateRecord;
 
 type DefaultProps = {};
 
@@ -30,8 +31,11 @@ const StateRecord = immutable.Record({
   enabled: false,
 });
 
-class BananaSlugFrontendControl extends
-  React.Component<DefaultProps, Props, State> {
+class BananaSlugFrontendControl extends React.Component {
+  props: Props;
+  defaultProps: DefaultProps;
+  state: State;
+
   _defaultState: ControlState;
   _toggle: (b: boolean) => void;
 
@@ -47,7 +51,7 @@ class BananaSlugFrontendControl extends
     }
   }
 
-  render(): ReactElement {
+  render() {
     var state = this.props.state || this._defaultState;
     return (
       <div style={styles.container} onClick={this._toggle} tabIndex={0}>

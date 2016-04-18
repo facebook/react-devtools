@@ -37,6 +37,8 @@ export type DOMNode = {
   parentNode: DOMNode,
   removeChild: (child: DOMNode) => void,
   removeListener: (evt: string, fn: () => void) => void,
+  selectionStart: number,
+  selectionEnd: number,
   scrollLeft: number,
   scrollTop: number,
   style: Object,

@@ -22,7 +22,7 @@ class Props extends React.Component {
     return true;
   }
 
-  render(): ReactElement {
+  render() {
     var props = this.props.props;
     if (!props || typeof props !== 'object') {
       return <span/>;

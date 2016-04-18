@@ -26,9 +26,15 @@ type EventLike = {
   stopPropagation: () => void,
 };
 
+type State = {
+  focused: boolean,
+};
+
 class SearchPane extends React.Component {
   input: ?HTMLElement;
   _key: (evt: EventLike) => void;
+  state: State;
+
   constructor(props) {
     super(props);
     this.state = {focused: false};

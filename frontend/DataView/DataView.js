@@ -19,18 +19,23 @@ var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
-class DataView extends React.Component {
-  props: {
-    data: Object,
-    path: Array<string>,
-    inspect: (path: Array<string>, cb: () => void) => void,
-    showMenu: (e: DOMEvent, val: any, path: Array<string>, name: string) => void,
-    startOpen: boolean,
-    noSort?: boolean,
-    readOnly: boolean,
-  };
+type Inspect = (path: Array<string>, cb: () => void) => void;
+type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
-  render(): ReactElement {
+type DataViewProps = {
+  data: Object,
+  path: Array<string>,
+  inspect: Inspect,
+  showMenu: ShowMenu,
+  startOpen?: boolean,
+  noSort?: boolean,
+  readOnly?: boolean,
+};
+
+class DataView extends React.Component {
+  props: DataViewProps;
+
+  render() {
     var data = this.props.data;
     if (!data) {
       return <div style={styles.missing}>null</div>;
@@ -80,9 +85,22 @@ class DataView extends React.Component {
 }
 
 class DataItem extends React.Component {
+  props: {
+    path: Array<string>,
+    inspect: Inspect,
+    showMenu: ShowMenu,
+    startOpen?: boolean,
+    noSort?: boolean,
+    readOnly?: boolean,
+    name: string,
+    value: any,
+  };
+  defaultProps: {};
+  state: {open: boolean, loading: boolean};
+
   constructor(props) {
     super(props);
-    this.state = {open: this.props.startOpen, loading: false};
+    this.state = {open: !!this.props.startOpen, loading: false};
   }
 
   componentDidMount() {
@@ -182,7 +200,11 @@ class DataItem extends React.Component {
             {this.props.name}:
           </div>
           <div
-            onContextMenu={e => this.props.showMenu(e, this.props.value, this.props.path, this.props.name)}
+            onContextMenu={e => {
+              if (typeof this.props.showMenu === 'function') {
+                return this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+              }
+            }}
             style={styles.preview}
           >
             {preview}

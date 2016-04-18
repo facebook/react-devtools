@@ -21,7 +21,7 @@ class StoreTab extends React.Component {
     data: Map,
     inspect: (path: Array<string>, cb: () => void) => void,
   };
-  render(): ReactElement {
+  render() {
     if (!this.props.storeData) {
       return (
         <div style={styles.container}>

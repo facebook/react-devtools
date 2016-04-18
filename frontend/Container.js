@@ -22,8 +22,8 @@ import type MenuItem from './ContextMenu';
 class Container extends React.Component {
   props: {
     reload: () => void,
-    extraPanes: Array<(node: Object) => ReactElement>,
-    extraTabs: ?{[key: string]: () => ReactElement},
+    extraPanes: Array<(node: Object) => React$Element>,
+    extraTabs: ?{[key: string]: () => React$Element},
     menuItems: {
       tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
       attr?: (
@@ -35,10 +35,10 @@ class Container extends React.Component {
         store: Object
       ) => ?Array<MenuItem>,
     },
-    extraTabs: {[key: string]: () => ReactElement},
+    extraTabs: {[key: string]: () => React$Element},
   };
 
-  render(): ReactElement {
+  render() {
     var tabs = {
       Elements: () => (
         <SplitPane

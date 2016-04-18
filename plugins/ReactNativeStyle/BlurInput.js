@@ -11,9 +11,23 @@
 'use strict';
 
 var React = require('react');
-import type {DOMEvent} from '../../frontend/types';
+import type {DOMEvent, DOMNode} from '../../frontend/types';
+
+type Props = {
+  onChange: (text: string|number) => any;
+  value: string|number;
+};
+type DefaultProps = {};
+type State = {
+  text: string;
+};
 
 class BlurInput extends React.Component {
+  props: Props;
+  defaultProps: DefaultProps;
+  state: State;
+  node: ?DOMNode;
+
   constructor(props: Object) {
     super(props);
     this.state = {text: '' + this.props.value};
@@ -44,7 +58,7 @@ class BlurInput extends React.Component {
     }
   }
 
-  render(): ReactElement {
+  render() {
     return (
       <input
         value={this.state.text}
