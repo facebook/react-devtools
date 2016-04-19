@@ -13,20 +13,18 @@ module.exports = {
   debug: true,
   devtool: 'source-map',
   entry: {
-    standalone: './node/standalone.js',
+    backend: './src/backend.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
-    library: '[name]',
-    libraryTarget: 'commonjs2',
   },
-  externals: ['ws'],
   module: {
     loaders: [{
       test: /\.js$/,
-      loader:  'babel',
+      loader: 'babel',
       exclude: /node_modules/,
     }],
   },
 };
+

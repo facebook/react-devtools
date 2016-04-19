@@ -17,7 +17,7 @@ var Panel = require('../../../frontend/Panel');
 var React = require('react');
 
 var node = null;
-var backendScript = null;
+var backendScript = require('raw!../build/backend.js');
 var wall = null;
 
 var config = {
@@ -163,11 +163,6 @@ function startServer(port = 8097) {
 }
 
 var DevtoolsUI = {
-  setBackendScript(_backendScript) {
-    backendScript = _backendScript;
-    return DevtoolsUI;
-  },
-
   setContentDOMNode(_node) {
     node = _node;
     return DevtoolsUI;

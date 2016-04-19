@@ -7,7 +7,8 @@ websocket.
 You'll need webpack, and [electron](http://electron.atom.io/#get-started) (`npm install electron-prebuilt -g`).
 
 - `npm install`
-- `webpack`
+- `webpack --config webpack.backend.js`
+- `webpack --config webpack.config.js`
 - `electron .`
 
 Start up the packager, start up your app, and things *should* just connect
