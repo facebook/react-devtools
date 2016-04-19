@@ -1,5 +1,8 @@
 {
   "main": "./index.js",
+  "scripts": {
+    "build": "webpack --config webpack.backend.js && webpack --config webpack.config.js"
+  },
   "dependencies": {
     "ws": "^0.7.2"
   }
