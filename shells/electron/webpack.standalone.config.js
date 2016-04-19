@@ -24,11 +24,9 @@ module.exports = {
   externals: ['ws'],
   module: {
     loaders: [{
-      test: /\.jsx?$/,
-      loader:  'babel-loader?stage=0',
-      exclude: [
-        'node_modules',
-      ],
+      test: /\.js$/,
+      loader:  'babel',
+      exclude: /node_modules/,
     }],
   },
 };

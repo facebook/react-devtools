@@ -19,14 +19,11 @@ module.exports = {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
   },
-
   module: {
     loaders: [{
-      test: /\.jsx?$/,
-      loader:  'babel-loader?stage=0',
-      exclude: [
-        'node_modules',
-      ],
+      test: /\.js$/,
+      loader: 'babel',
+      exclude: /node_modules/,
     }],
   },
 };
