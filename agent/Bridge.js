@@ -331,7 +331,7 @@ class Bridge {
 
   _handleCall(name: string, args: Array<any>, callback: number) {
     if (!this._callers[name]) {
-      return console.warn('unknown call');
+      return console.warn('unknown call: "' + name + '"');
     }
     args = !Array.isArray(args) ? [args] : args;
     var result;
