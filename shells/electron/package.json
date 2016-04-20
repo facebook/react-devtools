@@ -1,9 +1,9 @@
 {
   "main": "./index.js",
   "scripts": {
-    "build": "webpack --config webpack.backend.js && webpack --config webpack.config.js"
+    "build": "../../node_modules/.bin/webpack --config webpack.backend.js && ../../node_modules/.bin/webpack --config webpack.config.js"
   },
   "dependencies": {
-    "ws": "^0.7.2"
+    "ws": "1.1.0"
   }
 }
