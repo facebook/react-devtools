@@ -15,6 +15,7 @@ var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
+var ReactDOM = require('react-dom');
 
 var node = null;
 var backendScript = require('raw!../build/backend.js');
@@ -29,20 +30,20 @@ var config = {
 };
 
 function reload() {
-  React.unmountComponentAtNode(node);
+  ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    React.render(<Panel {...config} />, node);
+    ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
 function onDisconnected() {
-  React.unmountComponentAtNode(node);
+  ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
 }
 
 function onError(e) {
-  React.unmountComponentAtNode(node);
+  ReactDOM.unmountComponentAtNode(node);
   var message;
   if (e.code === 'EADDRINUSE') {
     message = 'Another instance of DevTools is running';
