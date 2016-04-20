@@ -27,7 +27,13 @@ function getData(element: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
-  if (element._currentElement === null || element._currentElement === false) {
+  // If the parent is a native node without rendered children, but with
+  // multiple string children, then the `element` that gets passed in here is
+  // a plain value -- a string or number.
+  if (typeof element !== 'object') {
+    nodeType = 'Text';
+    text = element + '';
+  } else if (element._currentElement === null || element._currentElement === false) {
     nodeType = 'Empty';
   } else if (element._renderedComponent) {
     nodeType = 'NativeWrapper';
@@ -40,9 +46,10 @@ function getData(element: Object): DataType {
     }
   } else if (element._renderedChildren) {
     children = childrenList(element._renderedChildren);
-  } else if (element._currentElement.props) {
+  } else if (element._currentElement && element._currentElement.props) {
     // This is a native node without rendered children -- meaning the children
-    // prop is just a string.
+    // prop is just a string or (in the case of the <option>) a list of
+    // strings & numbers.
     children = element._currentElement.props.children;
   }
 
