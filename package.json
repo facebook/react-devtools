@@ -19,6 +19,7 @@
     "json-loader": "0.5.4",
     "node-libs-browser": "0.5.3",
     "object-assign": "4.0.1",
+    "raw-loader": "^0.5.1",
     "react": "0.14.3",
     "react-addons-create-fragment": "0.14.3",
     "react-dom": "0.14.3",

@@ -15156,6 +15156,11 @@
       "from": "https://registry.npmjs.org/object-assign/-/object-assign-4.0.1.tgz",
       "resolved": "https://registry.npmjs.org/object-assign/-/object-assign-4.0.1.tgz"
     },
+    "raw-loader": {
+      "version": "0.5.1",
+      "from": "raw-loader@0.5.1",
+      "resolved": "https://registry.npmjs.org/raw-loader/-/raw-loader-0.5.1.tgz"
+    },
     "react": {
       "version": "0.14.3",
       "from": "https://registry.npmjs.org/react/-/react-0.14.3.tgz",
