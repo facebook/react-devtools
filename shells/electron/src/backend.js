@@ -30,6 +30,7 @@ var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+var setupRelay = require('../../../plugins/Relay/backend');
 
 FOR_BACKEND.wall.onClose(() => {
   if (agent) {
@@ -49,6 +50,8 @@ agent.addBridge(bridge);
 if (FOR_BACKEND.resolveRNStyle) {
   setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
 }
+
+setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
 var _connectTimeout = setTimeout(() => {
   console.warn('react-devtools agent got no connection');
