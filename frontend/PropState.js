@@ -14,6 +14,7 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
+var PropVal = require('./PropVal');
 var React = require('react');
 
 var decorate = require('./decorate');
@@ -74,8 +75,24 @@ class PropState extends React.Component {
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
         hint="($r in the console)">
-        {key && <DetailPaneSection title="Key" hint={key}/>}
-        {ref && <DetailPaneSection title="Ref" hint={ref}/>}
+        {key &&
+          <DetailPaneSection
+            title="Key"
+            key={this.props.id + '-key'}>
+            <PropVal
+              val={key}
+            />
+          </DetailPaneSection>
+        }
+        {ref &&
+          <DetailPaneSection
+            title="Ref"
+            key={this.props.id + '-ref'}>
+            <PropVal
+              val={ref}
+            />
+          </DetailPaneSection>
+        }
         {editTextContent}
         <DetailPaneSection
           hint={propsReadOnly ? 'read-only' : null}

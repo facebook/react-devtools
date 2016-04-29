@@ -14,7 +14,7 @@ export type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Empty',
   type: ?(string | AnyFn),
   key: ?string,
-  ref: ?string,
+  ref: ?(string | AnyFn),
   name: ?string,
   props: ?Object,
   state: ?Object,
