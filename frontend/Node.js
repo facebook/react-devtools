@@ -144,9 +144,9 @@ class Node extends React.Component {
             <span style={styles.tagText}>
               <span style={styles.openTag}>
                 <span style={tagStyle}>&lt;{name}</span>
-                {node.get('key') && <Props key='key' props={{'key': node.get('key')}}/>}
-                {node.get('ref') && <Props key='ref' props={{'ref': node.get('ref')}}/>}
-                {node.get('props') && <Props key='props' props={node.get('props')}/>}
+                {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
+                {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
+                {node.get('props') && <Props key="props" props={node.get('props')}/>}
                 {!content && '/'}
                 <span style={tagStyle}>&gt;</span>
               </span>
@@ -193,9 +193,9 @@ class Node extends React.Component {
         <span style={styles.tagText}>
           <span style={styles.openTag}>
             <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
-            {node.get('key') && <Props key='key' props={{'key': node.get('key')}}/>}
-            {node.get('ref') && <Props key='ref' props={{'ref': node.get('ref')}}/>}
-            {node.get('props') && <Props key='props' props={node.get('props')}/>}
+            {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
+            {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
+            {node.get('props') && <Props key="props" props={node.get('props')}/>}
             <span style={tagStyle}>&gt;</span>
           </span>
           {collapsed && '…'}
