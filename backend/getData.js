@@ -76,6 +76,8 @@ function getData(element: Object): DataType {
     } else if (element._stringText) {
       nodeType = 'Text';
       text = element._stringText;
+    } else if (typeof type == 'undefined') {
+      name = 'Unknown';
     } else {
       name = type.displayName || type.name || 'Unknown';
     }
