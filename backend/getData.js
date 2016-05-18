@@ -73,7 +73,7 @@ function getData(element: Object): DataType {
       if (name === null) {
         name = 'No display name';
       }
-    } else if (element._stringText || element._stringText === '') {
+    } else if (typeof element._stringText === 'string') {
       nodeType = 'Text';
       text = element._stringText;
     } else {
