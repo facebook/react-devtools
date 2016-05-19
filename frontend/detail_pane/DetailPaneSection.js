@@ -21,7 +21,7 @@ class DetailPaneSection extends React.Component {
     return (
       <div style={styles.section}>
         <strong style={styles.title}>{this.props.title}</strong>
-        {hint ? ' ' + hint : null}
+        {hint}
         {children}
       </div>
     );
@@ -34,7 +34,7 @@ var styles = {
     flexShrink: 0,
   },
   title: {
-    marginRight: 5,
+    marginRight: 7,
   },
 };
 
