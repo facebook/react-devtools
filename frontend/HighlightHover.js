@@ -13,13 +13,26 @@
 var React = require('react');
 var assign = require('object-assign');
 
+type Props = {
+  style: ?Object,
+  children?: any,
+};
+
+type State = {
+  hover: boolean,
+};
+
 class HighlightHover extends React.Component {
+  props: Props;
+  defaultProps: {};
+  state: State;
+
   constructor(props: Object) {
     super(props);
     this.state = {hover: false};
   }
 
-  render(): ReactElement {
+  render() {
     return (
       <div
         onMouseOver={() => !this.state.hover && this.setState({hover: true})}

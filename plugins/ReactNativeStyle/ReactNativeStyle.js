@@ -21,7 +21,23 @@ function shallowClone(obj) {
   return nobj;
 }
 
+type Props = {
+  // TODO: typecheck bridge interface
+  bridge: any;
+  id: any;
+};
+
+type DefaultProps = {};
+
+type State = {
+  style: ?Object;
+};
+
 class NativeStyler extends React.Component {
+  props: Props;
+  defaultProps: DefaultProps;
+  state: State;
+
   constructor(props: Object) {
     super(props);
     this.state = {style: null};
@@ -44,7 +60,9 @@ class NativeStyler extends React.Component {
   }
 
   _handleStyleChange(attr: string, val: string | number) {
-    this.state.style[attr] = val;
+    if (this.state.style) {
+      this.state.style[attr] = val;
+    }
     this.props.bridge.send('rn-style:set', {id: this.props.id, attr, val});
     this.setState({style: this.state.style});
   }

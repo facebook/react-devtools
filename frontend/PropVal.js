@@ -21,7 +21,7 @@ var valueStyles = require('./value-styles');
 class PropVal extends React.Component {
   props: {
     val: any,
-    nested: boolean,
+    nested?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -34,8 +34,8 @@ class PropVal extends React.Component {
     flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
   }
 
-  render(): ReactElement {
-    return previewProp(this.props.val, this.props.nested);
+  render() {
+    return previewProp(this.props.val, !!this.props.nested);
   }
 }
 

@@ -29,16 +29,25 @@ import type {Wall} from '../agent/Bridge';
 export type Props = {
   alreadyFoundReact: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
-  checkForReact: (cb: (isReact: boolean) => void) => void,
-  reload: () => void,
+
+
+  // if alreadyFoundReact, then these don’t need to be passed
+  checkForReact?: (cb: (isReact: boolean) => void) => void,
+  reload?: () => void,
 
   // optionals
-  showComponentSource: ?() => void,
-  reloadSubscribe: ?(reloadFn: () => void) => () => void,
-  showAttrSource: ?(path: Array<string>) => void,
-  executeFn: ?(path: Array<string>) => void,
-  selectElement: ?(id: string, bridge: Bridge) => void,
-  getNewSelection: ?(bridge: Bridge) => void,
+  showComponentSource?: () => void,
+  reloadSubscribe?: (reloadFn: () => void) => () => void,
+  showAttrSource?: (path: Array<string>) => void,
+  executeFn?: (path: Array<string>) => void,
+  selectElement?: (id: string, bridge: Bridge) => void,
+  getNewSelection?: (bridge: Bridge) => void,
+};
+
+type DefaultProps = {};
+type State = {
+  loading: boolean,
+  isReact: boolean,
 };
 
 class Panel extends React.Component {
@@ -49,8 +58,12 @@ class Panel extends React.Component {
   _bridge: Bridge;
   _store: Store;
   _unsub: ?() => void;
+  // TODO: typecheck plugin interface
+  plugins: Array<any>;
 
   props: Props;
+  defaultProps: DefaultProps;
+  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -193,6 +206,9 @@ class Panel extends React.Component {
   }
 
   lookForReact() {
+    if (typeof this.props.checkForReact !== 'function') {
+      return;
+    }
     this.props.checkForReact(isReact => {
       if (isReact) {
         this.setState({isReact: true, loading: true});

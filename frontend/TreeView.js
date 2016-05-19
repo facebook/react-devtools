@@ -14,11 +14,15 @@ var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
 
+import type {DOMNode} from './types';
+
 var decorate = require('./decorate');
 
 var MAX_SEARCH_ROOTS = 200;
 
 class TreeView extends React.Component {
+  node: ?DOMNode;
+
   getChildContext() {
     return {
       scrollTo: this.scrollTo.bind(this),

@@ -25,7 +25,7 @@ class QueryViewer extends React.Component {
     data: Map,
     inspect: (path: Array<string>, cb: () => void) => void,
   };
-  render(): ReactElement {
+  render() {
     var data = this.props.data;
     var status = data.get('status');
 

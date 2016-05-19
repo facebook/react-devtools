@@ -17,17 +17,28 @@ var Draggable = require('./Draggable');
 var assign = require('object-assign');
 
 type Props = {
-  style: ?{[key: string]: any},
-  left: () => ReactElement,
-  right: () => ReactElement,
+  style?: {[key: string]: any},
+  left: () => React$Element,
+  right: () => React$Element,
   initialWidth: number,
+};
+
+type DefaultProps = {};
+
+type State = {
+  moving: boolean,
+  width: number,
 };
 
 class SplitPane extends React.Component {
   props: Props;
+  defaultProps: DefaultProps;
+  state: State;
+
   constructor(props: Props) {
     super(props);
     this.state = {
+      moving: false,
       width: props.initialWidth,
     };
   }
@@ -39,7 +50,7 @@ class SplitPane extends React.Component {
     });
   }
 
-  render(): ReactElement {
+  render() {
     var dragStyle = styles.dragger;
     if (this.state.moving) {
       dragStyle = assign({}, dragStyle, styles.draggerMoving);

@@ -17,12 +17,21 @@ var assign = require('object-assign');
 var flash = require('../flash');
 var valueStyles = require('../value-styles');
 
-import type {DOMEvent} from '../types';
+import type {DOMEvent, DOMNode} from '../types';
+
+type State = {
+  editing: boolean,
+  text: string,
+};
 
 class Simple extends React.Component {
+  state: State;
+  input: DOMNode;
+
   constructor(props: Object) {
     super(props);
     this.state = {
+      text: '',
       editing: false,
     };
   }
@@ -90,7 +99,7 @@ class Simple extends React.Component {
     }
   }
 
-  render(): ReactElement {
+  render() {
     if (this.state.editing) {
       return (
         <input

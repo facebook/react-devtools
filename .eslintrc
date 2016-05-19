@@ -8,7 +8,7 @@ plugins:
   - react
 
 globals:
-  ReactElement: false
+  React$Element: false
 
 rules:
   brace-style: [2, 1tbs]

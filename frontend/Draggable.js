@@ -50,7 +50,7 @@ class Draggable extends React.Component {
     this.props.onStop();
   }
 
-  render(): ReactElement {
+  render() {
     return (
       <div
         style={this.props.style}

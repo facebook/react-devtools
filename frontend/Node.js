@@ -64,7 +64,7 @@ class Node extends React.Component {
     this.context.scrollTo(node.offsetTop, node.offsetHeight);
   }
 
-  render(): ReactElement {
+  render() {
     var node = this.props.node;
     if (!node) {
       return <span>Node was deleted</span>;

@@ -13,14 +13,26 @@
 var React = require('react');
 var BlurInput = require('./BlurInput');
 
-class StyleEdit extends React.Component {
-  props: {
-    style: Object,
-    onChange: (attr: string, val: string | number) => void,
-    onRename: (oldName: string, newName: string, val: string | number) => void,
-  };
 
-  constructor(props: Object) {
+type Props = {
+  style: Object,
+  onChange: (attr: string, val: string | number) => void,
+  onRename: (oldName: string, newName: string, val: string | number) => void,
+};
+
+type DefaultProps = {};
+
+type State = {
+  newAttr: string,
+  newValue: string|number,
+};
+
+class StyleEdit extends React.Component {
+  props: Props;
+  defaultProps: DefaultProps;
+  state: State;
+
+  constructor(props: Props) {
     super(props);
     this.state = {newAttr: '', newValue: ''};
   }
@@ -30,7 +42,7 @@ class StyleEdit extends React.Component {
     this.setState({newAttr: '', newValue: ''});
   }
 
-  render(): ReactElement {
+  render() {
     var attrs = Object.keys(this.props.style);
     return (
       <ul style={styles.container}>
@@ -38,7 +50,7 @@ class StyleEdit extends React.Component {
           <li style={styles.attr}>
             <BlurInput
               value={name}
-              onChange={newName => this.props.onRename(name, newName, this.props.style[name])}
+              onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
             />
             :
             <BlurInput
@@ -50,7 +62,7 @@ class StyleEdit extends React.Component {
         <li style={styles.attr}>
           <BlurInput
             value={this.state.newAttr}
-            onChange={newAttr => this.setState({newAttr})}
+            onChange={newAttr => this.setState({newAttr: '' + newAttr})}
           />
           :
           {this.state.newAttr && <BlurInput

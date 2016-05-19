@@ -15,7 +15,7 @@ var React = require('react');
 module.exports = function(name: string): Object {
   class Wrapper extends React.Component {
     props: {
-      children: () => ReactElement,
+      children: () => React$Element,
       store: Object,
     };
     getChildContext() {

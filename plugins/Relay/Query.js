@@ -20,7 +20,7 @@ class Query extends React.Component {
     oddRow: boolean,
     onSelect: () => void,
   };
-  render(): ReactElement {
+  render() {
     var data = this.props.data;
     var containerStyle = styles.container;
     if (this.props.isSelected) {

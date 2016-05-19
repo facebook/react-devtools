@@ -23,6 +23,8 @@ type Options = {
   props: (store: Object, props: Object) => Object,
 };
 
+type State = {};
+
 /**
  * This Higher Order Component decorator function is the way the components
  * communicate with the central Store.
@@ -55,6 +57,7 @@ module.exports = function(options: Options, Component: any): any {
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;
+    state: State;
 
     constructor(props) {
       super(props);
