@@ -256,6 +256,7 @@ var styles = {
     fontSize: 8,
     cursor: 'pointer',
     position: 'absolute',
+    top: '-2px',
     right: '100%',
     padding: '5px 0',
   },

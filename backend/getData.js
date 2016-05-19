@@ -24,6 +24,8 @@ function getData(element: Object): DataType {
   var updater = null;
   var name = null;
   var type = null;
+  var key = null;
+  var ref = null;
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
@@ -60,6 +62,10 @@ function getData(element: Object): DataType {
   // != used deliberately here to catch undefined and null
   if (element._currentElement != null) {
     type = element._currentElement.type;
+    if (element._currentElement.key) {
+      key = String(element._currentElement.key);
+    }
+    ref = element._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
     } else if (element.getName) {
@@ -103,6 +109,8 @@ function getData(element: Object): DataType {
   return {
     nodeType,
     type,
+    key,
+    ref,
     name,
     props,
     state,
