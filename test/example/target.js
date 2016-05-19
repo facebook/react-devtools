@@ -62,6 +62,7 @@ class Todos extends React.Component {
         item.completed = completed;
         return true;
       }
+      return false;
     });
     this.setState({todos});
   }

@@ -202,7 +202,7 @@ class DataItem extends React.Component {
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
-                return this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
               }
             }}
             style={styles.preview}

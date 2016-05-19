@@ -53,7 +53,8 @@ var config = {
 
 function inject(src, done) {
   if (!src || src === 'false') {
-    return done();
+    done();
+    return;
   }
   var script = target.contentDocument.createElement('script');
   script.src = src;
@@ -63,7 +64,8 @@ function inject(src, done) {
 
 function injectMany(sources, done) {
   if (sources.length === 1) {
-    return inject(sources[0], done);
+    inject(sources[0], done);
+    return;
   }
   inject(sources[0], () => injectMany(sources.slice(1), done));
 }

@@ -48,6 +48,7 @@ function previewComplex(data: Object) {
       </span>
     );
   }
+  return null;
 }
 
 module.exports = previewComplex;

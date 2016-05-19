@@ -3,6 +3,7 @@
 .*node_modules/babel.*
 .*node_modules/classnames.*
 .*node_modules/json-loader.*
+.*node_modules/json5.*
 .*node_modules/node-libs-browser.*
 .*node_modules/webpack.*
 .*node_modules/fbjs/flow.*
