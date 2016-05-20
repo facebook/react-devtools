@@ -50,7 +50,9 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     extras.getNativeFromReactElement = function(component) {
       try {
         return renderer.Mount.getNode(component._rootNodeID);
-      } catch (e) {}
+      } catch (e) {
+        return undefined;
+      }
     };
 
     extras.getReactElementFromNative = function(node) {

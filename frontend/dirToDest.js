@@ -47,6 +47,7 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
         return 'firstChild';
       }
     }
-    return null;
   }
+
+  return null;
 };

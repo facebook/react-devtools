@@ -2,7 +2,7 @@
 parser: babel-eslint
 
 extends:
-  - ./node_modules/fbjs-scripts/eslint/.eslintrc
+  - ./node_modules/fbjs-scripts/eslint/.eslintrc.js
 
 plugins:
   - react
@@ -19,6 +19,8 @@ rules:
   eol-last: 2
   indent: [2, 2, {SwitchCase: 1}]
   jsx-quotes: 2
+  keyword-spacing: 2
+  max-len: 0
   no-multi-spaces: 2
   no-redeclare: 2
   no-shadow: 2
@@ -26,10 +28,8 @@ rules:
   no-unused-vars: [2, {args: none}]
   prefer-const: 2
   quotes: [2, single, avoid-escape]
-  space-after-keywords: 2
   space-before-blocks: 2
   space-before-function-paren: 2
-  strict: [2, global]
 
   # JSX
   # Our transforms set this automatically

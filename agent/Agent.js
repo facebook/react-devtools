@@ -237,6 +237,7 @@ class Agent extends EventEmitter {
     if (renderer && this.reactInternals[renderer].getNativeFromReactElement) {
       return this.reactInternals[renderer].getNativeFromReactElement(component);
     }
+    return null;
   }
 
   selectFromDOMNode(node: Object, quiet?: boolean) {
@@ -271,6 +272,7 @@ class Agent extends EventEmitter {
         return this.getId(component);
       }
     }
+    return null;
   }
 
   _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {

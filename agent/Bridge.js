@@ -331,7 +331,8 @@ class Bridge {
 
   _handleCall(name: string, args: Array<any>, callback: number) {
     if (!this._callers[name]) {
-      return console.warn('unknown call: "' + name + '"');
+      console.warn('unknown call: "' + name + '"');
+      return;
     }
     args = !Array.isArray(args) ? [args] : args;
     var result;
@@ -339,7 +340,7 @@ class Bridge {
       result = this._callers[name].apply(null, args);
     } catch (e) {
       console.error('Failed to call', e);
-      return undefined;
+      return;
     }
     this._wall.send({
       type: 'callback',

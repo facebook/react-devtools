@@ -66,11 +66,12 @@ module.exports = function(options: Options, Component: any): any {
 
     componentWillMount() {
       if (!this.context[storeKey]) {
-        return console.warn('no store on context...');
+        console.warn('no store on context...');
+        return;
       }
       this._update = () => this.forceUpdate();
       if (!options.listeners) {
-        return undefined;
+        return;
       }
       this._listeners = options.listeners(this.props, this.context[storeKey]);
       this._listeners.forEach(evt => {
@@ -80,7 +81,8 @@ module.exports = function(options: Options, Component: any): any {
 
     componentWillUnmount() {
       if (!this.context[storeKey]) {
-        return console.warn('no store on context...');
+        console.warn('no store on context...');
+        return;
       }
       this._listeners.forEach(evt => {
         this.context[storeKey].off(evt, this._update);
@@ -99,10 +101,11 @@ module.exports = function(options: Options, Component: any): any {
 
     componentWillUpdate(nextProps, nextState) {
       if (!this.context[storeKey]) {
-        return console.warn('no store on context...');
+        console.warn('no store on context...');
+        return;
       }
       if (!options.listeners) {
-        return undefined;
+        return;
       }
       var listeners = options.listeners(this.props, this.context[storeKey]);
       var diff = arrayDiff(listeners, this._listeners);

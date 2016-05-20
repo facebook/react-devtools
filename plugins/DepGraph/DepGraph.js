@@ -38,7 +38,7 @@ class DisplayDeps extends React.Component {
   props: Object;
   componentWillReceiveProps(nextProps) {
     if (nextProps.selected !== this.props.selected) {
-      return this.props.onClose();
+      this.props.onClose();
     }
   }
   render() {
