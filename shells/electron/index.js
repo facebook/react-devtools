@@ -8,8 +8,8 @@
  */
 'use strict';
 
-var app = require('app');  // Module to control application life.
-var BrowserWindow = require('browser-window');  // Module to create native browser window.
+var app = require('electron').app;  // Module to control application life.
+var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 
 var mainWindow = null;
 
@@ -22,7 +22,7 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 800, height: 600});
 
   // and load the index.html of the app.
-  mainWindow.loadUrl('file://' + __dirname + '/index.html'); // eslint-disable-line no-path-concat
+  mainWindow.loadURL('file://' + __dirname + '/index.html'); // eslint-disable-line no-path-concat
 
   // Open the devtools.
   // mainWindow.openDevTools();
