@@ -31,7 +31,6 @@ class DetailPane extends React.Component {
 
 var styles = {
   container: {
-    padding: 3,
     fontSize: '11px',
     // TODO figure out what font Chrome devtools uses on Windows
     fontFamily: 'Menlo, Consolas, monospace',
@@ -46,6 +45,7 @@ var styles = {
     userSelect: 'none',
   },
   header: {
+    padding: 5,
     flexShrink: 0,
   },
   headerName: {

@@ -96,8 +96,9 @@ TreeView.childContextTypes = {
 
 var styles = {
   container: {
-    fontFamily: 'Menlo, monospace',
+    fontFamily: 'Menlo, Consolas, monospace',
     fontSize: '11px',
+    lineHeight: 1.3,
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -108,7 +109,7 @@ var styles = {
     userSelect: 'none',
   },
   scroll: {
-    padding: 3,
+    padding: '3px 0',
     overflow: 'auto',
     minHeight: 0,
     flex: 1,

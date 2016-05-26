@@ -12,35 +12,36 @@
 
 module.exports = {
   func: {
-    color: 'rgb(37, 153, 37)',
+    color: '#170',
   },
 
   attr: {
+    color: '#666',
   },
 
   object: {
-    color: 'rgb(232, 98, 0)',
+    color: '#666',
   },
 
   array: {
-    color: 'rgb(0, 154, 190)',
+    color: '#666',
   },
 
   symbol: {
-    color: 'rgb(232, 98, 0)',
+    color: '#22a',
   },
 
   number: {
-    color: 'rgb(255, 0, 252)',
+    color: '#a11',
   },
 
   string: {
-    color: 'rgb(0, 49, 205)',
+    color: '#22a',
     wordBreak: 'break-word',
   },
 
   bool: {
-    color: 'rgb(0, 187, 255)',
+    color: '#a11',
   },
 
   empty: {

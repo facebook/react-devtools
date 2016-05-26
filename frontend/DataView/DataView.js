@@ -47,9 +47,9 @@ class DataView extends React.Component {
     var path = this.props.path;
     if (!names.length) {
       return (
-        <span style={styles.empty}>
+        <div style={styles.empty}>
           {Array.isArray(data) ? 'Empty array' : 'Empty object'}
-        </span>
+        </div>
       );
     }
 
@@ -163,7 +163,9 @@ class DataItem extends React.Component {
         <div
           onClick={this.toggleOpen.bind(this)}
           style={styles.opener}>
-          {open ? <span>&#9660;</span> : <span>&#9654;</span>}
+          {open ?
+            <span style={styles.expandedArrow} /> :
+            <span style={styles.collapsedArrow} />}
         </div>
       );
     }
@@ -238,8 +240,7 @@ var styles = {
   },
 
   empty: {
-    fontSize: 12,
-    marginLeft: 20,
+    marginLeft: 10,
     padding: '2px 5px',
     color: '#aaa',
   },
@@ -247,18 +248,35 @@ var styles = {
   missing: {
     fontSize: 12,
     fontWeight: 'bold',
-    marginLeft: 20,
+    marginLeft: 10,
     padding: '2px 5px',
     color: '#888',
   },
 
   opener: {
-    fontSize: 8,
     cursor: 'pointer',
+    marginLeft: -8,
+    paddingRight: 3,
     position: 'absolute',
-    top: '-2px',
-    right: '100%',
-    padding: '5px 0',
+    top: 4,
+  },
+
+  collapsedArrow: {
+    borderColor: 'transparent transparent transparent #555',
+    borderStyle: 'solid',
+    borderWidth: '4px 0 4px 7px',
+    display: 'inline-block',
+    marginLeft: 1,
+    verticalAlign: 'top',
+  },
+
+  expandedArrow: {
+    borderColor: '#555 transparent transparent transparent',
+    borderStyle: 'solid',
+    borderWidth: '7px 4px 0 4px',
+    display: 'inline-block',
+    marginTop: 1,
+    verticalAlign: 'top',
   },
 
   head: {

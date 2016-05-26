@@ -18,6 +18,7 @@ class Draggable extends React.Component {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
   props: {
+    children?: mixed,
     onMove: (x: number, y: number) => void,
     onStart: () => void,
     onStop: () => void,
@@ -55,7 +56,9 @@ class Draggable extends React.Component {
       <div
         style={this.props.style}
         onMouseDown={this._startDragging.bind(this)}
-      />
+      >
+        {this.props.children}
+      </div>
     );
   }
 }
