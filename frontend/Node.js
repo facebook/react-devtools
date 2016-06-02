@@ -82,7 +82,8 @@ class Node extends React.Component {
     var collapsed = node.get('collapsed');
 
     var leftPad = {
-      paddingLeft: (this.props.depth + 1) * 10,
+      paddingLeft: 3 + (this.props.depth + 1) * 10,
+      paddingRight: 3,
     };
     var headStyles = assign(
       {},
@@ -176,20 +177,30 @@ class Node extends React.Component {
       {},
       styles.collapser,
       {left: leftPad.paddingLeft - 12},
-      isCustom && styles.customCollapser,
-      hasState && {
-        color: 'red',
-      },
     );
+    var arrowStyle = node.get('collapsed') ?
+      assign(
+        {},
+        styles.collapsedArrow,
+        hasState && styles.collapsedArrowStateful
+      ) :
+      assign(
+        {},
+        styles.expandedArrow,
+        hasState && styles.expandedArrowStateful
+      );
+
+    var collapser =
+      <span
+        title={hasState ? 'This component is stateful.' : null}
+        onClick={this.props.onToggleCollapse} style={collapserStyle}
+      >
+        <span style={arrowStyle} />
+      </span>;
 
     var head = (
       <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
-        <span
-          title={hasState && 'This component has state'}
-          onClick={this.props.onToggleCollapse} style={collapserStyle}
-        >
-          {node.get('collapsed') ? <span>&#9654;</span> : <span>&#9660;</span>}
-        </span>
+        {collapser}
         <span style={styles.tagText}>
           <span style={styles.openTag}>
             <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
@@ -297,17 +308,19 @@ var styles = {
   },
 
   head: {
-    cursor: 'pointer',
+    cursor: 'default',
+    borderTop: '1px solid #fff',
     position: 'relative',
     display: 'flex',
   },
 
   tail: {
-    cursor: 'pointer',
+    borderTop: '1px solid #fff',
+    cursor: 'default',
   },
 
   tagName: {
-    color: 'rgb(120, 120, 120)',
+    color: '#777',
   },
 
   customTagName: {
@@ -327,16 +340,32 @@ var styles = {
   },
 
   collapser: {
-    fontSize: 7,
-    color: '#aaa',
-    marginRight: 3,
     position: 'absolute',
     padding: 2,
   },
 
-  customCollapser: {
-    color: '#555',
-    fontSize: 9,
+  collapsedArrow: {
+    borderColor: 'transparent transparent transparent #555',
+    borderStyle: 'solid',
+    borderWidth: '4px 0 4px 7px',
+    display: 'inline-block',
+    marginLeft: 1,
+    verticalAlign: 'top',
+  },
+  collapsedArrowStateful: {
+    borderColor: 'transparent transparent transparent #e55',
+  },
+
+  expandedArrow: {
+    borderColor: '#555 transparent transparent transparent',
+    borderStyle: 'solid',
+    borderWidth: '7px 4px 0 4px',
+    display: 'inline-block',
+    marginTop: 1,
+    verticalAlign: 'top',
+  },
+  expandedArrowStateful: {
+    borderColor: '#e55 transparent transparent transparent',
   },
 
   headHover: {

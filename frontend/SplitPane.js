@@ -51,10 +51,6 @@ class SplitPane extends React.Component {
   }
 
   render() {
-    var dragStyle = styles.dragger;
-    if (this.state.moving) {
-      dragStyle = assign({}, dragStyle, styles.draggerMoving);
-    }
     var rightStyle = assign({}, styles.rightPane, {
       width: this.state.width,
     });
@@ -64,11 +60,12 @@ class SplitPane extends React.Component {
           {this.props.left()}
         </div>
         <Draggable
-          style={dragStyle}
+          style={styles.dragger}
           onStart={() => this.setState({moving: true})}
           onMove={x => this.onMove(x)}
-          onStop={() => this.setState({moving: false})}
-        />
+          onStop={() => this.setState({moving: false})}>
+          <div style={styles.draggerInner} />
+        </Draggable>
         <div style={rightStyle}>
           {this.props.right()}
         </div>
@@ -85,24 +82,26 @@ var styles = {
   },
 
   dragger: {
+    padding: '0 3px',
     cursor: 'ew-resize',
-    borderWidth: '0 5px',
-    backgroundColor: '#ccc',
-    width: 1,
-    borderStyle: 'solid',
-    borderColor: 'white',
+    position: 'relative',
+    zIndex: 1,
   },
 
-  draggerMoving: {
-    backgroundColor: '#aaf',
+  draggerInner: {
+    backgroundColor: '#ccc',
+    height: '100%',
+    width: 1,
   },
 
   rightPane: {
     display: 'flex',
+    marginLeft: -3,
   },
 
   leftPane: {
     display: 'flex',
+    marginRight: -3,
     minWidth: 0,
     flex: 1,
   },

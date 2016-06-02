@@ -74,7 +74,7 @@ function previewProp(val: any, nested: boolean) {
       );
     }
     if (type === 'object') {
-      return <span>{val[consts.name] + '{…}'}</span>;
+      return <span style={valueStyles.object}>{val[consts.name] + '{…}'}</span>;
     }
     if (type === 'array') {
       return <span>Array[{val[consts.meta].length}]</span>;
@@ -94,7 +94,7 @@ function previewArray(val) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
     items['n' + i] = <PropVal val={item} nested={true} />;
-    items['c' + i] = ',';
+    items['c' + i] = ', ';
   });
   if (val.length > 3) {
     items.last = '…';
