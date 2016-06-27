@@ -45,7 +45,7 @@ function renameStyle(agent, id, oldName, newName, val) {
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.reactElements.get(id);
     if (el && el.setNativeProps) {
-      el.setNativeProps(newStyle);
+      el.setNativeProps({ style: newStyle });
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
     }
@@ -86,7 +86,7 @@ function setStyle(agent, id, attr, val) {
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.reactElements.get(id);
     if (el && el.setNativeProps) {
-      el.setNativeProps(newStyle);
+      el.setNativeProps({ style: newStyle });
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
     }
