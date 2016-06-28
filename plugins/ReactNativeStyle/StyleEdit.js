@@ -47,7 +47,7 @@ class StyleEdit extends React.Component {
     return (
       <ul style={styles.container}>
         {attrs.map(name => (
-          <li style={styles.attr}>
+          <li key={'style-' + name} style={styles.attr}>
             <BlurInput
               value={name}
               onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
