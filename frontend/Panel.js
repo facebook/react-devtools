@@ -284,10 +284,10 @@ Panel.childContextTypes = {
 var panelRNStyle = bridge => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
-    return <strong>No style</strong>;
+    return <strong key="rnstyle">No style</strong>;
   }
   return (
-    <div>
+    <div key="rnstyle">
       <h3>React Native Style Editor</h3>
       <NativeStyler id={id} bridge={bridge} />
     </div>
