@@ -55,7 +55,10 @@ class StyleEdit extends React.Component {
             :
             <BlurInput
               value={this.props.style[name]}
-              onChange={val => this.props.onChange(name, val)}
+              onChange={val => {
+                var num = Number(val);
+                this.props.onChange(name, num == val ? num : val);
+              }}
             />
           </li>
         ))}
