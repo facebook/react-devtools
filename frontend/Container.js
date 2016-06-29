@@ -89,6 +89,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     minWidth: 0,
+    backgroundColor: '#fff',
   },
 };
 
