@@ -16,6 +16,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
+var debounce = require('../utils/debounce');
 
 import type Bridge from '../agent/Bridge';
 import type {DOMEvent, ElementID} from './types';
@@ -83,6 +84,7 @@ class Store extends EventEmitter {
   _nodesByName: Map;
   _eventQueue: Array<string>;
   _eventTimer: ?number;
+  _emitSearchRootsChange: Function;
 
   // Public state
   bananaslugState: ?Object;
@@ -150,6 +152,7 @@ class Store extends EventEmitter {
     this._establishConnection();
     this._eventQueue = [];
     this._eventTimer = null;
+    this._emitSearchRootsChange = debounce(this.filterSearchRoots, 100);
   }
 
   emit(event: string): boolean {
@@ -199,10 +202,18 @@ class Store extends EventEmitter {
 
   changeSearch(text: string): void {
     var needle = text.toLowerCase();
+
     if (needle === this.searchText.toLowerCase()) {
       return;
     }
-    if (!text) {
+
+    this.searchText = text;
+    this.emit('searchText');
+    this._emitSearchRootsChange(needle);
+  }
+
+  filterSearchRoots(needle: string): void {
+    if (!needle) {
       this.searchRoots = null;
     } else {
       if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
@@ -225,9 +236,9 @@ class Store extends EventEmitter {
         }
       });
     }
-    this.searchText = text;
-    this.emit('searchText');
+    
     this.emit('searchRoots');
+
     if (this.searchRoots && !this.searchRoots.contains(this.selected)) {
       this.select(null, true);
     } else if (!this.searchRoots) {
