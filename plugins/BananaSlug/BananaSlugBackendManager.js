@@ -23,6 +23,8 @@ import type {
   Presenter,
 } from './BananaSlugTypes';
 
+import type {ControlState} from '../../frontend/types.js';
+
 const NODE_TYPE_COMPOSITE = 'Composite';
 
 class BananaSlugBackendManager {
@@ -71,7 +73,7 @@ class BananaSlugBackendManager {
     this._presenter.present(measurement);
   }
 
-  _onBananaSlugChange(state: Object): void {
+  _onBananaSlugChange(state: ControlState): void {
     this._presenter.setEnabled(state.enabled);
   }
 

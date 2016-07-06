@@ -37,7 +37,3 @@ export type Presenter = {
   present: (m: Measurement) => void,
   setEnabled: (b: boolean) => void,
 };
-
-export type ControlState = {
-  enabled: boolean,
-};

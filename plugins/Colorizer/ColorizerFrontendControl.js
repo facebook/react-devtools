@@ -31,7 +31,7 @@ const StateRecord = immutable.Record({
   enabled: false,
 });
 
-class BananaSlugFrontendControl extends React.Component {
+class ColorizerFrontendControl extends React.Component {
   props: Props;
   defaultProps: DefaultProps;
   state: State;
@@ -61,7 +61,7 @@ class BananaSlugFrontendControl extends React.Component {
           checked={state.enabled}
           readOnly={true}
         />
-        <span>Trace React updates</span>
+        <span>Highlight Search</span>
       </div>
     );
   }
@@ -88,20 +88,20 @@ var styles = {
     fontSize: '12px',
     outline: 'none',
     userSelect: 'none',
-    margin: '0px 4px',
+    margin: '0px 4px 0px 4px',
   },
 };
 
 var Wrapped = decorate({
   listeners() {
-    return ['bananaslugchange'];
+    return ['colorizerchange'];
   },
   props(store) {
     return {
-      state: store.bananaslugState,
-      onChange: state => store.changeBananaSlug(state),
+      state: store.colorizerState,
+      onChange: state => store.changeColorizer(state),
     };
   },
-}, BananaSlugFrontendControl);
+}, ColorizerFrontendControl);
 
 module.exports = Wrapped;

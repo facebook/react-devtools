@@ -18,7 +18,7 @@ var consts = require('../agent/consts');
 var invariant = require('./invariant');
 
 import type Bridge from '../agent/Bridge';
-import type {DOMEvent, ElementID} from './types';
+import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -28,6 +28,8 @@ type ContextMenu = {
   y: number,
   args: Array<any>,
 };
+
+const DEFAULT_PLACEHOLDER = 'Search by Component Name';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -85,10 +87,12 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
-  bananaslugState: ?Object;
+  bananaslugState: ?ControlState;
+  colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagSelected: boolean;
+  placeholderText: string;
   roots: List;
   searchRoots: ?List;
   searchText: string;
@@ -119,6 +123,8 @@ class Store extends EventEmitter {
     this.searchText = '';
     this.capabilities = {};
     this.bananaslugState = null;
+    this.colorizerState = null;
+    this.placeholderText = DEFAULT_PLACEHOLDER;
 
     // for debugging
     window.store = this;
@@ -419,10 +425,23 @@ class Store extends EventEmitter {
     });
   }
 
-  changeBananaSlug(state: Object) {
+  changeBananaSlug(state: ControlState) {
     this.bananaslugState = state;
     this.emit('bananaslugchange');
+    invariant(state.toJS);
     this._bridge.send('bananaslugchange', state.toJS());
+  }
+
+  changeColorizer(state: ControlState) {
+    this.colorizerState = state;
+    this.placeholderText = this.colorizerState.enabled
+      ? 'Highlight by Component Name'
+      : DEFAULT_PLACEHOLDER;
+    this.emit('placeholderchange');
+
+    this.emit('colorizerchange');
+    invariant(state.toJS);
+    this._bridge.send('colorizerchange', state.toJS());
   }
 
   // Private stuff

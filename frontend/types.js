@@ -57,3 +57,7 @@ export type DOMEvent = {
   stopPropagation: () => void,
   target: DOMNode,
 };
+
+export type ControlState = {
+  enabled: boolean,
+};
