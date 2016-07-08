@@ -243,18 +243,39 @@ class Store extends EventEmitter {
         this.select(this.roots.get(0));
       }
     }
+
+    this.highlightSearch();
+  }
+
+  highlight(id: string): void {
+    if (!this.colorizerState || !this.colorizerState.enabled) {
+      this._bridge.send('highlight', id);
+    }
+  }
+
+  highlightMany(ids: Array<string>): void {
+    this._bridge.send('highlightMany', ids);
+  }
+
+  highlightSearch(): void {
+    if (this.colorizerState && this.colorizerState.enabled) {
+      this._bridge.send('hideHighlight');
+      if (this.searchRoots) {
+        this.highlightMany(this.searchRoots.toArray());
+      }
+    }
   }
 
   hoverClass(name: string): void {
     if (name === null) {
-      this._bridge.send('hideHighlight');
+      this.hideHighlight();
       return;
     }
     var ids = this._nodesByName.get(name);
     if (!ids) {
       return;
     }
-    this._bridge.send('highlightMany', ids.toArray());
+    this.highlightMany(ids.toArray());
   }
 
   selectFirstOfClass(name: string): void {
@@ -326,13 +347,16 @@ class Store extends EventEmitter {
       }
       this.emit(id);
       this.emit('hover');
-      this._bridge.send('highlight', id);
+      this.highlight(id);
     } else if (this.hovered === id) {
       this.hideHighlight();
     }
   }
 
   hideHighlight() {
+    if (this.colorizerState && this.colorizerState.enabled) {
+      return;
+    }
     this._bridge.send('hideHighlight');
     if (!this.hovered) {
       return;
@@ -375,8 +399,8 @@ class Store extends EventEmitter {
     }
     this.emit('selected');
     this._bridge.send('selected', id);
-    if (!noHighlight) {
-      this._bridge.send('highlight', id);
+    if (!noHighlight && id) {
+      this.highlight(id);
     }
   }
 
@@ -438,10 +462,11 @@ class Store extends EventEmitter {
       ? 'Highlight by Component Name'
       : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
-
     this.emit('colorizerchange');
     invariant(state.toJS);
     this._bridge.send('colorizerchange', state.toJS());
+    this.highlightSearch();
+    this.hideHighlight();
   }
 
   // Private stuff

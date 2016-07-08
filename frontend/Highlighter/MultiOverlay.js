@@ -37,7 +37,7 @@ class MultiOverlay {
         border: '2px dotted rgba(200, 100, 100, .8)',
         boxSizing: 'border-box',
         backgroundColor: 'rgba(200, 100, 100, .2)',
-        position: 'fixed',
+        position: 'absolute',
         zIndex: 10000000,
         pointerEvents: 'none',
       });

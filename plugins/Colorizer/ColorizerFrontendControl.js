@@ -11,8 +11,6 @@
 
 'use strict';
 
-const React = require('react');
-
 var decorate = require('../../frontend/decorate');
 var SettingsCheckbox = require('../../frontend/SettingsCheckbox');
 
