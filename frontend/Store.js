@@ -89,10 +89,12 @@ class Store extends EventEmitter {
   // Public state
   bananaslugState: ?ControlState;
   colorizerState: ?ControlState;
+  regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagSelected: boolean;
   placeholderText: string;
+  refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
@@ -124,7 +126,9 @@ class Store extends EventEmitter {
     this.capabilities = {};
     this.bananaslugState = null;
     this.colorizerState = null;
+    this.regexState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
+    this.refreshSearch = false;
 
     // for debugging
     window.store = this;
@@ -205,13 +209,18 @@ class Store extends EventEmitter {
 
   changeSearch(text: string): void {
     var needle = text.toLowerCase();
-    if (needle === this.searchText.toLowerCase()) {
+    if (needle === this.searchText.toLowerCase() && !this.refreshSearch) {
       return;
     }
     if (!text) {
       this.searchRoots = null;
     } else {
-      if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
+      if (
+        this.searchRoots &&
+        needle.indexOf(this.searchText.toLowerCase()) === 0 &&
+        this.regexState &&
+        !this.regexState.enabled
+      ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
             var node = this.get(item);
@@ -245,6 +254,7 @@ class Store extends EventEmitter {
     }
 
     this.highlightSearch();
+    this.refreshSearch = false;
   }
 
   highlight(id: string): void {
@@ -467,6 +477,13 @@ class Store extends EventEmitter {
     this._bridge.send('colorizerchange', state.toJS());
     this.highlightSearch();
     this.hideHighlight();
+  }
+
+  changeRegex(state: ControlState) {
+    this.regexState = state;
+    this.emit('regexchange');
+    this.refreshSearch = true;
+    this.changeSearch(this.searchText);
   }
 
   // Private stuff
