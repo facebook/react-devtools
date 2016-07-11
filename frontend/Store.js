@@ -539,10 +539,6 @@ class Store extends EventEmitter {
     var curNodes = this._nodesByName.get(data.name) || new Set();
     this._nodesByName = this._nodesByName.set(data.name, curNodes.add(data.id));
     this.emit(data.id);
-    if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase(), data.id, this)) {
-      this.searchRoots = this.searchRoots.push(data.id);
-      this.emit('searchRoots');
-    }
   }
 
   _updateComponent(data: DataType) {
@@ -554,7 +550,23 @@ class Store extends EventEmitter {
     this._nodes = this._nodes.mergeIn([data.id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        this._parents = this._parents.set(cid, data.id);
+        if (!this._parents.get(cid)) {
+          this._parents = this._parents.set(cid, data.id);
+          var childNode = this._nodes.get(cid);
+          var childID = childNode.get('id');
+          if (
+            this.searchRoots &&
+            nodeMatchesText(
+              childNode,
+              this.searchText.toLowerCase(),
+              childID,
+              this,
+          )) {
+            this.searchRoots = this.searchRoots.push(childID);
+            this.emit('searchRoots');
+            this.highlightSearch();
+          }
+        }
       });
     }
     this.emit(data.id);
@@ -582,6 +594,7 @@ class Store extends EventEmitter {
       // $FlowFixMe flow things searchRoots might be null
       this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
       this.emit('searchRoots');
+      this.highlightSearch();
     }
   }
 
