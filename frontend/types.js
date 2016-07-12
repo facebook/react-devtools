@@ -10,6 +10,8 @@
  */
 'use strict';
 
+var {Record} = require('immutable');
+
 export type Dir = 'up' | 'down' | 'left' | 'right';
 export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom';
 
@@ -17,6 +19,7 @@ export type ElementID = string;
 
 export type DOMNode = {
   appendChild: (child: DOMNode) => void,
+  childNodes: Array<DOMNode>,
   getBoundingClientRect: () => {
     top: number,
     left: number,
@@ -60,4 +63,4 @@ export type DOMEvent = {
 
 export type ControlState = {
   enabled: boolean,
-};
+} & Record;

@@ -21,6 +21,7 @@ module.exports = function setup(agent: Agent) {
   agent.on('highlight', data => hl.highlight(data.node, data.name));
   agent.on('highlightMany', nodes => hl.highlightMany(nodes));
   agent.on('hideHighlight', () => hl.hideHighlight());
+  agent.on('refreshMultiOverlay', () => hl.refreshMultiOverlay());
   agent.on('startInspecting', () => hl.startInspecting());
   agent.on('stopInspecting', () => hl.stopInspecting());
   agent.on('shutdown', () => {

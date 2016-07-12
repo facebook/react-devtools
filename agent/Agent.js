@@ -91,6 +91,7 @@ class Agent extends EventEmitter {
   capabilities: {[key: string]: boolean};
   renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
+  _scrollUpdate: boolean;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -108,12 +109,15 @@ class Agent extends EventEmitter {
       }
     });
     this._prevSelected = null;
+    this._scrollUpdate = false;
     var isReactDOM = window.document && typeof window.document.createElement === 'function';
     this.capabilities = assign({
       scroll: isReactDOM && typeof window.document.body.scrollIntoView === 'function',
       dom: isReactDOM,
       editTextContent: false,
     }, capabilities);
+
+    window.addEventListener('scroll', this._onScroll.bind(this), true);
   }
 
   // returns an "unsubscribe" function
@@ -373,6 +377,22 @@ class Agent extends EventEmitter {
     this.renderers.delete(id);
     this.emit('unmount', id);
     this.ids.delete(component);
+  }
+
+  _onScroll() {
+    this._requestScrollUpdate();
+  }
+
+  _updateScroll() {
+    this._scrollUpdate = false;
+    this.emit('refreshMultiOverlay');
+  }
+
+  _requestScrollUpdate() {
+    if (!this._scrollUpdate) {
+      window.requestAnimationFrame(this._updateScroll.bind(this));
+    }
+    this._scrollUpdate = true;
   }
 }
 

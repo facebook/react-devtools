@@ -79,6 +79,13 @@ class Highlighter {
     this.removeMultiOverlay();
   }
 
+  refreshMultiOverlay() {
+    if (!this._multiOverlay) {
+      return;
+    }
+    this._multiOverlay.refresh();
+  }
+
   removeOverlay() {
     if (!this._overlay) {
       return;

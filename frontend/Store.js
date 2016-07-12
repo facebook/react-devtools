@@ -473,7 +473,6 @@ class Store extends EventEmitter {
       : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
     this.emit('colorizerchange');
-    invariant(state.toJS);
     this._bridge.send('colorizerchange', state.toJS());
     this.highlightSearch();
     this.hideHighlight();
