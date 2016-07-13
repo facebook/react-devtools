@@ -29,12 +29,22 @@ class MultiOverlay {
   highlightMany(nodes: Array<DOMNode>) {
     this._currentNodes = nodes;
     this.container.innerHTML = '';
+    var documentTop = window.pageYOffset || document.documentElement.scrollTop;
+    var scrollAmt =
+      document.documentElement.scrollTop || document.body.scrollTop;
+
     nodes.forEach(node => {
       var div = this.win.document.createElement('div');
       if (typeof node.getBoundingClientRect !== 'function') {
         return;
       }
       var box = node.getBoundingClientRect();
+      if (
+        box.bottom + scrollAmt < documentTop ||
+        box.top + scrollAmt > documentTop + window.innerHeight
+      ) {
+        return;
+      }
       assign(div.style, {
         top: box.top + 'px',
         left: box.left + 'px',
@@ -43,7 +53,7 @@ class MultiOverlay {
         border: '2px dotted rgba(200, 100, 100, .8)',
         boxSizing: 'border-box',
         backgroundColor: 'rgba(200, 100, 100, .2)',
-        position: 'absolute',
+        position: 'fixed',
         zIndex: 10000000,
         pointerEvents: 'none',
       });

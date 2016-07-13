@@ -380,19 +380,15 @@ class Agent extends EventEmitter {
   }
 
   _onScroll() {
-    this._requestScrollUpdate();
+    if (!this._scrollUpdate) {
+      this._scrollUpdate = true;
+      window.requestAnimationFrame(this._updateScroll.bind(this));
+    }
   }
 
   _updateScroll() {
-    this._scrollUpdate = false;
     this.emit('refreshMultiOverlay');
-  }
-
-  _requestScrollUpdate() {
-    if (!this._scrollUpdate) {
-      window.requestAnimationFrame(this._updateScroll.bind(this));
-    }
-    this._scrollUpdate = true;
+    this._scrollUpdate = false;
   }
 }
 
