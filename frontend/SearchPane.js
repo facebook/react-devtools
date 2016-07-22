@@ -101,7 +101,7 @@ class SearchPane extends React.Component {
             onFocus={() => this.setState({focused: true})}
             onBlur={() => this.setState({focused: false})}
             onKeyDown={e => this.onKeyDown(e.key)}
-            placeholder="Search by Component Name"
+            placeholder={this.props.placeholderText}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
           {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
@@ -116,18 +116,20 @@ class SearchPane extends React.Component {
 SearchPane.propTypes = {
   reload: PropTypes.func,
   searchText: PropTypes.string,
-  onChangeSearch: PropTypes.func,
   selectFirstSearchResult: PropTypes.func,
+  onChangeSearch: PropTypes.func,
+  placeholderText: PropTypes.string,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['searchText'];
+    return ['searchText', 'placeholderchange'];
   },
   props(store) {
     return {
-      searchText: store.searchText,
       onChangeSearch: text => store.changeSearch(text),
+      placeholderText: store.placeholderText,
+      searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
     };
   },

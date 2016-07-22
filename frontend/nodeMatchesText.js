@@ -18,20 +18,29 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
   if (node.get('nodeType') === 'Native' && store.get(store.getParent(key)).get('nodeType') === 'NativeWrapper') {
     return false;
   }
+  var useRegex = !!store.regexState && store.regexState.enabled;
   if (name) {
-    if (node.get('nodeType') !== 'Wrapper' && name.toLowerCase().indexOf(needle) !== -1) {
-      return true;
+    if (node.get('nodeType') !== 'Wrapper') {
+      return validString(name, needle, useRegex);
     }
   }
   var text = node.get('text');
-  if (text && text.toLowerCase().indexOf(needle) !== -1) {
-    return true;
+  if (text) {
+    return validString(text, needle, useRegex);
   }
   var children = node.get('children');
-  if (typeof children === 'string' && children.toLowerCase().indexOf(needle) !== -1) {
-    return true;
+  if (typeof children === 'string') {
+    return validString(children, needle, useRegex);
   }
   return false;
+}
+
+function validString(str: string, needle: string, regex: boolean): boolean {
+  if (regex) {
+    var re = new RegExp(needle, 'i');
+    return re.test(str.toLowerCase());
+  }
+  return str.toLowerCase().indexOf(needle) !== -1;
 }
 
 module.exports = nodeMatchesText;

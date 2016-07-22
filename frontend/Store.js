@@ -18,7 +18,7 @@ var consts = require('../agent/consts');
 var invariant = require('./invariant');
 
 import type Bridge from '../agent/Bridge';
-import type {DOMEvent, ElementID} from './types';
+import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -28,6 +28,8 @@ type ContextMenu = {
   y: number,
   args: Array<any>,
 };
+
+const DEFAULT_PLACEHOLDER = 'Search by Component Name';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -85,10 +87,14 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
-  bananaslugState: ?Object;
+  bananaslugState: ?ControlState;
+  colorizerState: ?ControlState;
+  regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagSelected: boolean;
+  placeholderText: string;
+  refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
@@ -119,6 +125,10 @@ class Store extends EventEmitter {
     this.searchText = '';
     this.capabilities = {};
     this.bananaslugState = null;
+    this.colorizerState = null;
+    this.regexState = null;
+    this.placeholderText = DEFAULT_PLACEHOLDER;
+    this.refreshSearch = false;
 
     // for debugging
     window.store = this;
@@ -199,13 +209,17 @@ class Store extends EventEmitter {
 
   changeSearch(text: string): void {
     var needle = text.toLowerCase();
-    if (needle === this.searchText.toLowerCase()) {
+    if (needle === this.searchText.toLowerCase() && !this.refreshSearch) {
       return;
     }
     if (!text) {
       this.searchRoots = null;
     } else {
-      if (this.searchRoots && needle.indexOf(this.searchText.toLowerCase()) === 0) {
+      if (
+        this.searchRoots &&
+        needle.indexOf(this.searchText.toLowerCase()) === 0 &&
+        (!this.regexState || !this.regexState.enabled)
+      ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
             var node = this.get(item);
@@ -237,18 +251,41 @@ class Store extends EventEmitter {
         this.select(this.roots.get(0));
       }
     }
+
+    this.highlightSearch();
+    this.refreshSearch = false;
+  }
+
+  highlight(id: string): void {
+    // Individual highlighting is disabled while colorizer is active
+    if (!this.colorizerState || !this.colorizerState.enabled) {
+      this._bridge.send('highlight', id);
+    }
+  }
+
+  highlightMany(ids: Array<string>): void {
+    this._bridge.send('highlightMany', ids);
+  }
+
+  highlightSearch(): void {
+    if (this.colorizerState && this.colorizerState.enabled) {
+      this._bridge.send('hideHighlight');
+      if (this.searchRoots) {
+        this.highlightMany(this.searchRoots.toArray());
+      }
+    }
   }
 
   hoverClass(name: string): void {
     if (name === null) {
-      this._bridge.send('hideHighlight');
+      this.hideHighlight();
       return;
     }
     var ids = this._nodesByName.get(name);
     if (!ids) {
       return;
     }
-    this._bridge.send('highlightMany', ids.toArray());
+    this.highlightMany(ids.toArray());
   }
 
   selectFirstOfClass(name: string): void {
@@ -320,13 +357,16 @@ class Store extends EventEmitter {
       }
       this.emit(id);
       this.emit('hover');
-      this._bridge.send('highlight', id);
+      this.highlight(id);
     } else if (this.hovered === id) {
       this.hideHighlight();
     }
   }
 
   hideHighlight() {
+    if (this.colorizerState && this.colorizerState.enabled) {
+      return;
+    }
     this._bridge.send('hideHighlight');
     if (!this.hovered) {
       return;
@@ -369,8 +409,8 @@ class Store extends EventEmitter {
     }
     this.emit('selected');
     this._bridge.send('selected', id);
-    if (!noHighlight) {
-      this._bridge.send('highlight', id);
+    if (!noHighlight && id) {
+      this.highlight(id);
     }
   }
 
@@ -419,10 +459,33 @@ class Store extends EventEmitter {
     });
   }
 
-  changeBananaSlug(state: Object) {
+  changeBananaSlug(state: ControlState) {
     this.bananaslugState = state;
     this.emit('bananaslugchange');
+    invariant(state.toJS);
     this._bridge.send('bananaslugchange', state.toJS());
+  }
+
+  changeColorizer(state: ControlState) {
+    this.colorizerState = state;
+    this.placeholderText = this.colorizerState.enabled
+      ? 'Highlight by Component Name'
+      : DEFAULT_PLACEHOLDER;
+    this.emit('placeholderchange');
+    this.emit('colorizerchange');
+    this._bridge.send('colorizerchange', state.toJS());
+    if (this.colorizerState && this.colorizerState.enabled) {
+      this.highlightSearch();
+    } else {
+      this.hideHighlight();
+    }
+  }
+
+  changeRegex(state: ControlState) {
+    this.regexState = state;
+    this.emit('regexchange');
+    this.refreshSearch = true;
+    this.changeSearch(this.searchText);
   }
 
   // Private stuff
@@ -478,10 +541,6 @@ class Store extends EventEmitter {
     var curNodes = this._nodesByName.get(data.name) || new Set();
     this._nodesByName = this._nodesByName.set(data.name, curNodes.add(data.id));
     this.emit(data.id);
-    if (this.searchRoots && nodeMatchesText(map, this.searchText.toLowerCase(), data.id, this)) {
-      this.searchRoots = this.searchRoots.push(data.id);
-      this.emit('searchRoots');
-    }
   }
 
   _updateComponent(data: DataType) {
@@ -493,7 +552,23 @@ class Store extends EventEmitter {
     this._nodes = this._nodes.mergeIn([data.id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        this._parents = this._parents.set(cid, data.id);
+        if (!this._parents.get(cid)) {
+          this._parents = this._parents.set(cid, data.id);
+          var childNode = this._nodes.get(cid);
+          var childID = childNode.get('id');
+          if (
+            this.searchRoots &&
+            nodeMatchesText(
+              childNode,
+              this.searchText.toLowerCase(),
+              childID,
+              this,
+          )) {
+            this.searchRoots = this.searchRoots.push(childID);
+            this.emit('searchRoots');
+            this.highlightSearch();
+          }
+        }
       });
     }
     this.emit(data.id);
@@ -521,6 +596,7 @@ class Store extends EventEmitter {
       // $FlowFixMe flow things searchRoots might be null
       this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
       this.emit('searchRoots');
+      this.highlightSearch();
     }
   }
 

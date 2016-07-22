@@ -16,19 +16,29 @@ import type {DOMNode} from '../types';
 class MultiOverlay {
   win: Object;
   container: DOMNode;
+  _currentNodes: ?Array<DOMNode>;
 
   constructor(window: Object) {
     this.win = window;
     var doc = window.document;
     this.container = doc.createElement('div');
     doc.body.appendChild(this.container);
+    this._currentNodes = null;
   }
 
   highlightMany(nodes: Array<DOMNode>) {
+    this._currentNodes = nodes;
     this.container.innerHTML = '';
+
     nodes.forEach(node => {
       var div = this.win.document.createElement('div');
+      if (typeof node.getBoundingClientRect !== 'function') {
+        return;
+      }
       var box = node.getBoundingClientRect();
+      if (box.bottom < 0 || box.top > window.innerHeight) {
+        return;
+      }
       assign(div.style, {
         top: box.top + 'px',
         left: box.left + 'px',
@@ -45,9 +55,16 @@ class MultiOverlay {
     });
   }
 
+  refresh() {
+    if (this._currentNodes) {
+      this.highlightMany(this._currentNodes);
+    }
+  }
+
   remove() {
     if (this.container.parentNode) {
       this.container.parentNode.removeChild(this.container);
+      this._currentNodes = null;
     }
   }
 }

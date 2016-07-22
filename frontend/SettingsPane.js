@@ -10,15 +10,17 @@
 'use strict';
 
 var BananaSlugFrontendControl = require('../plugins/BananaSlug/BananaSlugFrontendControl');
+var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+var RegexFrontendControl = require('../plugins/Regex/RegexFrontendControl');
 var React = require('react');
-
-var decorate = require('./decorate');
 
 class SettingsPane extends React.Component {
   render() {
     return (
       <div style={styles.container}>
         <BananaSlugFrontendControl {...this.props} />
+        <ColorizerFrontendControl {...this.props} />
+        <RegexFrontendControl {...this.props} />
       </div>
     );
   }
@@ -34,16 +36,4 @@ var styles = {
   },
 };
 
-var Wrapped = decorate({
-  listeners() {
-    return ['bananaslugchange'];
-  },
-  props(store) {
-    return {
-      state: store.bananaslugState,
-      onChange: state => store.changeBananaSlug(state),
-    };
-  },
-}, SettingsPane);
-
-module.exports = Wrapped;
+module.exports = SettingsPane;

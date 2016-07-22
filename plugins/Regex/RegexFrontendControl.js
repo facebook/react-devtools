@@ -16,13 +16,13 @@ var SettingsCheckbox = require('../../frontend/SettingsCheckbox');
 
 var Wrapped = decorate({
   listeners() {
-    return ['bananaslugchange'];
+    return ['regexchange'];
   },
   props(store) {
     return {
-      state: store.bananaslugState,
-      text: 'Trace React Updates',
-      onChange: state => store.changeBananaSlug(state),
+      state: store.regexState,
+      text: 'Use Regular Expressions',
+      onChange: state => store.changeRegex(state),
     };
   },
 }, SettingsCheckbox);

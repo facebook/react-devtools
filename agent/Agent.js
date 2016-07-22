@@ -91,6 +91,8 @@ class Agent extends EventEmitter {
   capabilities: {[key: string]: boolean};
   renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
+  _scrollUpdate: boolean;
+  _updateScroll: () => void;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -108,12 +110,16 @@ class Agent extends EventEmitter {
       }
     });
     this._prevSelected = null;
+    this._scrollUpdate = false;
     var isReactDOM = window.document && typeof window.document.createElement === 'function';
     this.capabilities = assign({
       scroll: isReactDOM && typeof window.document.body.scrollIntoView === 'function',
       dom: isReactDOM,
       editTextContent: false,
     }, capabilities);
+
+    this._updateScroll = this._updateScroll.bind(this);
+    window.addEventListener('scroll', this._onScroll.bind(this), true);
   }
 
   // returns an "unsubscribe" function
@@ -179,6 +185,7 @@ class Agent extends EventEmitter {
     });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
     bridge.on('bananaslugchange', value => this.emit('bananaslugchange', value));
+    bridge.on('colorizerchange', value => this.emit('colorizerchange', value));
 
     /** Events sent to the frontend **/
     this.on('root', id => bridge.send('root', id));
@@ -372,6 +379,18 @@ class Agent extends EventEmitter {
     this.renderers.delete(id);
     this.emit('unmount', id);
     this.ids.delete(component);
+  }
+
+  _onScroll() {
+    if (!this._scrollUpdate) {
+      this._scrollUpdate = true;
+      window.requestAnimationFrame(this._updateScroll);
+    }
+  }
+
+  _updateScroll() {
+    this.emit('refreshMultiOverlay');
+    this._scrollUpdate = false;
   }
 }
 
