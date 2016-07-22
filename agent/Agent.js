@@ -92,6 +92,7 @@ class Agent extends EventEmitter {
   renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
   _scrollUpdate: boolean;
+  _updateScroll: () => void;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -117,6 +118,7 @@ class Agent extends EventEmitter {
       editTextContent: false,
     }, capabilities);
 
+    this._updateScroll = this._updateScroll.bind(this);
     window.addEventListener('scroll', this._onScroll.bind(this), true);
   }
 
@@ -382,7 +384,7 @@ class Agent extends EventEmitter {
   _onScroll() {
     if (!this._scrollUpdate) {
       this._scrollUpdate = true;
-      window.requestAnimationFrame(this._updateScroll.bind(this));
+      window.requestAnimationFrame(this._updateScroll);
     }
   }
 

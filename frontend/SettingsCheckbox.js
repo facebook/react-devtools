@@ -87,7 +87,7 @@ var styles = {
     fontSize: '12px',
     outline: 'none',
     userSelect: 'none',
-    margin: '0px 4px 0px 4px',
+    margin: '0px 4px',
   },
 };
 

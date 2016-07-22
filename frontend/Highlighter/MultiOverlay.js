@@ -29,9 +29,6 @@ class MultiOverlay {
   highlightMany(nodes: Array<DOMNode>) {
     this._currentNodes = nodes;
     this.container.innerHTML = '';
-    var documentTop = window.pageYOffset || document.documentElement.scrollTop;
-    var scrollAmt =
-      document.documentElement.scrollTop || document.body.scrollTop;
 
     nodes.forEach(node => {
       var div = this.win.document.createElement('div');
@@ -39,10 +36,7 @@ class MultiOverlay {
         return;
       }
       var box = node.getBoundingClientRect();
-      if (
-        box.bottom + scrollAmt < documentTop ||
-        box.top + scrollAmt > documentTop + window.innerHeight
-      ) {
+      if (box.bottom < 0 || box.top > window.innerHeight) {
         return;
       }
       assign(div.style, {

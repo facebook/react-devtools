@@ -37,7 +37,7 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
 
 function validString(str: string, needle: string, regex: boolean): boolean {
   if (regex) {
-    var re = new RegExp(needle);
+    var re = new RegExp(needle, 'i');
     return re.test(str.toLowerCase());
   }
   return str.toLowerCase().indexOf(needle) !== -1;

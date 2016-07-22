@@ -218,8 +218,7 @@ class Store extends EventEmitter {
       if (
         this.searchRoots &&
         needle.indexOf(this.searchText.toLowerCase()) === 0 &&
-        this.regexState &&
-        !this.regexState.enabled
+        (!this.regexState || !this.regexState.enabled)
       ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
@@ -258,6 +257,7 @@ class Store extends EventEmitter {
   }
 
   highlight(id: string): void {
+    // Individual highlighting is disabled while colorizer is active
     if (!this.colorizerState || !this.colorizerState.enabled) {
       this._bridge.send('highlight', id);
     }
@@ -474,8 +474,11 @@ class Store extends EventEmitter {
     this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
-    this.highlightSearch();
-    this.hideHighlight();
+    if (this.colorizerState && this.colorizerState.enabled) {
+      this.highlightSearch();
+    } else {
+      this.hideHighlight();
+    }
   }
 
   changeRegex(state: ControlState) {
