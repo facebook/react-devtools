@@ -1,7 +1,7 @@
 {
   "title": "React Devtools",
   "name": "react-devtools",
-  "version": "0.14.11",
+  "version": "0.15.0",
   "description": "Adds React debugging tools to Firefox.",
   "main": "main/index.js",
   "author": "Facebook",
