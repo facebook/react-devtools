@@ -20,6 +20,18 @@ var React = require('react');
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
+/**
+ * Shorten a file path to something reasonable.
+ * - if it has `/src/` in it, assume that's the project root
+ * - if it starts w/ `/Users/name/`, replace that with `~/`
+ */
+var shortFilePath = text => {
+  if (text.match(/\/src\//)) {
+    return 'src/' + text.split(/\/src\//)[1];
+  }
+  return text.replace(/^\/Users\/[^\/]+\//, '~/');
+};
+
 class PropState extends React.Component {
   getChildContext() {
     return {
@@ -27,6 +39,23 @@ class PropState extends React.Component {
         this.props.onChange(path, val);
       },
     };
+  }
+
+  renderSource(): React.Element {
+    var source = this.props.node.get('source');
+    if (!source) {
+      return null;
+    }
+    return (
+      <div style={styles.source}>
+        <div style={styles.sourceName}>
+          {shortFilePath(source.fileName)}
+        </div>
+        <div style={styles.sourcePos}>
+          :{source.lineNumber}
+        </div>
+      </div>
+    );
   }
 
   render(): React.Element {
@@ -129,6 +158,8 @@ class PropState extends React.Component {
           </DetailPaneSection>}
         {this.props.extraPanes &&
           this.props.extraPanes.map(fn => fn && fn(this.props.node, this.props.id))}
+        <div style={{flex: 1}} />
+        {this.renderSource()}
       </DetailPane>
     );
   }
@@ -170,5 +201,21 @@ var WrappedPropState = decorate({
     };
   },
 }, PropState);
+
+var styles = {
+  source: {
+    padding: '5px 10px',
+    display: 'flex',
+    flexDirection: 'row',
+  },
+
+  sourceName: {
+    color: 'blue',
+  },
+
+  sourcePos: {
+    color: '#777',
+  },
+};
 
 module.exports = WrappedPropState;

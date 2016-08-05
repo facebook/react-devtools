@@ -26,6 +26,7 @@ function getData(element: Object): DataType {
   var type = null;
   var key = null;
   var ref = null;
+  var source = null;
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
@@ -65,6 +66,7 @@ function getData(element: Object): DataType {
     if (element._currentElement.key) {
       key = String(element._currentElement.key);
     }
+    source = element._currentElement._source;
     ref = element._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
@@ -111,6 +113,7 @@ function getData(element: Object): DataType {
     type,
     key,
     ref,
+    source,
     name,
     props,
     state,
