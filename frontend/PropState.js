@@ -41,7 +41,7 @@ class PropState extends React.Component {
     };
   }
 
-  renderSource(): React.Element {
+  renderSource(): ?React.Element {
     var source = this.props.node.get('source');
     if (!source) {
       return null;
