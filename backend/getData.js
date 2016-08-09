@@ -73,7 +73,10 @@ function getData(element: Object): DataType {
       name = element.getName();
       // 0.14 top-level wrapper
       // TODO(jared): The backend should just act as if these don't exist.
-      if (element._renderedComponent && element._currentElement.props === element._renderedComponent._currentElement) {
+      if (element._renderedComponent && (
+        element._currentElement.props === element._renderedComponent._currentElement ||
+        element._currentElement.type.isReactTopLevelWrapper
+      )) {
         nodeType = 'Wrapper';
       }
       if (name === null) {
