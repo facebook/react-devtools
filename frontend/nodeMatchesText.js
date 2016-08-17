@@ -15,7 +15,8 @@ import type Store from './Store';
 
 function nodeMatchesText(node: Map, needle: string, key: string, store: Store): boolean {
   var name = node.get('name');
-  if (node.get('nodeType') === 'Native' && store.get(store.getParent(key)).get('nodeType') === 'NativeWrapper') {
+  var wrapper = store.get(store.getParent(key));
+  if (node.get('nodeType') === 'Native' && wrapper && wrapper.get('nodeType') === 'NativeWrapper') {
     return false;
   }
   var useRegex = !!store.regexState && store.regexState.enabled;
