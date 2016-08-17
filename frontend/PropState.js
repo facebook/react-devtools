@@ -20,17 +20,6 @@ var React = require('react');
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
-/**
- * Shorten a file path to something reasonable.
- * - if it has `/src/` in it, assume that's the project root
- * - if it starts w/ `/Users/name/`, replace that with `~/`
- */
-var shortFilePath = text => {
-  if (text.match(/\/src\//)) {
-    return 'src/' + text.split(/\/src\//)[1];
-  }
-  return text.replace(/^\/Users\/[^\/]+\//, '~/');
-};
 
 class PropState extends React.Component {
   getChildContext() {
@@ -49,7 +38,7 @@ class PropState extends React.Component {
     return (
       <div style={styles.source}>
         <div style={styles.sourceName}>
-          {shortFilePath(source.fileName)}
+          {source.fileName}
         </div>
         <div style={styles.sourcePos}>
           :{source.lineNumber}
