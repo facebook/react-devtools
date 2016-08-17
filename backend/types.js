@@ -15,6 +15,7 @@ export type DataType = {
   type: ?(string | AnyFn),
   key: ?string,
   ref: ?(string | AnyFn),
+  source: ?Object,
   name: ?string,
   props: ?Object,
   state: ?Object,

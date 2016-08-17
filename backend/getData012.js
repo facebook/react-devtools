@@ -91,6 +91,7 @@ function getData012(element: Object): DataType {
     type,
     key,
     ref,
+    source: null,
     name,
     props,
     state,
