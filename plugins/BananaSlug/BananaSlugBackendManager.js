@@ -54,6 +54,7 @@ class BananaSlugBackendManager {
 
   _onUpdate(agent: Agent, obj: any) {
     if (
+      !this._isActive ||
       !obj.publicInstance ||
       !obj.id ||
       obj.nodeType !== NODE_TYPE_COMPOSITE
@@ -74,10 +75,12 @@ class BananaSlugBackendManager {
   }
 
   _onBananaSlugChange(state: ControlState): void {
+    this._isActive = state.enabled;
     this._presenter.setEnabled(state.enabled);
   }
 
   _shutdown(): void {
+    this._isActive = false;
     this._presenter.setEnabled(false);
   }
 }
