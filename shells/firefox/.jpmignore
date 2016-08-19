@@ -1,5 +1,9 @@
 *.swp
 *.swo
+*.sh
+*.xpi
 .DS_Store
 node_modules
 src
+webpack.config.js
+.jpmignore
