@@ -10,6 +10,7 @@
 'use strict';
 
 var webpack = require('webpack');
+var __DEV__ = process.env.NODE_ENV !== 'production';
 
 module.exports = {
   debug: true,
