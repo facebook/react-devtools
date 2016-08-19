@@ -206,10 +206,18 @@ class Agent extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    if (node.scrollIntoViewIfNeeded) {
-      node.scrollIntoViewIfNeeded();
+    var element = node.nodeType === Node.ELEMENT_NODE ?
+      node :
+      node.parentElement;
+    if (!element) {
+      console.warn('unable to get the element for scrolling');
+      return;
+    }
+
+    if (element.scrollIntoViewIfNeeded) {
+      element.scrollIntoViewIfNeeded();
     } else {
-      node.scrollIntoView();
+      element.scrollIntoView();
     }
     this.highlight(id);
   }
