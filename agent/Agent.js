@@ -325,7 +325,7 @@ class Agent extends EventEmitter {
   }
 
   getId(element: OpaqueNodeHandle): ElementID {
-    if (typeof element !== 'object') {
+    if (typeof element !== 'object' || !element) {
       return element;
     }
     if (!this.ids.has(element)) {
