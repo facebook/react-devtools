@@ -163,21 +163,26 @@ class Store extends EventEmitter {
   }
 
   emit(event: string): boolean {
+    if (this._eventQueue.indexOf(event) !== -1) {
+      // to appease flow
+      return true;
+    }
+    this._eventQueue.push(event);
     if (!this._eventTimer) {
-      this._eventTimer = setTimeout(() => {
-        this._eventQueue.forEach(evt => {
-          EventEmitter.prototype.emit.call(this, evt);
-        });
-        this._eventQueue = [];
-        this._eventTimer = null;
-      }, 50);
-      this._eventQueue = [];
+      this._eventTimer = setTimeout(() => this.flush(), 50);
     }
-    if (this._eventQueue.indexOf(event) === -1) {
-      this._eventQueue.push(event);
-    }
-    // to appease flow
     return true;
+  }
+
+  flush() {
+    if (this._eventTimer) {
+      clearTimeout(this._eventTimer);
+      this._eventTimer = null;
+    }
+    this._eventQueue.forEach(evt => {
+      EventEmitter.prototype.emit.call(this, evt);
+    });
+    this._eventQueue = [];
   }
 
   // Public actions
@@ -254,6 +259,9 @@ class Store extends EventEmitter {
 
     this.highlightSearch();
     this.refreshSearch = false;
+
+    // SearchPane input depends on this change being flushed synchronously.
+    this.flush();
   }
 
   highlight(id: string): void {
