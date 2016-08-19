@@ -15,10 +15,29 @@ var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
 var performanceNow = require('fbjs/lib/performanceNow');
 
+// Based on https://gist.github.com/paullewis/55efe5d6f05434a96c36
+var cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
+var requestIdleCallback = window.requestIdleCallback || function(cb) {
+  var start = performanceNow();
+  return setTimeout(() => {
+    cb({
+      didTimeout: false,
+      timeRemaining() {
+        return Math.max(0, 50 - (performanceNow() - start));
+      },
+    });
+  }, 1);
+};
+
 type AnyFn = (...x: any) => any;
 export type Wall = {
   listen: (fn: (data: PayloadType) => void) => void,
   send: (data: PayloadType) => void,
+};
+
+type IdleDeadline = {
+  didTimeout: bool,
+  timeRemaining: () => number,
 };
 
 type EventPayload = {
@@ -112,9 +131,8 @@ class Bridge {
   _cbs: Map;
   _cid: number;
   _inspectables: Map;
-  _lastTime: number;
   _listeners: {[key: string]: Array<(data: any) => void>};
-  _waiting: ?number;
+  _flushHandle: ?number;
   _wall: Wall;
   _callers: {[key: string]: AnyFn};
   _paused: boolean;
@@ -125,8 +143,7 @@ class Bridge {
     this._cid = 0;
     this._listeners = {};
     this._buffer = [];
-    this._waiting = null;
-    this._lastTime = 5;
+    this._flushHandle = null;
     this._callers = {};
     this._paused = false;
     this._wall = wall;
@@ -197,34 +214,45 @@ class Bridge {
     this._inspectables.set(id, {...prev, ...data});
   }
 
-  sendOne(evt: string, data: any) {
-    var cleaned = [];
-    var san = dehydrate(data, cleaned);
-    if (cleaned.length) {
-      this.setInspectable(data.id, data);
-    }
-    this._wall.send({type: 'event', evt, data: san, cleaned});
-  }
-
   send(evt: string, data: any) {
-    if (!this._waiting && !this._paused) {
-      this._buffer = [];
-      var nextTime = this._lastTime * 3;
-      if (nextTime > 500) {
-        // flush is taking an unexpected amount of time
-        nextTime = 500;
-      }
-      this._waiting = setTimeout(() => {
-        this.flush();
-        this._waiting = null;
-      }, nextTime);
-    }
     this._buffer.push({evt, data});
+    this.scheduleFlush();
   }
 
-  flush() {
-    var start = performanceNow();
-    var events = this._buffer.map(({evt, data}) => {
+  scheduleFlush() {
+    if (!this._flushHandle && !this._paused && this._buffer.length) {
+      this._flushHandle = requestIdleCallback(
+        this.flushBufferWhileIdle.bind(this),
+        {timeout: 5000}
+      );
+    }
+  }
+
+  cancelFlush() {
+    if (this._flushHandle) {
+      cancelIdleCallback(this._flushHandle);
+      this._flushHandle = null;
+    }
+  }
+
+  flushBufferWhileIdle(deadline: IdleDeadline) {
+    this._flushHandle = null;
+
+    while (this._buffer.length && (
+      deadline.timeRemaining() >= 10 ||
+      deadline.didTimeout
+    )) {
+      var currentBuffer = this._buffer.splice(0, Math.min(50, this._buffer.length));
+      this.flushBufferSlice(currentBuffer);
+    }
+
+    if (this._buffer.length) {
+      this.scheduleFlush();
+    }
+  }
+
+  flushBufferSlice(bufferSlice: Array<{evt: string, data: any}>) {
+    var events = bufferSlice.map(({evt, data}) => {
       var cleaned = [];
       var san = dehydrate(data, cleaned);
       if (cleaned.length) {
@@ -233,9 +261,6 @@ class Bridge {
       return {type: 'event', evt, data: san, cleaned};
     });
     this._wall.send({type: 'many-events', events});
-    this._buffer = [];
-    this._waiting = null;
-    this._lastTime = performanceNow() - start;
   }
 
   forget(id: string) {
@@ -272,15 +297,13 @@ class Bridge {
   _handleMessage(payload: PayloadType) {
     if (payload.type === 'resume') {
       this._paused = false;
-      this._waiting = null;
-      this.flush();
+      this.scheduleFlush();
       return;
     }
 
     if (payload.type === 'pause') {
       this._paused = true;
-      clearTimeout(this._waiting);
-      this._waiting = null;
+      this.cancelFlush();
       return;
     }
 
