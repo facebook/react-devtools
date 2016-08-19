@@ -214,9 +214,9 @@ class Agent extends EventEmitter {
       return;
     }
 
-    if (element.scrollIntoViewIfNeeded) {
+    if (typeof element.scrollIntoViewIfNeeded === 'function') {
       element.scrollIntoViewIfNeeded();
-    } else {
+    } else if (typeof element.scrollIntoView === 'function') {
       element.scrollIntoView();
     }
     this.highlight(id);
