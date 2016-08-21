@@ -45,6 +45,9 @@ class Simple extends React.Component {
   onKeyDown(e: DOMEvent) {
     if (e.key === 'Enter') {
       this.onSubmit(true);
+      this.setState({
+        editing: false,
+      });
     }
     if (e.key === 'Escape') {
       this.setState({
