@@ -18,6 +18,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
+  state: {hovered: ?string};
 
   constructor(props) {
     super(props);

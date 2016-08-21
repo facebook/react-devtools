@@ -88,17 +88,13 @@ class SearchPane extends React.Component {
   }
 
   render() {
-    var inputStyle = styles.input;
-    if (this.props.searchText || this.state.focused) {
-      inputStyle = { ...inputStyle, ...styles.highlightedInput };
-    }
     return (
       <div style={styles.container}>
         <SettingsPane />
         <div style={styles.searchBox}>
           <div style={styles.searchInputBox}>
             <input
-              style={inputStyle}
+              style={styles.input}
               ref={i => this.input = i}
               value={this.props.searchText}
               onFocus={() => this.setState({ focused: true })}
