@@ -18,23 +18,40 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
+
+  constructor(props) {
+    super(props);
+    this.state = { hovered: null };
+  }
+  handleCrumbMouseOver(id) {
+    this.setState({ hovered: id });
+    this.props.hover(id, true);
+  }
+
+  handleCrumbMouseOut(id) {
+    this.setState({ hovered: null });
+    this.props.hover(id, false);
+  }
+
   render() {
     return (
       <ul style={styles.container}>
-        {this.props.path.map(({id, node}) => {
+        {this.props.path.map(({ id, node }) => {
           var isSelected = id === this.props.selected;
+          var isHovered = id === this.state.hovered;
           var style = assign(
             {},
             styles.item,
             node.get('nodeType') === 'Composite' && styles.composite,
-            isSelected && styles.selected
+            isHovered && styles.hovered,
+            isSelected && styles.selected,
           );
           return (
             <li
               style={style}
               key={id}
-              onMouseOver={() => this.props.hover(id, true)}
-              onMouseOut={() => this.props.hover(id, false)}
+              onMouseOver={() => this.handleCrumbMouseOver(id)}
+              onMouseOut={() => this.handleCrumbMouseOut(id)}
               onClick={isSelected ? null : () => this.props.select(id)}
             >
               {node.get('name') || '"' + node.get('text') + '"'}
@@ -50,6 +67,7 @@ var styles = {
   container: {
     borderTop: '1px solid #ccc',
     backgroundColor: 'white',
+    fontFamily: 'sans-serif',
     listStyle: 'none',
     padding: 0,
     margin: 0,
@@ -61,13 +79,20 @@ var styles = {
     color: 'white',
   },
 
+  hovered: {
+    backgroundColor: '#d8d8d8',
+  },
+
   composite: {
     color: 'rgb(136, 18, 128)',
   },
 
   item: {
     padding: '3px 7px',
-    cursor: 'pointer',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    userSelect: 'none',
+    cursor: 'default',
     display: 'inline-block',
   },
 };
