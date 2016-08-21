@@ -13,6 +13,7 @@
 
 const React = require('react');
 const immutable = require('immutable');
+const assign = require('object-assign');
 
 import type {ControlState} from './types.js';
 
@@ -54,13 +55,22 @@ class SettingsCheckbox extends React.Component {
     var state = this.props.state || this._defaultState;
     return (
       <div style={styles.container} onClick={this._toggle} tabIndex={0}>
-        <input
-          style={styles.checkbox}
-          type="checkbox"
-          checked={state.enabled}
-          readOnly={true}
-        />
-        <span>{this.props.text}</span>
+        {
+          this.props.record ? (
+            <div
+              style={ assign(styles.recordButton,
+                state.enabled ? styles.recordingState : styles.defaultState) }>
+            </div>
+          ) : (
+            <input
+              style={styles.checkbox}
+              type="checkbox"
+              checked={state.enabled}
+              readOnly={true}
+            />
+          )
+        }
+        <span style={styles.checkboxText}>{this.props.text}</span>
       </div>
     );
   }
@@ -79,15 +89,36 @@ var styles = {
   checkbox: {
     pointerEvents: 'none',
   },
+  recordButton: {
+    width: '11px',
+    height: '11px',
+    borderRadius: '50%',
+    display: 'inline-block',
+    marginRight: '3px',
+    verticalAlign: 'middle',
+  },
+  defaultState: {
+    backgroundColor: '#5a5a5a',
+    boxShadow: 'none',
+  },
+  recordingState: {
+    backgroundColor: '#00d8ff',
+    boxShadow: '0 0 2px 2px rgba(0, 215, 255, 0.35)',
+  },
   container: {
     WebkitUserSelect: 'none',
-    cursor: 'pointer',
+    cursor: 'default',
     display: 'inline-block',
     fontFamily: 'arial',
     fontSize: '12px',
+    lineHeight: 1.5,
     outline: 'none',
     userSelect: 'none',
     margin: '0px 4px',
+  },
+  checkboxText: {
+    marginLeft: '3px',
+    color: '#5a5a5a',
   },
 };
 

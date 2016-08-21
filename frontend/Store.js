@@ -29,7 +29,7 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search by Component Name';
+const DEFAULT_PLACEHOLDER = 'Search by component name';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -477,7 +477,7 @@ class Store extends EventEmitter {
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
     this.placeholderText = this.colorizerState.enabled
-      ? 'Highlight by Component Name'
+      ? 'Highlight by component name'
       : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
     this.emit('colorizerchange');

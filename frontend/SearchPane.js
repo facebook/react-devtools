@@ -16,7 +16,10 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
-var {PropTypes} = React;
+var { PropTypes } = React;
+
+var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+var RegexFrontendControl = require('../plugins/Regex/RegexFrontendControl');
 
 var decorate = require('./decorate');
 
@@ -37,7 +40,7 @@ class SearchPane extends React.Component {
 
   constructor(props) {
     super(props);
-    this.state = {focused: false};
+    this.state = { focused: false };
   }
 
   componentDidMount() {
@@ -87,27 +90,33 @@ class SearchPane extends React.Component {
   render() {
     var inputStyle = styles.input;
     if (this.props.searchText || this.state.focused) {
-      inputStyle = {...inputStyle, ...styles.highlightedInput};
+      inputStyle = { ...inputStyle, ...styles.highlightedInput };
     }
     return (
       <div style={styles.container}>
         <SettingsPane />
-        <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
-          <input
-            style={inputStyle}
-            ref={i => this.input = i}
-            value={this.props.searchText}
-            onFocus={() => this.setState({focused: true})}
-            onBlur={() => this.setState({focused: false})}
-            onKeyDown={e => this.onKeyDown(e.key)}
-            placeholder={this.props.placeholderText}
-            onChange={e => this.props.onChangeSearch(e.target.value)}
-          />
-          {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
-            &times;
-          </div>}
+          <div style={styles.searchInputBox}>
+            <input
+              style={inputStyle}
+              ref={i => this.input = i}
+              value={this.props.searchText}
+              onFocus={() => this.setState({ focused: true })}
+              onBlur={() => this.setState({ focused: false })}
+              onKeyDown={e => this.onKeyDown(e.key)}
+              placeholder={this.props.placeholderText}
+              onChange={e => this.props.onChangeSearch(e.target.value)}
+            />
+            {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+              &times;
+            </div>}
+          </div>
+          <div style={styles.searchControls}>
+            <RegexFrontendControl />
+            <ColorizerFrontendControl />
+          </div>
         </div>
+        <TreeView reload={this.props.reload} />
       </div>
     );
   }
@@ -143,39 +152,50 @@ var styles = {
     minWidth: 0,
   },
 
-  searchBox: {
-    display: 'flex',
-    flexShrink: 0,
+  searchInputBox: {
     position: 'relative',
+    display: 'inline-block',
+  },
+
+  searchBox: {
+    background: '#f3f3f3',
+    borderBottom: '1px solid #dadada',
+    padding: '4px',
+  },
+
+  searchControls: {
+    display: 'inline-block',
   },
 
   cancelButton: {
-    fontSize: '13px',
-    padding: '0 4px',
-    borderRadius: '10px',
-    height: '17px',
+    fontSize: '11px',
+    lineHeight: '11px',
+    borderRadius: '50%',
     position: 'absolute',
-    cursor: 'pointer',
-    right: '7px',
-    top: '8px',
+    cursor: 'default',
+    height: '12px',
+    width: '12px',
+    right: '4px',
+    bottom: 0,
+    top: 0,
+    margin: 'auto',
     color: 'white',
-    backgroundColor: 'rgb(255, 137, 137)',
+    backgroundColor: '#949494',
+    display: 'flex',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   input: {
-    flex: 1,
-    fontSize: '18px',
-    padding: '5px 10px',
-    border: 'none',
+    fontSize: '12px',
     transition: 'border-top-color .2s ease, background-color .2s ease',
-    borderTop: '1px solid #ccc',
-    borderTopColor: '#ccc',
+    border: '1px solid #a3a3a3',
     outline: 'none',
-  },
-
-  highlightedInput: {
-    borderTopColor: 'aqua',
-    backgroundColor: '#EEFFFE',
+    padding: '1px 3px 0',
+    margin: '0 0 0 1px',
+    borderRadius: '2px',
+    lineHeight: '1.5',
+    width: '200px',
   },
 };
 

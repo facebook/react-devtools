@@ -20,28 +20,28 @@ module.exports = {
   },
 
   object: {
-    color: '#666',
+    color: 'rgb(33, 33, 33)',
   },
 
   array: {
-    color: '#666',
+    color: 'rgb(33, 33, 33)',
   },
 
   symbol: {
-    color: '#22a',
+    color: '#1c00cf',
   },
 
   number: {
-    color: '#a11',
+    color: '#1c00cf',
   },
 
   string: {
-    color: '#22a',
+    color: '#c41a16',
     wordBreak: 'break-word',
   },
 
   bool: {
-    color: '#a11',
+    color: '#1c00cf',
   },
 
   empty: {

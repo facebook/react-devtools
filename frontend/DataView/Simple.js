@@ -162,18 +162,20 @@ var styles = {
   },
 
   editable: {
-    cursor: 'pointer',
+    cursor: 'text',
   },
 
   input: {
     flex: 1,
-    minWidth: 50,
-    boxSizing: 'border-box',
-    border: 'none',
-    padding: 0,
+    WebkitUserSelect: 'text',
+    userSelect: 'text',
+    boxShadow: '0 2px 4px rgba(0, 0, 0, 0.2)',
+    textOverflow: 'clip !important',
+    padding: '0 2px',
+    margin: '0 -2px -1px -2px',
     outline: 'none',
-    boxShadow: '0 0 3px #ccc',
-    fontFamily: 'monospace',
+    border: '1px solid #ccc',
+    fontFamily: 'Menlo, Consolas, monospace',
     fontSize: 'inherit',
   },
 };

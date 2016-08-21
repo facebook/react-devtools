@@ -254,7 +254,7 @@ var styles = {
   },
 
   opener: {
-    cursor: 'pointer',
+    cursor: 'default',
     marginLeft: -8,
     paddingRight: 3,
     position: 'absolute',
@@ -262,7 +262,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent #555',
+    borderColor: 'transparent transparent transparent #6e6e6e',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -271,7 +271,7 @@ var styles = {
   },
 
   expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
+    borderColor: '#6e6e6e transparent transparent transparent',
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
@@ -285,12 +285,12 @@ var styles = {
   },
 
   name: {
-    color: '#666',
+    color: '#881391',
     margin: '2px 3px',
   },
 
   complexName: {
-    cursor: 'pointer',
+    cursor: 'default',
   },
 
   preview: {

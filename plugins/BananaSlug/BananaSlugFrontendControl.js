@@ -21,7 +21,8 @@ var Wrapped = decorate({
   props(store) {
     return {
       state: store.bananaslugState,
-      text: 'Trace React Updates',
+      text: 'Trace updates',
+      record: true,
       onChange: state => store.changeBananaSlug(state),
     };
   },

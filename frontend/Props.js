@@ -56,7 +56,7 @@ var styles = {
   },
 
   propName: {
-    color: 'rgb(165, 103, 42)',
+    color: '#994500',
   },
 };
 

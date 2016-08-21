@@ -336,7 +336,7 @@ var styles = {
   },
 
   headSelect: {
-    backgroundColor: '#ccc',
+    backgroundColor: '#cddef7',
   },
 
   collapser: {
@@ -345,7 +345,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent #555',
+    borderColor: 'transparent transparent transparent #6e6e6e',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -353,11 +353,11 @@ var styles = {
     verticalAlign: 'top',
   },
   collapsedArrowStateful: {
-    borderColor: 'transparent transparent transparent #e55',
+    borderColor: 'transparent transparent transparent #985189',
   },
 
   expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
+    borderColor: '#6e6e6e transparent transparent transparent',
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
@@ -365,11 +365,11 @@ var styles = {
     verticalAlign: 'top',
   },
   expandedArrowStateful: {
-    borderColor: '#e55 transparent transparent transparent',
+    borderColor: '#985189 transparent transparent transparent',
   },
 
   headHover: {
-    backgroundColor: '#eee',
+    backgroundColor: 'rgba(56, 121, 217, 0.1)',
   },
 };
 

@@ -45,25 +45,28 @@ class Overlay {
 
     this.tip = doc.createElement('div');
     assign(this.tip.style, {
-      border: '1px solid #aaa',
-      backgroundColor: 'rgb(255, 255, 178)',
-      fontFamily: 'sans-serif',
+      backgroundColor: 'rgba(0, 0, 0, 0.85)',
+      fontFamily: 'Menlo, Consolas, monospace',
       color: 'orange',
-      padding: '3px 5px',
+      padding: '6px 8px',
       position: 'fixed',
-      fontSize: '10px',
+      fontSize: '11px',
+      borderRadius: '2px',
     });
 
     this.nameSpan = doc.createElement('span');
     this.tip.appendChild(this.nameSpan);
     assign(this.nameSpan.style, {
-      color:   'rgb(136, 18, 128)',
-      marginRight: '5px',
+      color:   '#ce75c3',
+      paddingRight: '5px',
+      fontWeight: 'bold',
+      borderRight: '1px solid #666',
     });
     this.dimSpan = doc.createElement('span');
     this.tip.appendChild(this.dimSpan);
     assign(this.dimSpan.style, {
-      color: '#888',
+      paddingLeft: '5px',
+      color: '#CCC',
     });
 
     this.container.style.zIndex = 10000000;
@@ -107,7 +110,7 @@ class Overlay {
     });
 
     this.nameSpan.textContent = (name || node.nodeName.toLowerCase());
-    this.dimSpan.textContent = box.width + 'px × ' + box.height + 'px';
+    this.dimSpan.textContent = box.width + ' × ' + box.height;
 
     var tipPos = findTipPos({
       top: box.top - dims.marginTop,
