@@ -332,7 +332,6 @@ var styles = {
 
   tagText: {
     flex: 1,
-    whiteSpace: 'nowrap',
   },
 
   headSelect: {

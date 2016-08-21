@@ -52,6 +52,7 @@ class Props extends React.Component {
 
 var styles = {
   prop: {
+    display: 'inline-block',
     paddingLeft: 5,
   },
 
