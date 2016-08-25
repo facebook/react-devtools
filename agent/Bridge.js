@@ -15,18 +15,30 @@ var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
 var performanceNow = require('fbjs/lib/performanceNow');
 
-// Based on https://gist.github.com/paullewis/55efe5d6f05434a96c36
+// Custom polyfill that runs the queue with a backoff.
+// If you change it, make sure it behaves reasonably well in Firefox.
+var lastRunTimeMS = 5;
 var cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
-var requestIdleCallback = window.requestIdleCallback || function(cb) {
-  var start = performanceNow();
+var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
+  var timeoutMS = options && options.timeout || Infinity;
+  var scheduleTimeMS = performanceNow() / 1000;
+  var delayMS = lastRunTimeMS * 3;
+  if (delayMS > 500) {
+    delayMS = 500;
+  }
   return setTimeout(() => {
+    var startTimeMS = performanceNow() / 1000;
     cb({
-      didTimeout: false,
+      didTimeout: startTimeMS > scheduleTimeMS + timeoutMS,
       timeRemaining() {
-        return Math.max(0, 50 - (performanceNow() - start));
+        var nowMS = performanceNow() / 1000;
+        var elapsedMS = nowMS - startTimeMS;
+        return Math.max(0, 50 - elapsedMS) / 1000;
       },
     });
-  }, 1);
+    var endTimeMS = performanceNow() / 1000;
+    lastRunTimeMS = endTimeMS - startTimeMS;
+  }, delayMS);
 };
 
 type AnyFn = (...x: any) => any;
@@ -220,10 +232,11 @@ class Bridge {
   }
 
   scheduleFlush() {
-    if (!this._flushHandle && !this._paused && this._buffer.length) {
+    if (!this._flushHandle && this._buffer.length) {
+      var timeout = this._paused ? 5000 : 500;
       this._flushHandle = requestIdleCallback(
         this.flushBufferWhileIdle.bind(this),
-        {timeout: 5000}
+        {timeout}
       );
     }
   }
@@ -238,11 +251,21 @@ class Bridge {
   flushBufferWhileIdle(deadline: IdleDeadline) {
     this._flushHandle = null;
 
+    // Magic numbers were determined by tweaking in a heavy UI and seeing
+    // what performs reasonably well both when DevTools are hidden and visible.
+    // The goal is that we try to catch up but avoid blocking the UI.
+    // When paused, it's okay to lag more, but not forever because otherwise
+    // when user activates React tab, it will freeze syncing.
+    var chunkCount = this._paused ? 20 : 10;
+    var chunkSize = Math.round(this._buffer.length / chunkCount);
+    var minChunkSize = this._paused ? 50 : 100;
+
     while (this._buffer.length && (
-      deadline.timeRemaining() >= 10 ||
+      deadline.timeRemaining() > 0 ||
       deadline.didTimeout
     )) {
-      var currentBuffer = this._buffer.splice(0, Math.min(50, this._buffer.length));
+      var take = Math.min(this._buffer.length, Math.max(minChunkSize, chunkSize));
+      var currentBuffer = this._buffer.splice(0, take);
       this.flushBufferSlice(currentBuffer);
     }
 
