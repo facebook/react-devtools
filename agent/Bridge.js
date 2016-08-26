@@ -20,24 +20,23 @@ var performanceNow = require('fbjs/lib/performanceNow');
 var lastRunTimeMS = 5;
 var cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
 var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
-  var timeoutMS = options && options.timeout || Infinity;
-  var scheduleTimeMS = performanceNow() / 1000;
-  var delayMS = lastRunTimeMS * 3;
+  // Magic numbers determined by tweaking in Firefox.
+  // There is no special meaning to them.
+  var delayMS = 3000 * lastRunTimeMS;
   if (delayMS > 500) {
     delayMS = 500;
   }
+
   return setTimeout(() => {
-    var startTimeMS = performanceNow() / 1000;
+    var startTime = performanceNow();
     cb({
-      didTimeout: startTimeMS > scheduleTimeMS + timeoutMS,
+      didTimeout: false,
       timeRemaining() {
-        var nowMS = performanceNow() / 1000;
-        var elapsedMS = nowMS - startTimeMS;
-        return Math.max(0, 50 - elapsedMS) / 1000;
+        return Infinity;
       },
     });
-    var endTimeMS = performanceNow() / 1000;
-    lastRunTimeMS = endTimeMS - startTimeMS;
+    var endTime = performanceNow();
+    lastRunTimeMS = (endTime - startTime) / 1000;
   }, delayMS);
 };
 
