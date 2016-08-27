@@ -262,7 +262,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent #555',
+    borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -271,7 +271,7 @@ var styles = {
   },
 
   expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
+    borderColor: 'rgb(110, 110, 110) transparent transparent transparent',
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
