@@ -22,9 +22,11 @@ var cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
 var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
   // Magic numbers determined by tweaking in Firefox.
   // There is no special meaning to them.
-  var delayMS = 3000 * lastRunTimeMS;
-  if (delayMS > 500) {
-    delayMS = 500;
+  var timeoutMS = options && options.timeout || 500;
+  if (timeoutMS < 1000) {
+    // We don't have a lot of time so let's just do it asap.
+    // Again, magic numbers are determined by tweaking in FF.
+    timeoutMS = Math.min(timeoutMS, 3000 * lastRunTimeMS);
   }
 
   return setTimeout(() => {
@@ -37,7 +39,7 @@ var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
     });
     var endTime = performanceNow();
     lastRunTimeMS = (endTime - startTime) / 1000;
-  }, delayMS);
+  }, timeoutMS);
 };
 
 type AnyFn = (...x: any) => any;
