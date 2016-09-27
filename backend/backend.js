@@ -14,7 +14,7 @@
  * 2. React (if present) calls .inject() with the internal renderer
  * 3. Devtools sees the renderer, and then adds this backend, along with the Agent
  *    and whatever else is needed.
- * 4. The agend then calls `.emit('react-devtools', agent)`
+ * 4. The agent then calls `.emit('react-devtools', agent)`
  *
  * Now things are hooked up.
  *
