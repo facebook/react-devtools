@@ -1,7 +1,10 @@
 {
   "main": "./index.js",
   "scripts": {
-    "build": "../../node_modules/.bin/webpack --config webpack.backend.js && ../../node_modules/.bin/webpack --config webpack.config.js",
+    "backend": "../../node_modules/.bin/webpack --config webpack.backend.js",
+    "ui": "../../node_modules/.bin/webpack --config webpack.config.js",
+    "ui:watch": "../../node_modules/.bin/webpack --config webpack.config.js --watch",
+    "build": "npm run backend && npm run ui",
     "start": "electron ."
   },
   "dependencies": {

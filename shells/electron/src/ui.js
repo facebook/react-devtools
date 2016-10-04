@@ -10,6 +10,9 @@
 'use strict';
 
 var ws = require('ws');
+var fs = require('fs');
+var path = require('path');
+var ip = require('ip');
 
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
@@ -18,7 +21,8 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = null;
-var backendScript = require('raw!../build/backend.js');
+var backendScript = fs.readFileSync(
+  path.join(__dirname, '../build/backend.js'));
 var wall = null;
 
 var config = {
@@ -93,39 +97,10 @@ function initialize(socket) {
   reload();
 }
 
-/**
- * This is the normal mode, where it connects to the react native packager
- */
-function connectToSocket(port = 8081) {
-  var socket = ws.connect(`ws://localhost:${port}/devtools`);
-  socket.onmessage = (evt) => {
-    if (evt.data === 'attach:agent') {
-      initialize(socket);
-    }
-  };
-  socket.onerror = (err) => {
-    onDisconnected();
-    console.log('Error with websocket connection', err);
-  };
-  socket.onclose = () => {
-    onDisconnected();
-    console.log('Connection to RN closed');
-  };
-
-  return {
-    close: function() {
-      onDisconnected();
-      socket.close();
-    },
-  };
-}
-
-/**
- * When the Electron app is running in "server mode"
- */
 var restartTimeout = null;
 function startServer(port = 8097) {
-  var server = new ws.Server({port});
+  var httpServer = require('http').createServer();
+  var server = new ws.Server({server: httpServer});
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
@@ -153,12 +128,29 @@ function startServer(port = 8097) {
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
+  var embedFile = fs.readFileSync(
+    path.join(__dirname, '../build/embed.js')
+  );
+  httpServer.on('request', (req, res) => {
+    res.end(embedFile);
+  });
+
+  httpServer.on('error', (e) => {
+    onError(e);
+    document.getElementById('loading-status').innerText = 'failed to start server :/';
+    restartTimeout = setTimeout(() => startServer(port), 1000);
+  });
+
+  httpServer.listen(port, () => {
+    document.getElementById('loading-status').innerText = 'listening on ' + port;
+  });
+
   return {
     close: function() {
       connected = false;
       onDisconnected();
       clearTimeout(restartTimeout);
-      server.close();
+      httpServer.close();
     },
   };
 }
@@ -170,7 +162,6 @@ var DevtoolsUI = {
   },
 
   startServer,
-  connectToSocket,
 };
 
 module.exports = DevtoolsUI;
