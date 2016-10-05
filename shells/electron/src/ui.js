@@ -12,7 +12,6 @@
 var ws = require('ws');
 var fs = require('fs');
 var path = require('path');
-var ip = require('ip');
 
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);

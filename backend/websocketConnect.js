@@ -37,7 +37,7 @@ function websocketConnect(uri: string, WebSocket?: (val: string) => Object) {
     console.warn('devtools socket errored', error);
     closeListeners.forEach(fn => fn());
   };
-  ws.onopen = function () {
+  ws.onopen = function() {
     tryToConnect();
   };
 
@@ -55,7 +55,7 @@ function websocketConnect(uri: string, WebSocket?: (val: string) => Object) {
       eval(text); // eslint-disable-line no-eval
     } catch (e) {
       console.error('Failed to eval' + e.message + '\n' + e.stack);
-      debugger
+      debugger; // eslint-disable-line no-debugger
       return;
     }
     ws.onmessage = handleMessage;
@@ -65,7 +65,8 @@ function websocketConnect(uri: string, WebSocket?: (val: string) => Object) {
     try {
       data = JSON.parse(evt.data);
     } catch (e) {
-      return console.error('failed to parse json: ' + evt.data);
+      console.error('failed to parse json: ' + evt.data);
+      return;
     }
     // the devtools closed
     if (data.$close || data.$error) {
