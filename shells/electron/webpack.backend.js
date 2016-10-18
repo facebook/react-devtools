@@ -14,6 +14,7 @@ module.exports = {
   devtool: 'source-map',
   entry: {
     backend: './src/backend.js',
+    embed: './src/embed.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat

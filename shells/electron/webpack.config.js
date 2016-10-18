@@ -18,6 +18,12 @@ module.exports = {
   entry: {
     standalone: './src/ui.js',
   },
+  // this lets us `require('fs')` etc
+  target: 'electron',
+  node: {
+    // don't replace __dirname, electron will handle it
+    __dirname: false,
+  },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
