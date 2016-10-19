@@ -118,8 +118,10 @@ class Agent extends EventEmitter {
       editTextContent: false,
     }, capabilities);
 
-    this._updateScroll = this._updateScroll.bind(this);
-    window.addEventListener('scroll', this._onScroll.bind(this), true);
+    if (isReactDOM) {
+      this._updateScroll = this._updateScroll.bind(this);
+      window.addEventListener('scroll', this._onScroll.bind(this), true);
+    }
   }
 
   // returns an "unsubscribe" function
