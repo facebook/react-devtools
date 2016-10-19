@@ -21,7 +21,7 @@ var Wrapped = decorate({
   props(store) {
     return {
       state: store.colorizerState,
-      text: 'Highlight Search',
+      text: 'Highlight search',
       onChange: state => store.changeColorizer(state),
     };
   },

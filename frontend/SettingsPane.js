@@ -10,17 +10,13 @@
 'use strict';
 
 var BananaSlugFrontendControl = require('../plugins/BananaSlug/BananaSlugFrontendControl');
-var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
-var RegexFrontendControl = require('../plugins/Regex/RegexFrontendControl');
 var React = require('react');
 
-class SettingsPane extends React.Component {
+class ControlsPane extends React.Component {
   render() {
     return (
       <div style={styles.container}>
         <BananaSlugFrontendControl {...this.props} />
-        <ColorizerFrontendControl {...this.props} />
-        <RegexFrontendControl {...this.props} />
       </div>
     );
   }
@@ -28,12 +24,13 @@ class SettingsPane extends React.Component {
 
 var styles = {
   container: {
-    backgroundColor: '#efefef',
-    padding: '2px 4px',
-    display: 'flex',
-    flexShrink: 0,
+    borderBottom: '1px solid #dadada',
+    color: 'rgb(48, 57, 66)',
+    padding: '5px 6px',
+    display: 'flexbox',
+    alignItems: 'center',
     position: 'relative',
   },
 };
 
-module.exports = SettingsPane;
+module.exports = ControlsPane;

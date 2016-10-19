@@ -52,11 +52,12 @@ class Props extends React.Component {
 
 var styles = {
   prop: {
+    display: 'inline-block',
     paddingLeft: 5,
   },
 
   propName: {
-    color: 'rgb(165, 103, 42)',
+    color: '#994500',
   },
 };
 
