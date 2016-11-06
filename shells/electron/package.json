@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "electron-prebuilt": "^1.4.2",
+    "ip": "^1.1.4",
     "ws": "1.1.0"
   }
 }
