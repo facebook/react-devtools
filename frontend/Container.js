@@ -63,12 +63,14 @@ var DEFAULT_MENU_ITEMS = {
     var items = [];
     if (node.get('name')) {
       items.push({
+        key: 'showNodesOfType',
         title: 'Show all ' + node.get('name'),
         action: () => store.changeSearch(node.get('name')),
       });
     }
     if (store.capabilities.scroll) {
       items.push({
+        key: 'scrollToNode',
         title: 'Scroll to Node',
         action: () => store.scrollToNode(id),
       });
@@ -77,6 +79,7 @@ var DEFAULT_MENU_ITEMS = {
   },
   attr: (id, node, val, path, name, store) => {
     var items = [{
+      key: 'storeAsGlobal',
       title: 'Store as global variable',
       action: () => store.makeGlobal(id, path),
     }];

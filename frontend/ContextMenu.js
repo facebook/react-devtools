@@ -18,6 +18,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 export type MenuItem = {
+  key: string,
   title: string,
   action: () => void
 };
@@ -85,7 +86,7 @@ class ContextMenu extends React.Component {
       <ul style={containerStyle}>
         {!this.props.items.length && <li style={styles.empty}>No actions</li>}
         {this.props.items.map((item, i) => item && (
-          <li onClick={evt => this.onClick(i, evt)}>
+          <li key={item.key} onClick={evt => this.onClick(i, evt)}>
             <HighlightHover style={styles.item}>
               {item.title}
             </HighlightHover>
