@@ -251,10 +251,12 @@ class Panel extends React.Component {
               return undefined;
             }
             return [this.props.showAttrSource && {
+              key: 'showSource',
               title: 'Show Source',
               // $FlowFixMe showAttrSource is provided
               action: () => this.props.showAttrSource(path),
             }, this.props.executeFn && {
+              key: 'executeFunction',
               title: 'Execute function',
               // $FlowFixMe executeFn is provided
               action: () => this.props.executeFn(path),
@@ -262,9 +264,11 @@ class Panel extends React.Component {
           },
           tree: (id, node) => {
             return [this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
+              key: 'showSource',
               title: 'Show Source',
               action: () => this.viewSource(id),
             }, this.props.selectElement && this._store.capabilities.dom && {
+              key: 'showInElementsPane',
               title: 'Show in Elements Pane',
               action: () => this.sendSelection(id),
             }];
