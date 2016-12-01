@@ -408,7 +408,7 @@ class Bridge {
       var isFn = typeof val === 'function';
 
       if (val && typeof val[Symbol.iterator] === 'function') {
-        var iterVal = {};
+        var iterVal = Object.create({});  // flow throws "object literal incompatible with object type"
         var count = 0;
         for (const entry of val) {
           iterVal[count] = entry;
