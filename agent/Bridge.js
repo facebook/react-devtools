@@ -408,7 +408,13 @@ class Bridge {
       var isFn = typeof val === 'function';
 
       if (val && typeof val[Symbol.iterator] === 'function') {
-        val = [...val];   // Convert iterable to array
+        var iterVal = {};
+        var count = 0;
+        for (const entry of val) {
+          iterVal[count] = entry;
+          count++;
+        }
+        val = iterVal;
       }
 
       Object.getOwnPropertyNames(val).forEach(name => {
