@@ -6,7 +6,6 @@
  * LICENSE file in the root directory of this source tree. An additional grant
  * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @flow
  */
 
 /**
@@ -15,7 +14,7 @@
  * @param  {Array<String>} path nested path
  * @return {any}      Value at end of path or `mull`
  */
-function getIn(base: Object, path: Array<string>): any {
+function getIn(base, path) {
   return path.reduce((obj, attr) => {
     if (obj) {
       if (obj.hasOwnProperty(attr)) {
