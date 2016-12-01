@@ -13,7 +13,7 @@
 /**
  * Get a enhanced/articial type string based on the object instance
  */
-function getPropType(data: Object): String {
+function getPropType(data: Object): string | null {
   if (!data) {
     return null;
   }
@@ -45,7 +45,7 @@ function getPropType(data: Object): String {
 /**
  * Generate the dehydrated metadata for complex object instances
  */
-function createDehydrated(type: String, data: Object, cleaned: Array<Array<string>>, path: Array<string>): Object {
+function createDehydrated(type: string, data: Object, cleaned: Array<Array<string>>, path: Array<string>): Object {
   var meta = {};
 
   if (type === 'array' || type === 'typed_array') {
@@ -84,9 +84,7 @@ function createDehydrated(type: String, data: Object, cleaned: Array<Array<strin
  * }
  * and cleaned = [["some", "attr"], ["other"]]
  */
-function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
-  level = level || 0;
-  path = path || [];
+function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string> = [], level?: number = 0): string | Object {
 
   var type = getPropType(data);
 
