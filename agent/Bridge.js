@@ -13,6 +13,7 @@
 var consts = require('./consts');
 var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
+var getIn = require('./getIn');
 var performanceNow = require('fbjs/lib/performanceNow');
 
 // Custom polyfill that runs the queue with a backoff.
@@ -396,15 +397,20 @@ class Bridge {
 
   _inspectResponse(id: string, path: Array<string>, callback: number) {
     var inspectable = this._inspectables.get(id);
-
     var result = {};
     var cleaned = [];
     var proto = null;
     var protoclean = [];
+
     if (inspectable) {
       var val = getIn(inspectable, path);
       var protod = false;
       var isFn = typeof val === 'function';
+
+      if (val && typeof val[Symbol.iterator] === 'function') {
+        val = [...val];   // Convert iterable to array
+      }
+
       Object.getOwnPropertyNames(val).forEach(name => {
         if (name === '__proto__') {
           protod = true;
@@ -436,12 +442,6 @@ class Bridge {
       args: [result, cleaned, proto, protoclean],
     });
   }
-}
-
-function getIn(base, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, base);
 }
 
 module.exports = Bridge;
