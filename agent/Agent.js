@@ -88,7 +88,7 @@ class Agent extends EventEmitter {
   elementData: Map<ElementID, DataType>;
   roots: Set<ElementID>;
   reactInternals: {[key: RendererID]: Helpers};
-  capabilities: {[key: string]: boolean};
+  capabilities: {[key: string]: boolean|string};
   renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
   _scrollUpdate: boolean;
@@ -103,10 +103,12 @@ class Agent extends EventEmitter {
     this.elementData = new Map();
     this.roots = new Set();
     this.reactInternals = {};
+
+    var $r: string = this._getGlobalRName();
     this.on('selected', id => {
       var data = this.elementData.get(id);
       if (data && data.publicInstance) {
-        this.global.$r = data.publicInstance;
+        this.global[$r] = data.publicInstance;
       }
     });
     this._prevSelected = null;
@@ -116,6 +118,7 @@ class Agent extends EventEmitter {
       scroll: isReactDOM && typeof window.document.body.scrollIntoView === 'function',
       dom: isReactDOM,
       editTextContent: false,
+      $r,
     }, capabilities);
 
     if (isReactDOM) {
@@ -402,6 +405,15 @@ class Agent extends EventEmitter {
     this.emit('refreshMultiOverlay');
     this._scrollUpdate = false;
   }
+
+  _getGlobalRName(): string {
+    var name: string = '$r';
+    while (typeof this.global[name] !== 'undefined') {
+      name = '$' + name;
+    }
+    return name;
+  }
+
 }
 
 function getIn(base, path) {
