@@ -403,16 +403,20 @@ class Bridge {
     var protoclean = [];
     if (inspectable) {
       var val = getIn(inspectable, path);
+
+
       var protod = false;
       var isFn = typeof val === 'function';
-      Object.getOwnPropertyNames(val).forEach(name => {
+      var data = val._state || val;
+
+      Object.getOwnPropertyNames( data ).forEach(name => {
         if (name === '__proto__') {
           protod = true;
         }
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        result[name] = dehydrate(val[name], cleaned, [name]);
+        result[name] = dehydrate( data[name], cleaned, [name]);
       });
 
       /* eslint-disable no-proto */
@@ -420,10 +424,13 @@ class Bridge {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
-          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
+          if( pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ){
             return;
           }
-          newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
+
+          var prop = Object.getOwnPropertyDescriptor( val.__proto__, name );
+
+          newProto[name] = dehydrate( prop.get ? prop.get : val.__proto__[name], protoclean, [name]);
         });
         proto = newProto;
       }
@@ -440,7 +447,7 @@ class Bridge {
 
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
+    return obj ? ( ( obj._state || obj )[ attr ] ): null;
   }, base);
 }
 
