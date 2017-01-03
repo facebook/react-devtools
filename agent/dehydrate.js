@@ -31,6 +31,10 @@
  * and cleaned = [["some", "attr"], ["other"]]
  */
 function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
+  if( data && data._state && path[ path.length - 1 ] === 'state' ){
+    data = data._state;
+  }
+
   level = level || 0;
   path = path || [];
   if (typeof data === 'function') {

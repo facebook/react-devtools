@@ -404,23 +404,27 @@ class Bridge {
     if (inspectable) {
       var val = getIn(inspectable, path);
 
-
-      var protod = false;
+      var protod = false, isWrapper = false;
       var isFn = typeof val === 'function';
-      var data = val._state || val;
 
-      Object.getOwnPropertyNames( data ).forEach(name => {
-        if (name === '__proto__') {
+      if( val && val._state ){
+          val = val._state;
+          isWrapper = true;
+      }
+
+      Object.getOwnPropertyNames( val ).forEach(name => {
+        if (name === '__proto__' && !isWrapper ) {
           protod = true;
         }
+
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        result[name] = dehydrate( data[name], cleaned, [name]);
+        result[name] = dehydrate( val[name], cleaned, [name]);
       });
 
       /* eslint-disable no-proto */
-      if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
+      if (!protod && val.__proto__ && val.constructor.name !== 'Object' && !isWrapper ) {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
@@ -447,7 +451,7 @@ class Bridge {
 
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
-    return obj ? ( ( obj._state || obj )[ attr ] ): null;
+    return obj ? ( ( obj._state || obj : obj )[ attr ] ): null;
   }, base);
 }
 
