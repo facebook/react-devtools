@@ -426,7 +426,7 @@ class Bridge {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
-          if( pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ){
+          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ) {
             return;
           }
 
@@ -452,22 +452,24 @@ function getIn(base, path) {
   let isPrototypeChain = false;
 
   return path.reduce((obj, attr) => {
-    if( !obj ) return null;
-
-    // Mark the beginning of the prototype chain...
-    if( attr === "__proto__" ){
-      isPrototypeChain = true;
-      return obj.__proto__;
+    if (!obj) {
+      return null;
     }
 
-    if( isPrototypeChain ){
+    // Mark the beginning of the prototype chain...
+    if (attr === '__proto__') {
+      isPrototypeChain = true;
+      return obj[attr];
+    }
+
+    if (isPrototypeChain) {
       // Avoid calling calculated properties on prototype.
       const property = Object.getOwnPropertyDescriptor( obj, attr );
       return property.get || property.value;
     }
 
     // Traverse inner state of the third-party data frameworks objects...
-    return ( obj._innerState || obj )[ attr ];
+    return ( obj._innerState || obj )[attr];
   }, base);
 }
 

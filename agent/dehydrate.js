@@ -32,7 +32,7 @@
  */
 function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<string>, level?: number): string | Object {
   // Support third-party frameworks data objects in react component state.
-  if( data && data._innerState && path[ path.length - 1 ] === 'state' ){
+  if (data && data._innerState && path[path.length - 1] === 'state') {
     data = data._innerState;
   }
 
