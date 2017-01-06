@@ -408,6 +408,7 @@ class Bridge {
       var isFn = typeof val === 'function';
 
       // Extract inner state of the third-party frameworks data objects...
+      var source = ( val && val.__inner_state__ ) || val;
 
       Object.getOwnPropertyNames( source ).forEach(name => {
         if (name === '__proto__' ) {
@@ -468,6 +469,7 @@ function getIn(base, path) {
     }
 
     // Traverse inner state of the third-party data frameworks objects...
+    return ( obj.__inner_state__ || obj )[attr];
   }, base);
 }
 
