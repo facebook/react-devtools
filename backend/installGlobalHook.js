@@ -58,11 +58,11 @@ function installGlobalHook(window: Object) {
         }
       },
       addInnerStateInspector: function(Ctor, getInnerState) {
-        Object.defineProperty( Ctor.prototype, '__inner_state__', {
+        Object.defineProperty( Ctor.prototype, '__inner_state__', ({
             get : function() {
                 return getInnerState( this );
             },
-        });
+        } : Object ));
       }
 }: Hook),
   });
