@@ -426,7 +426,7 @@ class Bridge {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
-          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ) {
+          if ( name === '__inner_state__' || ( pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ) ) {
             return;
           }
 
