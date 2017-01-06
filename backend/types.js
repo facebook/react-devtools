@@ -92,5 +92,5 @@ export type Hook = {
   on: (evt: string, handler: Handler) => void,
   off: (evt: string, handler: Handler) => void,
   reactDevtoolsAgent?: ?Object,
-  addInnerStateInspector: ( Ctor : Function, handler : InnerStateInspector ) => void;
+  addInnerStateInspector: ( Ctor : Function, handler : InnerStateInspector, skipIfDefined? : boolean ) => void;
 };

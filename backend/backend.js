@@ -24,10 +24,13 @@
 'use strict';
 
 import type {Hook} from './types';
+import attachInnerStateInspectors from './innerStateInspectors';
 
 var attachRenderer = require('./attachRenderer');
 
 module.exports = function setupBackend(hook: Hook): boolean {
+  attachInnerStateInspectors( hook );
+
   var oldReact = window.React && window.React.__internals;
   if (oldReact && Object.keys(hook._renderers).length === 0) {
     hook.inject(oldReact);
