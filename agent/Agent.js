@@ -410,14 +410,4 @@ function getIn(base, path) {
   }, base);
 }
 
-function addInnerStateInspector(Ctor, getInnerState) {
-  Object.defineProperty( Ctor.prototype, '__inner_state__', {
-    get : function() {
-      return getInnerState( this );
-    },
-  });
-}
-
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.addInnerStateInspector = addInnerStateInspector;
-
 module.exports = Agent;
