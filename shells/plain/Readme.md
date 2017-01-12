@@ -7,7 +7,7 @@ order to simulate the same network restrictions found in a plugin environment,
 the inspection target is within an iframe, and communication is done via
 `.postMessage`.
 
-You have to run `webpack` (or `webpack --watch`) to be able to run this. Then
+You have to run `./build.sh` (or `./build.sh --watch`) to be able to run this. Then
 open `index.html`.
 
 Here's an overview of how things work:
