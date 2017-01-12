@@ -403,27 +403,37 @@ class Bridge {
     var protoclean = [];
     if (inspectable) {
       var val = getIn(inspectable, path);
+
       var protod = false;
       var isFn = typeof val === 'function';
-      Object.getOwnPropertyNames(val).forEach(name => {
-        if (name === '__proto__') {
+
+      // Extract inner state of the third-party frameworks data objects...
+      var source = ( val && val.__inner_state__ ) || val;
+
+      Object.getOwnPropertyNames( source ).forEach(name => {
+        if (name === '__proto__' ) {
           protod = true;
         }
+
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        result[name] = dehydrate(val[name], cleaned, [name]);
+        result[name] = dehydrate( source[name], cleaned, [name]);
       });
 
       /* eslint-disable no-proto */
-      if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
+      if (!protod && val.__proto__ && val.constructor.name !== 'Object' ) {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
-          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
+          if ( name === '__inner_state__' || ( pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller') ) ) {
             return;
           }
-          newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
+
+          // Calculated properties should not be evaluated on prototype.
+          var prop = Object.getOwnPropertyDescriptor( val.__proto__, name );
+
+          newProto[name] = dehydrate( prop.get ? prop.get : val.__proto__[name], protoclean, [name]);
         });
         proto = newProto;
       }
@@ -439,8 +449,27 @@ class Bridge {
 }
 
 function getIn(base, path) {
+  let isPrototypeChain = false;
+
   return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
+    if (!obj) {
+      return null;
+    }
+
+    // Mark the beginning of the prototype chain...
+    if (attr === '__proto__') {
+      isPrototypeChain = true;
+      return obj[attr];
+    }
+
+    if (isPrototypeChain) {
+      // Avoid calling calculated properties on prototype.
+      const property = Object.getOwnPropertyDescriptor( obj, attr );
+      return property.get || property.value;
+    }
+
+    // Traverse inner state of the third-party data frameworks objects...
+    return ( obj.__inner_state__ || obj )[attr];
   }, base);
 }
 

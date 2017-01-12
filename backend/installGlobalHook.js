@@ -57,6 +57,17 @@ function installGlobalHook(window: Object) {
           this._listeners[evt].map(fn => fn(data));
         }
       },
+      addInnerStateInspector: function(Ctor, getInnerState, skipIfDefined) {
+        if ( !( skipIfDefined && Ctor.prototype.hasOwnProperty( '__inner_state__' ) ) ) {
+          Object.defineProperty(Ctor.prototype, '__inner_state__', ({
+            get: function() {
+              return getInnerState(this);
+            },
+            enumerable: false,
+            configurable: true,
+          } : Object ));
+        }
+      },
     }: Hook),
   });
 }
