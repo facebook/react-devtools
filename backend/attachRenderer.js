@@ -27,7 +27,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   var isPre013 = !renderer.Reconciler;
 
   // React Fiber
-  if (renderer.getRoot) {
+  if (renderer.attach) {
     extras.getNativeFromReactElement = function() {
       // TODO
       return null;
@@ -37,204 +37,52 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       return null;
     };
     extras.cleanup = function() {
-      // TODO
+      // TODO: frontends should unsubscribe when DevTools
+      // are hidden for more than a few seconds rather than
+      // when they are completely closed. We should detach
+      // whenever possible to avoid stretching the commit phase
+      // in development.
+      if (subscription) {
+        const s = subscription;
+        subscription = null;
+        s.unsubscribe();
+      }
     };
     extras.walkTree = function() {
-      // TODO: there can be more than one root
-      // TODO: expose a normal API instead of monkeypatching
-      const root = renderer.getRoot();
-      let current = root.stateNode.current;
-      Object.defineProperty(root.stateNode, 'current', {
-        get() {
-          return current;
-        },
-        set(nextCurrent) {
-          current = nextCurrent;
-          try {
-            updateFiber(current, current.alternate);
-          } catch (err) {
-            console.error(err);
-          }
-        }
-      });
-      mountFiber(current);
-      hook.emit('root', {
-        element: current._debugID,
-        renderer: rid
-      });
-    }
-
-    function describe(fiber) {
-      let data = {
-        type: fiber.type,
-        key: fiber.key,
-        ref: fiber.ref,
-        source: fiber._debugSource,
-        props: fiber.memoizedProps,
-        state: fiber.memoizedState,
-        publicInstance: fiber.stateNode,
-        children: [],
-      };
-      let child = fiber.child;
-      while (child) {
-        data.children.push(child._debugID);
-        child = child.sibling;
-      }
-      switch (fiber.tag) {
-        case 3:
-          data.nodeType = 'Wrapper';
-          break;
-        case 1:
-        case 2:
-          data.nodeType = 'Composite';
-          data.name = fiber.type.displayName || fiber.type.name;
-          data.publicInstance = fiber.stateNode;
-          data.updater = {
-            // TODO
-            setState() {},
-            forceUpdate() {},
-            setInProps() {},
-            setInState() {},
-            setInContext() {},
-          };
-          break;
-        case 5:
-          data.nodeType = 'Native';
-          data.name = fiber.type;
-          data.publicInstance = fiber.stateNode;
-          if (
-            typeof fiber.memoizedProps.children === 'string' ||
-            typeof fiber.memoizedProps.children === 'number'
-          ) {
-            data.children = fiber.memoizedProps.children.toString();
-          }
-          break;
-        case 6:
-          data.nodeType = 'Text';
-          data.text = fiber.memoizedProps;
-          break;
-        default:
-          data.nodeType = 'Native';
-          data.name = 'TODO_NOT_IMPLEMENTED_YET';
-          break;
-      }
-      return data;
-    }
-
-    function mapChildren(parent, allKeys) {
-      let children = new Map();
-      let node = parent.child;
-      while (node) {
-        const key = node.key || node.index;
-        allKeys.add(key);
-        children.set(key, node);
-        node = node.sibling;
-      }
-      return children;
-    }
-
-    function unmountFiber(fiber) {
-      let node = fiber;
-      outer: while (true) {
-        if (node.child) {
-          node.child.return = node;
-          node = node.child;
-          continue;
-        }
-        hook.emit('unmount', {
-          element: node._debugID,
-          renderer: rid
-        });
-        if (node.sibling) {
-          node.sibling.return = node.return;
-          node = node.sibling;
-          continue;
-        }
-        if (node == fiber) {
-          return;
-        }
-        while (node.return) {
-          node = node.return;
-          hook.emit('unmount', {
-            element: node._debugID,
-            renderer: rid
-          });
-          if (node == fiber) {
-            return;
-          }
-          if (node.sibling) {
-            node.sibling.return = node.return;
-            node = node.sibling;
-            continue outer;
-          }        
-        }
-        return;
-      }
-    }
-
-    function mountFiber(fiber) {
-      let node = fiber;
-      outer: while (true) {
-        if (node.child) {
-          node.child.return = node;
-          node = node.child;
-          continue;
-        }
+      // TODO
+    };
+    let subscription = renderer.attach({
+      // TODO: actual API design for `data` structure.
+      // `isRoot` can be inferred from the type of work.
+      // It is not clear yet if `id` will need to be an
+      // opaque data structure (i.e. Fiber) or can stay an ID.
+      onMount(id, data, isRoot) {
         hook.emit('mount', {
-          element: node._debugID,
-          data: describe(node),
+          element: id,
+          data: data,
           renderer: rid
         });
-        if (node.sibling) {
-          node.sibling.return = node.return;
-          node = node.sibling;
-          continue;
-        }
-        if (node == fiber) {
-          return;
-        }
-        while (node.return) {
-          node = node.return;
-          hook.emit('mount', {
-            element: node._debugID,
-            data: describe(node),
+        if (isRoot) {
+          hook.emit('root', {
+            element: id,
             renderer: rid
           });
-          if (node == fiber) {
-            return;
-          }
-          if (node.sibling) {
-            node.sibling.return = node.return;
-            node = node.sibling;
-            continue outer;
-          }        
         }
-        return;
-      }
-    }
-
-    function updateFiber(nextFiber, prevFiber) {
-      let allKeys = new Set();
-      let prevChildren = mapChildren(prevFiber, allKeys);
-      let nextChildren = mapChildren(nextFiber, allKeys);
-      allKeys.forEach(key => {
-        const prevChild = prevChildren.get(key);
-        const nextChild = nextChildren.get(key);
-
-        if (prevChild && !nextChild) {
-          unmountFiber(prevChild);
-        } else if (!prevChild && nextChild) {
-          mountFiber(nextChild);
-        } else if (prevChild !== nextChild) {
-          updateFiber(nextChild, prevChild);
-        }
-      });
-      hook.emit('update', {
-        element: nextFiber._debugID,
-        data: describe(nextFiber),
-        renderer: rid
-      });
-    }
+      },
+      onUpdate(id, data) {
+        hook.emit('update', {
+          element: id,
+          data: data,
+          renderer: rid
+        });
+      },
+      onUnmount(id) {
+        hook.emit('unmount', {
+          element: id,
+          renderer: rid
+        });
+      },
+    })
 
     return extras;
   }
