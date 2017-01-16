@@ -26,6 +26,219 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   // Before 0.13 there was no Reconciler, so we patch Component.Mixin
   var isPre013 = !renderer.Reconciler;
 
+  // React Fiber
+  if (renderer.getRoot) {
+    extras.getNativeFromReactElement = function() {
+      // TODO
+      return null;
+    };
+    extras.getReactElementFromNative = function() {
+      // TODO
+      return null;
+    };
+    extras.cleanup = function() {
+      // TODO
+    };
+    extras.walkTree = function() {
+      // TODO: there can be more than one root
+      // TODO: expose a normal API instead of monkeypatching
+      const root = renderer.getRoot();
+      let current = root.stateNode.current;
+      Object.defineProperty(root.stateNode, 'current', {
+        get() {
+          return current;
+        },
+        set(nextCurrent) {
+          current = nextCurrent;
+          try {
+            updateFiber(current, current.alternate);
+          } catch (err) {
+            console.error(err);
+          }
+        }
+      });
+      mountFiber(current);
+      hook.emit('root', {
+        element: current._debugID,
+        renderer: rid
+      });
+    }
+
+    function describe(fiber) {
+      let data = {
+        type: fiber.type,
+        key: fiber.key,
+        ref: fiber.ref,
+        source: fiber._debugSource,
+        props: fiber.memoizedProps,
+        state: fiber.memoizedState,
+        publicInstance: fiber.stateNode,
+        children: [],
+      };
+      let child = fiber.child;
+      while (child) {
+        data.children.push(child._debugID);
+        child = child.sibling;
+      }
+      switch (fiber.tag) {
+        case 3:
+          data.nodeType = 'Wrapper';
+          break;
+        case 1:
+        case 2:
+          data.nodeType = 'Composite';
+          data.name = fiber.type.displayName || fiber.type.name;
+          data.publicInstance = fiber.stateNode;
+          data.updater = {
+            // TODO
+            setState() {},
+            forceUpdate() {},
+            setInProps() {},
+            setInState() {},
+            setInContext() {},
+          };
+          break;
+        case 5:
+          data.nodeType = 'Native';
+          data.name = fiber.type;
+          data.publicInstance = fiber.stateNode;
+          if (
+            typeof fiber.memoizedProps.children === 'string' ||
+            typeof fiber.memoizedProps.children === 'number'
+          ) {
+            data.children = fiber.memoizedProps.children.toString();
+          }
+          break;
+        case 6:
+          data.nodeType = 'Text';
+          data.text = fiber.memoizedProps;
+          break;
+        default:
+          data.nodeType = 'Native';
+          data.name = 'TODO_NOT_IMPLEMENTED_YET';
+          break;
+      }
+      return data;
+    }
+
+    function mapChildren(parent, allKeys) {
+      let children = new Map();
+      let node = parent.child;
+      while (node) {
+        const key = node.key || node.index;
+        allKeys.add(key);
+        children.set(key, node);
+        node = node.sibling;
+      }
+      return children;
+    }
+
+    function unmountFiber(fiber) {
+      let node = fiber;
+      outer: while (true) {
+        if (node.child) {
+          node.child.return = node;
+          node = node.child;
+          continue;
+        }
+        hook.emit('unmount', {
+          element: node._debugID,
+          renderer: rid
+        });
+        if (node.sibling) {
+          node.sibling.return = node.return;
+          node = node.sibling;
+          continue;
+        }
+        if (node == fiber) {
+          return;
+        }
+        while (node.return) {
+          node = node.return;
+          hook.emit('unmount', {
+            element: node._debugID,
+            renderer: rid
+          });
+          if (node == fiber) {
+            return;
+          }
+          if (node.sibling) {
+            node.sibling.return = node.return;
+            node = node.sibling;
+            continue outer;
+          }        
+        }
+        return;
+      }
+    }
+
+    function mountFiber(fiber) {
+      let node = fiber;
+      outer: while (true) {
+        if (node.child) {
+          node.child.return = node;
+          node = node.child;
+          continue;
+        }
+        hook.emit('mount', {
+          element: node._debugID,
+          data: describe(node),
+          renderer: rid
+        });
+        if (node.sibling) {
+          node.sibling.return = node.return;
+          node = node.sibling;
+          continue;
+        }
+        if (node == fiber) {
+          return;
+        }
+        while (node.return) {
+          node = node.return;
+          hook.emit('mount', {
+            element: node._debugID,
+            data: describe(node),
+            renderer: rid
+          });
+          if (node == fiber) {
+            return;
+          }
+          if (node.sibling) {
+            node.sibling.return = node.return;
+            node = node.sibling;
+            continue outer;
+          }        
+        }
+        return;
+      }
+    }
+
+    function updateFiber(nextFiber, prevFiber) {
+      let allKeys = new Set();
+      let prevChildren = mapChildren(prevFiber, allKeys);
+      let nextChildren = mapChildren(nextFiber, allKeys);
+      allKeys.forEach(key => {
+        const prevChild = prevChildren.get(key);
+        const nextChild = nextChildren.get(key);
+
+        if (prevChild && !nextChild) {
+          unmountFiber(prevChild);
+        } else if (!prevChild && nextChild) {
+          mountFiber(nextChild);
+        } else if (prevChild !== nextChild) {
+          updateFiber(nextChild, prevChild);
+        }
+      });
+      hook.emit('update', {
+        element: nextFiber._debugID,
+        data: describe(nextFiber),
+        renderer: rid
+      });
+    }
+
+    return extras;
+  }
+
   // React Native
   if (renderer.Mount.findNodeHandle && renderer.Mount.nativeTagToRootNodeID) {
     extras.getNativeFromReactElement = function(component) {
