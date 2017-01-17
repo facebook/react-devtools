@@ -44,6 +44,9 @@ type DOMNode = {};
 export type AnyFn = (...args: Array<any>) => any;
 
 export type ReactRenderer = {
+  subscribeToFiberCommits: (listener: (root : Object) => void) => {
+    unsubscribe() : void,
+  },
   Reconciler: {
     mountComponent: AnyFn,
     performUpdateIfNecessary: AnyFn,

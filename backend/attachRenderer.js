@@ -13,6 +13,7 @@
 import type {DataType, OpaqueNodeHandle, Hook, ReactRenderer, Helpers} from './types';
 var getData = require('./getData');
 var getData012 = require('./getData012');
+var attachRendererFiber = require('./attachRendererFiber');
 
 type NodeLike = {};
 
@@ -27,64 +28,8 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   var isPre013 = !renderer.Reconciler;
 
   // React Fiber
-  if (renderer.attach) {
-    extras.getNativeFromReactElement = function() {
-      // TODO
-      return null;
-    };
-    extras.getReactElementFromNative = function() {
-      // TODO
-      return null;
-    };
-    extras.cleanup = function() {
-      // TODO: frontends should unsubscribe when DevTools
-      // are hidden for more than a few seconds rather than
-      // when they are completely closed. We should detach
-      // whenever possible to avoid stretching the commit phase
-      // in development.
-      if (subscription) {
-        const s = subscription;
-        subscription = null;
-        s.unsubscribe();
-      }
-    };
-    extras.walkTree = function() {
-      // TODO
-    };
-    let subscription = renderer.attach({
-      // TODO: actual API design for `data` structure.
-      // `isRoot` can be inferred from the type of work.
-      // It is not clear yet if `id` will need to be an
-      // opaque data structure (i.e. Fiber) or can stay an ID.
-      onMount(id, data, isRoot) {
-        hook.emit('mount', {
-          element: id,
-          data: data,
-          renderer: rid
-        });
-        if (isRoot) {
-          hook.emit('root', {
-            element: id,
-            renderer: rid
-          });
-        }
-      },
-      onUpdate(id, data) {
-        hook.emit('update', {
-          element: id,
-          data: data,
-          renderer: rid
-        });
-      },
-      onUnmount(id) {
-        hook.emit('unmount', {
-          element: id,
-          renderer: rid
-        });
-      },
-    })
-
-    return extras;
+  if (typeof renderer.subscribeToFiberCommits === 'function') {
+    return attachRendererFiber(hook, rid, renderer);
   }
 
   // React Native
