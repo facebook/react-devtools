@@ -13,6 +13,7 @@
 import type {DataType, OpaqueNodeHandle, Hook, ReactRenderer, Helpers} from './types';
 var getData = require('./getData');
 var getData012 = require('./getData012');
+var attachRendererFiber = require('./attachRendererFiber');
 
 type NodeLike = {};
 
@@ -25,6 +26,11 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   var extras = {};
   // Before 0.13 there was no Reconciler, so we patch Component.Mixin
   var isPre013 = !renderer.Reconciler;
+
+  // React Fiber
+  if (typeof renderer.subscribeToFiberCommits === 'function') {
+    return attachRendererFiber(hook, rid, renderer);
+  }
 
   // React Native
   if (renderer.Mount.findNodeHandle && renderer.Mount.nativeTagToRootNodeID) {
