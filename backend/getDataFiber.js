@@ -74,7 +74,11 @@ function getFiberData(fiber: Object): DataType {
       nodeType = 'Text';
       text = fiber.memoizedProps;
       break;
-    default: // Portals, coroutines, yields, fragments
+    case 10: // Fragment
+      nodeType = 'Wrapper';
+      children = [];
+      break;
+    default: // Portals, coroutines, yields
       nodeType = 'Native';
       props = fiber.memoizedProps;
       name = 'TODO_NOT_IMPLEMENTED_YET';
