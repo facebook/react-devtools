@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {DataType, OpaqueNodeHandle, Hook, ReactRenderer, Helpers} from './types';
+import type {Hook, ReactRenderer, Helpers} from './types';
 var getDataFiber = require('./getDataFiber');
 
 function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
@@ -73,7 +73,7 @@ function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function mapChildren(parent, allKeys) {
-    let children = new Map();
+    const children = new Map();
     let node = parent.child;
     while (node) {
       const key = node.key || node.index;
@@ -158,9 +158,9 @@ function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): 
     // TODO: optimize for the common case of children with implcit keys.
     // Just like we do in the Fiber child reconciler.
     // We shouldn't be allocating Maps all the time.
-    let allKeys = new Set();
-    let prevChildren = mapChildren(prevFiber, allKeys);
-    let nextChildren = mapChildren(nextFiber, allKeys);
+    const allKeys = new Set();
+    const prevChildren = mapChildren(prevFiber, allKeys);
+    const nextChildren = mapChildren(nextFiber, allKeys);
     allKeys.forEach(key => {
       const prevChild = prevChildren.get(key);
       const nextChild = nextChildren.get(key);
