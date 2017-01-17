@@ -167,7 +167,14 @@ function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): 
       if (prevChild != null && nextChild != null) {
         // TODO: are there more cases when we can bail out?
         if (prevChild !== nextChild) {
-          updateFiber(nextChild, prevChild, events);
+          if (prevChild.type === nextChild.type) {
+            // We already know their keys match.
+            updateFiber(nextChild, prevChild, events);
+          } else {
+            // These are different fibers.
+            unmountFiber(prevChild, events);
+            mountFiber(nextChild, events);
+          }
         }
       } else if (nextChild != null) {
         mountFiber(nextChild, events);
