@@ -22,6 +22,7 @@ function installGlobalHook(window: Object) {
   }
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: ({
+      supportsFiber: true,
       _renderers: {},
       helpers: {},
       inject: function(renderer) {
