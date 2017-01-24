@@ -14,7 +14,7 @@ import type {DataType} from './types';
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
-function getFiberData(fiber: Object): DataType {
+function getDataFiber(fiber: Object): DataType {
   var type = fiber.type;
   var key = fiber.key;
   var ref = fiber.ref;
@@ -111,4 +111,4 @@ function getFiberData(fiber: Object): DataType {
   };
 }
 
-module.exports = getFiberData;
+module.exports = getDataFiber;

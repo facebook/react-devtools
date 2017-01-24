@@ -13,7 +13,7 @@
 import type {Hook, ReactRenderer, Helpers} from './types';
 var getDataFiber = require('./getDataFiber');
 
-function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
+function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   function getNativeFromReactElement() {
     // TODO
     // This will likely require using Fibers
@@ -241,4 +241,4 @@ function attachFiberRenderer(hook: Hook, rid: string, renderer: ReactRenderer): 
   };
 }
 
-module.exports = attachFiberRenderer;
+module.exports = attachRendererFiber;
