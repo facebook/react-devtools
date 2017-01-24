@@ -75,7 +75,7 @@ class Node extends React.Component {
       return (
         <span>
           {children.map(child =>
-            <WrappedNode id={child} depth={this.props.depth} />
+            <WrappedNode key={child} id={child} depth={this.props.depth} />
           )}
         </span>
       );
