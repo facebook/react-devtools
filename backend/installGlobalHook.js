@@ -22,13 +22,13 @@ function installGlobalHook(window: Object) {
   }
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: ({
-      supportsFiber: true,
       _renderers: {},
       helpers: {},
       inject: function(renderer) {
         var id = Math.random().toString(16).slice(2);
         this._renderers[id] = renderer;
         this.emit('renderer', {id, renderer});
+        return id;
       },
       _listeners: {},
       sub: function(evt, fn) {
@@ -56,6 +56,25 @@ function installGlobalHook(window: Object) {
       emit: function(evt, data) {
         if (this._listeners[evt]) {
           this._listeners[evt].map(fn => fn(data));
+        }
+      },
+      _fiberRoots: {},
+      getFiberRoots(rendererID) {
+        return this._fiberRoots[rendererID] || (this._fiberRoots[rendererID] = new Set());
+      },
+      onCommitFiberRoot: function(rendererID, root) {
+        const mountedRoots = this.getFiberRoots(rendererID);
+        const current = root.current;
+        const isKnownRoot = mountedRoots.has(root);
+        const isUnmounting = current.memoizedState == null || current.memoizedState.element == null;
+        // Keep track of mounted roots so we can hydrate when DevTools connect.
+        if (!isKnownRoot && !isUnmounting) {
+          mountedRoots.add(root);
+        } else if (isKnownRoot && isUnmounting) {
+          mountedRoots.delete(root);
+        }
+        if (this.helpers[rendererID]) {
+          this.helpers[rendererID].handleCommitFiberRoot(root);
         }
       },
     }: Hook),

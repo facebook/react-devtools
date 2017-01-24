@@ -30,12 +30,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     return null;
   }
 
-  function walkTree() {
-    // TODO
-    // So far we didn't need this in Fiber
-    // since we always walk the tree anyway.
-  }
-
   function enqueueMount(fiber, events) {
     events.push({
       // TODO: we might need to pass Fiber instead to implement getNativeFromReactElement().
@@ -185,16 +179,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     enqueueUpdate(nextFiber, events);
   }
 
-  let subscription = null;
-
-  function cleanup() {
-    if (subscription) {
-      const {unsubscribe} = subscription;
-      subscription = null;
-      unsubscribe();
-    }
-  }
-
   function emitEvents(events) {
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
@@ -202,11 +186,23 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function handleFiberCommit(root) {
+  function walkTree() {
+    const events = [];
+    hook.getFiberRoots(rid).forEach(root => {
+      // Hydrate all the roots for the first time.
+      mountFiber(root.current, events);
+    });
+    emitEvents(events);
+  }
+
+  function cleanup() {
+  }
+
+  function handleCommitFiberRoot(root) {
     const current = root.current;
     const alternate = current.alternate;
     const events = [];
-    if (alternate && subscription != null) {
+    if (alternate) {
       // TODO: relying on this seems a bit fishy.
       const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;
       const isMounted = current.memoizedState != null && current.memoizedState.element != null;
@@ -221,21 +217,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         unmountFiber(current, events);
       }
     } else {
-      // Hydrate an existing root or mount a new one.
+      // Mount a new root.
       mountFiber(current, events);
     }
-    try {
-      emitEvents(events);
-    } catch (err) {
-      console.error(err);
-    }
+    emitEvents(events);
   }
-
-  subscription = renderer.subscribeToFiberCommits(handleFiberCommit);
 
   return {
     getNativeFromReactElement,
     getReactElementFromNative,
+    handleCommitFiberRoot,
     cleanup,
     walkTree,
   };
