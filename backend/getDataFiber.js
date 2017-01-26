@@ -89,7 +89,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       nodeType = 'Wrapper';
       children = [];
       break;
-    default: // Portals, coroutines, yields
+    default: // Coroutines and yields
       nodeType = 'Native';
       props = fiber.memoizedProps;
       name = 'TODO_NOT_IMPLEMENTED_YET';
