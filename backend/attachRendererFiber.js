@@ -31,7 +31,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   // However fibers have two versions.
   // We use this set to remember first encountered fiber for
   // each conceptual instance.
-  var opaqueNodes = new Set();
+  const opaqueNodes = new Set();
   function getOpaqueNode(fiber) {
     if (opaqueNodes.has(fiber)) {
       return fiber;
@@ -44,18 +44,56 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     return fiber;
   }
 
-  function enqueueMount(fiber, events) {
-    events.push({
-      // TODO: we might need to pass Fiber instead to implement getNativeFromReactElement().
+  function haveChildrenChanged(prevChildren, nextChildren) {
+    if (!Array.isArray(prevChildren) || !Array.isArray(nextChildren)) {
+      return prevChildren !== nextChildren;
+    }
+    if (prevChildren.length !== nextChildren.length) {
+      return true;
+    }
+    for (let i = 0; i < prevChildren.length; i++) {
+      if (prevChildren[i] !== nextChildren[i]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  function hasDataChanged(prevData, nextData) {
+    return (
+      prevData.ref !== nextData.ref ||
+      prevData.source !== nextData.source ||
+      prevData.props !== nextData.props ||
+      prevData.state !== nextData.state ||
+      prevData.context !== nextData.context ||
+      prevData.text !== nextData.text ||
+      haveChildrenChanged(prevData.children, nextData.children)
+    );
+  }
+
+  let pendingEvents = [];
+
+  function flushPendingEvents() {
+    const events = pendingEvents;
+    pendingEvents = [];
+    for (let i = 0; i < events.length; i++) {
+      const event = events[i];
+      hook.emit(event._event, event);
+    }
+  }
+
+  function enqueueMount(fiber) {
+    pendingEvents.push({
       // TODO: the naming is confusing. `element` is *not* a React element. It is an opaque ID.
       element: getOpaqueNode(fiber),
       data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       _event: 'mount',
     });
+
     const isRoot = fiber.tag === 3;
     if (isRoot) {
-      events.push({
+      pendingEvents.push({
         element: getOpaqueNode(fiber),
         renderer: rid,
         _event: 'root',
@@ -63,75 +101,45 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function enqueueUpdate(fiber, events) {
-    events.push({
+  function enqueueUpdateIfNecessary(fiber) {
+    const nextData = getDataFiber(fiber, getOpaqueNode);
+    const prevData = getDataFiber(fiber.alternate, getOpaqueNode);
+    // Avoid unnecessary updates since they are common
+    // when something changes deep in the tree due to setState.
+    if (!hasDataChanged(prevData, nextData)) {
+      return;
+    }
+    pendingEvents.push({
       element: getOpaqueNode(fiber),
-      data: getDataFiber(fiber, getOpaqueNode),
+      data: nextData,
       renderer: rid,
       _event: 'update',
     });
   }
 
-  function enqueueUnmount(fiber, events) {
-    events.push({
+  function enqueueUnmount(fiber) {
+    const isRoot = fiber.tag === 3;
+    const event = {
       element: getOpaqueNode(fiber),
       renderer: rid,
       _event: 'unmount',
-    });
+    };
+    if (isRoot) {
+      pendingEvents.push(event);
+    } else {
+      // Non-root fibers are deleted during the commit phase.
+      // They are deleted in the child-first order. However
+      // DevTools currently expects deletions to be parent-first.
+      // This is why we unshift deletions rather than push them.
+      pendingEvents.unshift(event);
+    }
     opaqueNodes.delete(fiber);
     if (fiber.alternate != null) {
       opaqueNodes.delete(fiber.alternate);
     }
   }
 
-  function mapChildren(parent, allKeys) {
-    const children = new Map();
-    let node = parent.child;
-    while (node) {
-      const key = node.key || node.index;
-      allKeys.add(key);
-      children.set(key, node);
-      node = node.sibling;
-    }
-    return children;
-  }
-
-  function unmountFiber(fiber, events) {
-    // Depth-first.
-    // Logs unmounting of children first, parents later.
-    let node = fiber;
-    outer: while (true) {
-      if (node.child) {
-        node.child.return = node;
-        node = node.child;
-        continue;
-      }
-      enqueueUnmount(node, events);
-      if (node == fiber) {
-        return;
-      }
-      if (node.sibling) {
-        node.sibling.return = node.return;
-        node = node.sibling;
-        continue;
-      }
-      while (node.return) {
-        node = node.return;
-        enqueueUnmount(node, events);
-        if (node == fiber) {
-          return;
-        }
-        if (node.sibling) {
-          node.sibling.return = node.return;
-          node = node.sibling;
-          continue outer;
-        }
-      }
-      return;
-    }
-  }
-
-  function mountFiber(fiber, events) {
+  function mountFiber(fiber) {
     // Depth-first.
     // Logs mounting of children first, parents later.
     let node = fiber;
@@ -141,7 +149,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         node = node.child;
         continue;
       }
-      enqueueMount(node, events);
+      enqueueMount(node);
       if (node == fiber) {
         return;
       }
@@ -152,7 +160,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       }
       while (node.return) {
         node = node.return;
-        enqueueMount(node, events);
+        enqueueMount(node);
         if (node == fiber) {
           return;
         }
@@ -166,54 +174,39 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function updateFiber(nextFiber, prevFiber, events) {
-    // TODO: optimize for the common case of children with implcit keys.
-    // Just like we do in the Fiber child reconciler.
-    // We shouldn't be allocating Maps all the time.
-    const allKeys = new Set();
-    const prevChildren = mapChildren(prevFiber, allKeys);
-    const nextChildren = mapChildren(nextFiber, allKeys);
-    allKeys.forEach(key => {
-      const prevChild = prevChildren.get(key);
-      const nextChild = nextChildren.get(key);
-      if (prevChild != null && nextChild != null) {
-        // TODO: are there more cases when we can bail out?
-        if (prevChild !== nextChild) {
-          if (prevChild.type === nextChild.type) {
-            // We already know their keys match.
-            updateFiber(nextChild, prevChild, events);
-          } else {
-            // These are different fibers.
-            unmountFiber(prevChild, events);
-            mountFiber(nextChild, events);
-          }
+  function updateFiber(nextFiber, prevFiber) {
+    if (nextFiber.child !== prevFiber.child) {
+      // If the first child is not equal, all children are not equal.
+      let nextChild = nextFiber.child;
+      while (nextChild) {
+        if (nextChild.alternate) {
+          updateFiber(nextChild, nextChild.alternate);
+        } else {
+          mountFiber(nextChild);
         }
-      } else if (nextChild != null) {
-        mountFiber(nextChild, events);
-      } else if (prevChild != null) {
-        unmountFiber(prevChild, events);
+        nextChild = nextChild.sibling;
       }
-    });
-    enqueueUpdate(nextFiber, events);
-  }
-
-  function emitEvents(events) {
-    for (let i = 0; i < events.length; i++) {
-      const event = events[i];
-      hook.emit(event._event, event);
     }
+    enqueueUpdateIfNecessary(nextFiber);
   }
 
   function walkTree() {
-    const events = [];
     hook.getFiberRoots(rid).forEach(root => {
       // Hydrate all the roots for the first time.
-      mountFiber(root.current, events);
+      mountFiber(root.current);
     });
-    emitEvents(events);
+    flushPendingEvents();
   }
 
   function cleanup() {
+  }
+
+  function handleCommitFiberUnmount(fiber) {
+    // This is not recursive.
+    // We can't traverse fibers after unmounting so instead
+    // we rely on React telling us about each unmount.
+    // It will be flushed after the root is committed.
+    enqueueUnmount(fiber);
   }
 
   function handleCommitFiberRoot(root) {
@@ -226,25 +219,27 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       const isMounted = current.memoizedState != null && current.memoizedState.element != null;
       if (!wasMounted && isMounted) {
         // Mount a new root.
-        mountFiber(current, events);
+        mountFiber(current);
       } else if (wasMounted && isMounted) {
         // Update an existing root.
-        updateFiber(current, alternate, events);
+        updateFiber(current, alternate);
       } else if (wasMounted && !isMounted) {
         // Unmount an existing root.
-        unmountFiber(current, events);
+        enqueueUnmount(current);
       }
     } else {
       // Mount a new root.
-      mountFiber(current, events);
+      mountFiber(current);
     }
-    emitEvents(events);
+    // We're done here.
+    flushPendingEvents();
   }
 
   return {
     getNativeFromReactElement,
     getReactElementFromNative,
     handleCommitFiberRoot,
+    handleCommitFiberUnmount,
     cleanup,
     walkTree,
   };

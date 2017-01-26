@@ -62,6 +62,12 @@ function installGlobalHook(window: Object) {
       getFiberRoots(rendererID) {
         return this._fiberRoots[rendererID] || (this._fiberRoots[rendererID] = new Set());
       },
+      onCommitFiberUnmount: function(rendererID, fiber) {
+        // TODO: can we use this for roots too?
+        if (this.helpers[rendererID]) {
+          this.helpers[rendererID].handleCommitFiberUnmount(fiber);
+        }
+      },
       onCommitFiberRoot: function(rendererID, root) {
         const mountedRoots = this.getFiberRoots(rendererID);
         const current = root.current;
