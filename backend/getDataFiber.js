@@ -77,6 +77,14 @@ function getDataFiber(fiber: Object, getOpaqueNode): DataType {
       nodeType = 'Text';
       text = fiber.memoizedProps;
       break;
+    case 4: // HostPortal
+      nodeType = 'Portal';
+      name = 'ReactPortal';
+      props = {
+        target: fiber.stateNode.containerInfo
+      };
+      children = [];
+      break;
     case 10: // Fragment
       nodeType = 'Wrapper';
       children = [];

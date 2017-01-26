@@ -11,7 +11,7 @@
 'use strict';
 
 export type DataType = {
-  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Empty',
+  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'HostPortal' | 'Empty',
   type: ?(string | AnyFn),
   key: ?string,
   ref: ?(string | AnyFn),

@@ -95,6 +95,7 @@ class Todos extends React.Component {
           onToggleComplete={this.toggleComplete.bind(this)}
         />
         <Filter onSort={this.sort.bind(this)} onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
+        {ReactDOM.unstable_createPortal(<h1>Lololo</h1>, newNode)}
       </div>
     );
   }
@@ -398,6 +399,9 @@ class Target extends React.Component {
   }
 }
 
+var newNode  = document.createElement('div');
+
 var node = document.createElement('div');
 document.body.appendChild(node);
+document.body.appendChild(newNode);
 ReactDOM.render(<Wrap more={['a', 2, 'c', 4]} str="thing" awesome={1} />, node);
