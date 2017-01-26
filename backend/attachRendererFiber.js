@@ -14,35 +14,49 @@ import type {Hook, ReactRenderer, Helpers} from './types';
 var getDataFiber = require('./getDataFiber');
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
-  function getNativeFromReactElement() {
-    // TODO
-    // This will likely require using Fibers
-    // as "opaque" IDs instead of debugIDs,
-    // and exposing the host component tree again.
-    return null;
+  // The naming is confusing.
+  // They deal with opaque nodes (fibers), not elements.
+  function getNativeFromReactElement(fiber) {
+    const node = renderer.findHostInstance(fiber);
+    return node;
+  }
+  function getReactElementFromNative(node) {
+    const fiber = renderer.ComponentTree.getClosestInstanceFromNode(node);
+    return fiber;
   }
 
-  function getReactElementFromNative() {
-    // TODO
-    // This will likely require using Fibers
-    // as "opaque" IDs instead of debugIDs,
-    // and exposing the host component tree again.
-    return null;
+  // This is a slightly annoying indirection.
+  // It is currently necessary because DevTools wants
+  // to use unique objects as keys for instances.
+  // However fibers have two versions.
+  // We use this set to remember first encountered fiber for
+  // each conceptual instance.
+  var opaqueNodes = new Set();
+  function getOpaqueNode(fiber) {
+    if (opaqueNodes.has(fiber)) {
+      return fiber;
+    }
+    const {alternate} = fiber;
+    if (alternate != null && opaqueNodes.has(alternate)) {
+      return alternate;
+    }
+    opaqueNodes.add(fiber);
+    return fiber;
   }
 
   function enqueueMount(fiber, events) {
     events.push({
       // TODO: we might need to pass Fiber instead to implement getNativeFromReactElement().
       // TODO: the naming is confusing. `element` is *not* a React element. It is an opaque ID.
-      element: fiber._debugID,
-      data: getDataFiber(fiber),
+      element: getOpaqueNode(fiber),
+      data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       _event: 'mount',
     });
     const isRoot = fiber.tag === 3;
     if (isRoot) {
       events.push({
-        element: fiber._debugID,
+        element: getOpaqueNode(fiber),
         renderer: rid,
         _event: 'root',
       });
@@ -51,8 +65,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function enqueueUpdate(fiber, events) {
     events.push({
-      element: fiber._debugID,
-      data: getDataFiber(fiber),
+      element: getOpaqueNode(fiber),
+      data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       _event: 'update',
     });
@@ -60,10 +74,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function enqueueUnmount(fiber, events) {
     events.push({
-      element: fiber._debugID,
+      element: getOpaqueNode(fiber),
       renderer: rid,
       _event: 'unmount',
     });
+    opaqueNodes.delete(fiber);
+    if (fiber.alternate != null) {
+      opaqueNodes.delete(fiber.alternate);
+    }
   }
 
   function mapChildren(parent, allKeys) {

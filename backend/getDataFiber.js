@@ -14,7 +14,7 @@ import type {DataType} from './types';
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
-function getDataFiber(fiber: Object): DataType {
+function getDataFiber(fiber: Object, getOpaqueNode: Object => Object): DataType {
   var type = fiber.type;
   var key = fiber.key;
   var ref = fiber.ref;
@@ -89,7 +89,7 @@ function getDataFiber(fiber: Object): DataType {
   if (Array.isArray(children)) {
     let child = fiber.child;
     while (child) {
-      children.push(child._debugID);
+      children.push(getOpaqueNode(child));
       child = child.sibling;
     }
   }
