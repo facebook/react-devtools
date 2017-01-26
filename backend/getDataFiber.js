@@ -15,7 +15,7 @@ var copyWithSet = require('./copyWithSet');
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
-function getDataFiber(fiber: Object, getOpaqueNode): DataType {
+function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): DataType {
   var type = fiber.type;
   var key = fiber.key;
   var ref = fiber.ref;
@@ -81,7 +81,7 @@ function getDataFiber(fiber: Object, getOpaqueNode): DataType {
       nodeType = 'Portal';
       name = 'ReactPortal';
       props = {
-        target: fiber.stateNode.containerInfo
+        target: fiber.stateNode.containerInfo,
       };
       children = [];
       break;

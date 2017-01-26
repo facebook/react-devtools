@@ -17,11 +17,11 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   // The naming is confusing.
   // They deal with opaque nodes (fibers), not elements.
   function getNativeFromReactElement(fiber) {
-    const node = renderer.findHostInstance(fiber);
+    const node = renderer.findHostInstanceByFiber(fiber);
     return node;
   }
   function getReactElementFromNative(node) {
-    const fiber = renderer.ComponentTree.getClosestInstanceFromNode(node);
+    const fiber = renderer.findFiberByHostInstance(node);
     return fiber;
   }
 
@@ -199,6 +199,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function cleanup() {
+    // We don't patch any methods so there is no cleanup.
   }
 
   function handleCommitFiberUnmount(fiber) {
@@ -212,7 +213,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function handleCommitFiberRoot(root) {
     const current = root.current;
     const alternate = current.alternate;
-    const events = [];
     if (alternate) {
       // TODO: relying on this seems a bit fishy.
       const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;

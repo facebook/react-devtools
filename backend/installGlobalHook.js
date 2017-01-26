@@ -22,9 +22,16 @@ function installGlobalHook(window: Object) {
   }
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: ({
+      // Shared between Stack and Fiber:
       _renderers: {},
       helpers: {},
       inject: function(renderer) {
+        if (typeof renderer.version === 'number' && renderer.version > 1) {
+          // This Fiber version is too new and not supported yet.
+          // The version field is declared in ReactFiberDevToolsHook.
+          // Only Fiber releases have the version field.
+          return null;
+        }
         var id = Math.random().toString(16).slice(2);
         this._renderers[id] = renderer;
         this.emit('renderer', {id, renderer});
@@ -58,6 +65,8 @@ function installGlobalHook(window: Object) {
           this._listeners[evt].map(fn => fn(data));
         }
       },
+      // Fiber-only:
+      supportsFiber: true,
       _fiberRoots: {},
       getFiberRoots(rendererID) {
         return this._fiberRoots[rendererID] || (this._fiberRoots[rendererID] = new Set());
