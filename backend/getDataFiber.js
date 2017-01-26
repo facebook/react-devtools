@@ -11,10 +11,11 @@
 'use strict';
 
 import type {DataType} from './types';
+var copyWithSet = require('./copyWithSet');
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
-function getDataFiber(fiber: Object, getOpaqueNode: Object => Object): DataType {
+function getDataFiber(fiber: Object, getOpaqueNode): DataType {
   var type = fiber.type;
   var key = fiber.key;
   var ref = fiber.ref;
@@ -23,8 +24,8 @@ function getDataFiber(fiber: Object, getOpaqueNode: Object => Object): DataType 
   var props = null;
   var state = null;
   var children = null;
-  var context = null; // TODO
-  var updater = null; // TODO
+  var context = null;
+  var updater = null;
   var nodeType = null;
   var name = null;
   var text = null;
@@ -43,14 +44,16 @@ function getDataFiber(fiber: Object, getOpaqueNode: Object => Object): DataType 
           context = null;
         }
       }
-      updater = {
-        // TODO
-        setState() {},
-        forceUpdate() {},
-        setInProps() {},
-        setInState() {},
-        setInContext() {},
-      };
+      const inst = publicInstance;
+      if (inst) {
+        updater = {
+          setState: inst.setState && inst.setState.bind(inst),
+          forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
+          setInProps: inst.forceUpdate && setInProps.bind(null, fiber),
+          setInState: inst.forceUpdate && setInState.bind(null, inst),
+          setInContext: inst.forceUpdate && setInContext.bind(null, inst),
+        };
+      }
       children = [];
       break;
     case 3: // HostRoot
@@ -109,6 +112,29 @@ function getDataFiber(fiber: Object, getOpaqueNode: Object => Object): DataType 
     updater,
     publicInstance,
   };
+}
+
+function setInProps(fiber, path: Array<string | number>, value: any) {
+  fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
+  fiber.stateNode.forceUpdate();
+}
+
+function setInState(inst, path: Array<string | number>, value: any) {
+  setIn(inst.state, path, value);
+  inst.forceUpdate();
+}
+
+function setInContext(inst, path: Array<string | number>, value: any) {
+  setIn(inst.context, path, value);
+  inst.forceUpdate();
+}
+
+function setIn(obj: Object, path: Array<string | number>, value: any) {
+  var last = path.pop();
+  var parent = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
+  if (parent) {
+    parent[last] = value;
+  }
 }
 
 module.exports = getDataFiber;
