@@ -17,8 +17,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   // The naming is confusing.
   // They deal with opaque nodes (fibers), not elements.
   function getNativeFromReactElement(fiber) {
-    const node = renderer.findHostInstanceByFiber(fiber);
-    return node;
+    try {
+      return renderer.findHostInstanceByFiber(fiber);
+    } catch (err) {
+      // The fiber might have unmounted by now.
+      return null;
+    }
   }
   function getReactElementFromNative(node) {
     const fiber = renderer.findFiberByHostInstance(node);
