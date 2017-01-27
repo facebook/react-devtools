@@ -12,6 +12,15 @@
 
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
+var {
+  FunctionalComponent,
+  ClassComponent,
+  HostRoot,
+  HostPortal,
+  HostComponent,
+  HostText,
+  Fragment,
+} = require('./ReactTypeOfWork');
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
@@ -31,8 +40,8 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var text = null;
 
   switch (fiber.tag) {
-    case 1: // FunctionalComponent
-    case 2: // ClassComponent
+    case FunctionalComponent:
+    case ClassComponent:
       nodeType = 'Composite';
       name = fiber.type.displayName || fiber.type.name;
       publicInstance = fiber.stateNode;
@@ -56,11 +65,19 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       }
       children = [];
       break;
-    case 3: // HostRoot
+    case HostRoot:
       nodeType = 'Wrapper';
       children = [];
       break;
-    case 5: // HostComponent
+    case HostPortal:
+      nodeType = 'Portal';
+      name = 'ReactPortal';
+      props = {
+        target: fiber.stateNode.containerInfo,
+      };
+      children = [];
+      break;
+    case HostComponent:
       nodeType = 'Native';
       name = fiber.type;
       props = fiber.memoizedProps;
@@ -73,19 +90,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         children = [];
       }
       break;
-    case 6: // HostText
+    case HostText:
       nodeType = 'Text';
       text = fiber.memoizedProps;
       break;
-    case 4: // HostPortal
-      nodeType = 'Portal';
-      name = 'ReactPortal';
-      props = {
-        target: fiber.stateNode.containerInfo,
-      };
-      children = [];
-      break;
-    case 10: // Fragment
+    case Fragment:
       nodeType = 'Wrapper';
       children = [];
       break;

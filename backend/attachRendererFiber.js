@@ -12,6 +12,10 @@
 
 import type {Hook, ReactRenderer, Helpers} from './types';
 var getDataFiber = require('./getDataFiber');
+var {
+  ClassComponent,
+  HostRoot,
+} = require('./ReactTypeOfWork');
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   // The naming is confusing.
@@ -49,7 +53,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function hasDataChanged(prevFiber, nextFiber) {
-    if (prevFiber.tag === 2 /* Class */) {
+    if (prevFiber.tag === ClassComponent) {
       // Only classes have context.
       if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
         return true;
@@ -89,7 +93,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       type: 'mount',
     });
 
-    const isRoot = fiber.tag === 3;
+    const isRoot = fiber.tag === HostRoot;
     if (isRoot) {
       pendingEvents.push({
         element: getOpaqueNode(fiber),
@@ -112,7 +116,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function enqueueUnmount(fiber) {
-    const isRoot = fiber.tag === 3;
+    const isRoot = fiber.tag === HostRoot;
     const opaqueNode = getOpaqueNode(fiber);
     const event = {
       element: opaqueNode,
