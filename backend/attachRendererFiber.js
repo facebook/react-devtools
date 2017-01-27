@@ -18,21 +18,6 @@ var {
 } = require('./ReactTypeOfWork');
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
-  // The naming is confusing.
-  // They deal with opaque nodes (fibers), not elements.
-  function getNativeFromReactElement(fiber) {
-    try {
-      return renderer.findHostInstanceByFiber(fiber);
-    } catch (err) {
-      // The fiber might have unmounted by now.
-      return null;
-    }
-  }
-  function getReactElementFromNative(node) {
-    const fiber = renderer.findFiberByHostInstance(node);
-    return fiber;
-  }
-
   // This is a slightly annoying indirection.
   // It is currently necessary because DevTools wants
   // to use unique objects as keys for instances.
@@ -258,6 +243,23 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     flushPendingEvents();
   }
 
+  // The naming is confusing.
+  // They deal with opaque nodes (fibers), not elements.
+  function getNativeFromReactElement(fiber) {
+    try {
+      const opaqueNode = fiber;
+      const hostInstance = renderer.findHostInstanceByFiber(opaqueNode);
+      return hostInstance;
+    } catch (err) {
+      // The fiber might have unmounted by now.
+      return null;
+    }
+  }
+  function getReactElementFromNative(hostInstance) {
+    const fiber = renderer.findFiberByHostInstance(hostInstance);
+    const opaqueNode = getOpaqueNode(fiber);
+    return opaqueNode;
+  }
   return {
     getNativeFromReactElement,
     getReactElementFromNative,
