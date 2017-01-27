@@ -113,8 +113,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function enqueueUnmount(fiber) {
     const isRoot = fiber.tag === 3;
+    const opaqueNode = getOpaqueNode(fiber);
     const event = {
-      element: getOpaqueNode(fiber),
+      element: opaqueNode,
       renderer: rid,
       type: 'unmount',
     };
@@ -127,10 +128,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       // This is why we unshift deletions rather than push them.
       pendingEvents.unshift(event);
     }
-    opaqueNodes.delete(fiber);
-    if (fiber.alternate != null) {
-      opaqueNodes.delete(fiber.alternate);
-    }
+    opaqueNodes.delete(opaqueNode);
   }
 
   function mountFiber(fiber) {
