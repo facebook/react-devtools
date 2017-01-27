@@ -28,7 +28,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
   var isPre013 = !renderer.Reconciler;
 
   // React Fiber
-  if (typeof renderer.version === 'number') {
+  if (typeof renderer.findFiberByHostInstance === 'function') {
     return attachRendererFiber(hook, rid, renderer);
   }
 

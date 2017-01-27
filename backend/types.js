@@ -45,7 +45,6 @@ export type AnyFn = (...args: Array<any>) => any;
 
 export type ReactRenderer = {
   // Fiber
-  supportsFiber: boolean,
   findHostInstanceByFiber: (fiber: Object) => ?NativeType,
   findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
 
@@ -97,5 +96,5 @@ export type Hook = {
   on: (evt: string, handler: Handler) => void,
   off: (evt: string, handler: Handler) => void,
   reactDevtoolsAgent?: ?Object,
-  getFiberRoots: () => Set<Object>,
+  getFiberRoots: (rendererID : string) => Set<Object>,
 };
