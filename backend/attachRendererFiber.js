@@ -48,30 +48,24 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     return fiber;
   }
 
-  function haveChildrenChanged(prevChildren, nextChildren) {
-    if (!Array.isArray(prevChildren) || !Array.isArray(nextChildren)) {
-      return prevChildren !== nextChildren;
-    }
-    if (prevChildren.length !== nextChildren.length) {
-      return true;
-    }
-    for (let i = 0; i < prevChildren.length; i++) {
-      if (prevChildren[i] !== nextChildren[i]) {
+  function hasDataChanged(prevFiber, nextFiber) {
+    if (prevFiber.tag === 2 /* Class */) {
+      // Only classes have context.
+      if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
+        return true;
+      }
+      // Force updating won't update state or props.
+      if (nextFiber.updateQueue != null && nextFiber.updateQueue.hasForceUpdate) {
         return true;
       }
     }
-    return false;
-  }
-
-  function hasDataChanged(prevData, nextData) {
+    // Compare the fields that would result in observable changes in DevTools.
+    // We don't compare type, tag, index, and key, because these are known to match.
     return (
-      prevData.ref !== nextData.ref ||
-      prevData.source !== nextData.source ||
-      prevData.props !== nextData.props ||
-      prevData.state !== nextData.state ||
-      prevData.context !== nextData.context ||
-      prevData.text !== nextData.text ||
-      haveChildrenChanged(prevData.children, nextData.children)
+      prevFiber.memoizedProps !== nextFiber.memoizedProps ||
+      prevFiber.memoizedState !== nextFiber.memoizedState ||
+      prevFiber.ref !== nextFiber.ref ||
+      prevFiber._debugSource !== nextFiber._debugSource
     );
   }
 
@@ -105,17 +99,13 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function enqueueUpdateIfNecessary(fiber) {
-    const nextData = getDataFiber(fiber, getOpaqueNode);
-    const prevData = getDataFiber(fiber.alternate, getOpaqueNode);
-    // Avoid unnecessary updates since they are common
-    // when something changes deep in the tree due to setState.
-    if (!hasDataChanged(prevData, nextData)) {
+  function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
+    if (!hasChildOrderChanged && !hasDataChanged(fiber.alternate, fiber)) {
       return;
     }
     pendingEvents.push({
       element: getOpaqueNode(fiber),
-      data: nextData,
+      data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       _event: 'update',
     });
@@ -179,19 +169,46 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function updateFiber(nextFiber, prevFiber) {
+    let hasChildOrderChanged = false;
     if (nextFiber.child !== prevFiber.child) {
-      // If the first child is not equal, all children are not equal.
+      // If the first child is different, we need to traverse them.
+      // Each next child will be either a new child (mount) or an alternate (update).
       let nextChild = nextFiber.child;
+      let prevChildAtSameIndex = prevFiber.child;
       while (nextChild) {
+        // We already know children will be referentially different because
+        // they are either new mounts or alternates of previous children.
+        // Schedule updates and mounts depending on whether alternates exist.
+        // We don't track deletions here because they are reported separately.
         if (nextChild.alternate) {
-          updateFiber(nextChild, nextChild.alternate);
+          const prevChild = nextChild.alternate;
+          updateFiber(nextChild, prevChild);
+          // However we also keep track if the order of the children matches
+          // the previous order. They are always different referentially, but
+          // if the instances line up conceptually we'll want to know that.
+          if (!hasChildOrderChanged && prevChild !== prevChildAtSameIndex) {
+            hasChildOrderChanged = true;
+          }
         } else {
           mountFiber(nextChild);
+          if (!hasChildOrderChanged) {
+            hasChildOrderChanged = true;
+          }
         }
+        // Try the next child.
         nextChild = nextChild.sibling;
+        // Advance the pointer in the previous list so that we can
+        // keep comparing if they line up.
+        if (!hasChildOrderChanged && prevChildAtSameIndex != null) {
+          prevChildAtSameIndex = prevChildAtSameIndex.sibling;
+        }
+      }
+      // If we have no more children, but used to, they don't line up.
+      if (!hasChildOrderChanged && prevChildAtSameIndex != null) {
+        hasChildOrderChanged = true;
       }
     }
-    enqueueUpdateIfNecessary(nextFiber);
+    enqueueUpdateIfNecessary(nextFiber, hasChildOrderChanged);
   }
 
   function walkTree() {
