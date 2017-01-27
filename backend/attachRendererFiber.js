@@ -76,7 +76,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     pendingEvents = [];
     for (let i = 0; i < events.length; i++) {
       const event = events[i];
-      hook.emit(event._event, event);
+      hook.emit(event.type, event);
     }
   }
 
@@ -86,7 +86,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       element: getOpaqueNode(fiber),
       data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
-      _event: 'mount',
+      type: 'mount',
     });
 
     const isRoot = fiber.tag === 3;
@@ -94,7 +94,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       pendingEvents.push({
         element: getOpaqueNode(fiber),
         renderer: rid,
-        _event: 'root',
+        type: 'root',
       });
     }
   }
@@ -107,7 +107,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       element: getOpaqueNode(fiber),
       data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
-      _event: 'update',
+      type: 'update',
     });
   }
 
@@ -116,7 +116,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     const event = {
       element: getOpaqueNode(fiber),
       renderer: rid,
-      _event: 'unmount',
+      type: 'unmount',
     };
     if (isRoot) {
       pendingEvents.push(event);
