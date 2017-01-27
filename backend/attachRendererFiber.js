@@ -257,8 +257,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
   function getReactElementFromNative(hostInstance) {
     const fiber = renderer.findFiberByHostInstance(hostInstance);
-    const opaqueNode = getOpaqueNode(fiber);
-    return opaqueNode;
+    if (fiber != null) {
+      // TODO: type fibers.
+      const opaqueNode = getOpaqueNode((fiber: any));
+      return opaqueNode;
+    }
+    return null;
   }
   return {
     getNativeFromReactElement,
