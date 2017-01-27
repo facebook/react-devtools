@@ -10,6 +10,7 @@
   },
   "license": "BSD-3-Clause",
   "permissions": {
-    "private-browsing": true
+    "private-browsing": true,
+    "multiprocess": true
   }
 }
