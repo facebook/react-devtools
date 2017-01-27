@@ -11,7 +11,7 @@
 'use strict';
 
 export type DataType = {
-  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Empty',
+  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Portal' | 'Empty',
   type: ?(string | AnyFn),
   key: ?string,
   ref: ?(string | AnyFn),
@@ -44,6 +44,11 @@ type DOMNode = {};
 export type AnyFn = (...args: Array<any>) => any;
 
 export type ReactRenderer = {
+  // Fiber
+  findHostInstanceByFiber: (fiber: Object) => ?NativeType,
+  findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
+
+  // Stack
   Reconciler: {
     mountComponent: AnyFn,
     performUpdateIfNecessary: AnyFn,
@@ -85,10 +90,11 @@ export type Hook = {
   _renderers: {[key: string]: ReactRenderer},
   _listeners: {[key: string]: Array<Handler>},
   helpers: {[key: string]: Helpers},
-  inject: (renderer: ReactRenderer) => void,
+  inject: (renderer: ReactRenderer) => string | null,
   emit: (evt: string, data: any) => void,
   sub: (evt: string, handler: Handler) => () => void,
   on: (evt: string, handler: Handler) => void,
   off: (evt: string, handler: Handler) => void,
   reactDevtoolsAgent?: ?Object,
+  getFiberRoots: (rendererID : string) => Set<Object>,
 };

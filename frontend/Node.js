@@ -72,7 +72,13 @@ class Node extends React.Component {
     var children = node.get('children');
 
     if (node.get('nodeType') === 'Wrapper') {
-      return <WrappedNode id={children[0]} depth={this.props.depth} />;
+      return (
+        <span>
+          {children.map(child =>
+            <WrappedNode key={child} id={child} depth={this.props.depth} />
+          )}
+        </span>
+      );
     }
 
     if (node.get('nodeType') === 'NativeWrapper') {
