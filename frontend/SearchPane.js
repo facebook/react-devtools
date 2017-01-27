@@ -53,8 +53,10 @@ class SearchPane extends React.Component {
   }
 
   onDocumentKeyDown(e) {
-    if (e.keyCode === 191 && // forward slash
-      this.input && e.target && e.target.nodeName !== 'INPUT'
+    if (
+      e.keyCode === 191 && // forward slash
+      e.target.nodeName !== 'INPUT' &&
+      this.input
     ) {
       this.input.focus();
       e.preventDefault();
