@@ -37,8 +37,13 @@ class StyleEdit extends React.Component {
     this.state = {newAttr: '', newValue: ''};
   }
 
+  onChange(name: string, val: string | number) {
+    var num = Number(val);
+    this.props.onChange(name, num == val ? num : val);
+  }
+
   onNew(val: string | number) {
-    this.props.onChange(this.state.newAttr, val);
+    this.onChange(this.state.newAttr, val);
     this.setState({newAttr: '', newValue: ''});
   }
 
@@ -55,10 +60,7 @@ class StyleEdit extends React.Component {
             :
             <BlurInput
               value={this.props.style[name]}
-              onChange={val => {
-                var num = Number(val);
-                this.props.onChange(name, num == val ? num : val);
-              }}
+              onChange={val => this.onChange(name, val)}
             />
           </li>
         ))}
