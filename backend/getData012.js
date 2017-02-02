@@ -12,6 +12,7 @@
 
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
+var getDisplayName = require('./getDisplayName');
 
 function getData012(element: Object): DataType {
   var children = null;
