@@ -12,6 +12,7 @@
 
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
+var getDisplayName = require('./getDisplayName');
 
 /**
  * Convert a react internal instance to a sanitized data object.
@@ -88,7 +89,7 @@ function getData(element: Object): DataType {
       nodeType = 'Text';
       text = element._stringText;
     } else {
-      name = type.displayName || type.name || 'Unknown';
+      name = getDisplayName(type);
     }
   }
 

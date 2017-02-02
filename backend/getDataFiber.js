@@ -12,6 +12,7 @@
 
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
+var getDisplayName = require('./getDisplayName');
 var {
   FunctionalComponent,
   ClassComponent,
@@ -43,7 +44,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     case FunctionalComponent:
     case ClassComponent:
       nodeType = 'Composite';
-      name = fiber.type.displayName || fiber.type.name;
+      name = getDisplayName(fiber.type);
       publicInstance = fiber.stateNode;
       props = fiber.memoizedProps;
       state = fiber.memoizedState;
