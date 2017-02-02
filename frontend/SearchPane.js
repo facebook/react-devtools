@@ -22,6 +22,7 @@ var decorate = require('./decorate');
 
 type EventLike = {
   keyCode: number,
+  target: Node,
   preventDefault: () => void,
   stopPropagation: () => void,
 };
