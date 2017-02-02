@@ -11,6 +11,15 @@
 'use strict';
 
 const FB_MODULE_RE = /^(.*) \[from (.*)\]$/;
+
+// Hack: base class names are hardcoded because of internal FB transform that puts
+// displayName on all modules. It resulted in displayName of React base classes shadowing
+// actual ES6 class names. We can remove the hack if we use flat bundles on www, or
+// if we stop automatically putting displayName on every exported function.
+// We are using a regex because we also want to fix names like
+// Connect(ReactComponent [from ReactComponent]) to be just Connect() for lack of better alternative.
+const BASE_CLASS_NAMES_RE = /React(Pure)?Component \[from React(Pure)?Component\]/g;
+
 const cachedDisplayNames = new WeakMap();
 
 function getDisplayName(type: Function): string {
@@ -18,12 +27,11 @@ function getDisplayName(type: Function): string {
     return cachedDisplayNames.get(type);
   }
 
-  let displayName = (
-    (type.hasOwnProperty('displayName') && type.displayName) ||
-    (type.hasOwnProperty('name') && type.name) ||
-    (type.displayName || type.name) ||
-    'Unknown'
-  );
+  let displayName =
+    (type.displayName || '').replace(BASE_CLASS_NAMES_RE, '') ||
+    type.name ||
+    'Unknown';
+
   // Facebook-specific hack to turn "Image [from Image.react]" into just "Image".
   // We need displayName with module name for error reports but it clutters the DevTools.
   const match = displayName.match(FB_MODULE_RE);
