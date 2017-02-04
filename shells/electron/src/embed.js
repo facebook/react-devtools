@@ -13,9 +13,12 @@
 var globalHook = require('../../../backend/installGlobalHook');
 globalHook(window);
 var websocketConnect = require('../../../backend/websocketConnect');
-var setupHighlighter = require('../../../frontend/Highlighter/setup');
 
 websocketConnect('ws://localhost:8097/');
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('react-devtools', agent => {
-  setupHighlighter(agent);
-});
+
+if (window.document) {
+  window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('react-devtools', agent => {
+    var setupHighlighter = require('../../../frontend/Highlighter/setup');
+    setupHighlighter(agent);
+  });
+}
