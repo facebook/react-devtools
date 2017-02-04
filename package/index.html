@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>React Electron App</title>
+        <meta charset=utf8>
+        <style>
+            html {
+                display: flex;
+                font-family: sans-serif;
+            }
+            body {
+                margin: 0;
+                padding: 0;
+                flex: 1;
+                display: flex;
+            }
+            #container {
+                display: flex;
+                position: fixed;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: white;
+            }
+            #logs {
+                position: fixed;
+                top: 0;
+                left: 0;
+                white-space: pre;
+            }
+            #waiting {
+                flex-direction: column;
+                text-align: center;
+                font-family: sans-serif;
+                color: #aaa;
+                flex: 1;
+            }
+            #waiting h2 {
+                padding: 30px;
+            }
+            #waiting p {
+                padding: 0;
+                margin: 0;
+            }
+            #waiting input {
+                width: 300px;
+                font-family: monospace;
+            }
+            #loading-status {
+                margin-top: 10px;
+            }
+        </style>
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    </head>
+    <body>
+        <div id="container">
+            <div id="waiting">
+                <h2>Waiting for a connection from React Native</h2>
+                <div>
+                    <div>
+                        Add <input id="localhost"><br/>
+                        or <input id="byip">
+                    </div>
+                    <div>to the top of the page you want to debug,<br/>*before* react is loaded.</div>
+                    <div id="loading-status">starting server</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            var port = 8097;
+            var localIp = require('ip').address();
+            var $ = document.querySelector.bind(document);
+            function selectAll() {
+                this.selectionStart = 0;
+                this.selectionEnd = this.value.length;
+            }
+            $('#localhost').value = '<' + 'script src="http://localhost:' + port + '"><' + '/script>';
+            $('#byip').value = '<' + 'script src="http://' + localIp + ':' + port + '"><' + '/script>';
+            $('#localhost').onclick = selectAll;
+            $('#byip').onclick = selectAll;
+            window.server = require('./build/standalone.js')
+                .setContentDOMNode(document.getElementById('container'))
+                .startServer(port);
+        </script>
+    </body>
+</html>
