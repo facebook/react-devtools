@@ -9,6 +9,9 @@
  */
 'use strict';
 
+var webpack = require('webpack');
+var __DEV__ = process.env.NODE_ENV !== 'production';
+
 module.exports = {
   debug: true,
   devtool: 'source-map',
@@ -20,6 +23,17 @@ module.exports = {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
   },
+  plugins: __DEV__ ? [] : [
+    // Ensure we get production React
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': '"production"',
+    }),
+    // Remove dead code but keep it readable:
+    new webpack.optimize.UglifyJsPlugin({
+      mangle: false,
+      beautify: true,
+    }),
+  ],
   module: {
     loaders: [{
       test: /\.js$/,
