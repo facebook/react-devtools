@@ -8,7 +8,7 @@ You'll need webpack, and [electron](http://electron.atom.io/#get-started) (`npm 
 
 - `npm install`
 - `npm run build`
-- `electron .`
+- `npm start`
 
 Start up the packager, start up your app, and things *should* just connect
 happily.
