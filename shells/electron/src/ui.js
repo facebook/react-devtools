@@ -60,7 +60,6 @@ function initialize(socket) {
   socket.send('eval:' + backendScript);
   var listeners = [];
   socket.onmessage = (evt) => {
-    console.log('socket msg', evt)
     if (evt.data === 'attach:agent') {
       return;
     }
@@ -107,8 +106,6 @@ function startServer(port = 8097) {
       connected.close()
       console.warn('only one connection allowed at a time');
       console.warn('closing the previous connection');
-      // socket.close();
-      // return;
     }
     connected = socket;
     socket.onerror = (err) => {
