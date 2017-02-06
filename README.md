@@ -17,6 +17,8 @@ The official extensions represent the current stable release.
 - [Firefox extension](https://addons.mozilla.org/firefox/addon/react-devtools/)
 - Standalone app (coming soon)
 
+Opera users can [enable Chrome extensions](https://addons.opera.com/extensions/details/download-chrome-extension-9/) and then install the [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
+
 If you inspect an element or launch the developer tools on a React page, you
 should see an extra tab called **React** in the inspector.
 
