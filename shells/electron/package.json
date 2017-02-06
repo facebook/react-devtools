@@ -1,9 +1,9 @@
 {
   "main": "./index.js",
   "scripts": {
-    "backend": "../../node_modules/.bin/webpack --config webpack.backend.js",
-    "ui": "../../node_modules/.bin/webpack --config webpack.config.js",
-    "ui:watch": "../../node_modules/.bin/webpack --config webpack.config.js --watch",
+    "backend": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js",
+    "ui": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js",
+    "ui:watch": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js --watch",
     "build": "npm run backend && npm run ui",
     "start": "electron ."
   },
