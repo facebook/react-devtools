@@ -1,6 +1,6 @@
 {
   "name": "react-devtools",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Use react-devtools outside of the browser",
   "main": "./build/embed.js",
   "repository": {
