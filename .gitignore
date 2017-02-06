@@ -17,3 +17,7 @@
 /backend/integration/build
 /shells/firefox/*.xpi
 npm-debug.log
+/package/index.html
+/package/index.js
+/package/build
+/package/node_modules

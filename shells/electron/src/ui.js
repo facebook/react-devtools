@@ -103,11 +103,11 @@ function startServer(port = 8097) {
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
+      connected.close()
       console.warn('only one connection allowed at a time');
-      socket.close();
-      return;
+      console.warn('closing the previous connection');
     }
-    connected = true;
+    connected = socket;
     socket.onerror = (err) => {
       connected = false;
       onDisconnected();
