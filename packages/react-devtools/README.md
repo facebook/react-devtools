@@ -25,6 +25,7 @@ import.
 This is not supported yet - stay tuned!
 
 ## Developing
-1) `(cd ../shells/electron && npm run build)`
-2) `make`
+
+1) `npm run build`
+2) `npm start`
 3) `npm publish`
