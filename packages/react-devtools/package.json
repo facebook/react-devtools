@@ -1,8 +1,7 @@
 {
   "name": "react-devtools",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Use react-devtools outside of the browser",
-  "main": "./build/embed.js",
   "repository": {
     "url": "https://github.com/facebook/react-devtools.git",
     "type": "git"
@@ -11,23 +10,19 @@
     "react-devtools": "./bin.js"
   },
   "files": [
-    "build",
     "bin.js",
-    "index.html",
+    "app.html",
+    "app.js",
     "index.js"
   ],
   "scripts": {
-    "backend": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js",
-    "standalone": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js",
-    "standalone:watch": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.config.js --watch",
-    "build": "npm run backend && npm run standalone",
-    "start": "electron ./index.js"
+    "start": "electron app.js"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
     "electron": "^1.4.15",
     "ip": "^1.1.4",
-    "ws": "^1.1.1"
+    "react-devtools-core": "^1.0.4"
   }
 }

@@ -1,2 +1,2 @@
 #!/usr/bin/env electron
-require('./index.js')
+require('./app.js')
