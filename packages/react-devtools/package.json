@@ -16,11 +16,12 @@
     "index.js"
   ],
   "scripts": {
-    "start": "electron app.js"
+    "start": "./bin.js"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "cross-spawn": "^5.0.1",
     "electron": "^1.4.15",
     "ip": "^1.1.4",
     "react-devtools-core": "^1.0.4"
