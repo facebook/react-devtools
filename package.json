@@ -28,7 +28,7 @@
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
   "scripts": {
-    "lint": "./node_modules/.bin/eslint .",
+    "lint": "eslint .",
     "postinstall": "lerna bootstrap",
     "test": "node --harmony ./node_modules/.bin/jest",
     "typecheck": "flow check"
@@ -44,6 +44,9 @@
       "js",
       "json",
       "es6"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/shells"
     ]
   },
   "devDependencies": {
