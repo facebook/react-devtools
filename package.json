@@ -29,6 +29,7 @@
   "repository": "facebook/react-devtools",
   "scripts": {
     "lint": "eslint .",
+    "postinstall": "lerna bootstrap",
     "test": "node --harmony ./node_modules/.bin/jest",
     "typecheck": "flow check"
   },
@@ -43,6 +44,12 @@
       "js",
       "json",
       "es6"
+    ],
+    "modulePathIgnorePatterns": [
+      "<rootDir>/shells"
     ]
+  },
+  "devDependencies": {
+    "lerna": "2.0.0-beta.36"
   }
 }

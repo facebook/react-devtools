@@ -1,8 +1,7 @@
 {
   "name": "react-devtools",
-  "version": "1.0.4",
+  "version": "1.0.6",
   "description": "Use react-devtools outside of the browser",
-  "main": "./build/embed.js",
   "repository": {
     "url": "https://github.com/facebook/react-devtools.git",
     "type": "git"
@@ -10,11 +9,21 @@
   "bin": {
     "react-devtools": "./bin.js"
   },
+  "files": [
+    "bin.js",
+    "app.html",
+    "app.js",
+    "index.js"
+  ],
+  "scripts": {
+    "start": "./bin.js"
+  },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "cross-spawn": "^5.0.1",
     "electron": "^1.4.15",
     "ip": "^1.1.4",
-    "ws": "^1.1.1"
+    "react-devtools-core": "^1.0.6"
   }
 }

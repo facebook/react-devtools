@@ -16,7 +16,7 @@ module.exports = {
   debug: true,
   devtool: 'source-map',
   entry: {
-    standalone: './src/ui.js',
+    standalone: './src/standalone.js',
   },
   // this lets us `require('fs')` etc
   target: 'electron',

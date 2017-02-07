@@ -22,10 +22,7 @@ app.on('ready', function() {
   mainWindow = new BrowserWindow({width: 800, height: 600});
 
   // and load the index.html of the app.
-  mainWindow.loadURL('file://' + __dirname + '/index.html'); // eslint-disable-line no-path-concat
-
-  // Open the devtools.
-  // mainWindow.openDevTools();
+  mainWindow.loadURL('file://' + __dirname + '/app.html'); // eslint-disable-line no-path-concat
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
