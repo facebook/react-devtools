@@ -18,11 +18,11 @@ import React, {Component} from 'react'
 ```
 
 3) Profit!
-Make sure that your `react-devtools` import comes *before* your `react`
-import.
+Make sure that your `react-devtools` import comes *before* your `react`, `react-dom`, or `react-native`
+imports.
 
-## Usage with non-localhost
-This is not supported yet - stay tuned!
+## Advanced
+If you need to customize host, port, or other settings, see the `react-devtools-core` package instead.
 
 ## Developing
 

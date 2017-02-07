@@ -131,7 +131,8 @@ function startServer(port = 8097) {
     path.join(__dirname, '../build/embed.js')
   );
   httpServer.on('request', (req, res) => {
-    res.end(embedFile);
+    // Serve a file that immediately sets up the connection.
+    res.end(embedFile + '\n' + ';ReactDevToolsEmbed.connectToDevTools();');
   });
 
   httpServer.on('error', (e) => {

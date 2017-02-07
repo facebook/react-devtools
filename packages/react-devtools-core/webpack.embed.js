@@ -16,11 +16,13 @@ module.exports = {
   debug: true,
   devtool: 'source-map',
   entry: {
-    backend: './src/backend.js',
+    embed: './src/embed.js',
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
+    library: 'ReactDevToolsEmbed',
+    libraryTarget: 'umd'
   },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React

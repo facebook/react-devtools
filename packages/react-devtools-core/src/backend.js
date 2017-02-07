@@ -11,7 +11,7 @@
 
 'use strict';
 
-// See https://github.com/facebook/react-native/blob/b00c77af8066cf74f05ccaca2b08c8952e1ae8a6/Libraries/Devtools/setupDevtools.js#L19
+// This object is set up by websocketConnect() that is called from ./embed.js.
 declare var FOR_BACKEND: {
   wall: Object;
   resolveRNStyle: () => void;
