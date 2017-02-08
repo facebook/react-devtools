@@ -71,9 +71,9 @@ function getData(element: Object): DataType {
     ref = element._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
-    } else if (element.getName) {
+    } else if (typeof type === 'function') {
       nodeType = 'Composite';
-      name = element.getName();
+      name = getDisplayName(type);
       // 0.14 top-level wrapper
       // TODO(jared): The backend should just act as if these don't exist.
       if (element._renderedComponent && (
