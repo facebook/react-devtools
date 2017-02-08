@@ -20,13 +20,11 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = null;
+var onStatusChange = function noop() {};
+
 var backendScript = fs.readFileSync(
   path.join(__dirname, '../build/backend.js'));
 var wall = null;
-var loadingStatus = message => {
-  var el = document.getElementById('loading-status');
-  if (el) el.innerText = message;
-};
 
 var config = {
   reload,
@@ -141,12 +139,12 @@ function startServer(port = 8097) {
 
   httpServer.on('error', (e) => {
     onError(e);
-    loadingStatus('failed to start server :/');
+    onStatusChange('Failed to start the server');
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
   httpServer.listen(port, () => {
-    loadingStatus('listening on ' + port);
+    onStatusChange('Listening on ' + port);
   });
 
   return {
@@ -165,8 +163,8 @@ var DevtoolsUI = {
     return DevtoolsUI;
   },
 
-  loadingStatus(_func) {
-    loadingStatus = _func;
+  setStatusListener(_listener) {
+    onStatusChange = _listener;
     return DevtoolsUI;
   },
 

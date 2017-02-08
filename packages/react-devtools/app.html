@@ -91,6 +91,9 @@
             }
             window.server = devtools
                 .setContentDOMNode(document.getElementById('container'))
+                .setStatusListener(function(status) {
+                    document.getElementById('loading-status').innerText = status;
+                })
                 .startServer(port);
         </script>
     </body>
