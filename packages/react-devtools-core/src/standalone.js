@@ -21,9 +21,6 @@ var ReactDOM = require('react-dom');
 
 var node = null;
 var onStatusChange = function noop() {};
-
-var backendScript = fs.readFileSync(
-  path.join(__dirname, '../build/backend.js'));
 var wall = null;
 
 var config = {
@@ -59,26 +56,12 @@ function onError(e) {
 }
 
 function initialize(socket) {
-  socket.send('eval:' + backendScript);
   var listeners = [];
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
       return;
     }
     var data = JSON.parse(evt.data);
-    if (data.$close || data.$error) {
-      console.log('Closing or Erroring');
-      onDisconnected();
-      socket.onmessage = (msg) => {
-        if (msg.data === 'attach:agent') {
-          initialize(socket);
-        }
-      };
-      return;
-    }
-    if (data.$open) {
-      return; // ignore
-    }
     listeners.forEach((fn) => fn(data));
   };
 
@@ -129,12 +112,12 @@ function startServer(port = 8097) {
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
-  var embedFile = fs.readFileSync(
-    path.join(__dirname, '../build/embed.js')
+  var backendFile = fs.readFileSync(
+    path.join(__dirname, '../build/backend.js')
   );
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
-    res.end(embedFile + '\n;ReactDevToolsEmbed.connectToDevTools();');
+    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
   });
 
   httpServer.on('error', (e) => {

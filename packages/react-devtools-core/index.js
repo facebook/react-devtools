@@ -1,1 +1,1 @@
-module.exports = require('./build/embed');
+module.exports = require('./build/backend');
