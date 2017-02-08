@@ -17,7 +17,7 @@ type ConnectOptions = {
 };
 
 var globalHook = require('../../../backend/installGlobalHook');
-var websocketConnect = require('../../../backend/websocketConnect');
+var websocketConnect = require('./websocketConnect');
 
 globalHook(window);
 if (window.document) {

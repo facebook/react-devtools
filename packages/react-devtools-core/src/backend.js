@@ -32,36 +32,39 @@ var inject = require('../../../agent/inject');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
 
-FOR_BACKEND.wall.onClose(() => {
-  if (agent) {
-    agent.emit('shutdown');
+function setupBackend(FOR_BACKEND) {
+  FOR_BACKEND.wall.onClose(() => {
+    if (agent) {
+      agent.emit('shutdown');
+    }
+    bridge = null;
+    agent = null;
+    console.log('closing devtools');
+  });
+
+  var bridge = new Bridge(FOR_BACKEND.wall);
+  var agent = new Agent(window, {
+    rnStyle: !!FOR_BACKEND.resolveRNStyle,
+  });
+  agent.addBridge(bridge);
+
+  if (FOR_BACKEND.resolveRNStyle) {
+    setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
   }
-  bridge = null;
-  agent = null;
-  console.log('closing devtools');
-});
 
-var bridge = new Bridge(FOR_BACKEND.wall);
-var agent = new Agent(window, {
-  rnStyle: !!FOR_BACKEND.resolveRNStyle,
-});
-agent.addBridge(bridge);
+  setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
-if (FOR_BACKEND.resolveRNStyle) {
-  setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle);
+  var _connectTimeout = setTimeout(() => {
+    console.warn('react-devtools agent got no connection');
+  }, 20000);
+
+  agent.once('connected', () => {
+    if (!agent) {
+      return;
+    }
+    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
+    clearTimeout(_connectTimeout);
+  });
 }
 
-setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
-
-var _connectTimeout = setTimeout(() => {
-  console.warn('react-devtools agent got no connection');
-}, 20000);
-
-agent.once('connected', () => {
-  if (!agent) {
-    return;
-  }
-  inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
-  clearTimeout(_connectTimeout);
-});
-
+module.exports = setupBackend;

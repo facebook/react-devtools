@@ -21,9 +21,6 @@ var ReactDOM = require('react-dom');
 
 var node = null;
 var onStatusChange = function noop() {};
-
-var backendScript = fs.readFileSync(
-  path.join(__dirname, '../build/backend.js'));
 var wall = null;
 
 var config = {
@@ -59,26 +56,12 @@ function onError(e) {
 }
 
 function initialize(socket) {
-  socket.send('eval:' + backendScript);
   var listeners = [];
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
       return;
     }
     var data = JSON.parse(evt.data);
-    if (data.$close || data.$error) {
-      console.log('Closing or Erroring');
-      onDisconnected();
-      socket.onmessage = (msg) => {
-        if (msg.data === 'attach:agent') {
-          initialize(socket);
-        }
-      };
-      return;
-    }
-    if (data.$open) {
-      return; // ignore
-    }
     listeners.forEach((fn) => fn(data));
   };
 
