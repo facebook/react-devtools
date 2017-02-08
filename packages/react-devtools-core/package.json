@@ -22,6 +22,6 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "ws": "^1.1.1"
+    "ws": "^2.0.3"
   }
 }
