@@ -10,15 +10,32 @@
  */
 'use strict';
 
+type ConnectOptions = {
+  host?: string,
+  port?: number,
+  resolveRNStyle?: (style: number) => ?Object,
+};
+
 var globalHook = require('../../../backend/installGlobalHook');
-globalHook(window);
 var websocketConnect = require('../../../backend/websocketConnect');
 
-websocketConnect('ws://localhost:8097/');
-
+globalHook(window);
 if (window.document) {
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('react-devtools', agent => {
     var setupHighlighter = require('../../../frontend/Highlighter/setup');
     setupHighlighter(agent);
   });
 }
+
+function connectToDevTools(options: ?ConnectOptions) {
+  var {
+    host = 'localhost',
+    port = 8097,
+    resolveRNStyle = null,
+  } = options || {};
+  websocketConnect(host, port, resolveRNStyle);
+}
+
+module.exports = {
+  connectToDevTools
+};

@@ -2,15 +2,26 @@
 
 A standalone React DevTools implementation.  
 
-This is a low-level package.
+This is a low-level package.  
 **If you're looking for the Electron app you can run, use `react-devtools` package instead.**
 
 ## Exports
 
-## `require('react-devtools-core')`
+## `require('react-devtools-core').connectToDevTools(options)`
 
-The code that needs to run in the same context as React, and initialized before React.
-It will connect to the DevTools.
+This is similar to `require('react-devtools')` in another package but providing more control.  
+Unlike `require('react-devtools')`, it doesn't connect immediately, but exports a function.
+
+Run `connectToDevTools()` in the same context as React to set up a connection to DevTools.  
+Make sure this runs *before* any `react`, `react-dom`, or `react-native` imports.
+
+The `options` object may contain:
+
+* `host` (string), defaults to `'localhost'`.
+* `port` (number), defaults to `8097`.
+* `resolveRNStyle` (function), used by RN and `null` by default.
+
+None of the options are required.
 
 ## `require('react-devtools-core/standalone')`
 
@@ -24,4 +35,4 @@ require('react-devtools-core/standalone')
   .startServer(port);
 ```
 
-You check the Electron shell in `packages/react-devtools` for a complete integration example.
+You can check the Electron shell in `react-devtools` package for a complete integration example.

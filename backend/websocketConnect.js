@@ -10,13 +10,14 @@
  */
 'use strict';
 
-function websocketConnect(uri: string, WebSocket?: (val: string) => Object) {
-  WebSocket = WebSocket || window.WebSocket;
+function websocketConnect(host: string, port: number, resolveRNStyle: Function | null) {
   var messageListeners = [];
   var closeListeners = [];
-  var ws = new WebSocket(uri);
+  var uri = 'ws://' + host + ':' + port;
+  var ws = new window.WebSocket(uri);
   // this is accessed by the eval'd backend code
   var FOR_BACKEND = { // eslint-disable-line no-unused-vars
+    resolveRNStyle,
     wall: {
       listen(fn) {
         messageListeners.push(fn);
