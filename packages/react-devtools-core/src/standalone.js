@@ -23,6 +23,10 @@ var node = null;
 var backendScript = fs.readFileSync(
   path.join(__dirname, '../build/backend.js'));
 var wall = null;
+var loadingStatus = message => {
+  var el = document.getElementById('loading-status');
+  if (el) el.innerText = message;
+};
 
 var config = {
   reload,
@@ -137,12 +141,12 @@ function startServer(port = 8097) {
 
   httpServer.on('error', (e) => {
     onError(e);
-    document.getElementById('loading-status').innerText = 'failed to start server :/';
+    loadingStatus('failed to start server :/');
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
   httpServer.listen(port, () => {
-    document.getElementById('loading-status').innerText = 'listening on ' + port;
+    loadingStatus('listening on ' + port);
   });
 
   return {
@@ -158,6 +162,11 @@ function startServer(port = 8097) {
 var DevtoolsUI = {
   setContentDOMNode(_node) {
     node = _node;
+    return DevtoolsUI;
+  },
+
+  loadingStatus(_func) {
+    loadingStatus = _func;
     return DevtoolsUI;
   },
 
