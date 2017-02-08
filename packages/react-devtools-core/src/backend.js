@@ -53,7 +53,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   ws.onclose = handleClose;
   ws.onerror = handleClose;
   ws.onmessage = handleMessage;
-  ws.onopen = function () {
+  ws.onopen = function() {
     var wall = {
       listen(fn) {
         messageListeners.push(fn);
