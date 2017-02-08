@@ -21,6 +21,8 @@ module.exports = {
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
     filename: '[name].js',
+    library: 'ReactDevToolsBackend',
+    libraryTarget: 'umd',
   },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React

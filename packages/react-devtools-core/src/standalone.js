@@ -112,12 +112,12 @@ function startServer(port = 8097) {
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
-  var embedFile = fs.readFileSync(
-    path.join(__dirname, '../build/embed.js')
+  var backendFile = fs.readFileSync(
+    path.join(__dirname, '../build/backend.js')
   );
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
-    res.end(embedFile + '\n;ReactDevToolsEmbed.connectToDevTools();');
+    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
   });
 
   httpServer.on('error', (e) => {
