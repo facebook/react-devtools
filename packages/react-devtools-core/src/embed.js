@@ -37,5 +37,5 @@ function connectToDevTools(options: ?ConnectOptions) {
 }
 
 module.exports = {
-  connectToDevTools
+  connectToDevTools,
 };

@@ -103,7 +103,7 @@ function startServer(port = 8097) {
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
-      connected.close()
+      connected.close();
       console.warn('only one connection allowed at a time');
       console.warn('closing the previous connection');
     }
@@ -132,7 +132,7 @@ function startServer(port = 8097) {
   );
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
-    res.end(embedFile + '\n' + ';ReactDevToolsEmbed.connectToDevTools();');
+    res.end(embedFile + '\n;ReactDevToolsEmbed.connectToDevTools();');
   });
 
   httpServer.on('error', (e) => {
