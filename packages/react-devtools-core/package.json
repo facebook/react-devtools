@@ -10,7 +10,8 @@
   "files": [
     "build",
     "index.js",
-    "standalone.js"
+    "standalone.js",
+    "vendor"
   ],
   "scripts": {
     "backend": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js",
