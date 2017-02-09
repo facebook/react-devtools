@@ -56,15 +56,25 @@
     <body>
         <div id="container">
             <div id="waiting">
-                <h2>Waiting for a connection from React Native</h2>
+                <h2>Waiting for React to connect…</h2>
                 <div>
+                    <h4>React Native</h4>
+                    <div>Your app will connect automatically in a few seconds.</div>
+                    <br />
+                    <h4>React DOM</h4>
                     <div>
                         Add <input id="localhost"><br/>
                         or <input id="byip">
                     </div>
-                    <div>to the top of the page you want to debug,<br/>*before* react is loaded.</div>
-                    <div id="loading-status">starting server</div>
+                    <div>
+                        to the top of the page you want to debug,
+                        <br/>
+                        <b>before</b> importing React DOM.
+                    </div>
                 </div>
+                <br />
+                <br />
+                <div id="loading-status">Starting the server…</div>
             </div>
         </div>
         <script>

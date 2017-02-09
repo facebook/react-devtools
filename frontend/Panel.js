@@ -228,12 +228,12 @@ class Panel extends React.Component {
       // and communicate with the bridge.
       return (
         <div style={styles.loading}>
-          <h1>Connecting to React...</h1>
+          <h2>Connecting to React…</h2>
         </div>
       );
     }
     if (!this.state.isReact) {
-      return <div style={styles.loading}><h1>Looking for React...</h1></div>;
+      return <div style={styles.loading}><h2>Looking for React…</h2></div>;
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));

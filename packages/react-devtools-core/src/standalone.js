@@ -41,7 +41,7 @@ function reload() {
 
 function onDisconnected() {
   ReactDOM.unmountComponentAtNode(node);
-  node.innerHTML = '<h2 id="waiting">Waiting for a connection from React Native</h2>';
+  node.innerHTML = '<div id="waiting"><h2>Waiting for React to connect…</h2></div>';
 }
 
 function onError(e) {
@@ -52,7 +52,7 @@ function onError(e) {
   } else {
     message = `Unknown error (${e.message})`;
   }
-  node.innerHTML = `<h2 id="waiting">${message}</h2>`;
+  node.innerHTML = `<div id="waiting"><h2>${message}</h2></div>`;
 }
 
 function initialize(socket) {
@@ -133,12 +133,12 @@ function startServer(port = 8097) {
 
   httpServer.on('error', (e) => {
     onError(e);
-    onStatusChange('Failed to start the server');
+    onStatusChange('Failed to start the server.');
     restartTimeout = setTimeout(() => startServer(port), 1000);
   });
 
   httpServer.listen(port, () => {
-    onStatusChange('Listening on ' + port);
+    onStatusChange('The server is listening on the port ' + port + '.');
   });
 
   return {
