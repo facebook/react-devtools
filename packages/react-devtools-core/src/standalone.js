@@ -57,8 +57,18 @@ function onError(e) {
 
 function initialize(socket) {
   var listeners = [];
+  var isLegacyRN = false;
   socket.onmessage = (evt) => {
     if (evt.data === 'attach:agent') {
+      // <hack>
+      // TODO: This branch (and vendor/backend-1.0.6.js) can be removed when we're comfortable dropping
+      // support for RN <= 0.42 in Nuclide RN inspector. We used to send backend to RN to `eval`
+      // but in newer RN versions we just import the backend from npm package.
+      if (!isLegacyRN) {
+        isLegacyRN = true;
+        socket.send('eval:' + fs.readFileSync(path.join(__dirname, '../vendor/backend-1.0.6.js')));
+      }
+      // </hack>
       return;
     }
     var data = JSON.parse(evt.data);
