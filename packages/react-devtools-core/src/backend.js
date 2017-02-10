@@ -14,6 +14,7 @@ type ConnectOptions = {
   host?: string,
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
+  isAppActive?: () => boolean,
 };
 
 // TODO: why?
@@ -46,7 +47,20 @@ function connectToDevTools(options: ?ConnectOptions) {
     host = 'localhost',
     port = 8097,
     resolveRNStyle = null,
+    isAppActive = () => true,
   } = options || {};
+
+  function scheduleRetry() {
+    // Two seconds because RN had issues with too fast retries.
+    setTimeout(() => connectToDevTools(options), 2000);
+  }
+
+  if (!isAppActive()) {
+    // If the app is in background, maybe retry later.
+    // Don't actually attempt to connect until we're in foreground.
+    scheduleRetry();
+    return;
+  }
 
   var messageListeners = [];
   var closeListeners = [];
@@ -74,9 +88,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   function handleClose() {
     if (!hasClosed) {
       hasClosed = true;
-      setTimeout(() => {
-        connectToDevTools(options);
-      }, 2000);
+      scheduleRetry();
       closeListeners.forEach(fn => fn());
     }
   }
