@@ -1,6 +1,6 @@
 {
   "name": "react-devtools",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Use react-devtools outside of the browser",
   "repository": {
     "url": "https://github.com/facebook/react-devtools.git",
@@ -24,6 +24,6 @@
     "cross-spawn": "^5.0.1",
     "electron": "^1.4.15",
     "ip": "^1.1.4",
-    "react-devtools-core": "^2.0.2"
+    "react-devtools-core": "^2.0.3"
   }
 }
