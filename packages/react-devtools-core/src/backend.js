@@ -25,12 +25,14 @@ if (!window.performance) {
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
-var installGlobalHook = require('../../../backend/installGlobalHook.js');
+var installGlobalHook = require('../../../backend/installGlobalHook');
+var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
 
 installGlobalHook(window);
+installRelayHook(window);
 
 if (window.document) {
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('react-devtools', agent => {
