@@ -116,6 +116,8 @@ function setupBackend(wall, resolveRNStyle) {
     if (agent) {
       agent.emit('shutdown');
     }
+    // This appears necessary for plugin (e.g. Relay) cleanup.
+    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('shutdown');
     bridge = null;
     agent = null;
     console.log('closing devtools');
