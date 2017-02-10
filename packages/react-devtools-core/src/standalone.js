@@ -85,7 +85,9 @@ function initialize(socket) {
       listeners.push(fn);
     },
     send(data) {
-      socket.send(JSON.stringify(data));
+      if (socket.readyState === socket.OPEN) {
+        socket.send(JSON.stringify(data));
+      }
     },
     disconnect() {
       socket.close();
