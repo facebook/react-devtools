@@ -12,6 +12,7 @@
 var BananaSlugFrontendControl = require('../plugins/BananaSlug/BananaSlugFrontendControl');
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 var RegexFrontendControl = require('../plugins/Regex/RegexFrontendControl');
+var WrappersFrontendControl = require('../plugins/Wrappers/WrappersFrontendControl');
 var React = require('react');
 
 class SettingsPane extends React.Component {
@@ -21,6 +22,7 @@ class SettingsPane extends React.Component {
         <BananaSlugFrontendControl {...this.props} />
         <ColorizerFrontendControl {...this.props} />
         <RegexFrontendControl {...this.props} />
+        <WrappersFrontendControl {...this.props} />
       </div>
     );
   }

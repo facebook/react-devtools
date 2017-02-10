@@ -64,12 +64,16 @@ module.exports = function(options: Options, Component: any): any {
       this.state = {};
     }
 
+    componentDidMount() {
+      this._mounted = true;
+    }
+
     componentWillMount() {
       if (!this.context[storeKey]) {
         console.warn('no store on context...');
         return;
       }
-      this._update = () => this.forceUpdate();
+      this._update = () => this._mounted && this.forceUpdate();
       if (!options.listeners) {
         return;
       }
@@ -87,6 +91,7 @@ module.exports = function(options: Options, Component: any): any {
       this._listeners.forEach(evt => {
         this.context[storeKey].off(evt, this._update);
       });
+      this._mounted = false;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
