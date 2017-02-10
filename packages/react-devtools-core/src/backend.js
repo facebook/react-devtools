@@ -83,6 +83,14 @@ function connectToDevTools(options: ?ConnectOptions) {
 
   function handleMessage(evt) {
     var data;
+    // <hack>
+    // This branch can be dropped when we don't care about supporting
+    // Nuclide Inspector versions before https://github.com/facebook/nuclide/pull/1021.
+    // Inspector used to send this message but it is unnecessary now.
+    if (evt.data.indexOf('eval:') === 0) {
+      return;
+    }
+    // </hack>
     try {
       data = JSON.parse(evt.data);
     } catch (e) {
