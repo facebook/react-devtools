@@ -90,7 +90,7 @@ class Store extends EventEmitter {
   bananaslugState: ?ControlState;
   colorizerState: ?ControlState;
   regexState: ?ControlState;
-  showWrappersState: ?ControlState;
+  hideWrappersState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagSelected: boolean;

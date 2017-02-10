@@ -56,7 +56,8 @@ module.exports = function(options: Options, Component: any): any {
   var storeKey = options.store || 'store';
   class Wrapper extends React.Component {
     _listeners: Array<string>;
-    _update: () => void;
+    _update: () => boolean|void;
+    _mounted: boolean;
     state: State;
 
     constructor(props) {
