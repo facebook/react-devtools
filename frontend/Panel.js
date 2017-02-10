@@ -96,6 +96,7 @@ class Panel extends React.Component {
     if (this._unsub) {
       this._unsub();
     }
+    this.teardown();
   }
 
   pauseTransfer() {
