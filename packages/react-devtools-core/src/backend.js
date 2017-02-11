@@ -160,6 +160,4 @@ function setupBackend(wall, resolveRNStyle) {
   });
 }
 
-module.exports = {
-  connectToDevTools,
-};
+module.exports = { connectToDevTools };
