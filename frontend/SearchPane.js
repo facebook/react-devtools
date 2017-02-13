@@ -57,6 +57,7 @@ class SearchPane extends React.Component {
     if (
       e.keyCode === 191 && // forward slash
       e.target.nodeName !== 'INPUT' &&
+      !e.target.isContentEditable &&
       this.input
     ) {
       this.input.focus();
