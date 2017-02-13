@@ -154,6 +154,7 @@ function startServer(port = 8097) {
       connected = false;
       onDisconnected();
       clearTimeout(restartTimeout);
+      server.close();
       httpServer.close();
     },
   };
