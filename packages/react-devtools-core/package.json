@@ -18,7 +18,8 @@
     "backend:watch": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js --watch",
     "standalone": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.standalone.js",
     "standalone:watch": "NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.standalone.js --watch",
-    "build": "npm run backend && npm run standalone"
+    "build": "npm run backend && npm run standalone",
+    "prepublish": "npm run build"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
