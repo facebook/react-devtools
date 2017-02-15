@@ -4,6 +4,8 @@
 
 If you need to debug a React page somewhere other than Chrome on desktop (a mobile browser, an embedded webview, safari, etc), the `react-devtools` package is for you! It is also useful if your app is inside an iframe.
 
+It works both with React DOM and React Native.
+
 ## Usage
 
 Install the package:
@@ -24,6 +26,10 @@ Add a script to your `package.json`:
 Now run `npm run devtools` to launch the standalone DevTools app.
 
 The final step depends on your rendering target.
+
+### React Native
+
+You don't need to do anything else. Just make sure your app is running in foreground in the simulator, and DevTools will connect to it.
 
 ### React DOM
 
