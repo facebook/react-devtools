@@ -15,7 +15,7 @@ The official extensions represent the current stable release.
 
 - [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 - [Firefox extension](https://addons.mozilla.org/firefox/addon/react-devtools/)
-- Standalone app (coming soon)
+- [Standalone app (supports React Native too!)](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md)
 
 Opera users can [enable Chrome extensions](https://addons.opera.com/extensions/details/download-chrome-extension-9/) and then install the [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
 
@@ -30,6 +30,10 @@ Tools or use a pre-prelease version.
 ### Supporting tools
 
 - The babel plugin [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source) is required if you want react devtools to tell you the source file & line number of created react elements. Its display is in the bottom of the right panel if the information is present.
+
+### React Native
+
+There is a [standalone version](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md) that works with React Native.
 
 ### Tree View
 
