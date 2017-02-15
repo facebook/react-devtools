@@ -26,11 +26,6 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent) {
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent.emit('shutdown');
 }
 
-// TODO: check to see if we're in RN before doing this?
-setInterval(function() {
-  // this is needed to force refresh on react native
-}, 100);
-
 window.addEventListener('message', welcome);
 function welcome(evt) {
   if (evt.data && evt.data.source !== 'react-devtools-reporter') {
