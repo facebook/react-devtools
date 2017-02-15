@@ -132,7 +132,7 @@ function installRelayHook(window: Object) {
 
   var _relayInternals = null;
   Object.defineProperty(hook, '_relayInternals', ({
-    writable: true,
+    configurable: true,
     set: function(relayInternals) {
       _relayInternals = instrumentRelayRequests(relayInternals);
     },
