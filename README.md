@@ -64,18 +64,15 @@ For other shells (Chrome, Firefox, etc.), see the respective directories in `/sh
 
 ### The React Tab Doesn't Show Up
 
-The "React" tab won't show up if React can't communicate with the
-devtools. When the page loads, the devtools sets a global named
-`__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that
-hook during initialization.
+If you are running your app from `file://` URL, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page.
 
-(In React 0.11 and older, it was necessary to expose a global called `React`
-for the devtools to function.)
+The "React" tab won't show up if the site doesn't use React, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization.
 
-You can test this on the [React website](http://facebook.github.io/react/)
-or by inspecting [Facebook](https://www.facebook.com/).
+You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
 
-Currently iframes and Chrome apps/extensions are not inspectable.
+If your app is inside an iframe, using React Native, or in another unusual environment, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools).
+
+Chrome apps/extensions are currently not inspectable.
 
 ### Does "Trace React Updates" trace renders?
 
