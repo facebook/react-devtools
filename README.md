@@ -70,9 +70,9 @@ The "React" tab won't show up if the site doesn't use React, or if React can't c
 
 You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
 
-If your app is inside an iframe, using React Native, or in another unusual environment, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools).
+If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools).
 
-Chrome apps/extensions are currently not inspectable.
+Chrome apps are currently not inspectable.
 
 ### Does "Trace React Updates" trace renders?
 
