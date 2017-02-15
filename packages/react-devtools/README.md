@@ -45,6 +45,7 @@ And **don't forget to remove the import before shipping to production!**
 
 ## Advanced
 
+By default DevTools listen to port `8097` on `localhost`.  
 If you need to customize host, port, or other settings, see the `react-devtools-core` package instead.
 
 ## Developing
