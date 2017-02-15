@@ -73,7 +73,7 @@ class Node extends React.Component {
 
     if (node.get('nodeType') === 'Wrapper') {
       return (
-        <span>
+        <span style={styles.wrappedNodeContainer}>
           {children.map(child =>
             <WrappedNode key={child} id={child} depth={this.props.depth} />
           )}
@@ -297,7 +297,12 @@ var styles = {
   // TODO(jared): how do people feel about empty style rules? I put them here
   // in case we need them later, and the corresponding divs refernce them. But
   // I could remove them if desired.
+  wrappedNodeContainer: {
+    display: 'flex',
+  },
+
   container: {
+    flex: '1',
   },
 
   children: {
