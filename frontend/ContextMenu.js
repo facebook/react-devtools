@@ -137,17 +137,23 @@ var styles = {
   container: {
     position: 'fixed',
     backgroundColor: 'white',
-    boxShadow: '0 3px 5px #ccc',
+    boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
     listStyle: 'none',
     margin: 0,
-    padding: 0,
-    fontFamily: 'sans-serif',
-    fontSize: 14,
+    padding: '4px 0',
+    fontSize: 13,
+    borderRadius: '3px',
+    overflow: 'hidden',
+    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
+    zIndex:1,
   },
 
   item: {
-    padding: '5px 10px',
-    cursor: 'pointer',
+    padding: '3px 10px',
+    cursor: 'default',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    userSelect: 'none',
   },
 
   empty: {
