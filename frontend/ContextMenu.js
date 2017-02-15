@@ -141,11 +141,11 @@ var styles = {
     listStyle: 'none',
     margin: 0,
     padding: '4px 0',
-    fontSize: 13,
+    fontSize: 14,
     borderRadius: '3px',
     overflow: 'hidden',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
-    zIndex:1,
+    zIndex: 1,
   },
 
   item: {
