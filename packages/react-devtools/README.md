@@ -1,4 +1,4 @@
-# `npm install react-devtools`
+# `react-devtools`
 
 ## Why use this?
 If you need to debug a react page somewhere other than Chrome on desktop (a
