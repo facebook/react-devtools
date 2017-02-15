@@ -6,8 +6,10 @@ This shell lets you use react devtools as a firefox devtools extension.
 ## Installation
 
 - `npm install -g jpm`
-- `webpack` or `webpack --watch`
-- `jpm run --debug`
+- `npm install` in the repo root folder
+- `./build.sh`
+
+This will produce an `xpi` file. You can load it in Firefox via Addons > gear icon > Debug Addons > Load Temporary Addon.
 
 ## Hacking
 
