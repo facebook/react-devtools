@@ -92,7 +92,7 @@ class PropState extends React.Component {
     return (
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
-        hint={'(' + this.props.$r + ' in the console)'}>
+        hint="($r in the console)">
         {key &&
           <DetailPaneSection
             title="Key"
@@ -187,7 +187,6 @@ var WrappedPropState = decorate({
         store.showContextMenu('attr', e, store.selected, node, val, path, name);
       },
       inspect: store.inspect.bind(store, store.selected),
-      $r: store.capabilities.$r,
     };
   },
 }, PropState);

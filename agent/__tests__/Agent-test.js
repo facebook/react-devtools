@@ -14,24 +14,35 @@ var Agent = require('../Agent');
 
 describe('Agent', () => {
 
-  it('does not overwrite existing global $r', () => {
-    const instance = new Agent({
-      $r: 'exists',
-    });
-    const expected = '$$r';
-    const actual = instance._getGlobalRName();
-    expect(actual).toBe(expected);
+  const publicInstance1 = {};
+  const publicInstance2 = {};
+  let agent;
+  beforeEach(() => {
+    agent = new Agent({});
+    agent.elementData.set('test1', { publicInstance: publicInstance1 });
+    agent.elementData.set('test2', { publicInstance: publicInstance2 });
   });
 
-  it('it finds a suitable $r name when there are multiple conflicts', () => {
-    const instance = new Agent({
-      $r: 'exists',
-      $$r: 'exists',
-      $$$r: 'exists',
-    });
-    const expected = '$$$$r';
-    const actual = instance._getGlobalRName();
-    expect(actual).toBe(expected);
+  it('sets global $r if it is not set', () => {
+    delete agent.global.$r;
+    agent.emit('selected', 'test1');
+    expect(agent.global.$r).toBe(publicInstance1);
+  });
+
+  it('overwrites global $r if it was last set by itself', () => {
+    agent.emit('selected', 'test1');
+    expect(agent.global.$r).toBe(publicInstance1);
+    agent.emit('selected', 'test2');
+    expect(agent.global.$r).toBe(publicInstance2);
+  });
+
+  it('does not overwrite global $r if was not last set by itself', () => {
+    agent.emit('selected', 'test1');
+    expect(agent.global.$r).toBe(publicInstance1);
+    agent.global.$r = 'set externally';
+    expect(agent.global.$r).toBe('set externally');
+    agent.emit('selected', 'test1');
+    expect(agent.global.$r).toBe('set externally');
   });
 
 });
