@@ -36,7 +36,7 @@ You don't need to do anything else. Just make sure your app is running in foregr
 Add `import 'react-devtools'` to the top of your entry file.
 
 ```js
-import 'react-devtools';
+import 'react-devtools'; // Put it first!
 import ReactDOM from 'react-dom';
 ```
 
