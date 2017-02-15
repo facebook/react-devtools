@@ -24,6 +24,11 @@ module.exports = {
     path: __dirname + '/data/build',
     filename: '[name].js',
   },
+  // Mozilla prefers that vendor files are separated
+  externals: {
+    'react': 'React',
+    'react-dom': 'ReactDOM',
+  },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
     new webpack.DefinePlugin({
