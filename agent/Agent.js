@@ -103,10 +103,12 @@ class Agent extends EventEmitter {
     this.elementData = new Map();
     this.roots = new Set();
     this.reactInternals = {};
+    var lastSelected;
     this.on('selected', id => {
       var data = this.elementData.get(id);
-      if (data && data.publicInstance) {
+      if (data && data.publicInstance && this.global.$r === lastSelected) {
         this.global.$r = data.publicInstance;
+        lastSelected = data.publicInstance;
       }
     });
     this._prevSelected = null;
