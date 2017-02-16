@@ -52,13 +52,16 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 
 ![](/images/devtools-side-pane.gif)
 
-## For Hacking
+## Contributing
+
 For changes that don't directly involve Chrome/Firefox/etc. APIs, there is a
 "plain" shell that just renders the devtools into an html page along with a
 TodoMVC test app. This is by far the quickest way to develop. Check out
 [the Readme.md](/shells/plain) in `/shells/plain` for info.
 
 For other shells (Chrome, Firefox, etc.), see the respective directories in `/shells`.
+
+For a list of good contribution opportunities, check the [good first bug](https://github.com/facebook/react-devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+bug%22) label. We're happy to answer any questions on those issues!
 
 ## FAQ
 
