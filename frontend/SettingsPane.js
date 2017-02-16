@@ -31,6 +31,7 @@ var styles = {
     backgroundColor: '#efefef',
     padding: '2px 4px',
     display: 'flex',
+    flexWrap: 'wrap',
     flexShrink: 0,
     position: 'relative',
   },
