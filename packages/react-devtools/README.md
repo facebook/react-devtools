@@ -53,3 +53,10 @@ If you need to customize host, port, or other settings, see the `react-devtools-
 * Run `npm run backend:watch` and `npm run standalone:watch` in `../react-devtools-core`
 * Run `npm start` in this folder
 * Refresh the app after it has recompiled on change
+
+### React Native
+
+React Native uses `react-devtools-core` as a dependency.
+Unfortunately, due to RN Packager aggressive caching of `node_modules`, it is very inconvenient to develop against it.
+
+The way I do it is by changing [this require](https://github.com/facebook/react-native/blob/167ac4993ab86d15eabc2094f2749818b7659ebc/Libraries/Core/Devtools/setupDevtools.js#L18) to be relative, and then running [`watch-and-rsync`](https://www.npmjs.com/package/watch-and-rsync)` -o=start -s=../react-devtools-core -t=~/<YOUR PATH TO PROJECT DIR>/react-native/Libraries/Core/Devtools/react-devtools-core`. This circumvents RN Packager caching, and if you are also runing `npm run backend:watch` in `../react-devtools-core`, rebuilds on each change.
