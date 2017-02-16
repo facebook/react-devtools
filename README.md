@@ -22,7 +22,7 @@ Opera users can [enable Chrome extensions](https://addons.opera.com/extensions/d
 If you inspect an element or launch the developer tools on a React page, you
 should see an extra tab called **React** in the inspector.
 
-Check out [For Hacking](#for-hacking) if you want to develop the Developer
+Check out [Contributing](#contributing) if you want to develop the Developer
 Tools or use a pre-prelease version.
 
 ## Usage
