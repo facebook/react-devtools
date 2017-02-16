@@ -298,6 +298,7 @@ var styles = {
   // in case we need them later, and the corresponding divs refernce them. But
   // I could remove them if desired.
   container: {
+    flexShrink: 0,
   },
 
   children: {

@@ -54,13 +54,15 @@ class TreeView extends React.Component {
       } else {
         return (
           <div style={styles.container}>
-            <span>
+            <div ref={n => this.node = n} style={styles.scroll}>
+              <div style={styles.scrollContents}>
               Waiting for roots to load...
               {this.props.reload &&
                 <span>
                   to reload the inspector <button onClick={this.props.reload}> click here</button>
                 </span>}
-            </span>
+              </div>
+            </div>
           </div>
         );
       }
@@ -69,10 +71,14 @@ class TreeView extends React.Component {
     if (this.props.searching && this.props.roots.count() > MAX_SEARCH_ROOTS) {
       return (
         <div style={styles.container}>
-          {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
-            <Node key={id} id={id} depth={0} />
-          )).toJS()}
-          <span>Some results not shown. Narrow your search criteria to find them</span>
+          <div ref={n => this.node = n} style={styles.scroll}>
+            <div style={styles.scrollContents}>
+              {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
+                <Node key={id} id={id} depth={0} />
+              )).toJS()}
+              <span>Some results not shown. Narrow your search criteria to find them</span>
+            </div>
+          </div>
         </div>
       );
     }
@@ -80,9 +86,11 @@ class TreeView extends React.Component {
     return (
       <div style={styles.container}>
         <div ref={n => this.node = n} style={styles.scroll}>
-          {this.props.roots.map(id => (
-            <Node key={id} id={id} depth={0} />
-          )).toJS()}
+          <div style={styles.scrollContents}>
+            {this.props.roots.map(id => (
+              <Node key={id} id={id} depth={0} />
+            )).toJS()}
+          </div>
         </div>
         <Breadcrumb />
       </div>
@@ -108,11 +116,21 @@ var styles = {
     MozUserSelect: 'none',
     userSelect: 'none',
   },
+
   scroll: {
     padding: '3px 0',
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
+    display: 'flex',
+    alignItems: 'flex-start',
+  },
+
+  scrollContents: {
+    flexDirection: 'column',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'stretch',
   },
 };
 
