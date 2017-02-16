@@ -102,7 +102,7 @@ var styles = {
   leftPane: {
     display: 'flex',
     marginRight: -3,
-    minWidth: 0,
+    minWidth: '255px',
     flex: 1,
   },
 };

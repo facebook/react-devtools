@@ -167,7 +167,7 @@ var styles = {
   input: {
     flex: 1,
     fontSize: '18px',
-    padding: '5px 10px',
+    padding: '5px 0px 5px 10px',
     border: 'none',
     transition: 'border-top-color .2s ease, background-color .2s ease',
     borderTop: '1px solid #ccc',
