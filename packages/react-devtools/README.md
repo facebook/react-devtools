@@ -1,10 +1,10 @@
 # `react-devtools`
 
-## Why use this?
-
 If you need to debug a React page somewhere other than Chrome on desktop (a mobile browser, an embedded webview, safari, etc), the `react-devtools` package is for you! It is also useful if your app is inside an iframe.
 
 It works both with React DOM and React Native.
+
+<img src="http://i.imgur.com/OZxWlyw.png" width="500" alt="Screenshot of React DevTools running with React Native">
 
 ## Usage
 
