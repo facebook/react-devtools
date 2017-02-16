@@ -78,12 +78,11 @@ var DEFAULT_MENU_ITEMS = {
     return items;
   },
   attr: (id, node, val, path, name, store) => {
-    var items = [{
+    return [{
       key: 'storeAsGlobal',
       title: 'Store as global variable',
       action: () => store.makeGlobal(id, path),
     }];
-    return items;
   },
 };
 
@@ -92,7 +91,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     minWidth: 0,
-    backgroundColor: '#fff',
+    backgroundColor: 'white',
   },
 };
 

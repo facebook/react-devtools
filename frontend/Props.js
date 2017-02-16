@@ -16,10 +16,7 @@ var PropVal = require('./PropVal');
 class Props extends React.Component {
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
-    if (nextProps === this.props) {
-      return false;
-    }
-    return true;
+    return nextProps !== this.props;
   }
 
   render() {
