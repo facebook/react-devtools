@@ -37,10 +37,11 @@ class DataView extends React.Component {
 
   render() {
     var data = this.props.data;
+    var isArray = Array.isArray(data);
     if (!data) {
       return <div style={styles.missing}>null</div>;
     }
-    var names = Object.keys(data);
+    var names = !isArray ? Object.keys(data) : [...data.keys()];
     if (!this.props.noSort) {
       names.sort(alphanumericSort);
     }
@@ -48,7 +49,7 @@ class DataView extends React.Component {
     if (!names.length) {
       return (
         <div style={styles.empty}>
-          {Array.isArray(data) ? 'Empty array' : 'Empty object'}
+          {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
     }
