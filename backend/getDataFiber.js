@@ -94,6 +94,19 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       } else {
         children = [];
       }
+      if (typeof fiber.stateNode.setNativeProps === 'function') {
+        // For editing styles in RN
+        updater = {
+          setState() {},
+          forceUpdate() {},
+          setInState() {},
+          setInContext() {},
+          setInProps(path: Array<string | number>, value: any) {
+            const props = copyWithSet(fiber.memoizedProps, path, value);
+            fiber.stateNode.setNativeProps(props);
+          },
+        };
+      }
       break;
     case HostText:
       nodeType = 'Text';
