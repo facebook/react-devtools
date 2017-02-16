@@ -80,7 +80,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       break;
     case HostComponent:
       nodeType = 'Native';
-      name = fiber.type;
+      name = typeof fiber.type === 'string' ?
+        fiber.type :
+        // Necessary for React Native Fiber if host types are not strings.
+        // https://github.com/facebook/react/pull/9013
+        getDisplayName(fiber.type);
       props = fiber.memoizedProps;
       if (
         typeof props.children === 'string' ||
