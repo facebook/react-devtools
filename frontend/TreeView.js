@@ -113,6 +113,7 @@ var styles = {
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
+    display: 'flex',
   },
 };
 
