@@ -98,13 +98,8 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       if (typeof fiber.stateNode.setNativeProps === 'function') {
         // For editing styles in RN
         updater = {
-          setState() {},
-          forceUpdate() {},
-          setInState() {},
-          setInContext() {},
-          setInProps(path: Array<string | number>, value: any) {
-            const props = copyWithSet(fiber.memoizedProps, path, value);
-            fiber.stateNode.setNativeProps(props);
+          setNativeProps(nativeProps) {
+            fiber.stateNode.setNativeProps(nativeProps);
           },
         };
       }
@@ -151,7 +146,14 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
 }
 
 function setInProps(fiber, path: Array<string | number>, value: any) {
-  fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
+  const inst = fiber.stateNode;
+  fiber.pendingProps = copyWithSet(inst.props, path, value);
+  if (fiber.alternate) {
+    // We don't know which fiber is the current one because DevTools may bail out of getDataFiber() call,
+    // and so the data object may refer to another version of the fiber. Therefore we update pendingProps
+    // on both. I hope that this is safe.
+    fiber.alternate.pendingProps = fiber.pendingProps;
+  }
   fiber.stateNode.forceUpdate();
 }
 
