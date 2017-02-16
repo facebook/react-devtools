@@ -120,6 +120,20 @@ function getData(internalInstance: Object): DataType {
     }
   }
 
+  if (typeof element.setNativeProps === 'function') {
+    // For editing styles in RN
+    updater = {
+      setState() {},
+      forceUpdate() {},
+      setInState() {},
+      setInContext() {},
+      setInProps(path: Array<string | number>, value: any) {
+        const props = copyWithSet(element._currentElement.props, path, value);
+        element.setNativeProps(props);
+      },
+    }
+  }
+
   return {
     nodeType,
     type,

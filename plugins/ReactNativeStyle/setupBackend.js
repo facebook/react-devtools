@@ -94,6 +94,13 @@ function shallowClone(obj) {
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[newName]: val};
+  if (!data) {
+    return;
+  }
+  // <hack>
+  // We can remove this when we stop supporting RN versions
+  // before https://github.com/facebook/react-devtools/pull/528.
+  // Newer versions just use the same `updater` path for native updates.
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
@@ -103,6 +110,7 @@ function renameStyle(agent, id, oldName, newName, val) {
     }
     return;
   }
+  // </hack>
   var style = data && data.props && data.props.style;
   var customStyle;
   if (Array.isArray(style)) {
@@ -135,6 +143,13 @@ function renameStyle(agent, id, oldName, newName, val) {
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
+  if (!data) {
+    return;
+  }
+  // <hack>
+  // We can remove this when we stop supporting RN versions
+  // before https://github.com/facebook/react-devtools/pull/528.
+  // Newer versions just use the same `updater` path for native updates.
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
@@ -144,6 +159,7 @@ function setStyle(agent, id, attr, val) {
     }
     return;
   }
+  // </hack>
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
     if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
