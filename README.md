@@ -63,6 +63,9 @@ For other shells (Chrome, Firefox, etc.), see the respective directories in `/sh
 
 For a list of good contribution opportunities, check the [good first bug](https://github.com/facebook/react-devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+bug%22) label. We're happy to answer any questions on those issues!
 
+To read more about the community and guidelines for submitting pull requests,
+please read the [Contributing document](CONTRIBUTING.md).
+
 ## FAQ
 
 ### The React Tab Doesn't Show Up
@@ -106,7 +109,3 @@ What to do if the extension breaks.
 - open `chrome://extensions`, find react devtools, and click "background page"
     under "Inspected views". You might find the errors there.
 
-## Contributing
-
-To read more about the community and guidelines for submitting pull requests,
-please read the [Contributing document](CONTRIBUTING.md).
