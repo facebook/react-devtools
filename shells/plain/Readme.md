@@ -18,7 +18,9 @@ Here's an overview of how things work:
 - the inspection target script is added to the iframe (from `/test/example/`)
 - the devtools backend is added to the iframe
 
-And yes, you can use this to inspect the inspector :) but you'll have to serve `index.html` through a web server (opening the file directly won't cut it).
+And yes, you can use this to inspect the inspector :) but you'll have either 
+to enable file access for your browser's extension or to serve `index.html` through 
+a web server.
 
 For example, using a well-known, simple node server:
 
@@ -27,4 +29,5 @@ npm i -g http-server
 http-server
 ```
 
-browse to `localhost:8080` and inspect the inspector with the browser's extension. Inception!
+browse to `localhost:8080` and inspect the inspector with the browser's extension. 
+Inception!
