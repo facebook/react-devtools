@@ -65,19 +65,20 @@ class Container extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
+    clearTimeout(resizeTimeout);
   }
 
   handleResize = (e: Event) => {
     if (!resizeTimeout) {
-      resizeTimeout = setTimeout(this.handleResizeTimeout, 50, this, e);
+      resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
     }
   }
 
-  handleResizeTimeout(scope: Container, e: Event) {
+  handleResizeTimeout = () => {
     resizeTimeout = null;
 
-    scope.setState({
-      isVertical: (e.target.innerWidth < IS_VERTICAL_BREAKPOINT),
+    this.setState({
+      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
     });
   }
 

@@ -50,12 +50,10 @@ class SplitPane extends React.Component {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.isVertical !== this.props.isVertical) {
-      if (nextProps.isVertical && !this.props.isVertical) {
-        this.setState({width: '100%'});
-      } else if (!nextProps.isVertical && this.props.isVertical) {
-        this.setState({height: '100%'});
-      }
+    if (nextProps.isVertical && !this.props.isVertical) {
+      this.setState({width: '100%'});
+    } else if (!nextProps.isVertical && this.props.isVertical) {
+      this.setState({height: '100%'});
     }
   }
 
