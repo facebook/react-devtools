@@ -18,4 +18,5 @@ Here's an overview of how things work:
 - the inspection target script is added to the iframe (from `/test/example/`)
 - the devtools backend is added to the iframe
 
-And yes, you can use this to inspect the inspector :)
+And yes, you can use this to inspect the inspector :) but remember to enable 
+file access for your browser's react-devtools extension.
