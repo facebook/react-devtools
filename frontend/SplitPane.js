@@ -97,6 +97,7 @@ var styles = {
   rightPane: {
     display: 'flex',
     marginLeft: -3,
+    padding: 5,
   },
 
   leftPane: {
