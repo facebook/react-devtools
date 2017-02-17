@@ -61,11 +61,15 @@ class DataView extends React.Component {
   render() {
     var data = this.props.data;
     if (!data) {
-        return <div style={styles.missing}>null</div>;
+      return <div style={styles.missing}>null</div>;
     }
 
     var isArray = Array.isArray(data);
-    var isSparseArray = isArray && data.length !== data.reduce(acc => ++acc);
+    if (isArray) {
+      var itemCounter = 0;
+      data.forEach(() => ++itemCounter);
+    }
+    var isSparseArray = isArray && data.length !== itemCounter;
     var names = !isSparseArray ? Object.keys(data) : this.parseSparseArray(data);
     if (!this.props.noSort && !isSparseArray) {
       names.sort(alphanumericSort);
@@ -99,6 +103,7 @@ class DataView extends React.Component {
             name={name}
             path={path.concat([name])}
             key={i}
+            isSparseArrayFiller={isSparseArray && this.props.data[name] === undefined}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
@@ -114,6 +119,7 @@ class DataView extends React.Component {
 class DataItem extends React.Component {
   props: {
     path: Array<string>,
+    isSparseArrayFiller?: boolean,
     inspect: Inspect,
     showMenu: ShowMenu,
     startOpen?: boolean,
@@ -223,21 +229,27 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={assign({}, styles.name, complex && styles.complexName)}
+            style={assign({},
+              styles.name,
+              complex && styles.complexName,
+              this.props.isSparseArrayFiller && styles.sparseArrayFiller)
+            }
             onClick={this.toggleOpen.bind(this)}
           >
-            {this.props.name}:
+            {this.props.name}{!this.props.isSparseArrayFiller && ':'}
           </div>
-          <div
-            onContextMenu={e => {
-              if (typeof this.props.showMenu === 'function') {
-                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
-              }
-            }}
-            style={styles.preview}
-          >
-            {preview}
-          </div>
+          {!this.props.isSparseArrayFiller && (
+            <div
+              onContextMenu={e => {
+                if (typeof this.props.showMenu === 'function') {
+                  this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+                }
+              }}
+              style={styles.preview}
+            >
+              {preview}
+            </div>
+          )}
         </div>
         {children}
       </li>
@@ -314,6 +326,10 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 3px',
+  },
+
+  sparseArrayFiller: {
+    fontStyle: 'italic',
   },
 
   complexName: {
