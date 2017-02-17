@@ -35,16 +35,42 @@ type DataViewProps = {
 class DataView extends React.Component {
   props: DataViewProps;
 
+  parseSparseArray(arr) {
+    var acc = [];
+    var length = arr.length;
+    var numOfUndefsInRow = 0;
+    var pushUndefValsNumber = () => acc.push('undefined x ' + numOfUndefsInRow);
+
+    for (var i = 0; i < length; ++i) {
+      if (arr[i] === undefined) {
+        numOfUndefsInRow++;
+        if (i === length - 1) {
+          pushUndefValsNumber();
+        }
+      } else {
+        if (numOfUndefsInRow) {
+          pushUndefValsNumber();
+        }
+        numOfUndefsInRow = 0;
+        acc.push(i);
+      }
+    }
+    return acc;
+  }
+
   render() {
     var data = this.props.data;
-    var isArray = Array.isArray(data);
     if (!data) {
-      return <div style={styles.missing}>null</div>;
+        return <div style={styles.missing}>null</div>;
     }
-    var names = !isArray ? Object.keys(data) : [...data.keys()];
-    if (!this.props.noSort) {
+
+    var isArray = Array.isArray(data);
+    var isSparseArray = isArray && data.length !== data.reduce(acc => ++acc);
+    var names = !isSparseArray ? Object.keys(data) : this.parseSparseArray(data);
+    if (!this.props.noSort && !isSparseArray) {
       names.sort(alphanumericSort);
     }
+
     var path = this.props.path;
     if (!names.length) {
       return (
@@ -72,7 +98,7 @@ class DataView extends React.Component {
           <DataItem
             name={name}
             path={path.concat([name])}
-            key={name}
+            key={i}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
