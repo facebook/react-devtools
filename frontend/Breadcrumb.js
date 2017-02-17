@@ -24,6 +24,7 @@ class Breadcrumb extends React.Component {
     super(props);
     this.state = { hovered: null };
   }
+
   handleCrumbMouseOver(id) {
     this.setState({ hovered: id });
     this.props.hover(id, true);
