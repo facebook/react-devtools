@@ -21,13 +21,18 @@ type Props = {
   left: () => React$Element,
   right: () => React$Element,
   initialWidth: number,
+  initialHeight: number,
+  isVertical: bool,
 };
 
-type DefaultProps = {};
+type DefaultProps = {
+  isVertical: true,
+};
 
 type State = {
   moving: boolean,
   width: number,
+  height: number,
 };
 
 class SplitPane extends React.Component {
@@ -39,30 +44,45 @@ class SplitPane extends React.Component {
     super(props);
     this.state = {
       moving: false,
-      width: props.initialWidth,
+      width: (props.isVertical) ? '100%' : props.initialWidth,
+      height: (!props.isVertical) ? '100%' : props.initialHeight,
     };
   }
 
-  onMove(x: number) {
+  componentWillReceiveProps(nextProps: Props) {
+    this.setState({
+      width: (nextProps.isVertical) ? '100%' : this.state.width,
+      height: (!nextProps.isVertical) ? '100%' : this.state.height,
+    });
+  }
+
+  onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
     this.setState({
-      width: (node.offsetLeft + node.offsetWidth) - x,
+      width: (this.props.isVertical) ? '100%' : (node.offsetLeft + node.offsetWidth) - x,
+      height: (!this.props.isVertical) ? '100%' : (node.offsetTop + node.offsetHeight) - y,
     });
   }
 
   render() {
     var rightStyle = assign({}, styles.rightPane, {
       width: this.state.width,
+      height: this.state.height,
+      marginLeft: (this.props.isVertical) ? 0 : -3,
     });
+
+    var containerStyles = (this.props.isVertical) ? styles.containerVertical : styles.container;
+    var draggerStyles = (this.props.isVertical) ? styles.draggerVertical : styles.dragger;
+
     return (
-      <div style={styles.container}>
+      <div style={containerStyles}>
         <div style={styles.leftPane}>
           {this.props.left()}
         </div>
         <Draggable
-          style={styles.dragger}
+          style={draggerStyles}
           onStart={() => this.setState({moving: true})}
-          onMove={x => this.onMove(x)}
+          onMove={(x, y) => this.onMove(x, y)}
           onStop={() => this.setState({moving: false})}>
           <div style={styles.draggerInner} />
         </Draggable>
@@ -81,9 +101,24 @@ var styles = {
     flex: 1,
   },
 
+  containerVertical: {
+    display: 'flex',
+    minWidth: 0,
+    flex: 1,
+    flexDirection: 'column',
+  },
+
   dragger: {
     padding: '0 3px',
     cursor: 'ew-resize',
+    position: 'relative',
+    zIndex: 1,
+  },
+
+  draggerVertical: {
+    backgroundColor: '#efefef',
+    padding: '3px 0',
+    cursor: 'ns-resize',
     position: 'relative',
     zIndex: 1,
   },
@@ -97,13 +132,17 @@ var styles = {
   rightPane: {
     display: 'flex',
     marginLeft: -3,
+    minWidth: 100,
+    minHeight: 100,
   },
 
   leftPane: {
     display: 'flex',
     marginRight: -3,
-    minWidth: '255px',
+    minWidth: 255,
+    minHeight: 100,
     flex: 1,
+    borderBottom: '1px solid #ccc',
   },
 };
 

@@ -19,6 +19,12 @@ var TabbedPane = require('./TabbedPane');
 
 import type MenuItem from './ContextMenu';
 
+type Props = {};
+
+type State = {
+  isVertical: boolean,
+};
+
 class Container extends React.Component {
   props: {
     reload: () => void,
@@ -37,14 +43,42 @@ class Container extends React.Component {
     },
     extraTabs: {[key: string]: () => React$Element},
   };
+  state: State;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      isVertical: (window.innerWidth < 500),
+    };
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', (e) => this.handleResize(e), false);
+    this.setState({
+      isVertical: (window.innerWidth < 500),
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize');
+  }
+
+  handleResize(e) {
+    this.setState({
+      isVertical: (e.target.innerWidth < 500),
+    });
+  }
 
   render() {
     var tabs = {
       Elements: () => (
         <SplitPane
           initialWidth={300}
+          initialHeight={300}
           left={() => <SearchPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
+          isVertical={this.state.isVertical}
         />
       ),
       ...this.props.extraTabs,
