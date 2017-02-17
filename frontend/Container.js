@@ -67,13 +67,13 @@ class Container extends React.Component {
     window.removeEventListener('resize', this.handleResize);
   }
 
-  handleResize = (e: Object) => {
+  handleResize = (e: Event) => {
     if (!resizeTimeout) {
       resizeTimeout = setTimeout(this.handleResizeTimeout, 50, this, e);
     }
   }
 
-  handleResizeTimeout(scope: Object, e: Object) {
+  handleResizeTimeout(scope: Container, e: Event) {
     resizeTimeout = null;
 
     scope.setState({
