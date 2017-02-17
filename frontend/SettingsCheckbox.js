@@ -78,16 +78,17 @@ class SettingsCheckbox extends React.Component {
 var styles = {
   checkbox: {
     pointerEvents: 'none',
+    margin: '0 5px 0 0',
   },
   container: {
     WebkitUserSelect: 'none',
     cursor: 'pointer',
     display: 'inline-block',
-    fontFamily: 'arial',
     fontSize: '12px',
     outline: 'none',
+    fontFamily: 'sans-serif',
     userSelect: 'none',
-    margin: '0px 4px',
+    margin: '0 10px 10px 0',
   },
 };
 
