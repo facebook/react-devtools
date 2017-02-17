@@ -86,9 +86,6 @@ class Store extends EventEmitter {
   _eventQueue: Array<string>;
   _eventTimer: ?number;
 
-  // pinned components
-  _pinnedComponents: Array<string>;
-
   // Public state
   bananaslugState: ?ControlState;
   colorizerState: ?ControlState;
@@ -98,6 +95,8 @@ class Store extends EventEmitter {
   isBottomTagSelected: boolean;
   placeholderText: string;
   refreshSearch: boolean;
+  // pinned components
+  pinnedComponents: Array<string>;
   roots: List;
   searchRoots: ?List;
   searchText: string;
@@ -109,13 +108,14 @@ class Store extends EventEmitter {
     scroll?: boolean,
   };
 
+
   constructor(bridge: Bridge) {
     super();
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
-    this._pinnedComponents = [];
+    this.pinnedComponents = [];
 
     // Public state
     this.roots = new List();
@@ -502,25 +502,27 @@ class Store extends EventEmitter {
 
   // pin component
   pinComponent(componentId: string): void {
-    this._pinnedComponents.push(componentId);
+    this.pinnedComponents.push(componentId);
+    this.emit('pinComponent');
   }
 
   // remove pinned component
   unpinComponent(componentId: string): void {
-    const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
+    const foundIndex = this.pinnedComponents.findIndex(id => id === componentId);
     if (foundIndex === -1) {
       return;
     }
 
-    this._pinnedComponents = [
-      ...this._pinnedComponents.slice(0, foundIndex),
-      ...this._pinnedComponents.slice(foundIndex + 1, this._pinnedComponents.length),
+    this.pinnedComponents = [
+      ...this.pinnedComponents.slice(0, foundIndex),
+      ...this.pinnedComponents.slice(foundIndex + 1, this.pinnedComponents.length),
     ];
+    this.emit('unpinComponent');
   }
 
   // is pinned component
   checkPinnedComponent(componentId: string): boolean {
-    const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
+    const foundIndex = this.pinnedComponents.findIndex(id => id === componentId);
     return foundIndex !== -1;
   }
 

@@ -16,6 +16,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
+var PinnedComponents = require('./PinnedComponents');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
@@ -94,7 +95,7 @@ class SearchPane extends React.Component {
     return (
       <div style={styles.container}>
         <SettingsPane />
-        Khang was here 
+        <PinnedComponents />
         ---\\n
         <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
