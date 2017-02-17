@@ -501,12 +501,12 @@ class Store extends EventEmitter {
   }
 
   // pin component
-  pin(componentId: string): void {
+  pinComponent(componentId: string): void {
     this._pinnedComponents.push(componentId);
   }
 
   // remove pinned component
-  unpin(componentId: string): void {
+  unpinComponent(componentId: string): void {
     const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
     if (foundIndex === -1) {
       return;
@@ -519,7 +519,7 @@ class Store extends EventEmitter {
   }
 
   // is pinned component
-  isPinnedComponent(componentId: string): boolean {
+  checkPinnedComponent(componentId: string): boolean {
     const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
     return foundIndex !== -1;
   }

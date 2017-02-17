@@ -75,13 +75,23 @@ var DEFAULT_MENU_ITEMS = {
         action: () => store.scrollToNode(id),
       });
     }
-    items.push({
-      key: 'pinComponent',
-      title: 'Pin this component',
-      action: () => {
-        console.log('pin this component');
-      },
-    });
+    if (!store.checkPinnedComponent(id)) {
+      items.push({
+        key: 'pinComponent',
+        title: 'Pin this component',
+        action: () => {
+          store.pinComponent(id);
+        },
+      });
+    } else {
+      items.push({
+        key: 'unpinComponent',
+        title: 'Unpin this component',
+        action: () => {
+          store.unpinComponent(id);
+        },
+      });
+    }
     return items;
   },
   attr: (id, node, val, path, name, store) => {
