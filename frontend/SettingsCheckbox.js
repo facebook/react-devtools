@@ -88,7 +88,7 @@ var styles = {
     outline: 'none',
     fontFamily: 'sans-serif',
     userSelect: 'none',
-    margin: '0 10px 10px 0',
+    margin: '0 10px 5px 0',
   },
 };
 

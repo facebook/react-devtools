@@ -162,7 +162,7 @@ var styles = {
     position: 'absolute',
     cursor: 'pointer',
     right: '10px',
-    top: '11px',
+    top: '8px',
     color: 'white',
     backgroundColor: 'rgb(255, 137, 137)',
     lineHeight: '0',
@@ -170,8 +170,8 @@ var styles = {
 
   input: {
     flex: 1,
-    fontSize: '18px',
-    padding: '10px',
+    fontSize: '16px',
+    padding: '8px',
     border: 'none',
     transition: 'border-top-color .2s ease, background-color .2s ease',
     borderTop: '1px solid #ccc',
