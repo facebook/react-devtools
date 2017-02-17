@@ -15,6 +15,7 @@ type ConnectOptions = {
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
   isAppActive?: () => boolean,
+  maxConnectAttempt?: number
 };
 
 // TODO: why?
@@ -48,6 +49,7 @@ function connectToDevTools(options: ?ConnectOptions) {
     port = 8097,
     resolveRNStyle = null,
     isAppActive = () => true,
+    maxConnectAttempt = Number.POSITIVE_INFINITY
   } = options || {};
 
   function scheduleRetry() {
@@ -88,7 +90,9 @@ function connectToDevTools(options: ?ConnectOptions) {
   function handleClose() {
     if (!hasClosed) {
       hasClosed = true;
-      scheduleRetry();
+      if (maxConnectAttempt-- > 0) {
+        scheduleRetry();
+      }
       closeListeners.forEach(fn => fn());
     }
   }
