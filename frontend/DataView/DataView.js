@@ -35,8 +35,8 @@ type DataViewProps = {
 class DataView extends React.Component {
   props: DataViewProps;
 
-  parseSparseArray(arr) {
-    var acc = [];
+  parseSparseArray(arr: Object) {
+    var acc: Array<any> = [];
     var length = arr.length;
     var numOfUndefsInRow = 0;
     var pushUndefValsNumber = () => acc.push('undefined x ' + numOfUndefsInRow);
