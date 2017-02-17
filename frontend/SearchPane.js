@@ -94,6 +94,8 @@ class SearchPane extends React.Component {
     return (
       <div style={styles.container}>
         <SettingsPane />
+        Khang was here 
+        ---\\n
         <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
           <input

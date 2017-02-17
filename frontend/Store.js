@@ -86,6 +86,9 @@ class Store extends EventEmitter {
   _eventQueue: Array<string>;
   _eventTimer: ?number;
 
+  // pinned components
+  _pinnedComponents: Array<string>;
+
   // Public state
   bananaslugState: ?ControlState;
   colorizerState: ?ControlState;
@@ -112,6 +115,7 @@ class Store extends EventEmitter {
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
+    this._pinnedComponents = [];
 
     // Public state
     this.roots = new List();
@@ -494,6 +498,30 @@ class Store extends EventEmitter {
     this.emit('regexchange');
     this.refreshSearch = true;
     this.changeSearch(this.searchText);
+  }
+
+  // pin component
+  pin(componentId: string): void {
+    this._pinnedComponents.push(componentId);
+  }
+
+  // remove pinned component
+  unpin(componentId: string): void {
+    const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
+    if (foundIndex === -1) {
+      return;
+    }
+
+    this._pinnedComponents = [
+      ...this._pinnedComponents.slice(0, foundIndex),
+      ...this._pinnedComponents.slice(foundIndex + 1, this._pinnedComponents.length),
+    ];
+  }
+
+  // is pinned component
+  isPinnedComponent(componentId: string): boolean {
+    const foundIndex = this._pinnedComponents.findIndex(id => id === componentId);
+    return foundIndex !== -1;
   }
 
   // Private stuff

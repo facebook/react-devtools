@@ -75,6 +75,13 @@ var DEFAULT_MENU_ITEMS = {
         action: () => store.scrollToNode(id),
       });
     }
+    items.push({
+      key: 'pinComponent',
+      title: 'Pin this component',
+      action: () => {
+        console.log('pin this component');
+      },
+    });
     return items;
   },
   attr: (id, node, val, path, name, store) => {
