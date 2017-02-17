@@ -13,7 +13,8 @@
     "bin.js",
     "app.html",
     "app.js",
-    "index.js"
+    "index.js",
+    "icons"
   ],
   "scripts": {
     "start": "./bin.js"
