@@ -20,8 +20,8 @@ type Props = {
   style?: {[key: string]: any},
   left: () => React$Element,
   right: () => React$Element,
-  initialWidth: number,
-  initialHeight: number,
+  initialWidth: string,
+  initialHeight: string,
   isVertical: bool,
 };
 
@@ -31,8 +31,8 @@ type DefaultProps = {
 
 type State = {
   moving: boolean,
-  width: number,
-  height: number,
+  width: string,
+  height: string,
 };
 
 class SplitPane extends React.Component {
@@ -50,10 +50,13 @@ class SplitPane extends React.Component {
   }
 
   componentWillReceiveProps(nextProps: Props) {
-    this.setState({
-      width: (nextProps.isVertical) ? '100%' : this.state.width,
-      height: (!nextProps.isVertical) ? '100%' : this.state.height,
-    });
+    if (nextProps.isVertical !== this.props.isVertical) {
+      if (nextProps.isVertical && !this.props.isVertical) {
+        this.setState({width: '100%'});
+      } else if (!nextProps.isVertical && this.props.isVertical) {
+        this.setState({height: '100%'});
+      }
+    }
   }
 
   onMove(x: number, y: number) {

@@ -25,6 +25,9 @@ type State = {
   isVertical: boolean,
 };
 
+var IS_VERTICAL_BREAKPOINT = 500;
+var resizeTimeout = null;
+
 class Container extends React.Component {
   props: {
     reload: () => void,
@@ -49,24 +52,32 @@ class Container extends React.Component {
     super(props);
 
     this.state = {
-      isVertical: (window.innerWidth < 500),
+      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
     };
   }
 
   componentDidMount() {
-    window.addEventListener('resize', (e) => this.handleResize(e), false);
+    window.addEventListener('resize', this.handleResize, false);
     this.setState({
-      isVertical: (window.innerWidth < 500),
+      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
     });
   }
 
   componentWillUnmount() {
-    window.removeEventListener('resize');
+    window.removeEventListener('resize', this.handleResize);
   }
 
-  handleResize(e) {
-    this.setState({
-      isVertical: (e.target.innerWidth < 500),
+  handleResize = (e: Object) => {
+    if (!resizeTimeout) {
+      resizeTimeout = setTimeout(this.handleResizeTimeout, 50, this, e);
+    }
+  }
+
+  handleResizeTimeout(scope: Object, e: Object) {
+    resizeTimeout = null;
+
+    scope.setState({
+      isVertical: (e.target.innerWidth < IS_VERTICAL_BREAKPOINT),
     });
   }
 
