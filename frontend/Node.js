@@ -22,7 +22,6 @@ type PropsType = {
   hovered: boolean,
   selected: boolean,
   node: Map,
-  depth: number,
   isBottomTagSelected: boolean,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
@@ -50,12 +49,6 @@ class Node extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps) {
-    if (this.props.selected && !prevProps.selected) {
-      this.ensureInView();
-    }
-  }
-
   ensureInView() {
     var node = this.props.isBottomTagSelected ? this._tail : this._head;
     if (!node) {
@@ -73,11 +66,11 @@ class Node extends React.Component {
 
     if (node.get('nodeType') === 'Wrapper') {
       return (
-        <span>
+        <div style={styles.wrappedNodeContainer}>
           {children.map(child =>
-            <WrappedNode key={child} id={child} depth={this.props.depth} />
+            <WrappedNode key={child} id={child} />
           )}
-        </span>
+        </div>
       );
     }
 
@@ -88,14 +81,19 @@ class Node extends React.Component {
     var collapsed = node.get('collapsed');
 
     var leftPad = {
-      paddingLeft: 3 + (this.props.depth + 1) * 10,
-      paddingRight: 3,
+      paddingLeft: 12,
     };
-    var headStyles = assign(
+
+    var backgroundStyles = assign(
       {},
-      styles.head,
-      this.props.hovered && styles.headHover,
-      this.props.selected && (collapsed || !this.props.isBottomTagSelected) && styles.headSelect,
+      styles.fill,
+      this.props.hovered && styles.fillHover,
+      this.props.selected && (collapsed || !this.props.isBottomTagSelected) && styles.fillSelect,
+    );
+
+    var containerStyles = assign(
+      {},
+      styles.container,
       leftPad
     );
 
@@ -129,9 +127,10 @@ class Node extends React.Component {
           </span>;
       }
       return (
-        <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
+        <div style={containerStyles}>
+          <div style={styles.head} ref={h => this._head = h} {...tagEvents}>
             {tag}
+            <div style={backgroundStyles}></div>
           </div>
         </div>
       );
@@ -140,50 +139,54 @@ class Node extends React.Component {
     var isCustom = nodeType === 'Composite';
 
     var tagStyle = isCustom ? styles.customTagName : styles.tagName;
+    var openTagStyle = isCustom ? styles.customOpenTag : styles.openTag;
+    var closeTagStyle = isCustom ? styles.customCloseTag : styles.closeTag;
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
       var name = node.get('name');
       var content = children;
       return (
-        <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
+        <div style={containerStyles}>
+          <div style={styles.head} ref={h => this._head = h} {...tagEvents}>
             <span style={styles.tagText}>
-              <span style={styles.openTag}>
-                <span style={tagStyle}>&lt;{name}</span>
+              <span style={openTagStyle}>
+                &lt;
+                <span style={tagStyle}>{name}</span>
                 {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
                 {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
                 {node.get('props') && <Props key="props" props={node.get('props')}/>}
                 {!content && '/'}
-                <span style={tagStyle}>&gt;</span>
+                <span style={tagStyle}></span>
+                &gt;
               </span>
               {content && [
                 <span key="content" style={styles.textContent}>{content}</span>,
-                <span key="close" style={styles.closeTag}>
-                  <span style={tagStyle}>&lt;/{name}&gt;</span>
+                <span key="close" style={closeTagStyle}>
+                  &lt;
+                  <span style={tagStyle}>/{name}</span>
+                  &gt;
                 </span>,
               ]}
             </span>
+            <div style={backgroundStyles}></div>
           </div>
         </div>
       );
     }
 
     var closeTag = (
-      <span style={styles.closeTag}>
+      <span style={closeTagStyle}>
+         &lt;
         <span style={tagStyle}>
-          &lt;/{'' + node.get('name')}&gt;
+         /{'' + node.get('name')}
         </span>
+        &gt;
       </span>
     );
 
     var hasState = !!node.get('state') || !!node.get('context');
 
-    var collapserStyle = assign(
-      {},
-      styles.collapser,
-      {left: leftPad.paddingLeft - 12},
-    );
     var arrowStyle = node.get('collapsed') ?
       assign(
         {},
@@ -197,55 +200,64 @@ class Node extends React.Component {
       );
 
     var collapser =
-      <span
+      <div
         title={hasState ? 'This component is stateful.' : null}
-        onClick={this.props.onToggleCollapse} style={collapserStyle}
+        onClick={this.props.onToggleCollapse} style={styles.collapser}
       >
-        <span style={arrowStyle} />
-      </span>;
+        <div style={arrowStyle}/>
+      </div>;
 
     var head = (
-      <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
+      <div ref={h => this._head = h} style={styles.head} {...tagEvents}>
         {collapser}
         <span style={styles.tagText}>
-          <span style={styles.openTag}>
-            <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
+          <span style={openTagStyle}>
+            &lt;
+            <span style={tagStyle}>{'' + node.get('name')}</span>
             {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
             {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
             {node.get('props') && <Props key="props" props={node.get('props')}/>}
-            <span style={tagStyle}>&gt;</span>
+            <span style={tagStyle}></span>
+            &gt;
           </span>
           {collapsed && '…'}
           {collapsed && closeTag}
         </span>
+        <div style={backgroundStyles}></div>
       </div>
     );
-
     if (collapsed) {
       return (
-        <div style={styles.container}>
+        <div style={containerStyles}>
           {head}
         </div>
       );
     }
 
-    var tailStyles = assign(
+    var tailBackgroundStyles = assign(
       {},
-      styles.tail,
-      this.props.hovered && styles.headHover,
-      this.props.selected && this.props.isBottomTagSelected && styles.headSelect,
-      leftPad
+      styles.fill,
+      this.props.hovered && styles.fillHover,
+      this.props.selected && this.props.isBottomTagSelected && styles.fillSelect,
+    );
+
+    var guidelineStyles = assign(
+      {},
+      styles.guideline,
+      this.props.selected && styles.selectedGuideline,
     );
 
     return (
-      <div style={styles.container}>
+      <div style={containerStyles}>
         {head}
         <div style={styles.children}>
-          {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
+          {children.map(id => <WrappedNode key={id} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
+        <div ref={t => this._tail = t} style={styles.tail} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
           {closeTag}
+          <div style={tailBackgroundStyles}></div>
         </div>
+        <div style={guidelineStyles}></div>
       </div>
     );
   }
@@ -298,7 +310,11 @@ var styles = {
   // in case we need them later, and the corresponding divs refernce them. But
   // I could remove them if desired.
   container: {
-    flexShrink: 0,
+    position: 'relative',
+  },
+
+  wrappedNodeContainer: {
+    flexGrow: 1,
   },
 
   children: {
@@ -311,19 +327,46 @@ var styles = {
     fontStyle: 'italic',
   },
 
+  customCloseTag: {
+    color: 'rgb(168, 148, 166)',
+  },
+
+  customOpenTag: {
+    color: 'rgb(168, 148, 166)',
+  },
+
   closeTag: {
+    color: '#ccc',
+  },
+
+  guideline: {
+    position: 'absolute',
+    width: '1px',
+    background: 'rgba(0,0,0,0.025)',
+    top: '17px',
+    left: '18px',
+    bottom: '15px',
+  },
+
+  selectedGuideline: {
+    background: '#a9c5ef',
   },
 
   head: {
     cursor: 'default',
+    padding: '1px 0',
     borderTop: '1px solid #fff',
     position: 'relative',
     display: 'flex',
+    zIndex: 0,
   },
 
   tail: {
+    padding: '1px 0',
     borderTop: '1px solid #fff',
     cursor: 'default',
+    position: 'relative',
+    zIndex: 0,
   },
 
   tagName: {
@@ -335,6 +378,7 @@ var styles = {
   },
 
   openTag: {
+    color: '#ccc',
   },
 
   tagText: {
@@ -347,17 +391,15 @@ var styles = {
   },
 
   collapser: {
-    position: 'absolute',
     padding: 2,
+    left: -12,
   },
 
   collapsedArrow: {
     borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
-    display: 'inline-block',
     marginLeft: 1,
-    verticalAlign: 'top',
   },
   collapsedArrowStateful: {
     borderColor: 'transparent transparent transparent #e55',
@@ -367,9 +409,7 @@ var styles = {
     borderColor: '#555 transparent transparent transparent',
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
-    display: 'inline-block',
     marginTop: 1,
-    verticalAlign: 'top',
   },
   expandedArrowStateful: {
     borderColor: '#e55 transparent transparent transparent',
@@ -377,6 +417,25 @@ var styles = {
 
   headHover: {
     backgroundColor: '#eee',
+  },
+
+  fill: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    marginLeft: '-1000px',
+    right: '-3px',
+    bottom: 0,
+    pointerEvents: 'none',
+    zIndex: -1,
+  },
+
+  fillHover: {
+    background: '#eee',
+  },
+
+  fillSelect: {
+    background: '#e1ebfb',
   },
 };
 
