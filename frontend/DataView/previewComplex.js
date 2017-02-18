@@ -17,7 +17,7 @@ var valueStyles = require('../value-styles');
 
 function previewComplex(data: Object) {
   if (Array.isArray(data)) {
-    if(data.length) {
+    if (data.length) {
       return (
         <span style={valueStyles.array}>
           Array[{data.length}]
@@ -29,8 +29,9 @@ function previewComplex(data: Object) {
   }
 
   if (!data[consts.type]) {
-    if(Object.keys(data).length > 0)
+    if (Object.keys(data).length > 0) {
       return '{…}';
+    }
     return '{}';
   }
 

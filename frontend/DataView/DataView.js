@@ -139,8 +139,8 @@ class DataItem extends React.Component {
   isEmpty(value) {
     return (
       (Array.isArray(value) && !value.length) ||
-      (value === Object(value) && Object.keys(value).length === 0)
-    )
+      (!value[consts.type] && Object.keys(value).length === 0)
+    );
   }
 
   render() {
@@ -148,7 +148,7 @@ class DataItem extends React.Component {
     var otype = typeof data;
 
     var complex = true;
-    var isEmptyComplexValue = this.isEmpty(data)
+    var isEmptyComplexValue = this.isEmpty(data);
     var preview;
     if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean' || isEmptyComplexValue) {
       preview = (
