@@ -20,23 +20,40 @@ class InnerContent extends React.Component {
   }
 }
 
-class OuterWrapper extends React.Component {
+class IframeWrapper extends React.Component {
   componentDidMount() {
     const node = document.createElement('div');
     this.frame.contentDocument.body.appendChild(node);
-    ReactDOM.render(<InnerContent />, node);
+    ReactDOM.render(this.props.children, node);
   }
 
   render() {
+    var { children, ...props } = this.props; // eslint-disable-line no-unused-vars
+
     return (
       <div>
         <div>Iframe below</div>
-        <iframe ref={(frame) => this.frame = frame} />
+        <iframe ref={(frame) => this.frame = frame} {...props} />
       </div>
     );
   }
 }
 
 var node = document.createElement('div');
+var node2 = document.createElement('div');
 document.body.appendChild(node);
-ReactDOM.render(<OuterWrapper />, node);
+document.body.appendChild(node2);
+
+ReactDOM.render(
+  <IframeWrapper>
+    <IframeWrapper frameBorder="0">
+      <InnerContent />
+    </IframeWrapper>
+  </IframeWrapper>
+, node);
+
+ReactDOM.render(
+  <IframeWrapper>
+    <InnerContent />
+  </IframeWrapper>
+, node2);
