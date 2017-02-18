@@ -326,6 +326,7 @@ class Wrap extends React.Component {
         <span val={undefined}/>
         <div>&lt;</div>*/}
         <OldStyle awesome={2}/>
+        <DeeplyNested />
       </div>
     );
   }
@@ -333,9 +334,37 @@ class Wrap extends React.Component {
 
 var OldStyle = React.createClass({
   render() {
-    return <span>OldStyle {this.props.awesome}</span>;
+    return <div style={styles.container}>OldStyle {this.props.awesome}</div>;
   },
 });
+
+class Nested extends React.Component {
+  render() {
+    return (
+      <div style={styles.container}>Deeply Nested Component</div>
+    );
+  }
+}
+
+function wrapWithHoc(Component) {
+  class HigherOrderComponent extends React.Component {
+    render() {
+      return <div><Component /></div>;
+    }
+  }
+
+  return HigherOrderComponent;
+}
+
+function wrapMultipleNested(Component, times) {
+  for (var i = 0; i < times; i++) {
+    Component = wrapWithHoc(Component);
+  }
+
+  return Component;
+}
+
+var DeeplyNested = wrapMultipleNested(Nested, 50);
 
 function long(children) { // eslint-disable-line no-unused-vars
   return (

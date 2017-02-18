@@ -34,6 +34,16 @@ if (iframeSrc) {
   win.document.documentElement.innerHTML = iframeSrc.textContent.replace(/&gt;/g, '>');
 }
 
+window.addEventListener('keydown', function(e) {
+  if (e.altKey && e.keyCode === 68) { // Alt + D
+    if (document.body.className === 'devtools-bottom') {
+      document.body.className = 'devtools-right';
+    } else {
+      document.body.className = 'devtools-bottom';
+    }
+  }
+});
+
 var config = {
   alreadyFoundReact: true,
   inject(done) {
