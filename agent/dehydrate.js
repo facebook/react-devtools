@@ -38,6 +38,9 @@ function getPropType(data: Object): string | null {
     if (data[Symbol.iterator] === 'function') {
       return 'iterator';
     }
+    if (Object.prototype.toString.call(data) === '[object Date]') {
+      return 'date';
+    }
   }
 
   return type;
@@ -136,11 +139,20 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     case 'typed_array':
     case 'iterator':
       return createDehydrated(type, data, cleaned, path);
-
+    case 'date':
+      cleaned.push(path);
+      return {
+        name: data.toString(),
+        type: 'date',
+        meta: {
+          uninspectable: true,
+        },
+      };
     case 'object':
       if (level > 2 || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
         return createDehydrated(type, data, cleaned, path);
       } else {
+
         var res = {};
         for (var name in data) {
           res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);

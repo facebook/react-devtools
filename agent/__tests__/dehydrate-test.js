@@ -55,4 +55,12 @@ describe('dehydrate', () => {
     expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
     expect(result.a.b.d).toEqual({type: 'object', name: 'Something', meta: {}});
   });
+
+  it('returns readable name for dates', () => {
+    var d = new Date();
+    var object = {a: d };
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(result.a).toEqual({type: 'date', name: d.toString(), meta: {uninspectable: true}});
+  });
 });
