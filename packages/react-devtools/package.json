@@ -17,7 +17,7 @@
     "icons"
   ],
   "scripts": {
-    "start": "./bin.js"
+    "start": "node bin.js"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
