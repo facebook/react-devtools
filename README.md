@@ -29,7 +29,7 @@ Tools or use a pre-prelease version.
 
 ### Supporting tools
 
-- The babel plugin [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source) is required if you want react devtools to tell you the source file & line number of created react elements. Its display is in the bottom of the right panel if the information is present.
+- The babel plugin [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source) is required if you want react devtools to tell you the source file & line number of created react elements. Its display is in the bottom of the right panel if the information is present. Don't forget to disable it in production!
 
 ### React Native
 
