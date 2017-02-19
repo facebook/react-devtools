@@ -95,6 +95,10 @@ function getData(element: Object): DataType {
 
   if (element._instance) {
     var inst = element._instance;
+    //for StatelessComponent
+    if (element._compositeType === 2) {
+      inst.constructor = type;
+    }
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
