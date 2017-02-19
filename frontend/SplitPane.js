@@ -20,8 +20,8 @@ type Props = {
   style?: {[key: string]: any},
   left: () => React$Element,
   right: () => React$Element,
-  initialWidth: string,
-  initialHeight: string,
+  initialWidth: number,
+  initialHeight: number,
   isVertical: bool,
 };
 
@@ -44,8 +44,8 @@ class SplitPane extends React.Component {
     super(props);
     this.state = {
       moving: false,
-      width: (props.isVertical) ? '100%' : props.initialWidth,
-      height: (!props.isVertical) ? '100%' : props.initialHeight,
+      width: (props.isVertical) ? '100%' : props.initialWidth.toString(),
+      height: (!props.isVertical) ? '100%' : props.initialHeight.toString(),
     };
   }
 
@@ -60,15 +60,15 @@ class SplitPane extends React.Component {
   onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
     this.setState({
-      width: (this.props.isVertical) ? '100%' : (node.offsetLeft + node.offsetWidth) - x,
-      height: (!this.props.isVertical) ? '100%' : (node.offsetTop + node.offsetHeight) - y,
+      width: (this.props.isVertical) ? '100%' : ((node.offsetLeft + node.offsetWidth) - x).toString(),
+      height: (!this.props.isVertical) ? '100%' : ((node.offsetTop + node.offsetHeight) - y).toString(),
     });
   }
 
   render() {
     var rightStyle = assign({}, styles.rightPane, {
-      width: this.state.width,
-      height: this.state.height,
+      width: (this.state.width === '100%') ? '100%' : parseInt(this.state.width, 10),
+      height: (this.state.height === '100%') ? '100%' : parseInt(this.state.height, 10),
       marginLeft: (this.props.isVertical) ? 0 : -3,
     });
 
