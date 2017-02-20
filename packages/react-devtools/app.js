@@ -20,7 +20,12 @@ app.on('window-all-closed', function() {
 
 app.on('ready', function() {
   // Create the browser window.
-  mainWindow = new BrowserWindow({width: 800, height: 600, icon: path.join(__dirname, 'icons/icon128.png')});
+  mainWindow = new BrowserWindow({
+    width: 800, 
+    height: 600, 
+    backgroundColor: '#7BC7BA',
+    icon: path.join(__dirname, 'icons/icon128.png'),
+  });
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app.html'); // eslint-disable-line no-path-concat

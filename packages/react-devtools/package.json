@@ -1,7 +1,9 @@
 {
   "name": "react-devtools",
+  "productName": "React Developer Tools",
   "version": "2.0.12",
   "description": "Use react-devtools outside of the browser",
+  "main": "./app.js",
   "repository": {
     "url": "https://github.com/facebook/react-devtools.git",
     "type": "git"
