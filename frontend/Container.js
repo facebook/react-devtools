@@ -80,7 +80,7 @@ class Container extends React.Component {
     this.setState({
       isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
     });
-  }
+  };
 
   render() {
     var tabs = {
