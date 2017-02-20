@@ -52,7 +52,7 @@ class Todos extends React.Component {
         title: text,
         completed: false,
         id: this._nextid++,
-        time: JSON.stringify(new Date()).replace(/\/"/, ''),
+        time: JSON.stringify(new Date()),
       }]),
     });
   }
