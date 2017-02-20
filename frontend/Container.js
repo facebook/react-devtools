@@ -26,7 +26,6 @@ type State = {
 };
 
 var IS_VERTICAL_BREAKPOINT = 500;
-var resizeTimeout = null;
 
 class Container extends React.Component {
   props: {
@@ -47,6 +46,7 @@ class Container extends React.Component {
     extraTabs: {[key: string]: () => React$Element},
   };
   state: State;
+  resizeTimeout: number = null;
 
   constructor(props: Props) {
     super(props);
@@ -65,17 +65,17 @@ class Container extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
-    clearTimeout(resizeTimeout);
+    clearTimeout(this.resizeTimeout);
   }
 
   handleResize = (e: Event) => {
-    if (!resizeTimeout) {
-      resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
+    if (!this.resizeTimeout) {
+      this.resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
     }
   }
 
   handleResizeTimeout = () => {
-    resizeTimeout = null;
+    this.resizeTimeout = null;
 
     this.setState({
       isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
