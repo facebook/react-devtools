@@ -40,8 +40,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       type: 'function',
     };
   }
-  //check if data is of type date. typeof doesn't support Date, so instanceof is being used
-  if (data instanceof Date) {
+  if (data != null && typeof data === 'object' && Object.prototype.toString.call(data) === '[object Date]') {
     return {
       type: 'date',
       name: data.toJSON(),
