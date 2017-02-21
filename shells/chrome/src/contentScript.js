@@ -34,7 +34,7 @@ function handleMessageFromDevtools(message) {
 }
 
 function handleMessageFromPage(evt) {
-  if (evt.data && evt.data.source === 'react-devtools-bridge') {
+  if (evt.source === window && evt.data && evt.data.source === 'react-devtools-bridge') {
     // console.log('page -> rep -> dev', evt.data);
     port.postMessage(evt.data.payload);
   }
