@@ -47,4 +47,8 @@ module.exports = {
   empty: {
     color: '#777',
   },
+
+  date: {
+    color: '#333',
+  },
 };

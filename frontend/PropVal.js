@@ -83,6 +83,9 @@ function previewProp(val: any, nested: boolean) {
       // the name is "Symbol(something)"
       return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
     }
+    if (type === 'date') {
+      return <span style={valueStyles.date}>{val[consts.name]}</span>;
+    }
   }
   if (nested) {
     return <span>{'{…}'}</span>;

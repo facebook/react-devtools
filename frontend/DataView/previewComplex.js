@@ -47,6 +47,12 @@ function previewComplex(data: Object) {
         {data[consts.name]}
       </span>
     );
+  } else if (type === 'date') {
+    return (
+      <span style={valueStyles.date}>
+        {data[consts.name]}
+      </span>
+    );
   }
   return null;
 }
