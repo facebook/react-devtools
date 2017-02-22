@@ -238,7 +238,7 @@ function getNestedBoundingClientRect(node: DOMNode, boundaryWindow: Window): DOM
     ownerIframe !== boundaryWindow
   ) {
     var rects = [node.getBoundingClientRect()];
-    var currentIframe = getOwnerIframe(node);
+    var currentIframe = ownerIframe;
     var onlyOneMore = false;
     while (currentIframe) {
       var rect = getBoundingClientRectWithBorderOffset(currentIframe);
