@@ -28,7 +28,7 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent) {
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
-  if (evt.data && evt.data.source !== 'react-devtools-reporter') {
+  if (evt.source !== window || evt.data && evt.data.source !== 'react-devtools-reporter') {
     return;
   }
 
@@ -42,7 +42,7 @@ function setup() {
   var wall = {
     listen(fn) {
       var listener = evt => {
-        if (evt.data.source !== 'react-devtools-reporter' || !evt.data.payload) {
+        if (evt.source !== window || !evt.data || evt.data.source !== 'react-devtools-reporter' || !evt.data.payload) {
           return;
         }
         fn(evt.data.payload);

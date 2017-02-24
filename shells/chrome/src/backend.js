@@ -26,7 +26,7 @@ setInterval(function() {
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
-  if (evt.data.source !== 'react-devtools-content-script') {
+  if (evt.source !== window || evt.data.source !== 'react-devtools-content-script') {
     return;
   }
 
@@ -40,7 +40,7 @@ function setup(hook) {
   var wall = {
     listen(fn) {
       var listener = evt => {
-        if (evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
+        if (evt.source !== window || !evt.data || evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
           return;
         }
         fn(evt.data.payload);
