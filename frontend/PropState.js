@@ -50,7 +50,7 @@ class PropState extends React.Component {
   render(): React.Element {
     if (!this.props.node) {
       // TODO(jared): style this
-      return <span>No selection</span>;
+      return <span style={styles.noSelection}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -66,9 +66,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane header="Text Node">No props/state.</DetailPane>;
+      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane header="Empty Node">No props/state.</DetailPane>;
+      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;
@@ -204,6 +204,18 @@ var styles = {
 
   sourcePos: {
     color: '#777',
+  },
+
+  noSelection: {
+    fontFamily: 'sans-serif',
+    margin: 'auto',
+    color: 'rgba(0,0,0,0.4)',
+  },
+
+  noPropsState: {
+    fontWeight: 'bold',
+    padding: '5px',
+    borderTop: '1px solid rgba(0,0,0,0.1)',
   },
 };
 

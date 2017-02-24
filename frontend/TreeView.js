@@ -48,7 +48,7 @@ class TreeView extends React.Component {
       if (this.props.searching) {
         return (
           <div style={styles.container}>
-            <span>No search results</span>
+            <span style={styles.noSearchResults}>No search results</span>
           </div>
         );
       } else {
@@ -118,7 +118,7 @@ var styles = {
   },
 
   scroll: {
-    padding: '3px 0',
+    padding: '5px',
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
@@ -131,6 +131,13 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
+  },
+
+  noSearchResults: {
+    fontFamily: 'sans-serif',
+    fontSize: '14px',
+    padding: '10px',
+    color: 'rgba(0,0,0,0.4)',
   },
 };
 

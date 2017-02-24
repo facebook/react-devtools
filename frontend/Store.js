@@ -150,7 +150,7 @@ class Store extends EventEmitter {
     });
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
-    this._bridge.on('unmount', id => this._unmountComponenent(id));
+    this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('select', ({id, quiet}) => {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
@@ -582,7 +582,7 @@ class Store extends EventEmitter {
     this.emit(data.id);
   }
 
-  _unmountComponenent(id: ElementID) {
+  _unmountComponent(id: ElementID) {
     var pid = this._parents.get(id);
     this._removeFromNodesByName(id);
     this._parents = this._parents.delete(id);

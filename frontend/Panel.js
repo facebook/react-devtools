@@ -245,7 +245,7 @@ class Panel extends React.Component {
       <Container
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
-          attr: (id, node, val, path, name) => {
+          attr: (id, node, val, path) => {
             if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
               return undefined;
             }

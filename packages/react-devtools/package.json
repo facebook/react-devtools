@@ -13,10 +13,11 @@
     "bin.js",
     "app.html",
     "app.js",
-    "index.js"
+    "index.js",
+    "icons"
   ],
   "scripts": {
-    "start": "./bin.js"
+    "start": "node bin.js"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",

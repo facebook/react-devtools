@@ -51,7 +51,6 @@ class BlurInput extends React.Component {
   onKeyDown(e: DOMEvent) {
     if (e.key === 'Enter') {
       this.done();
-      return;
     }
   }
 

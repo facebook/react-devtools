@@ -48,6 +48,8 @@ var styles = {
     backgroundColor: '#efefef',
     padding: 5,
     flexShrink: 0,
+    display: 'flex',
+    alignItems: 'center',
   },
   headerName: {
     flex: 1,
@@ -62,6 +64,7 @@ var styles = {
   consoleHint: {
     float: 'right',
     fontSize: 11,
+    marginLeft: 10,
   },
 };
 

@@ -40,7 +40,11 @@ var config = {
     inject(devtoolsSrc, () => {
       var wall = {
         listen(fn) {
-          win.parent.addEventListener('message', evt => fn(evt.data));
+          win.parent.addEventListener('message', evt => {
+            if (evt.source === win) {
+              fn(evt.data);
+            }
+          });
         },
         send(data) {
           win.postMessage(data, '*');

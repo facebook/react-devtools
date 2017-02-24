@@ -135,6 +135,7 @@ var styles = {
     marginLeft: -3,
     minWidth: 100,
     minHeight: 100,
+    padding: 5,
   },
 
   leftPane: {
