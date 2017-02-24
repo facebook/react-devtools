@@ -238,6 +238,11 @@ class Panel extends React.Component {
   }
 
   render() {
+    var showFileUrlWarningMessage = false;
+    if (navigator.userAgent.indexOf('Chrome') > -1) {
+      // Chrome requires access to 'file URLs' permission for devtools loaded over file://
+      showFileUrlWarningMessage = window.location.protocol.indexOf('http') === -1;
+    }
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
@@ -250,7 +255,16 @@ class Panel extends React.Component {
       );
     }
     if (!this.state.isReact) {
-      return <div style={styles.loading}><h2>Looking for React…</h2></div>;
+      return (
+        <div style={styles.loading}>
+          <h2 style={styles.errorMessage}>Unable to find React…</h2>
+          {showFileUrlWarningMessage &&
+            <div style={styles.troubleshootingHint}>
+              Please enable 'Allow access to file URLs' permission for the devtools extension
+            </div>
+          }
+        </div>
+      );
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
@@ -329,6 +343,12 @@ var styles = {
     color: '#888',
     padding: 30,
     flex: 1,
+  },
+  errorMessage: {
+    color: '#f38b00',
+  },
+  troubleshootingHint: {
+    fontSize: 14,
   },
 };
 
