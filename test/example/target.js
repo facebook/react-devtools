@@ -39,6 +39,7 @@ class Todos extends React.Component {
         */
       ],
       filter: 'All',
+      time: new Date(),
     };
   }
 
@@ -51,6 +52,7 @@ class Todos extends React.Component {
         title: text,
         completed: false,
         id: this._nextid++,
+        time: new Date(),
       }]),
     });
   }

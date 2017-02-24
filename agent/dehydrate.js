@@ -40,6 +40,12 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       type: 'function',
     };
   }
+  if (data != null && typeof data === 'object' && Object.prototype.toString.call(data) === '[object Date]') {
+    return {
+      type: 'date',
+      name: data.toJSON(),
+    };
+  }
   if (!data || typeof data !== 'object') {
     if (typeof data === 'string' && data.length > 500) {
       return data.slice(0, 500) + '...';
