@@ -92,6 +92,7 @@ var styles = {
     display: 'flex',
     minWidth: 0,
     backgroundColor: 'white',
+    color: 'rgb(48, 57, 66)',
   },
 };
 
