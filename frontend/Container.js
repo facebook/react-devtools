@@ -46,7 +46,7 @@ class Container extends React.Component {
     extraTabs: {[key: string]: () => React$Element},
   };
   state: State;
-  resizeTimeout: number = null;
+  resizeTimeout: ?number;
 
   constructor(props: Props) {
     super(props);
@@ -68,13 +68,15 @@ class Container extends React.Component {
     clearTimeout(this.resizeTimeout);
   }
 
-  handleResize = (e: Event) => {
+  // $FlowFixMe future versions of Flow can infer this
+  handleResize = (e: Event): void => {
     if (!this.resizeTimeout) {
       this.resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
     }
-  }
+  };
 
-  handleResizeTimeout = () => {
+  // $FlowFixMe future versions of Flow can infer this
+  handleResizeTimeout = (): void => {
     this.resizeTimeout = null;
 
     this.setState({
