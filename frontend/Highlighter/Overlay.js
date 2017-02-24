@@ -11,7 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
-import type {DOMNode} from '../types';
+import type {DOMNode, DOMRect, Window} from '../types';
 
 class Overlay {
   win: Object;
@@ -89,7 +89,7 @@ class Overlay {
     if (node.nodeType !== Node.ELEMENT_NODE) {
       return;
     }
-    var box = node.getBoundingClientRect();
+    var box = getNestedBoundingClientRect(node, this.win);
     var dims = getElementDimensions(node);
 
     boxWrap(dims, 'margin', this.node);
@@ -167,6 +167,99 @@ function getElementDimensions(element) {
     paddingTop: +calculatedStyle.paddingTop.match(/[0-9]*/)[0],
     paddingBottom: +calculatedStyle.paddingBottom.match(/[0-9]*/)[0],
   };
+}
+
+// Get the window object for the document that a node belongs to,
+// or return null if it cannot be found (node not attached to DOM,
+// etc).
+function getOwnerWindow(node: DOMNode): Window | null {
+  if (!node.ownerDocument) {
+    return null;
+  }
+  return node.ownerDocument.defaultView;
+}
+
+// Get the iframe containing a node, or return null if it cannot
+// be found (node not within iframe, etc).
+function getOwnerIframe(node: DOMNode): DOMNode | null {
+  var nodeWindow = getOwnerWindow(node);
+  if (nodeWindow) {
+    return nodeWindow.frameElement;
+  }
+  return null;
+}
+
+// Get a bounding client rect for a node, with an
+// offset added to compensate for its border.
+function getBoundingClientRectWithBorderOffset(node: DOMNode) {
+  var dimensions = getElementDimensions(node);
+
+  return mergeRectOffsets([
+    node.getBoundingClientRect(),
+    {
+      top: dimensions.borderTop,
+      left: dimensions.borderLeft,
+      bottom: dimensions.borderBottom,
+      right: dimensions.borderRight,
+      // This width and height won't get used by mergeRectOffsets (since this
+      // is not the first rect in the array), but we set them so that this
+      // object typechecks as a DOMRect.
+      width: 0,
+      height: 0,
+    },
+  ]);
+}
+
+// Add together the top, left, bottom, and right properties of
+// each DOMRect, but keep the width and height of the first one.
+function mergeRectOffsets(rects: Array<DOMRect>): DOMRect {
+  return rects.reduce((previousRect, rect) => {
+    if (previousRect == null) {
+      return rect;
+    }
+
+    return {
+      top: previousRect.top + rect.top,
+      left: previousRect.left + rect.left,
+      width: previousRect.width,
+      height: previousRect.height,
+      bottom: previousRect.bottom + rect.bottom,
+      right: previousRect.right + rect.right,
+    };
+  });
+}
+
+// Calculate a boundingClientRect for a node relative to boundaryWindow,
+// taking into account any offsets caused by intermediate iframes.
+function getNestedBoundingClientRect(node: DOMNode, boundaryWindow: Window): DOMRect {
+  var ownerIframe = getOwnerIframe(node);
+  if (
+    ownerIframe &&
+    ownerIframe !== boundaryWindow
+  ) {
+    var rects = [node.getBoundingClientRect()];
+    var currentIframe = ownerIframe;
+    var onlyOneMore = false;
+    while (currentIframe) {
+      var rect = getBoundingClientRectWithBorderOffset(currentIframe);
+      rects.push(rect);
+      currentIframe = getOwnerIframe(currentIframe);
+
+      if (onlyOneMore) {
+        break;
+      }
+      // We don't want to calculate iframe offsets upwards beyond
+      // the iframe containing the boundaryWindow, but we
+      // need to calculate the offset relative to the boundaryWindow.
+      if (currentIframe && getOwnerWindow(currentIframe) === boundaryWindow) {
+        onlyOneMore = true;
+      }
+    }
+
+    return mergeRectOffsets(rects);
+  } else {
+    return node.getBoundingClientRect();
+  }
 }
 
 function boxWrap(dims, what, node) {

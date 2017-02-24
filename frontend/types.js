@@ -17,17 +17,18 @@ export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 
 
 export type ElementID = string;
 
+export type Window = {
+  frameElement: DOMNode | null,
+};
+
+export type Document = {
+  defaultView: Window | null,
+};
+
 export type DOMNode = {
   appendChild: (child: DOMNode) => void,
   childNodes: Array<DOMNode>,
-  getBoundingClientRect: () => {
-    top: number,
-    left: number,
-    width: number,
-    height: number,
-    bottom: number,
-    right: number,
-  },
+  getBoundingClientRect: () => DOMRect,
   innerHTML: string,
   innerText: string,
   nodeName: string,
@@ -48,6 +49,7 @@ export type DOMNode = {
   style: Object,
   textContent: string,
   value: string,
+  ownerDocument: Document | null,
 };
 
 export type DOMEvent = {
@@ -59,6 +61,15 @@ export type DOMEvent = {
   preventDefault: () => void,
   stopPropagation: () => void,
   target: DOMNode,
+};
+
+export type DOMRect = {
+  top: number,
+  left: number,
+  width: number,
+  height: number,
+  bottom: number,
+  right: number,
 };
 
 export type ControlState = {
