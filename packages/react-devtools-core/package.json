@@ -24,7 +24,9 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "cross-env": "^3.1.4",
     "ws": "^2.0.3"
+  },
+  "devDependencies": {
+    "cross-env": "^3.1.4"
   }
 }
