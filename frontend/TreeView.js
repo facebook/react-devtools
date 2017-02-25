@@ -131,6 +131,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
+    width: '100%',
   },
 
   noSearchResults: {
