@@ -65,7 +65,7 @@ class DataView extends React.Component {
 
     var isArray = Array.isArray(data);
     if (isArray) {
-        var realItemCount = data.reduce((acc) => {return ++acc});
+      var realItemCount = data.reduce(acc => ++acc);
     }
     var isSparseArray = isArray && data.length !== realItemCount;
     var names = !isSparseArray ? Object.keys(data) : this.parseSparseArray(data);
