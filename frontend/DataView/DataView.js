@@ -39,17 +39,16 @@ class DataView extends React.Component {
     var acc: Array<any> = [];
     var length = arr.length;
     var numOfUndefsInRow = 0;
-    var pushUndefValsNumber = () => acc.push('undefined x ' + numOfUndefsInRow);
 
     for (var i = 0; i < length; ++i) {
-      if (arr[i] === undefined) {
+      if (!arr.hasOwnProperty(i)) {
         numOfUndefsInRow++;
         if (i === length - 1) {
-          pushUndefValsNumber();
+          acc.push('undefined x ' + numOfUndefsInRow);
         }
       } else {
         if (numOfUndefsInRow) {
-          pushUndefValsNumber();
+          acc.push('undefined x ' + numOfUndefsInRow);
         }
         numOfUndefsInRow = 0;
         acc.push(i);
@@ -66,10 +65,9 @@ class DataView extends React.Component {
 
     var isArray = Array.isArray(data);
     if (isArray) {
-      var itemCounter = 0;
-      data.forEach(() => ++itemCounter);
+        var realItemCount = data.reduce((acc) => {return ++acc});
     }
-    var isSparseArray = isArray && data.length !== itemCounter;
+    var isSparseArray = isArray && data.length !== realItemCount;
     var names = !isSparseArray ? Object.keys(data) : this.parseSparseArray(data);
     if (!this.props.noSort && !isSparseArray) {
       names.sort(alphanumericSort);
