@@ -94,9 +94,8 @@ class SearchPane extends React.Component {
     }
     return (
       <div style={styles.container}>
-        <SettingsPane />
         <PinnedComponents />
-        ---\\n
+        <SettingsPane />
         <TreeView reload={this.props.reload} />
         <div style={styles.searchBox}>
           <input

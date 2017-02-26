@@ -9,7 +9,6 @@
  */
 'use strict';
 
-var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
 
@@ -53,7 +52,6 @@ class PinnedComponents extends React.Component {
             )).toJS()}
           </div>
         </div>
-        <Breadcrumb />
       </div>
     );
   }
