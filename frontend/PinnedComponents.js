@@ -45,6 +45,7 @@ class PinnedComponents extends React.Component {
     }
     return (
       <div style={styles.container}>
+        <div style={styles.header}><span>Pinned Components</span></div>
         <div ref={n => this.node = n} style={styles.scroll}>
           <div style={styles.scrollContents}>
             {this.props.nodes.map(id => (
@@ -62,6 +63,12 @@ PinnedComponents.childContextTypes = {
 };
 
 var styles = {
+  header: {
+    fontSize: '16px',
+    color: '#4CBCFF',
+    padding: '5px 5px 4px 5px',
+    borderBottom: '1px solid #eee',
+  },
   container: {
     fontFamily: 'Menlo, Consolas, monospace',
     fontSize: '11px',
