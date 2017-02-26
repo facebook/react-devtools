@@ -64,6 +64,7 @@ const DEFAULT_PLACEHOLDER = 'Search by Component Name';
  * - selectFirstSearchResult
  * - toggleCollapse
  * - setProps/State/Context
+ * - evalGetter
  * - makeGlobal(id, path)
  * - setHover(id, isHovered)
  * - selectTop(id)
@@ -151,6 +152,7 @@ class Store extends EventEmitter {
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
+    this._bridge.on('evalgetterresult', (data) => this._setGetterValue(data));
     this._bridge.on('select', ({id, quiet}) => {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
@@ -350,6 +352,10 @@ class Store extends EventEmitter {
 
   setContext(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setContext', {id, path, value});
+  }
+
+  evalGetter(id: ElementID, path: Array<string>) {
+    this._bridge.send('evalGetter', {id, path});
   }
 
   makeGlobal(id: ElementID, path: Array<string>) {
@@ -613,6 +619,15 @@ class Store extends EventEmitter {
     if (node) {
       this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
     }
+  }
+
+  _setGetterValue(data: DataType) {
+    var node = this._nodes.get(data.id);
+    var props = node.get('props');
+    var last = data.path.length - 1;
+    var propObj = data.path.slice(0, last).reduce((obj_, attr) => obj_ ? obj_[attr] : null, props);
+    propObj[data.path[last]] = data.value;
+    this.emit(data.id);
   }
 }
 

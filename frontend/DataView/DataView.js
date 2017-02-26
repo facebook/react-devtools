@@ -14,6 +14,7 @@ import type {DOMEvent} from '../types';
 
 var React = require('react');
 var Simple = require('./Simple');
+var Getter = require('./Getter');
 
 var assign = require('object-assign');
 var consts = require('../../agent/consts');
@@ -150,6 +151,9 @@ class DataItem extends React.Component {
           data={data}
         />
       );
+      complex = false;
+    } else if (data[consts.type] === 'getter') {
+      preview = <Getter data={data} path={this.props.path} />;
       complex = false;
     } else {
       preview = previewComplex(data);

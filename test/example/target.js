@@ -309,6 +309,28 @@ class Something {
 var someVal = new Something();
 someVal.awesome = 2;
 
+var protoWithGetter = {
+  get upper() {
+    return this.name.toUpperCase();
+  },
+};
+
+var withProtoWithGetter = Object.create(protoWithGetter);
+withProtoWithGetter.name = 'Foo';
+
+var funWithGetters = {
+  name: 'foo',
+  get sideEffect() {
+    alert('Wow!');
+  },
+  get simple() {
+    return this.name.toUpperCase();
+  },
+  get object() {
+    return {foo: 'bar'};
+  },
+};
+
 class Wrap extends React.Component {
   render() {
     return (
@@ -325,7 +347,7 @@ class Wrap extends React.Component {
         <span val={null}/>
         <span val={undefined}/>
         <div>&lt;</div>*/}
-        <OldStyle awesome={2}/>
+        <OldStyle awesome={2} gettersTest={funWithGetters} getInProto={withProtoWithGetter}/>
       </div>
     );
   }

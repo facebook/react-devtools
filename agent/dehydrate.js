@@ -84,9 +84,24 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
   }
   var res = {};
   for (var name in data) {
-    res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);
+    if (isPropertyGetter(data, name)) {
+      cleaned.push(path.concat([name]));
+      res[name] = {
+        name: name,
+        type: 'getter',
+      };
+    } else {
+      res[name] = dehydrate(data[name], cleaned, path.concat([name]), level + 1);
+    }
   }
   return res;
+}
+
+function isPropertyGetter(obj, prop) {
+  /* eslint-disable no-proto */
+  const descriptor = Object.getOwnPropertyDescriptor(obj.hasOwnProperty(prop) ? obj : obj.__proto__, prop);
+  return descriptor.get !== undefined;
+  /* eslint-enable no-proto */
 }
 
 module.exports = dehydrate;

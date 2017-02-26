@@ -79,6 +79,7 @@ import type Bridge from './Bridge';
  * - mount
  * - update
  * - unmount
+ * - sendGetterValue
  */
 class Agent extends EventEmitter {
   // the window or global -> used to "make a value available in the console"
@@ -148,6 +149,7 @@ class Agent extends EventEmitter {
     bridge.on('setState', this._setState.bind(this));
     bridge.on('setProps', this._setProps.bind(this));
     bridge.on('setContext', this._setContext.bind(this));
+    bridge.on('evalGetter', this._evalGetter.bind(this));
     bridge.on('makeGlobal', this._makeGlobal.bind(this));
     bridge.on('highlight', id => this.highlight(id));
     bridge.on('highlightMany', id => this.highlightMany(id));
@@ -202,6 +204,7 @@ class Agent extends EventEmitter {
       bridge.forget(id);
     });
     this.on('setSelection', data => bridge.send('select', data));
+    this.on('sendGetterValue', (data) => bridge.send('evalgetterresult', data));
   }
 
   scrollToNode(id: ElementID): void {
@@ -319,6 +322,12 @@ class Agent extends EventEmitter {
     } else {
       console.warn("trying to set state on a component that doesn't support it");
     }
+  }
+
+  _evalGetter({id, path}: {id: ElementID, path: Array<string>}) {
+    var obj = this.elementData.get(id).props;
+    var value = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
+    this.emit('sendGetterValue', {id, path, value});
   }
 
   _makeGlobal({id, path}: {id: ElementID, path: Array<string>}) {

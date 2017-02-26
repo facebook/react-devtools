@@ -27,6 +27,9 @@ class PropState extends React.Component {
       onChange: (path, val) => {
         this.props.onChange(path, val);
       },
+      onEvalGetter: (path) => {
+        this.props.onEvalGetter(path);
+      },
     };
   }
 
@@ -156,6 +159,7 @@ class PropState extends React.Component {
 
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
+  onEvalGetter: React.PropTypes.func,
 };
 
 var WrappedPropState = decorate({
@@ -185,6 +189,9 @@ var WrappedPropState = decorate({
       },
       showMenu(e, val, path, name) {
         store.showContextMenu('attr', e, store.selected, node, val, path, name);
+      },
+      onEvalGetter(path) {
+        store.evalGetter(store.selected, path.slice(1));
       },
       inspect: store.inspect.bind(store, store.selected),
     };
