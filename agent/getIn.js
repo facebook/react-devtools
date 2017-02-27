@@ -17,12 +17,20 @@
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
     if (obj) {
-      if (obj.hasOwnProperty(attr)) {
+      if (Object.prototype.hasOwnProperty.call(obj, attr)) {
         return obj[attr];
       }
-      if (typeof obj[Symbol.iterator] === 'function') {
-        // Convert iterable to array and return array[index]
-        return [...obj][attr];
+      if (typeof obj.get === 'function') {
+        return obj.get(attr);
+      }
+      if (typeof obj[Symbol.iterator] === 'function' && Number.isInteger(attr)) {
+        var i = 0;
+        for (var value of obj) {
+          i++;
+          if (i == attr) {
+            return value;
+          }
+        }
       }
     }
 
