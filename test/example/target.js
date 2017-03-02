@@ -376,28 +376,14 @@ var complexProps = {
   typedArray: Int8Array.from([128, -127, 255]),
   immutableThings: Immutable.fromJS({
     a: [
-      {
-        hello: 'there',
-        nestedMap: {
-          myStr: 'a string',
-          myList: [
-            new Date(),
-            'yet another string',
-          ],
-          anotherMap: {
-            a: 1,
-            b: 2,
-            c: 3,
-          },
-        },
-      },
+      { hello: 'there' },
       'fixed',
       true,
     ],
     b: 123,
     c: {
-      '1': 'abced',
-      xyz: 12345,
+      '1': 'xyz',
+      xyz: 1,
     },
   }),
 };
