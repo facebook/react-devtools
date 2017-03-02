@@ -40,12 +40,10 @@ class PropState extends React.Component {
     }
     return (
       <div style={styles.source}>
-        <div style={styles.sourceName}>
-          {source.fileName}
-        </div>
-        <div style={styles.sourcePos}>
+        {source.fileName}
+        <span style={styles.sourcePos}>
           :{source.lineNumber}
-        </div>
+        </span>
       </div>
     );
   }
@@ -53,7 +51,7 @@ class PropState extends React.Component {
   render(): React.Element {
     if (!this.props.node) {
       // TODO(jared): style this
-      return <span>No selection</span>;
+      return <span style={styles.noSelection}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -69,9 +67,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane header="Text Node">No props/state.</DetailPane>;
+      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane header="Empty Node">No props/state.</DetailPane>;
+      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;
@@ -201,16 +199,25 @@ var WrappedPropState = decorate({
 var styles = {
   source: {
     padding: '5px 10px',
-    display: 'flex',
-    flexDirection: 'row',
-  },
-
-  sourceName: {
     color: 'blue',
+    overflow: 'auto',
+    overflowWrap: 'break-word',
   },
 
   sourcePos: {
     color: '#777',
+  },
+
+  noSelection: {
+    fontFamily: 'sans-serif',
+    margin: 'auto',
+    color: 'rgba(0,0,0,0.4)',
+  },
+
+  noPropsState: {
+    fontWeight: 'bold',
+    padding: '5px',
+    borderTop: '1px solid rgba(0,0,0,0.1)',
   },
 };
 

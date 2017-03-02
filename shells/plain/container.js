@@ -34,13 +34,27 @@ if (iframeSrc) {
   win.document.documentElement.innerHTML = iframeSrc.textContent.replace(/&gt;/g, '>');
 }
 
+window.addEventListener('keydown', function(e) {
+  if (e.altKey && e.keyCode === 68) { // Alt + D
+    if (document.body.className === 'devtools-bottom') {
+      document.body.className = 'devtools-right';
+    } else {
+      document.body.className = 'devtools-bottom';
+    }
+  }
+});
+
 var config = {
   alreadyFoundReact: true,
   inject(done) {
     inject(devtoolsSrc, () => {
       var wall = {
         listen(fn) {
-          win.parent.addEventListener('message', evt => fn(evt.data));
+          win.parent.addEventListener('message', evt => {
+            if (evt.source === win) {
+              fn(evt.data);
+            }
+          });
         },
         send(data) {
           win.postMessage(data, '*');

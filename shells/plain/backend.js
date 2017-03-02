@@ -19,7 +19,11 @@ var inject = require('../../agent/inject');
 
 var wall = {
   listen(fn) {
-    window.addEventListener('message', evt => fn(evt.data));
+    window.addEventListener('message', evt => {
+      if (evt.source === window.parent) {
+        fn(evt.data);
+      }
+    });
   },
   send(data) {
     window.parent.postMessage(data, '*');
