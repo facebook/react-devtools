@@ -12,18 +12,16 @@
 var React = require('react');
 
 class Getter extends React.Component {
-
-  constructor(props: Object) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
-
   handleClick() {
     this.context.onEvalGetter(this.props.path);
   }
 
+  constructor(props: Object) {
+    super(props);
+  }
+
   render() {
-    return (<div style={style} onClick={this.handleClick}>(...)</div>);
+    return (<div style={style} onClick={this.handleClick.bind(this)}>(…)</div>);
   }
 }
 

@@ -325,7 +325,11 @@ class Agent extends EventEmitter {
   }
 
   _evalGetter({id, path}: {id: ElementID, path: Array<string>}) {
-    var obj = this.elementData.get(id).props;
+    var data = this.elementData.get(id);
+    if (!data) {
+      return;
+    }
+    var obj = data.props;
     var value = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
     this.emit('sendGetterValue', {id, path, value});
   }
