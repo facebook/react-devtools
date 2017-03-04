@@ -31,8 +31,8 @@ type DefaultProps = {
 
 type State = {
   moving: boolean,
-  width: string,
-  height: string,
+  width: number,
+  height: number,
 };
 
 class SplitPane extends React.Component {
@@ -44,36 +44,31 @@ class SplitPane extends React.Component {
     super(props);
     this.state = {
       moving: false,
-      width: (props.isVertical) ? '100%' : props.initialWidth.toString(),
-      height: (!props.isVertical) ? '100%' : props.initialHeight.toString(),
+      width: props.initialWidth,
+      height: props.initialHeight,
     };
-  }
-
-  componentWillReceiveProps(nextProps: Props) {
-    if (nextProps.isVertical && !this.props.isVertical) {
-      this.setState({width: '100%'});
-    } else if (!nextProps.isVertical && this.props.isVertical) {
-      this.setState({height: '100%'});
-    }
   }
 
   onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
-    this.setState({
-      width: (this.props.isVertical) ? '100%' : ((node.offsetLeft + node.offsetWidth) - x).toString(),
-      height: (!this.props.isVertical) ? '100%' : ((node.offsetTop + node.offsetHeight) - y).toString(),
-    });
+
+    this.setState(prevState => ({
+      width: !this.props.isVertical ? prevState.width : (node.offsetLeft + node.offsetWidth) - x,
+      height: this.props.isVertical ? prevState.height : (node.offsetTop + node.offsetHeight) - y,
+    }));
   }
 
   render() {
+    var newWidth = this.state.width === this.props.initialWidth ? '50%' : this.state.width;
+    var newHeight = this.state.height === this.props.initialHeight ? '50%' : this.state.height;
     var rightStyle = assign({}, styles.rightPane, {
-      width: (this.state.width === '100%') ? '100%' : parseInt(this.state.width, 10),
-      height: (this.state.height === '100%') ? '100%' : parseInt(this.state.height, 10),
+      width: this.props.isVertical ? newWidth : '100%',
+      height: this.props.isVertical ? '100%' : newHeight,
       marginLeft: (this.props.isVertical) ? 0 : -3,
     });
 
-    var containerStyles = (this.props.isVertical) ? styles.containerVertical : styles.container;
-    var draggerStyles = (this.props.isVertical) ? styles.draggerVertical : styles.dragger;
+    var containerStyles = this.props.isVertical ? styles.container : styles.containerVertical;
+    var draggerStyles = this.props.isVertical ? styles.dragger : styles.draggerVertical;
 
     return (
       <div style={containerStyles}>
@@ -141,8 +136,8 @@ var styles = {
   leftPane: {
     display: 'flex',
     marginRight: -3,
-    minWidth: 255,
-    minHeight: 100,
+    minWidth: '50%',
+    minHeight: '50%',
     flex: 1,
     borderBottom: '1px solid #ccc',
   },

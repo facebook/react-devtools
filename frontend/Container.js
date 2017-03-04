@@ -52,14 +52,14 @@ class Container extends React.Component {
     super(props);
 
     this.state = {
-      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
     };
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize, false);
     this.setState({
-      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
     });
   }
 
@@ -80,7 +80,7 @@ class Container extends React.Component {
     this.resizeTimeout = null;
 
     this.setState({
-      isVertical: (window.innerWidth < IS_VERTICAL_BREAKPOINT),
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
     });
   };
 
@@ -88,8 +88,8 @@ class Container extends React.Component {
     var tabs = {
       Elements: () => (
         <SplitPane
-          initialWidth={300}
-          initialHeight={300}
+          initialWidth={10}
+          initialHeight={10}
           left={() => <SearchPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
           isVertical={this.state.isVertical}
