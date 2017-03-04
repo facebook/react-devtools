@@ -199,12 +199,12 @@ class DataItem extends React.Component {
             style={assign({}, styles.name, complex && styles.complexName)}
             onClick={this.toggleOpen.bind(this)}
           >
-            {this.props.name}:
+            {name}:
           </div>
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
-                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+                this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
             style={styles.preview}
