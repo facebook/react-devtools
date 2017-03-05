@@ -8,11 +8,11 @@
             id: moduleId,
             loaded: !1
         };
-        return modules[moduleId].call(module.exports, module, module.exports, __webpack_require__), 
+        return modules[moduleId].call(module.exports, module, module.exports, __webpack_require__),
         module.loaded = !0, module.exports;
     }
     var installedModules = {};
-    return __webpack_require__.m = modules, __webpack_require__.c = installedModules, 
+    return __webpack_require__.m = modules, __webpack_require__.c = installedModules,
     __webpack_require__.p = "", __webpack_require__(0);
 }([ function(module, exports, __webpack_require__) {
     "use strict";
@@ -30,7 +30,7 @@
     var bridge = new Bridge(FOR_BACKEND.wall), agent = new Agent(window, {
         rnStyle: !!FOR_BACKEND.resolveRNStyle
     });
-    agent.addBridge(bridge), FOR_BACKEND.resolveRNStyle && setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle), 
+    agent.addBridge(bridge), FOR_BACKEND.resolveRNStyle && setupRNStyle(bridge, agent, FOR_BACKEND.resolveRNStyle),
     setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
     var _connectTimeout = setTimeout(function() {
         console.warn("react-devtools agent got no connection");
@@ -83,8 +83,8 @@
                     hook.helpers[rendererID] && hook.helpers[rendererID].handleCommitFiberUnmount(fiber);
                 },
                 onCommitFiberRoot: function(rendererID, root) {
-                    var mountedRoots = hook.getFiberRoots(rendererID), current = root.current, isKnownRoot = mountedRoots.has(root), isUnmounting = null == current.memoizedState || null == current.memoizedState.element;
-                    isKnownRoot || isUnmounting ? isKnownRoot && isUnmounting && mountedRoots["delete"](root) : mountedRoots.add(root), 
+                    var mountedRoots = hook.getFiberRoots(rendererID), current = root.current, isKnownRoot = mountedRoots.has(root), isUnmounting = null == current.memoizedState || null == current.memoizedState.internalInstance;
+                    isKnownRoot || isUnmounting ? isKnownRoot && isUnmounting && mountedRoots["delete"](root) : mountedRoots.add(root),
                     hook.helpers[rendererID] && hook.helpers[rendererID].handleCommitFiberRoot(root);
                 }
             };
@@ -127,20 +127,20 @@
         function defineProperties(target, props) {
             for (var i = 0; i < props.length; i++) {
                 var descriptor = props[i];
-                descriptor.enumerable = descriptor.enumerable || !1, descriptor.configurable = !0, 
+                descriptor.enumerable = descriptor.enumerable || !1, descriptor.configurable = !0,
                 "value" in descriptor && (descriptor.writable = !0), Object.defineProperty(target, descriptor.key, descriptor);
             }
         }
         return function(Constructor, protoProps, staticProps) {
-            return protoProps && defineProperties(Constructor.prototype, protoProps), staticProps && defineProperties(Constructor, staticProps), 
+            return protoProps && defineProperties(Constructor.prototype, protoProps), staticProps && defineProperties(Constructor, staticProps),
             Constructor;
         };
     }(), _require = __webpack_require__(3), EventEmitter = _require.EventEmitter, assign = __webpack_require__(4), guid = __webpack_require__(5), Agent = function(_EventEmitter) {
         function Agent(global, capabilities) {
             _classCallCheck(this, Agent);
             var _this = _possibleConstructorReturn(this, (Agent.__proto__ || Object.getPrototypeOf(Agent)).call(this));
-            _this.global = global, _this.reactElements = new Map(), _this.ids = new WeakMap(), 
-            _this.renderers = new Map(), _this.elementData = new Map(), _this.roots = new Set(), 
+            _this.global = global, _this.reactElements = new Map(), _this.ids = new WeakMap(),
+            _this.renderers = new Map(), _this.elementData = new Map(), _this.roots = new Set(),
             _this.reactInternals = {}, _this.on("selected", function(id) {
                 var data = _this.elementData.get(id);
                 data && data.publicInstance && (_this.global.$r = data.publicInstance);
@@ -150,7 +150,7 @@
                 scroll: isReactDOM && "function" == typeof window.document.body.scrollIntoView,
                 dom: isReactDOM,
                 editTextContent: !1
-            }, capabilities), isReactDOM && (_this._updateScroll = _this._updateScroll.bind(_this), 
+            }, capabilities), isReactDOM && (_this._updateScroll = _this._updateScroll.bind(_this),
             window.addEventListener("scroll", _this._onScroll.bind(_this), !0)), _this;
         }
         return _inherits(Agent, _EventEmitter), _createClass(Agent, [ {
@@ -172,8 +172,8 @@
                 var _this3 = this;
                 bridge.on("requestCapabilities", function() {
                     bridge.send("capabilities", _this3.capabilities), _this3.emit("connected");
-                }), bridge.on("setState", this._setState.bind(this)), bridge.on("setProps", this._setProps.bind(this)), 
-                bridge.on("setContext", this._setContext.bind(this)), bridge.on("makeGlobal", this._makeGlobal.bind(this)), 
+                }), bridge.on("setState", this._setState.bind(this)), bridge.on("setProps", this._setProps.bind(this)),
+                bridge.on("setContext", this._setContext.bind(this)), bridge.on("makeGlobal", this._makeGlobal.bind(this)),
                 bridge.on("highlight", function(id) {
                     return _this3.highlight(id);
                 }), bridge.on("highlightMany", function(id) {
@@ -227,7 +227,7 @@
                 var node = this.getNodeForID(id);
                 if (!node) return void console.warn("unable to get the node for scrolling");
                 var element = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
-                return element ? ("function" == typeof element.scrollIntoViewIfNeeded ? element.scrollIntoViewIfNeeded() : "function" == typeof element.scrollIntoView && element.scrollIntoView(), 
+                return element ? ("function" == typeof element.scrollIntoViewIfNeeded ? element.scrollIntoViewIfNeeded() : "function" == typeof element.scrollIntoView && element.scrollIntoView(),
                 void this.highlight(id)) : void console.warn("unable to get the element for scrolling");
             }
         }, {
@@ -312,14 +312,14 @@
                 var id = _ref5.id, path = _ref5.path, data = this.elementData.get(id);
                 if (data) {
                     var value;
-                    value = "instance" === path ? data.publicInstance : getIn(data, path), this.global.$tmp = value, 
+                    value = "instance" === path ? data.publicInstance : getIn(data, path), this.global.$tmp = value,
                     console.log("$tmp =", value);
                 }
             }
         }, {
             key: "getId",
             value: function(element) {
-                return "object" === ("undefined" == typeof element ? "undefined" : _typeof(element)) && element ? (this.ids.has(element) || (this.ids.set(element, guid()), 
+                return "object" === ("undefined" == typeof element ? "undefined" : _typeof(element)) && element ? (this.ids.has(element) || (this.ids.set(element, guid()),
                 this.reactElements.set(this.ids.get(element), element)), this.ids.get(element)) : element;
             }
         }, {
@@ -336,7 +336,7 @@
                 var send = assign({}, data);
                 send.children && send.children.map && (send.children = send.children.map(function(c) {
                     return _this5.getId(c);
-                })), send.id = id, send.canUpdate = send.updater && !!send.updater.forceUpdate, 
+                })), send.id = id, send.canUpdate = send.updater && !!send.updater.forceUpdate,
                 delete send.type, delete send.updater, this.emit("mount", send);
             }
         }, {
@@ -347,14 +347,14 @@
                 var send = assign({}, data);
                 send.children && send.children.map && (send.children = send.children.map(function(c) {
                     return _this6.getId(c);
-                })), send.id = id, send.canUpdate = send.updater && !!send.updater.forceUpdate, 
+                })), send.id = id, send.canUpdate = send.updater && !!send.updater.forceUpdate,
                 delete send.type, delete send.updater, this.emit("update", send);
             }
         }, {
             key: "onUnmounted",
             value: function(component) {
                 var id = this.getId(component);
-                this.elementData["delete"](id), this.roots["delete"](id), this.renderers["delete"](id), 
+                this.elementData["delete"](id), this.roots["delete"](id), this.renderers["delete"](id),
                 this.emit("unmount", id), this.ids["delete"](component);
             }
         }, {
@@ -386,8 +386,8 @@
     function isUndefined(arg) {
         return void 0 === arg;
     }
-    module.exports = EventEmitter, EventEmitter.EventEmitter = EventEmitter, EventEmitter.prototype._events = void 0, 
-    EventEmitter.prototype._maxListeners = void 0, EventEmitter.defaultMaxListeners = 10, 
+    module.exports = EventEmitter, EventEmitter.EventEmitter = EventEmitter, EventEmitter.prototype._events = void 0,
+    EventEmitter.prototype._maxListeners = void 0, EventEmitter.defaultMaxListeners = 10,
     EventEmitter.prototype.setMaxListeners = function(n) {
         if (!isNumber(n) || n < 0 || isNaN(n)) throw TypeError("n must be a positive number");
         return this._maxListeners = n, this;
@@ -414,17 +414,17 @@
 
           default:
             args = Array.prototype.slice.call(arguments, 1), handler.apply(this, args);
-        } else if (isObject(handler)) for (args = Array.prototype.slice.call(arguments, 1), 
+        } else if (isObject(handler)) for (args = Array.prototype.slice.call(arguments, 1),
         listeners = handler.slice(), len = listeners.length, i = 0; i < len; i++) listeners[i].apply(this, args);
         return !0;
     }, EventEmitter.prototype.addListener = function(type, listener) {
         var m;
         if (!isFunction(listener)) throw TypeError("listener must be a function");
-        return this._events || (this._events = {}), this._events.newListener && this.emit("newListener", type, isFunction(listener.listener) ? listener.listener : listener), 
-        this._events[type] ? isObject(this._events[type]) ? this._events[type].push(listener) : this._events[type] = [ this._events[type], listener ] : this._events[type] = listener, 
-        isObject(this._events[type]) && !this._events[type].warned && (m = isUndefined(this._maxListeners) ? EventEmitter.defaultMaxListeners : this._maxListeners, 
-        m && m > 0 && this._events[type].length > m && (this._events[type].warned = !0, 
-        console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.", this._events[type].length), 
+        return this._events || (this._events = {}), this._events.newListener && this.emit("newListener", type, isFunction(listener.listener) ? listener.listener : listener),
+        this._events[type] ? isObject(this._events[type]) ? this._events[type].push(listener) : this._events[type] = [ this._events[type], listener ] : this._events[type] = listener,
+        isObject(this._events[type]) && !this._events[type].warned && (m = isUndefined(this._maxListeners) ? EventEmitter.defaultMaxListeners : this._maxListeners,
+        m && m > 0 && this._events[type].length > m && (this._events[type].warned = !0,
+        console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.", this._events[type].length),
         "function" == typeof console.trace && console.trace())), this;
     }, EventEmitter.prototype.on = EventEmitter.prototype.addListener, EventEmitter.prototype.once = function(type, listener) {
         function g() {
@@ -437,21 +437,21 @@
         var list, position, length, i;
         if (!isFunction(listener)) throw TypeError("listener must be a function");
         if (!this._events || !this._events[type]) return this;
-        if (list = this._events[type], length = list.length, position = -1, list === listener || isFunction(list.listener) && list.listener === listener) delete this._events[type], 
+        if (list = this._events[type], length = list.length, position = -1, list === listener || isFunction(list.listener) && list.listener === listener) delete this._events[type],
         this._events.removeListener && this.emit("removeListener", type, listener); else if (isObject(list)) {
             for (i = length; i-- > 0; ) if (list[i] === listener || list[i].listener && list[i].listener === listener) {
                 position = i;
                 break;
             }
             if (position < 0) return this;
-            1 === list.length ? (list.length = 0, delete this._events[type]) : list.splice(position, 1), 
+            1 === list.length ? (list.length = 0, delete this._events[type]) : list.splice(position, 1),
             this._events.removeListener && this.emit("removeListener", type, listener);
         }
         return this;
     }, EventEmitter.prototype.removeAllListeners = function(type) {
         var key, listeners;
         if (!this._events) return this;
-        if (!this._events.removeListener) return 0 === arguments.length ? this._events = {} : this._events[type] && delete this._events[type], 
+        if (!this._events.removeListener) return 0 === arguments.length ? this._events = {} : this._events[type] && delete this._events[type],
         this;
         if (0 === arguments.length) {
             for (key in this._events) "removeListener" !== key && this.removeAllListeners(key);
@@ -523,12 +523,12 @@
         function defineProperties(target, props) {
             for (var i = 0; i < props.length; i++) {
                 var descriptor = props[i];
-                descriptor.enumerable = descriptor.enumerable || !1, descriptor.configurable = !0, 
+                descriptor.enumerable = descriptor.enumerable || !1, descriptor.configurable = !0,
                 "value" in descriptor && (descriptor.writable = !0), Object.defineProperty(target, descriptor.key, descriptor);
             }
         }
         return function(Constructor, protoProps, staticProps) {
-            return protoProps && defineProperties(Constructor.prototype, protoProps), staticProps && defineProperties(Constructor, staticProps), 
+            return protoProps && defineProperties(Constructor.prototype, protoProps), staticProps && defineProperties(Constructor, staticProps),
             Constructor;
         };
     }(), consts = __webpack_require__(7), hydrate = __webpack_require__(26), dehydrate = __webpack_require__(27), performanceNow = __webpack_require__(28), lastRunTimeMS = 5, cancelIdleCallback = window.cancelIdleCallback || clearTimeout, requestIdleCallback = window.requestIdleCallback || function(cb, options) {
@@ -546,8 +546,8 @@
         }, delayMS);
     }, Bridge = function() {
         function Bridge(wall) {
-            _classCallCheck(this, Bridge), this._cbs = new Map(), this._inspectables = new Map(), 
-            this._cid = 0, this._listeners = {}, this._buffer = [], this._flushHandle = null, 
+            _classCallCheck(this, Bridge), this._cbs = new Map(), this._inspectables = new Map(),
+            this._cid = 0, this._listeners = {}, this._buffer = [], this._flushHandle = null,
             this._callers = {}, this._paused = !1, this._wall = wall, wall.listen(this._handleMessage.bind(this));
         }
         return _createClass(Bridge, [ {
@@ -555,7 +555,7 @@
             value: function(id, path, cb) {
                 var _cid = this._cid++;
                 this._cbs.set(_cid, function(data, cleaned, proto, protoclean) {
-                    cleaned.length && hydrate(data, cleaned), proto && protoclean.length && hydrate(proto, protoclean), 
+                    cleaned.length && hydrate(data, cleaned), proto && protoclean.length && hydrate(proto, protoclean),
                     proto && (data[consts.proto] = proto), cb(data);
                 }), this._wall.send({
                     type: "inspect",
@@ -685,7 +685,7 @@
                 if ("pause" === payload.type) return this._paused = !0, void this.cancelFlush();
                 if ("callback" === payload.type) {
                     var callback = this._cbs.get(payload.id);
-                    return void (callback && (callback.apply(void 0, _toConsumableArray(payload.args)), 
+                    return void (callback && (callback.apply(void 0, _toConsumableArray(payload.args)),
                     this._cbs["delete"](payload.id)));
                 }
                 if ("call" === payload.type) return void this._handleCall(payload.name, payload.args, payload.callback);
@@ -781,7 +781,7 @@
         return function(desc) {
             for (var name, ie11BugWorkaround, postfix = 0; created[desc + (postfix || "")]; ) ++postfix;
             return desc += postfix || "", created[desc] = !0, name = "@@" + desc, defineProperty(objPrototype, name, d.gs(null, function(value) {
-                ie11BugWorkaround || (ie11BugWorkaround = !0, defineProperty(this, name, d(value)), 
+                ie11BugWorkaround || (ie11BugWorkaround = !0, defineProperty(this, name, d(value)),
                 ie11BugWorkaround = !1);
             })), name;
         };
@@ -792,7 +792,7 @@
     }, module.exports = SymbolPolyfill = function Symbol(description) {
         var symbol;
         if (this instanceof Symbol) throw new TypeError("TypeError: Symbol is not a constructor");
-        return symbol = create(HiddenSymbol.prototype), description = void 0 === description ? "" : String(description), 
+        return symbol = create(HiddenSymbol.prototype), description = void 0 === description ? "" : String(description),
         defineProperties(symbol, {
             __description__: d("", description),
             __name__: d("", generateName(description))
@@ -831,16 +831,16 @@
         })
     }), defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toPrimitive, d("", function() {
         return validateSymbol(this);
-    })), defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toStringTag, d("c", "Symbol")), 
-    defineProperty(HiddenSymbol.prototype, SymbolPolyfill.toStringTag, d("c", SymbolPolyfill.prototype[SymbolPolyfill.toStringTag])), 
+    })), defineProperty(SymbolPolyfill.prototype, SymbolPolyfill.toStringTag, d("c", "Symbol")),
+    defineProperty(HiddenSymbol.prototype, SymbolPolyfill.toStringTag, d("c", SymbolPolyfill.prototype[SymbolPolyfill.toStringTag])),
     defineProperty(HiddenSymbol.prototype, SymbolPolyfill.toPrimitive, d("c", SymbolPolyfill.prototype[SymbolPolyfill.toPrimitive]));
 }, function(module, exports, __webpack_require__) {
     "use strict";
     var d, assign = __webpack_require__(12), normalizeOpts = __webpack_require__(19), isCallable = __webpack_require__(20), contains = __webpack_require__(21);
     d = module.exports = function(dscr, value) {
         var c, e, w, options, desc;
-        return arguments.length < 2 || "string" != typeof dscr ? (options = value, value = dscr, 
-        dscr = null) : options = arguments[2], null == dscr ? (c = w = !0, e = !1) : (c = contains.call(dscr, "c"), 
+        return arguments.length < 2 || "string" != typeof dscr ? (options = value, value = dscr,
+        dscr = null) : options = arguments[2], null == dscr ? (c = w = !0, e = !1) : (c = contains.call(dscr, "c"),
         e = contains.call(dscr, "e"), w = contains.call(dscr, "w")), desc = {
             value: value,
             configurable: c,
@@ -849,9 +849,9 @@
         }, options ? assign(normalizeOpts(options), desc) : desc;
     }, d.gs = function(dscr, get, set) {
         var c, e, options, desc;
-        return "string" != typeof dscr ? (options = set, set = get, get = dscr, dscr = null) : options = arguments[3], 
-        null == get ? get = void 0 : isCallable(get) ? null == set ? set = void 0 : isCallable(set) || (options = set, 
-        set = void 0) : (options = get, get = set = void 0), null == dscr ? (c = !0, e = !1) : (c = contains.call(dscr, "c"), 
+        return "string" != typeof dscr ? (options = set, set = get, get = dscr, dscr = null) : options = arguments[3],
+        null == get ? get = void 0 : isCallable(get) ? null == set ? set = void 0 : isCallable(set) || (options = set,
+        set = void 0) : (options = get, get = set = void 0), null == dscr ? (c = !0, e = !1) : (c = contains.call(dscr, "c"),
         e = contains.call(dscr, "e")), desc = {
             get: get,
             set: set,
@@ -966,7 +966,7 @@
             }, data);
             if (obj && obj[last]) {
                 var replace = {};
-                replace[consts.name] = obj[last].name, replace[consts.type] = obj[last].type, replace[consts.meta] = obj[last].meta, 
+                replace[consts.name] = obj[last].name, replace[consts.type] = obj[last].type, replace[consts.meta] = obj[last].meta,
                 replace[consts.inspected] = !1, obj[last] = replace;
             }
         });
@@ -976,7 +976,7 @@
 }, function(module, exports) {
     "use strict";
     function dehydrate(data, cleaned, path, level) {
-        if (level = level || 0, path = path || [], "function" == typeof data) return cleaned.push(path), 
+        if (level = level || 0, path = path || [], "function" == typeof data) return cleaned.push(path),
         {
             name: data.name,
             type: "function"
@@ -1000,7 +1000,7 @@
         if (Array.isArray(data)) return data.map(function(item, i) {
             return dehydrate(item, cleaned, path.concat([ i ]), level + 1);
         });
-        if (data.constructor && "function" == typeof data.constructor && "Object" !== data.constructor.name) return cleaned.push(path), 
+        if (data.constructor && "function" == typeof data.constructor && "Object" !== data.constructor.name) return cleaned.push(path),
         {
             name: data.constructor.name,
             type: "object"
@@ -1026,7 +1026,7 @@
 }, function(module, exports, __webpack_require__) {
     "use strict";
     var performance, ExecutionEnvironment = __webpack_require__(30);
-    ExecutionEnvironment.canUseDOM && (performance = window.performance || window.msPerformance || window.webkitPerformance), 
+    ExecutionEnvironment.canUseDOM && (performance = window.performance || window.msPerformance || window.webkitPerformance),
     module.exports = performance || {};
 }, function(module, exports) {
     "use strict";
@@ -1058,7 +1058,7 @@
             var element = (_ref5.renderer, _ref5.element);
             return agent.onUnmounted(element);
         }) ], success = setupBackend(hook);
-        success && (hook.emit("react-devtools", agent), hook.reactDevtoolsAgent = agent, 
+        success && (hook.emit("react-devtools", agent), hook.reactDevtoolsAgent = agent,
         agent.on("shutdown", function() {
             subs.forEach(function(fn) {
                 return fn();
@@ -1071,7 +1071,7 @@
     module.exports = function(hook) {
         var oldReact = window.React && window.React.__internals;
         oldReact && 0 === Object.keys(hook._renderers).length && hook.inject(oldReact);
-        for (var rid in hook._renderers) hook.helpers[rid] = attachRenderer(hook, rid, hook._renderers[rid]), 
+        for (var rid in hook._renderers) hook.helpers[rid] = attachRenderer(hook, rid, hook._renderers[rid]),
         hook.emit("renderer-attached", {
             id: rid,
             renderer: hook._renderers[rid],
@@ -1112,7 +1112,7 @@
                 return;
             }
         }, extras.getReactElementFromNative = function(node) {
-            for (var id = renderer.Mount.getID(node); node && node.parentNode && !id; ) node = node.parentNode, 
+            for (var id = renderer.Mount.getID(node); node && node.parentNode && !id; ) node = node.parentNode,
             id = renderer.Mount.getID(node);
             return rootNodeIDMap.get(id);
         }) : console.warn("Unknown react version (does not have getID), probably an unshimmed React Native");
@@ -1127,7 +1127,7 @@
                 renderer: rid,
                 element: element._reactInternalInstance
             });
-        })), renderer.Component ? (console.error("You are using a version of React with limited support in this version of the devtools.\nPlease upgrade to use at least 0.13, or you can downgrade to use the old version of the devtools:\ninstructions here https://github.com/facebook/react-devtools/tree/devtools-next#how-do-i-use-this-for-react--013"), 
+        })), renderer.Component ? (console.error("You are using a version of React with limited support in this version of the devtools.\nPlease upgrade to use at least 0.13, or you can downgrade to use the old version of the devtools:\ninstructions here https://github.com/facebook/react-devtools/tree/devtools-next#how-do-i-use-this-for-react--013"),
         oldMethods = decorateMany(renderer.Component.Mixin, {
             mountComponent: function() {
                 var _this = this;
@@ -1190,8 +1190,8 @@
             };
             walkRoots(renderer.Mount._instancesByReactRootID || renderer.Mount._instancesByContainerID, onMount, visitRoot, isPre013);
         }, extras.cleanup = function() {
-            oldMethods && (renderer.Component ? restoreMany(renderer.Component.Mixin, oldMethods) : restoreMany(renderer.Reconciler, oldMethods)), 
-            oldRenderRoot && (renderer.Mount._renderNewRootComponent = oldRenderRoot), oldRenderComponent && (renderer.Mount.renderComponent = oldRenderComponent), 
+            oldMethods && (renderer.Component ? restoreMany(renderer.Component.Mixin, oldMethods) : restoreMany(renderer.Reconciler, oldMethods)),
+            oldRenderRoot && (renderer.Mount._renderNewRootComponent = oldRenderRoot), oldRenderComponent && (renderer.Mount.renderComponent = oldRenderComponent),
             oldMethods = null, oldRenderRoot = null, oldRenderComponent = null;
         }, extras;
     }
@@ -1232,15 +1232,15 @@
     "use strict";
     function getData(element) {
         var children = null, props = null, state = null, context = null, updater = null, name = null, type = null, key = null, ref = null, source = null, text = null, publicInstance = null, nodeType = "Native";
-        if ("object" !== ("undefined" == typeof element ? "undefined" : _typeof(element)) ? (nodeType = "Text", 
-        text = element + "") : null === element._currentElement || element._currentElement === !1 ? nodeType = "Empty" : element._renderedComponent ? (nodeType = "NativeWrapper", 
-        children = [ element._renderedComponent ], props = element._instance.props, state = element._instance.state, 
-        context = element._instance.context, context && 0 === Object.keys(context).length && (context = null)) : element._renderedChildren ? children = childrenList(element._renderedChildren) : element._currentElement && element._currentElement.props && (children = element._currentElement.props.children), 
-        !props && element._currentElement && element._currentElement.props && (props = element._currentElement.props), 
-        null != element._currentElement && (type = element._currentElement.type, element._currentElement.key && (key = String(element._currentElement.key)), 
-        source = element._currentElement._source, ref = element._currentElement.ref, "string" == typeof type ? name = type : element.getName ? (nodeType = "Composite", 
-        name = element.getName(), element._renderedComponent && (element._currentElement.props === element._renderedComponent._currentElement || element._currentElement.type.isReactTopLevelWrapper) && (nodeType = "Wrapper"), 
-        null === name && (name = "No display name")) : "string" == typeof element._stringText ? (nodeType = "Text", 
+        if ("object" !== ("undefined" == typeof element ? "undefined" : _typeof(element)) ? (nodeType = "Text",
+        text = element + "") : null === element._currentElement || element._currentElement === !1 ? nodeType = "Empty" : element._renderedComponent ? (nodeType = "NativeWrapper",
+        children = [ element._renderedComponent ], props = element._instance.props, state = element._instance.state,
+        context = element._instance.context, context && 0 === Object.keys(context).length && (context = null)) : element._renderedChildren ? children = childrenList(element._renderedChildren) : element._currentElement && element._currentElement.props && (children = element._currentElement.props.children),
+        !props && element._currentElement && element._currentElement.props && (props = element._currentElement.props),
+        null != element._currentElement && (type = element._currentElement.type, element._currentElement.key && (key = String(element._currentElement.key)),
+        source = element._currentElement._source, ref = element._currentElement.ref, "string" == typeof type ? name = type : element.getName ? (nodeType = "Composite",
+        name = element.getName(), element._renderedComponent && (element._currentElement.props === element._renderedComponent._currentElement || element._currentElement.type.isReactTopLevelWrapper) && (nodeType = "Wrapper"),
+        null === name && (name = "No display name")) : "string" == typeof element._stringText ? (nodeType = "Text",
         text = element._stringText) : name = getDisplayName(type)), element._instance) {
             var inst = element._instance;
             updater = {
@@ -1337,14 +1337,14 @@
     "use strict";
     function getData012(element) {
         var children = null, props = element.props, state = element.state, context = element.context, updater = null, name = null, type = null, key = null, ref = null, text = null, publicInstance = null, nodeType = "Native";
-        return element._renderedComponent ? (nodeType = "Wrapper", children = [ element._renderedComponent ], 
-        context && 0 === Object.keys(context).length && (context = null)) : element._renderedChildren ? (name = element.constructor.displayName, 
-        children = childrenList(element._renderedChildren)) : "string" == typeof props.children && (name = element.constructor.displayName, 
-        children = props.children, nodeType = "Native"), !props && element._currentElement && element._currentElement.props && (props = element._currentElement.props), 
-        element._currentElement && (type = element._currentElement.type, element._currentElement.key && (key = String(element._currentElement.key)), 
-        ref = element._currentElement.ref, "string" == typeof type ? name = type : (nodeType = "Composite", 
-        name = type.displayName, name || (name = "No display name"))), name || (name = element.constructor.displayName || "No display name", 
-        nodeType = "Composite"), "string" == typeof props && (nodeType = "Text", text = props, 
+        return element._renderedComponent ? (nodeType = "Wrapper", children = [ element._renderedComponent ],
+        context && 0 === Object.keys(context).length && (context = null)) : element._renderedChildren ? (name = element.constructor.displayName,
+        children = childrenList(element._renderedChildren)) : "string" == typeof props.children && (name = element.constructor.displayName,
+        children = props.children, nodeType = "Native"), !props && element._currentElement && element._currentElement.props && (props = element._currentElement.props),
+        element._currentElement && (type = element._currentElement.type, element._currentElement.key && (key = String(element._currentElement.key)),
+        ref = element._currentElement.ref, "string" == typeof type ? name = type : (nodeType = "Composite",
+        name = type.displayName, name || (name = "No display name"))), name || (name = element.constructor.displayName || "No display name",
+        nodeType = "Composite"), "string" == typeof props && (nodeType = "Text", text = props,
         props = null, name = null), element.forceUpdate && (updater = {
             setState: element.setState.bind(element),
             forceUpdate: element.forceUpdate.bind(element),
@@ -1395,7 +1395,7 @@
         function getOpaqueNode(fiber) {
             if (opaqueNodes.has(fiber)) return fiber;
             var alternate = fiber.alternate;
-            return null != alternate && opaqueNodes.has(alternate) ? alternate : (opaqueNodes.add(fiber), 
+            return null != alternate && opaqueNodes.has(alternate) ? alternate : (opaqueNodes.add(fiber),
             fiber);
         }
         function hasDataChanged(prevFiber, nextFiber) {
@@ -1526,8 +1526,8 @@
         switch (fiber.tag) {
           case FunctionalComponent:
           case ClassComponent:
-            nodeType = "Composite", name = getDisplayName(fiber.type), publicInstance = fiber.stateNode, 
-            props = fiber.memoizedProps, state = fiber.memoizedState, null != publicInstance && (context = publicInstance.context, 
+            nodeType = "Composite", name = getDisplayName(fiber.type), publicInstance = fiber.stateNode,
+            props = fiber.memoizedProps, state = fiber.memoizedState, null != publicInstance && (context = publicInstance.context,
             context && 0 === Object.keys(context).length && (context = null));
             var inst = publicInstance;
             inst && (updater = {
@@ -1562,10 +1562,10 @@
             break;
 
           default:
-            nodeType = "Native", props = fiber.memoizedProps, name = "TODO_NOT_IMPLEMENTED_YET", 
+            nodeType = "Native", props = fiber.memoizedProps, name = "TODO_NOT_IMPLEMENTED_YET",
             children = [];
         }
-        if (Array.isArray(children)) for (var child = fiber.child; child; ) children.push(getOpaqueNode(child)), 
+        if (Array.isArray(children)) for (var child = fiber.child; child; ) children.push(getOpaqueNode(child)),
         child = child.sibling;
         return {
             nodeType: nodeType,
@@ -1639,10 +1639,10 @@
             }) : console.error("Unable to set style for this element... (no forceUpdate or setNativeProps)"));
         }
         var customStyle, style = data && data.props && data.props.style;
-        Array.isArray(style) ? "object" !== _typeof(style[style.length - 1]) || Array.isArray(style[style.length - 1]) ? (style = style.concat([ newStyle ]), 
-        data.updater.setInProps([ "style" ], style)) : (customStyle = shallowClone(style[style.length - 1]), 
-        delete customStyle[oldName], customStyle[newName] = val, data.updater.setInProps([ "style", style.length - 1 ], customStyle)) : "object" === ("undefined" == typeof style ? "undefined" : _typeof(style)) ? (customStyle = shallowClone(style), 
-        delete customStyle[oldName], customStyle[newName] = val, data.updater.setInProps([ "style" ], customStyle)) : (style = [ style, newStyle ], 
+        Array.isArray(style) ? "object" !== _typeof(style[style.length - 1]) || Array.isArray(style[style.length - 1]) ? (style = style.concat([ newStyle ]),
+        data.updater.setInProps([ "style" ], style)) : (customStyle = shallowClone(style[style.length - 1]),
+        delete customStyle[oldName], customStyle[newName] = val, data.updater.setInProps([ "style", style.length - 1 ], customStyle)) : "object" === ("undefined" == typeof style ? "undefined" : _typeof(style)) ? (customStyle = shallowClone(style),
+        delete customStyle[oldName], customStyle[newName] = val, data.updater.setInProps([ "style" ], customStyle)) : (style = [ style, newStyle ],
         data.updater.setInProps([ "style" ], style)), agent.emit("hideHighlight");
     }
     function setStyle(agent, id, attr, val) {
@@ -1654,8 +1654,8 @@
             }) : console.error("Unable to set style for this element... (no forceUpdate or setNativeProps)"));
         }
         var style = data.props && data.props.style;
-        Array.isArray(style) ? "object" !== _typeof(style[style.length - 1]) || Array.isArray(style[style.length - 1]) ? (style = style.concat([ newStyle ]), 
-        data.updater.setInProps([ "style" ], style)) : data.updater.setInProps([ "style", style.length - 1, attr ], val) : (style = [ style, newStyle ], 
+        Array.isArray(style) ? "object" !== _typeof(style[style.length - 1]) || Array.isArray(style[style.length - 1]) ? (style = style.concat([ newStyle ]),
+        data.updater.setInProps([ "style" ], style)) : data.updater.setInProps([ "style", style.length - 1, attr ], val) : (style = [ style, newStyle ],
         data.updater.setInProps([ "style" ], style)), agent.emit("hideHighlight");
     }
     var _typeof = "function" == typeof Symbol && "symbol" == typeof Symbol.iterator ? function(obj) {
@@ -1703,7 +1703,7 @@
                 subscriptionEnabled = !0, sendStoreData();
             }), bridge.onCall("relay:store:disable", function() {
                 subscriptionEnabled = !1;
-            }), sendStoreData(), decorate(DefaultStoreData, "handleUpdatePayload", sendStoreData), 
+            }), sendStoreData(), decorate(DefaultStoreData, "handleUpdatePayload", sendStoreData),
             decorate(DefaultStoreData, "handleQueryPayload", sendStoreData);
             var removeListener = setRequestListener(function(event, data) {
                 bridge.send(event, data);

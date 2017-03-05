@@ -210,18 +210,18 @@ class Agent extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    var element = node.nodeType === Node.ELEMENT_NODE ?
+    var internalInstance = node.nodeType === Node.ELEMENT_NODE ?
       node :
       node.parentElement;
-    if (!element) {
-      console.warn('unable to get the element for scrolling');
+    if (!internalInstance) {
+      console.warn('unable to get the internalInstance for scrolling');
       return;
     }
 
-    if (typeof element.scrollIntoViewIfNeeded === 'function') {
-      element.scrollIntoViewIfNeeded();
-    } else if (typeof element.scrollIntoView === 'function') {
-      element.scrollIntoView();
+    if (typeof internalInstance.scrollIntoViewIfNeeded === 'function') {
+      internalInstance.scrollIntoViewIfNeeded();
+    } else if (typeof internalInstance.scrollIntoView === 'function') {
+      internalInstance.scrollIntoView();
     }
     this.highlight(id);
   }
@@ -336,19 +336,19 @@ class Agent extends EventEmitter {
     console.log('$tmp =', value);
   }
 
-  getId(element: OpaqueNodeHandle): ElementID {
-    if (typeof element !== 'object' || !element) {
-      return element;
+  getId(internalInstance: OpaqueNodeHandle): ElementID {
+    if (typeof internalInstance !== 'object' || !internalInstance) {
+      return internalInstance;
     }
-    if (!this.ids.has(element)) {
-      this.ids.set(element, guid());
-      this.reactElements.set(this.ids.get(element), element);
+    if (!this.ids.has(internalInstance)) {
+      this.ids.set(internalInstance, guid());
+      this.reactElements.set(this.ids.get(internalInstance), internalInstance);
     }
-    return this.ids.get(element);
+    return this.ids.get(internalInstance);
   }
 
-  addRoot(renderer: RendererID, element: OpaqueNodeHandle) {
-    var id = this.getId(element);
+  addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
+    var id = this.getId(internalInstance);
     this.roots.add(id);
     this.emit('root', id);
   }

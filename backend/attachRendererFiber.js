@@ -71,8 +71,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function enqueueMount(fiber) {
     pendingEvents.push({
-      // TODO: the naming is confusing. `element` is *not* a React element. It is an opaque ID.
-      element: getOpaqueNode(fiber),
+      internalInstance: getOpaqueNode(fiber),
       data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       type: 'mount',
@@ -81,7 +80,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     const isRoot = fiber.tag === HostRoot;
     if (isRoot) {
       pendingEvents.push({
-        element: getOpaqueNode(fiber),
+        internalInstance: getOpaqueNode(fiber),
         renderer: rid,
         type: 'root',
       });
@@ -93,7 +92,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       return;
     }
     pendingEvents.push({
-      element: getOpaqueNode(fiber),
+      internalInstance: getOpaqueNode(fiber),
       data: getDataFiber(fiber, getOpaqueNode),
       renderer: rid,
       type: 'update',
@@ -104,7 +103,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     const isRoot = fiber.tag === HostRoot;
     const opaqueNode = getOpaqueNode(fiber);
     const event = {
-      element: opaqueNode,
+      internalInstance: opaqueNode,
       renderer: rid,
       type: 'unmount',
     };
@@ -223,8 +222,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     const alternate = current.alternate;
     if (alternate) {
       // TODO: relying on this seems a bit fishy.
-      const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;
-      const isMounted = current.memoizedState != null && current.memoizedState.element != null;
+      const wasMounted = alternate.memoizedState != null && alternate.memoizedState.internalInstance != null;
+      const isMounted = current.memoizedState != null && current.memoizedState.internalInstance != null;
       if (!wasMounted && isMounted) {
         // Mount a new root.
         mountFiber(current);

@@ -150,8 +150,8 @@ function findTipPos(dims, win) {
   return {top, left: dims.left + margin + 'px'};
 }
 
-function getElementDimensions(element) {
-  var calculatedStyle = window.getComputedStyle(element);
+function getElementDimensions(internalInstance) {
+  var calculatedStyle = window.getComputedStyle(internalInstance);
 
   return {
     borderLeft: +calculatedStyle.borderLeftWidth.match(/[0-9]*/)[0],
