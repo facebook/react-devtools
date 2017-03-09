@@ -97,18 +97,26 @@ class DataView extends React.Component {
           />}
 
         {names.map((name, i) => (
-          <DataItem
-            name={name}
-            path={path.concat([name])}
-            key={i}
-            isSparseArrayFiller={isSparseArray && this.props.data[name] === undefined}
-            startOpen={this.props.startOpen}
-            inspect={this.props.inspect}
-            showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
-            value={this.props.data[name]}
-          />
-        ))}
+          this.props.data.hasOwnProperty(name) ? (
+            <DataItem
+              name={name}
+              path={path.concat([name])}
+              key={i}
+              startOpen={this.props.startOpen}
+              inspect={this.props.inspect}
+              showMenu={this.props.showMenu}
+              readOnly={this.props.readOnly}
+              value={this.props.data[name]}
+            />
+          ) : (
+            <li>
+              <div style={styles.head}>
+                <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+                  {name}
+                </div>
+              </div>
+            </li>
+        )))}
       </ul>
     );
   }
@@ -117,7 +125,6 @@ class DataView extends React.Component {
 class DataItem extends React.Component {
   props: {
     path: Array<string>,
-    isSparseArrayFiller?: boolean,
     inspect: Inspect,
     showMenu: ShowMenu,
     startOpen?: boolean,
@@ -227,27 +234,21 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={assign({},
-              styles.name,
-              complex && styles.complexName,
-              this.props.isSparseArrayFiller && styles.sparseArrayFiller)
-            }
+            style={assign({}, styles.name, complex && styles.complexName)}
             onClick={this.toggleOpen.bind(this)}
           >
-            {this.props.name}{!this.props.isSparseArrayFiller && ':'}
+            {this.props.name}:
           </div>
-          {!this.props.isSparseArrayFiller && (
-            <div
-              onContextMenu={e => {
-                if (typeof this.props.showMenu === 'function') {
-                  this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
-                }
-              }}
-              style={styles.preview}
-            >
-              {preview}
-            </div>
-          )}
+          <div
+            onContextMenu={e => {
+              if (typeof this.props.showMenu === 'function') {
+                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+              }
+            }}
+            style={styles.preview}
+          >
+            {preview}
+          </div>
         </div>
         {children}
       </li>
@@ -299,7 +300,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent #555',
+    borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -308,7 +309,7 @@ var styles = {
   },
 
   expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
+    borderColor: 'rgb(110, 110, 110) transparent transparent transparent',
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
