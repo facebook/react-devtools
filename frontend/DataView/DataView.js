@@ -35,26 +35,30 @@ type DataViewProps = {
 class DataView extends React.Component {
   props: DataViewProps;
 
-  parseSparseArray(arr: Object) {
-    var acc: Array<any> = [];
-    var length = arr.length;
-    var numOfUndefsInRow = 0;
+  renderSparseArrayHole(count: number, key: string) {
+    return (
+      <li key={key}>
+        <div style={styles.head}>
+          <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+            undefined × {count}
+          </div>
+        </div>
+      </li>
+    );
+  }
 
-    for (var i = 0; i < length; ++i) {
-      if (!arr.hasOwnProperty(i)) {
-        numOfUndefsInRow++;
-        if (i === length - 1) {
-          acc.push('undefined x ' + numOfUndefsInRow);
-        }
-      } else {
-        if (numOfUndefsInRow) {
-          acc.push('undefined x ' + numOfUndefsInRow);
-        }
-        numOfUndefsInRow = 0;
-        acc.push(i);
-      }
-    }
-    return acc;
+  renderItem(name: string, key: string) {
+    return (
+      <DataItem
+        key={key}
+        name={name}
+        path={this.props.path.concat([name])}
+        startOpen={this.props.startOpen}
+        inspect={this.props.inspect}
+        showMenu={this.props.showMenu}
+        readOnly={this.props.readOnly}
+        value={this.props.data[name]} />
+    );
   }
 
   render() {
@@ -64,17 +68,40 @@ class DataView extends React.Component {
     }
 
     var isArray = Array.isArray(data);
+    var elements = [];
     if (isArray) {
-      var realItemCount = data.reduce(acc => ++acc);
-    }
-    var isSparseArray = isArray && data.length !== realItemCount;
-    var names = !isSparseArray ? Object.keys(data) : this.parseSparseArray(data);
-    if (!this.props.noSort && !isSparseArray) {
-      names.sort(alphanumericSort);
+      // Iterate over array, filling holes with special items
+      var lastIndex = -1;
+      data.forEach((item, i) => {
+        if (lastIndex < i - 1) {
+          // Have we skipped over a hole?
+          var holeCount = (i - 1) - lastIndex;
+          elements.push(
+            this.renderSparseArrayHole(holeCount, i + '-hole')
+          );
+        }
+        elements.push(this.renderItem(i, i));
+        lastIndex = i;
+      });
+      if (lastIndex < data.length - 1) {
+        // Is there a hole at the end?
+        var holeCount = (data.length - 1) - lastIndex;
+        elements.push(
+          this.renderSparseArrayHole(holeCount, lastIndex + '-hole')
+        );
+      }
+    } else {
+      // Iterate over a regular object
+      var names = Object.keys(data);
+      if (!this.props.noSort) {
+        names.sort(alphanumericSort);
+      }
+      names.forEach((name, i) => {
+        elements.push(this.renderItem(name, name));
+      });
     }
 
-    var path = this.props.path;
-    if (!names.length) {
+    if (!elements.length) {
       return (
         <div style={styles.empty}>
           {isArray ? 'Empty array' : 'Empty object'}
@@ -86,9 +113,9 @@ class DataView extends React.Component {
       <ul style={styles.container}>
         {data[consts.proto] &&
           <DataItem
-            name={'__proto__'}
-            path={path.concat(['__proto__'])}
             key={'__proto__'}
+            name={'__proto__'}
+            path={this.props.path.concat(['__proto__'])}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
@@ -96,27 +123,7 @@ class DataView extends React.Component {
             value={this.props.data[consts.proto]}
           />}
 
-        {names.map((name, i) => (
-          this.props.data.hasOwnProperty(name) ? (
-            <DataItem
-              name={name}
-              path={path.concat([name])}
-              key={i}
-              startOpen={this.props.startOpen}
-              inspect={this.props.inspect}
-              showMenu={this.props.showMenu}
-              readOnly={this.props.readOnly}
-              value={this.props.data[name]}
-            />
-          ) : (
-            <li>
-              <div style={styles.head}>
-                <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
-                  {name}
-                </div>
-              </div>
-            </li>
-        )))}
+        {elements}
       </ul>
     );
   }
