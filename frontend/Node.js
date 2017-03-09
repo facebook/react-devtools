@@ -154,10 +154,10 @@ class Node extends React.Component {
                 {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
                 {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
                 {node.get('props') && <Props key="props" props={node.get('props')}/>}
-                {!content && '/'}
+                {!content && content != 0 && '/'}
                 <span style={tagStyle}>&gt;</span>
               </span>
-              {content && [
+              {(content || content == 0) && [
                 <span key="content" style={styles.textContent}>{content}</span>,
                 <span key="close" style={styles.closeTag}>
                   <span style={tagStyle}>&lt;/{name}&gt;</span>
