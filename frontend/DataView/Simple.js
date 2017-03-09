@@ -200,8 +200,8 @@ function textToValue(txt) {
 function valueToText(value) {
   if (value === undefined) {
     return 'undefined';
-  } else if (value === Infinity) {
-    return 'Infinity';
+  } else if (typeof value === 'number') {
+    return value.toString();
   }
   return JSON.stringify(value);
 }
