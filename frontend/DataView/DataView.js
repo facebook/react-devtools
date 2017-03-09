@@ -35,20 +35,76 @@ type DataViewProps = {
 class DataView extends React.Component {
   props: DataViewProps;
 
+  renderSparseArrayHole(count: number, key: string) {
+    return (
+      <li key={key}>
+        <div style={styles.head}>
+          <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+            undefined × {count}
+          </div>
+        </div>
+      </li>
+    );
+  }
+
+  renderItem(name: string, key: string) {
+    return (
+      <DataItem
+        key={key}
+        name={name}
+        path={this.props.path.concat([name])}
+        startOpen={this.props.startOpen}
+        inspect={this.props.inspect}
+        showMenu={this.props.showMenu}
+        readOnly={this.props.readOnly}
+        value={this.props.data[name]} />
+    );
+  }
+
   render() {
     var data = this.props.data;
     if (!data) {
       return <div style={styles.missing}>null</div>;
     }
-    var names = Object.keys(data);
-    if (!this.props.noSort) {
-      names.sort(alphanumericSort);
+
+    var isArray = Array.isArray(data);
+    var elements = [];
+    if (isArray) {
+      // Iterate over array, filling holes with special items
+      var lastIndex = -1;
+      data.forEach((item, i) => {
+        if (lastIndex < i - 1) {
+          // Have we skipped over a hole?
+          var holeCount = (i - 1) - lastIndex;
+          elements.push(
+            this.renderSparseArrayHole(holeCount, i + '-hole')
+          );
+        }
+        elements.push(this.renderItem(i, i));
+        lastIndex = i;
+      });
+      if (lastIndex < data.length - 1) {
+        // Is there a hole at the end?
+        var holeCount = (data.length - 1) - lastIndex;
+        elements.push(
+          this.renderSparseArrayHole(holeCount, lastIndex + '-hole')
+        );
+      }
+    } else {
+      // Iterate over a regular object
+      var names = Object.keys(data);
+      if (!this.props.noSort) {
+        names.sort(alphanumericSort);
+      }
+      names.forEach((name, i) => {
+        elements.push(this.renderItem(name, name));
+      });
     }
-    var path = this.props.path;
-    if (!names.length) {
+
+    if (!elements.length) {
       return (
         <div style={styles.empty}>
-          {Array.isArray(data) ? 'Empty array' : 'Empty object'}
+          {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
     }
@@ -57,9 +113,9 @@ class DataView extends React.Component {
       <ul style={styles.container}>
         {data[consts.proto] &&
           <DataItem
-            name={'__proto__'}
-            path={path.concat(['__proto__'])}
             key={'__proto__'}
+            name={'__proto__'}
+            path={this.props.path.concat(['__proto__'])}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
@@ -67,18 +123,7 @@ class DataView extends React.Component {
             value={this.props.data[consts.proto]}
           />}
 
-        {names.map((name, i) => (
-          <DataItem
-            name={name}
-            path={path.concat([name])}
-            key={name}
-            startOpen={this.props.startOpen}
-            inspect={this.props.inspect}
-            showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
-            value={this.props.data[name]}
-          />
-        ))}
+        {elements}
       </ul>
     );
   }
@@ -287,6 +332,10 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 3px',
+  },
+
+  sparseArrayFiller: {
+    fontStyle: 'italic',
   },
 
   complexName: {
