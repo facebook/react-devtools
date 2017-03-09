@@ -23,9 +23,9 @@ export type DataType = {
   children: ?(string | Array<OpaqueNodeHandle>),
   text: ?string,
   updater: ?{
-    setInProps: ?(path: Array<string>, value: any) => void,
-    setInState: ?(path: Array<string>, value: any) => void,
-    setInContext: ?(path: Array<string>, value: any) => void,
+    setInProps: ?(path: Array<string | number>, value: any) => void,
+    setInState: ?(path: Array<string | number>, value: any) => void,
+    setInContext: ?(path: Array<string | number>, value: any) => void,
     // setState: ?(newState: any) => void,
     forceUpdate: ?() => void,
   },

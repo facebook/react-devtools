@@ -45,6 +45,7 @@ function renameStyle(agent, id, oldName, newName, val) {
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.reactElements.get(id);
     if (el && el.setNativeProps) {
+      // $FlowFixMe we know that setNativeProps can be called here
       el.setNativeProps({ style: newStyle });
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
@@ -86,6 +87,7 @@ function setStyle(agent, id, attr, val) {
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.reactElements.get(id);
     if (el && el.setNativeProps) {
+      // $FlowFixMe we know that setNativeProps can be called here
       el.setNativeProps({ style: newStyle });
     } else {
       console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
@@ -95,7 +97,6 @@ function setStyle(agent, id, attr, val) {
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
     if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-      // $FlowFixMe we know that updater is not null here
       data.updater.setInProps(['style', style.length - 1, attr], val);
     } else {
       style = style.concat([newStyle]);

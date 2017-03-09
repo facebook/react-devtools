@@ -601,7 +601,6 @@ class Store extends EventEmitter {
       this.selectTop(newsel, true);
     }
     if (this.searchRoots && this.searchRoots.contains(id)) {
-      // $FlowFixMe flow things searchRoots might be null
       this.searchRoots = this.searchRoots.delete(this.searchRoots.indexOf(id));
       this.emit('searchRoots');
       this.highlightSearch();

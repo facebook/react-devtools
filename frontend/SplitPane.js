@@ -18,8 +18,8 @@ var assign = require('object-assign');
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React$Element,
-  right: () => React$Element,
+  left: () => React$Element<*>,
+  right: () => React$Element<*>,
   initialWidth: number,
 };
 
@@ -44,10 +44,12 @@ class SplitPane extends React.Component {
   }
 
   onMove(x: number) {
-    var node = ReactDOM.findDOMNode(this);
-    this.setState({
-      width: (node.offsetLeft + node.offsetWidth) - x,
-    });
+    var node:any = ReactDOM.findDOMNode(this);
+    if (node) {
+      this.setState({
+        width: (node.offsetLeft + node.offsetWidth) - x,
+      });
+    }
   }
 
   render() {

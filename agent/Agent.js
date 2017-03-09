@@ -294,7 +294,7 @@ class Agent extends EventEmitter {
     return null;
   }
 
-  _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setProps({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInProps) {
       data.updater.setInProps(path, value);
@@ -303,7 +303,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setState({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInState) {
       data.updater.setInState(path, value);
@@ -312,7 +312,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setContext({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInContext) {
       data.updater.setInContext(path, value);
@@ -341,10 +341,16 @@ class Agent extends EventEmitter {
       return element;
     }
     if (!this.ids.has(element)) {
-      this.ids.set(element, guid());
-      this.reactElements.set(this.ids.get(element), element);
+      const id = guid();
+      this.ids.set(element, id);
+      this.reactElements.set(id, element);
+      return id;
     }
-    return this.ids.get(element);
+    const id = this.ids.get(element);
+    if (typeof id !== 'string') {
+      throw new Error('Expected ID to exist by now.');
+    }
+    return id;
   }
 
   addRoot(renderer: RendererID, element: OpaqueNodeHandle) {

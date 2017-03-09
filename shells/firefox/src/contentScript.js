@@ -46,14 +46,19 @@ function connectToBackend() {
 
 function injectBackend() {
   var node = document.createElement('script');
+  var documentElement = document.documentElement;
 
   node.onload = function() {
     window.postMessage({source: 'react-devtools-reporter'}, '*');
 
     connectToBackend();
-    node.parentNode.removeChild(node);
+    if (node.parentNode) {
+      node.parentNode.removeChild(node);
+    }
   };
 
   node.src = 'resource://react-devtools/data/build/backend.js';
-  document.documentElement.appendChild(node);
+  if (documentElement) {
+    documentElement.appendChild(node);
+  }
 }

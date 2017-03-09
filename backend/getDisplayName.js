@@ -15,7 +15,11 @@ const cachedDisplayNames = new WeakMap();
 
 function getDisplayName(type: Function): string {
   if (cachedDisplayNames.has(type)) {
-    return cachedDisplayNames.get(type);
+    const displayName = cachedDisplayNames.get(type);
+    if (typeof displayName !== 'string') {
+      throw new Error('Expected displayName to exist by now.');
+    }
+    return displayName;
   }
 
   let displayName = type.displayName || type.name || 'Unknown';

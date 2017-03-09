@@ -16,7 +16,7 @@ var decorate = require('./decorate');
 
 class TabbedPane extends React.Component {
   props: {
-    tabs: {[key: string]: () => React$Element},
+    tabs: {[key: string]: () => React$Element<*>},
     selected: string,
     setSelectedTab: (name: string) => void,
   };

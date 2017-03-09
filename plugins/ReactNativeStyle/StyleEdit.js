@@ -39,7 +39,7 @@ class StyleEdit extends React.Component {
 
   onChange(name: string, val: string | number) {
     var num = Number(val);
-    this.props.onChange(name, num == val ? num : val);
+    this.props.onChange(name, num === val ? num : val);
   }
 
   onNew(val: string | number) {

@@ -139,9 +139,9 @@ type PayloadType = {
  */
 class Bridge {
   _buffer: Array<{evt: string, data: any}>;
-  _cbs: Map;
+  _cbs: Map<number, Function>;
   _cid: number;
-  _inspectables: Map;
+  _inspectables: Map<string, Object>;
   _listeners: {[key: string]: Array<(data: any) => void>};
   _flushHandle: ?number;
   _wall: Wall;
@@ -405,7 +405,13 @@ class Bridge {
       var val = getIn(inspectable, path);
       var protod = false;
       var isFn = typeof val === 'function';
+      if (val === null) {
+        throw new Error('Expected val to be defined by now.');
+      }
       Object.getOwnPropertyNames(val).forEach(name => {
+        if (!val) {
+          return;
+        }
         if (name === '__proto__') {
           protod = true;
         }
@@ -419,8 +425,9 @@ class Bridge {
       if (!protod && val.__proto__ && val.constructor.name !== 'Object') {
         var newProto = {};
         var pIsFn = typeof val.__proto__ === 'function';
+
         Object.getOwnPropertyNames(val.__proto__).forEach(name => {
-          if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
+          if ((pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) || !val) {
             return;
           }
           newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);

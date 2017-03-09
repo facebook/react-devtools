@@ -30,8 +30,10 @@ class PropVal extends React.Component {
     if (this.props.val && prevProps.val && typeof this.props.val === 'object' && typeof prevProps.val === 'object') {
       return;
     }
-    var node = ReactDOM.findDOMNode(this);
-    flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
+    var node:any = ReactDOM.findDOMNode(this);
+    if (node) {
+      flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
+    }
   }
 
   render() {

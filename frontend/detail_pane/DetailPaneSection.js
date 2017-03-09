@@ -13,7 +13,7 @@
 var React = require('react');
 
 class DetailPaneSection extends React.Component {
-  render(): React.Element {
+  render(): React.Element<any> {
     var {
       children,
       hint,

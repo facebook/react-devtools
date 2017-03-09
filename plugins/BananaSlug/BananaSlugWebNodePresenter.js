@@ -81,7 +81,7 @@ class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
     this._canvas = null;
   }
 
-  drawImpl(pool: Set): void {
+  drawImpl(pool: Set<any>): void {
     this._ensureCanvas();
     var canvas = this._canvas;
     var ctx = canvas.getContext('2d');

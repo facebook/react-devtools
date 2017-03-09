@@ -14,7 +14,7 @@ var React = require('react');
 
 class DetailPane extends React.Component {
 
-  render(): React.Element {
+  render(): React.Element<any> {
     return (
       <div style={styles.container}>
         <div style={styles.header}>

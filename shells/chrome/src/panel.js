@@ -37,7 +37,7 @@ var config: Props = {
       chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$node)');
     }, 100);
   },
-  showComponentSource(vbl) {
+  showComponentSource(vbl: any) {
     // if it is an es6 class-based component, (isMounted throws), then inspect
     // the constructor. Otherwise, inspect the render function.
     var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
@@ -103,7 +103,9 @@ var node = document.getElementById('container');
 function reload() {
   setTimeout(() => {
     ReactDOM.unmountComponentAtNode(node);
-    node.innerHTML = '';
+    if (node) {
+      node.innerHTML = '';
+    }
     ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
