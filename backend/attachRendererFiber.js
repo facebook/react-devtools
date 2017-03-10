@@ -222,8 +222,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     const alternate = current.alternate;
     if (alternate) {
       // TODO: relying on this seems a bit fishy.
-      const wasMounted = alternate.memoizedState != null && alternate.memoizedState.internalInstance != null;
-      const isMounted = current.memoizedState != null && current.memoizedState.internalInstance != null;
+      const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;
+      const isMounted = current.memoizedState != null && current.memoizedState.element != null;
       if (!wasMounted && isMounted) {
         // Mount a new root.
         mountFiber(current);

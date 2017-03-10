@@ -97,8 +97,8 @@ class Agent extends EventEmitter {
   constructor(global: Object, capabilities?: Object) {
     super();
     this.global = global;
-    this.reactElements = new Map();
-    this.ids = new WeakMap();
+    this.internalInstancesById = new Map();
+    this.idsByInternalInstances = new WeakMap();
     this.renderers = new Map();
     this.elementData = new Map();
     this.roots = new Set();
@@ -210,18 +210,16 @@ class Agent extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    var internalInstance = node.nodeType === Node.ELEMENT_NODE ?
-      node :
-      node.parentElement;
-    if (!internalInstance) {
-      console.warn('unable to get the internalInstance for scrolling');
+    var domElement = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    if (!domElement) {
+      console.warn('unable to get the domElement for scrolling');
       return;
     }
 
-    if (typeof internalInstance.scrollIntoViewIfNeeded === 'function') {
-      internalInstance.scrollIntoViewIfNeeded();
-    } else if (typeof internalInstance.scrollIntoView === 'function') {
-      internalInstance.scrollIntoView();
+    if (typeof domElement.scrollIntoViewIfNeeded === 'function') {
+      domElement.scrollIntoViewIfNeeded();
+    } else if (typeof domElement.scrollIntoView === 'function') {
+      domElement.scrollIntoView();
     }
     this.highlight(id);
   }
@@ -248,7 +246,7 @@ class Agent extends EventEmitter {
   }
 
   getNodeForID(id: ElementID): ?Object {
-    var component = this.reactElements.get(id);
+    var component = this.internalInstancesById.get(id);
     if (!component) {
       return null;
     }
@@ -340,11 +338,14 @@ class Agent extends EventEmitter {
     if (typeof internalInstance !== 'object' || !internalInstance) {
       return internalInstance;
     }
-    if (!this.ids.has(internalInstance)) {
-      this.ids.set(internalInstance, guid());
-      this.reactElements.set(this.ids.get(internalInstance), internalInstance);
+    if (!this.idsByInternalInstances.has(internalInstance)) {
+      this.idsByInternalInstances.set(internalInstance, guid());
+      this.internalInstancesById.set(
+        this.idsByInternalInstances.get(internalInstance),
+        internalInstance
+      );
     }
-    return this.ids.get(internalInstance);
+    return this.idsByInternalInstances.get(internalInstance);
   }
 
   addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
@@ -390,7 +391,7 @@ class Agent extends EventEmitter {
     this.roots.delete(id);
     this.renderers.delete(id);
     this.emit('unmount', id);
-    this.ids.delete(component);
+    this.idsByInternalInstancesByInternalInstances.delete(component);
   }
 
   _onScroll() {

@@ -130,10 +130,10 @@ function getData(internalInstance: Object): DataType {
 }
 
 function setInProps(internalInst, path: Array<string | number>, value: any) {
-  var internalInstance = internalInst._currentElement;
+  var element = internalInst._currentElement;
   internalInst._currentElement = {
-    ...internalInstance,
-    props: copyWithSet(internalInstance.props, path, value),
+    ...element,
+    props: copyWithSet(element.props, path, value),
   };
   internalInst._instance.forceUpdate();
 }
