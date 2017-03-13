@@ -83,15 +83,15 @@ import type Bridge from './Bridge';
 class Agent extends EventEmitter {
   // the window or global -> used to "make a value available in the console"
   global: Object;
-  reactElements: Map<ElementID, OpaqueNodeHandle>;
-  ids: WeakMap<OpaqueNodeHandle, ElementID>;
+  internalInstancesById: Map<ElementID, OpaqueNodeHandle>;
+  idsByInternalInstances: WeakMap<OpaqueNodeHandle, ElementID>;
+  renderers: Map<ElementID, RendererID>;
   elementData: Map<ElementID, DataType>;
   roots: Set<ElementID>;
   reactInternals: {[key: RendererID]: Helpers};
-  capabilities: {[key: string]: boolean};
-  renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
   _scrollUpdate: boolean;
+  capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
 
   constructor(global: Object, capabilities?: Object) {
@@ -391,7 +391,7 @@ class Agent extends EventEmitter {
     this.roots.delete(id);
     this.renderers.delete(id);
     this.emit('unmount', id);
-    this.idsByInternalInstancesByInternalInstances.delete(component);
+    this.idsByInternalInstances.delete(component);
   }
 
   _onScroll() {
