@@ -21,7 +21,7 @@ class Getter extends React.Component {
   }
 
   render() {
-    return (<div style={style} onClick={this.handleClick.bind(this)}>(…)</div>);
+    return <div style={style} onClick={this.handleClick.bind(this)}>(…)</div>;
   }
 }
 

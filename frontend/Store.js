@@ -627,6 +627,8 @@ class Store extends EventEmitter {
     var last = data.path.length - 1;
     var propObj = data.path.slice(0, last).reduce((obj_, attr) => obj_ ? obj_[attr] : null, props);
     propObj[data.path[last]] = data.value;
+    var newProps = assign({}, props);
+    this._nodes = this._nodes.setIn([data.id, 'props'], newProps);
     this.emit(data.id);
   }
 }
