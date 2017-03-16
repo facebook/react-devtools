@@ -64,10 +64,10 @@ PinnedComponents.childContextTypes = {
 
 var styles = {
   header: {
-    fontSize: '16px',
-    color: '#4CBCFF',
-    padding: '5px 5px 4px 5px',
+    fontSize: '18px',
+    padding: '5px 5px 4px 10px',
     borderBottom: '1px solid #eee',
+    fontFamily: 'system-ui',
   },
   container: {
     fontFamily: 'Menlo, Consolas, monospace',
@@ -77,10 +77,10 @@ var styles = {
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
-
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
+    borderBottom: '1px solid #eee',
   },
 
   scroll: {
