@@ -13,13 +13,14 @@
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
-module.exports = function setupRNStyle(bridge: Bridge, agent: Agent, resolveRNStyle: (style: number) => ?Object) {
-  bridge.onCall('rn-style:get', id => {
-    var node = agent.elementData.get(id);
-    if (!node || !node.props) {
-      return null;
-    }
-    return resolveRNStyle(node.props.style);
+module.exports = function setupRNStyle(
+  bridge: Bridge,
+  agent: Agent,
+  resolveRNStyle: (style: number) => ?Object,
+  resolveBoxStyle: ?(name: string, style: Object) => ?Object,
+) {
+  bridge.on('rn-style:get', id => {
+    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
   });
 
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
@@ -30,6 +31,41 @@ module.exports = function setupRNStyle(bridge: Bridge, agent: Agent, resolveRNSt
     setStyle(agent, id, attr, val);
   });
 };
+
+var blank = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+};
+
+function getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
+  var node = agent.elementData.get(id);
+  if (!node || !node.props) {
+    return;
+  }
+  const style = resolveRNStyle(node.props.style);
+
+  var instance = node.publicInstance;
+  if (!resolveBoxStyle || !instance || !instance.measure) {
+    bridge.send('rn-style:get', { style });
+    return;
+  }
+
+  instance.measure((x, y, width, height, left, top) => {
+    var margin = style && resolveBoxStyle && resolveBoxStyle('margin', style) || blank;
+    var padding = style && resolveBoxStyle && resolveBoxStyle('padding', style) || blank;
+    bridge.send('rn-style:get', {
+      id, style,
+      measureLayout: {
+        x, y,
+        width, height,
+        left, top,
+        margin, padding,
+      },
+    });
+  });
+}
 
 function shallowClone(obj) {
   var nobj = {};

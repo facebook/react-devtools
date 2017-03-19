@@ -31,6 +31,12 @@ type DefaultProps = {};
 
 type State = {
   style: ?Object;
+  measureLayout: ?Object;
+};
+
+type StyleResult = {
+  style: Object;
+  measureLayout: ?Object;
 };
 
 class NativeStyler extends React.Component {
@@ -40,13 +46,17 @@ class NativeStyler extends React.Component {
 
   constructor(props: Object) {
     super(props);
-    this.state = {style: null};
+    this.state = {style: null, measureLayout: null};
   }
 
   componentWillMount() {
-    this.props.bridge.call('rn-style:get', this.props.id, style => {
-      this.setState({style});
-    });
+    (this:any)._styleGet = this._styleGet.bind(this);
+    this.props.bridge.on('rn-style:get', this._styleGet);
+    this.props.bridge.send('rn-style:get', this.props.id);
+  }
+
+  componentWillUnmount() {
+    this.props.bridge.off('rn-style:get', this._styleGet);
   }
 
   componentWillReceiveProps(nextProps: Object) {
@@ -54,9 +64,12 @@ class NativeStyler extends React.Component {
       return;
     }
     this.setState({style: null});
-    this.props.bridge.call('rn-style:get', nextProps.id, style => {
-      this.setState({style});
-    });
+    this.props.bridge.send('rn-style:get', nextProps.id);
+  }
+
+  _styleGet(result: StyleResult) {
+    var {style, measureLayout} = result;
+    this.setState({style, measureLayout});
   }
 
   _handleStyleChange(attr: string, val: string | number) {
