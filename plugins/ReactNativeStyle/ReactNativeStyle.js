@@ -12,6 +12,7 @@
 
 var React = require('react');
 var StyleEdit = require('./StyleEdit');
+var BoxInspector = require('./BoxInspector');
 
 function shallowClone(obj) {
   var nobj = {};
@@ -93,13 +94,24 @@ class NativeStyler extends React.Component {
       return <em>loading</em>;
     }
     return (
-      <StyleEdit
-        style={this.state.style}
-        onRename={this._handleStyleRename.bind(this)}
-        onChange={this._handleStyleChange.bind(this)}
-      />
+      <div style={styles.container}>
+        {this.state.measureLayout && <BoxInspector {...this.state.measureLayout} />}
+        <StyleEdit
+          style={this.state.style}
+          onRename={this._handleStyleRename.bind(this)}
+          onChange={this._handleStyleChange.bind(this)}
+        />
+      </div>
     );
   }
 }
+
+var styles = {
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+};
 
 module.exports = NativeStyler;
