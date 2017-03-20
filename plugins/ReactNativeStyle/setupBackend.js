@@ -19,20 +19,30 @@ module.exports = function setupRNStyle(
   resolveRNStyle: (style: number) => ?Object,
   resolveBoxStyle: ?(name: string, style: Object) => ?Object,
 ) {
-  bridge.on('rn-style:get', id => {
-    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+  bridge.onCall('rn-style:get', id => {
+    var node = agent.elementData.get(id);
+    if (!node || !node.props) {
+      return null;
+    }
+    return resolveRNStyle(node.props.style);
+  });
+
+  bridge.on('rn-style:measure', id => {
+    measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
   });
 
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
-    // Remeasure layout
-    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+    if (resolveBoxStyle) {
+      measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+    }
   });
 
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
-    // Remeasure layout
-    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+    if (resolveBoxStyle) {
+      measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+    }
   });
 };
 
@@ -43,7 +53,7 @@ var blank = {
   bottom: 0,
 };
 
-function getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
+function measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
   var node = agent.elementData.get(id);
   if (!node || !node.props) {
     return;
@@ -52,14 +62,14 @@ function getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
 
   var instance = node.publicInstance;
   if (!resolveBoxStyle || !instance || !instance.measure) {
-    bridge.send('rn-style:get', { style });
+    bridge.send('rn-style:measure', { style });
     return;
   }
 
   instance.measure((x, y, width, height, left, top) => {
     var margin = style && resolveBoxStyle && resolveBoxStyle('margin', style) || blank;
     var padding = style && resolveBoxStyle && resolveBoxStyle('padding', style) || blank;
-    bridge.send('rn-style:get', {
+    bridge.send('rn-style:measure', {
       id, style,
       measureLayout: {
         x, y,

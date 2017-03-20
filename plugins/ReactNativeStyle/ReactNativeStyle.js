@@ -26,6 +26,7 @@ type Props = {
   // TODO: typecheck bridge interface
   bridge: any;
   id: any;
+  measureSupport: boolean;
 };
 
 type DefaultProps = {};
@@ -52,12 +53,20 @@ class NativeStyler extends React.Component {
 
   componentWillMount() {
     (this:any)._styleGet = this._styleGet.bind(this);
-    this.props.bridge.on('rn-style:get', this._styleGet);
-    this.props.bridge.send('rn-style:get', this.props.id);
+    if (this.props.measureSupport) {
+      this.props.bridge.on('rn-style:measure', this._styleGet);
+      this.props.bridge.send('rn-style:measure', this.props.id);
+    } else {
+      this.props.bridge.call('rn-style:get', this.props.id, style => {
+        this.setState({style});
+      });
+    }
   }
 
   componentWillUnmount() {
-    this.props.bridge.off('rn-style:get', this._styleGet);
+    if (this.props.measureSupport) {
+      this.props.bridge.off('rn-style:measure', this._styleGet);
+    }
   }
 
   componentWillReceiveProps(nextProps: Object) {
@@ -66,6 +75,14 @@ class NativeStyler extends React.Component {
     }
     this.setState({style: null});
     this.props.bridge.send('rn-style:get', nextProps.id);
+
+    if (this.props.measureSupport) {
+      this.props.bridge.send('rn-style:measure', nextProps.id);
+    } else {
+      this.props.bridge.call('rn-style:get', nextProps, style => {
+        this.setState({style});
+      });
+    }
   }
 
   _styleGet(result: StyleResult) {
@@ -78,6 +95,7 @@ class NativeStyler extends React.Component {
       this.state.style[attr] = val;
     }
     this.props.bridge.send('rn-style:set', {id: this.props.id, attr, val});
+    this.setState(this.state.style);
   }
 
   _handleStyleRename(oldName: string, newName: string, val: string | number) {
@@ -85,6 +103,7 @@ class NativeStyler extends React.Component {
     delete style[oldName];
     style[newName] = val;
     this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
+    this.setState(this.state.style);
   }
 
   render() {

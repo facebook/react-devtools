@@ -239,7 +239,7 @@ class Panel extends React.Component {
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge));
+      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure));
     }
     return (
       <Container
@@ -284,7 +284,7 @@ Panel.childContextTypes = {
   store: React.PropTypes.object,
 };
 
-var panelRNStyle = bridge => (node, id) => {
+var panelRNStyle = (bridge, measureSupport) => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
     return <strong key="rnstyle">No style</strong>;
@@ -292,7 +292,7 @@ var panelRNStyle = bridge => (node, id) => {
   return (
     <div key="rnstyle">
       <h3>React Native Style Editor</h3>
-      <NativeStyler id={id} bridge={bridge} />
+      <NativeStyler id={id} bridge={bridge} measureSupport={measureSupport} />
     </div>
   );
 };

@@ -140,6 +140,7 @@ function setupBackend(wall, resolveRNStyle, resolveBoxStyle) {
   var bridge = new Bridge(wall);
   var agent = new Agent(window, {
     rnStyle: !!resolveRNStyle,
+    rnStyleMeasure: !!resolveBoxStyle,
   });
   agent.addBridge(bridge);
 
