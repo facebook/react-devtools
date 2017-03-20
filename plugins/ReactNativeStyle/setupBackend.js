@@ -25,10 +25,14 @@ module.exports = function setupRNStyle(
 
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
+    // Remeasure layout
+    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
   });
 
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
+    // Remeasure layout
+    getStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
   });
 };
 
