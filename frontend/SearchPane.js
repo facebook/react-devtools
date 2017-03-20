@@ -82,6 +82,8 @@ class SearchPane extends React.Component {
 
   onKeyDown(key) {
     if (key === 'Enter' && this.input) {
+      // switch focus to tree view
+      this.input.blur();
       this.props.selectFirstSearchResult();
     }
   }
