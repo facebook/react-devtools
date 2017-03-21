@@ -391,6 +391,12 @@ var uninspectableProps = {
   a: new ArrayBuffer(256),
   b: new DataView(new ArrayBuffer(128)),
 };
+var massiveMap = new Map();
+
+for (var i = 200; i--;) {
+  massiveMap.set(`entry-${i}`, i);
+}
+
 
 class Wrap extends React.Component {
   render() {
@@ -414,6 +420,7 @@ class Wrap extends React.Component {
         <PropTester {...primitiveProps}/>
         <PropTester {...complexProps}/>
         <PropTester {...uninspectableProps}/>
+        <PropTester massiveMap={massiveMap}/>
       </div>
     );
   }
