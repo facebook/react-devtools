@@ -411,6 +411,10 @@ class Bridge {
         var iterVal = Object.create({});  // flow throws "object literal incompatible with object type"
         var count = 0;
         for (const entry of val) {
+          if (count > 100) {
+            // TODO: replace this if block with better logic to handle large iterables
+            break;
+          }
           iterVal[count] = entry;
           count++;
         }
