@@ -56,13 +56,14 @@ var blank = {
 function measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
   var node = agent.elementData.get(id);
   if (!node || !node.props) {
+    bridge.send('rn-style:measure', {});
     return;
   }
   const style = resolveRNStyle(node.props.style);
 
   var instance = node.publicInstance;
   if (!resolveBoxStyle || !instance || !instance.measure) {
-    bridge.send('rn-style:measure', { style });
+    bridge.send('rn-style:measure', {style});
     return;
   }
 
