@@ -11,32 +11,33 @@
 'use strict';
 
 /**
- * Get a enhanced/articial type string based on the object instance
+ * Get a enhanced/artificial type string based on the object instance
  */
 function getPropType(data: Object): string | null {
   if (!data) {
     return null;
   }
-  if (data._reactFragment) {
-    return 'react_fragment';
-  }
-  if (Array.isArray(data)) {
-    return 'array';
-  }
-  if (ArrayBuffer.isView(data)) {
-    if (data instanceof DataView) {
-      return 'data_view';
-    }
-    return 'typed_array';
-  }
-  if (data instanceof ArrayBuffer) {
-    return 'array_buffer';
-  }
-
   var type = typeof data;
 
-  if (type === 'object' && typeof data[Symbol.iterator] === 'function') {
-    return 'iterator';
+  if (type === 'object') {
+    if (data._reactFragment) {
+      return 'react_fragment';
+    }
+    if (Array.isArray(data)) {
+      return 'array';
+    }
+    if (ArrayBuffer.isView(data)) {
+      if (data instanceof DataView) {
+        return 'data_view';
+      }
+      return 'typed_array';
+    }
+    if (data instanceof ArrayBuffer) {
+      return 'array_buffer';
+    }
+    if (data[Symbol.iterator] === 'function') {
+      return 'iterator';
+    }
   }
 
   return type;
