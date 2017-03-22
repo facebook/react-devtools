@@ -181,6 +181,10 @@ class DataItem extends React.Component {
     });
   }
 
+  toggleBooleanValue(e) {
+    this.context.onChange(this.props.path, e.target.checked);
+  }
+
   render() {
     var data = this.props.value;
     var otype = typeof data;
@@ -212,6 +216,15 @@ class DataItem extends React.Component {
             <span style={styles.expandedArrow} /> :
             <span style={styles.collapsedArrow} />}
         </div>
+      );
+    } else if (otype === 'boolean' && !this.props.readOnly) {
+      opener = (
+        <input
+          checked={data}
+          onChange={this.toggleBooleanValue.bind(this)}
+          style={styles.toggler}
+          type="checkbox"
+        />
       );
     }
 
@@ -263,6 +276,10 @@ class DataItem extends React.Component {
   }
 }
 
+DataItem.contextTypes = {
+  onChange: React.PropTypes.func,
+};
+
 function alphanumericSort(a: string, b: string): number {
   if ('' + (+a) === a) {
     if ('' + (+b) !== b) {
@@ -304,6 +321,12 @@ var styles = {
     paddingRight: 3,
     position: 'absolute',
     top: 4,
+  },
+
+  toggler: {
+    left: -15,
+    position: 'absolute',
+    top: -1,
   },
 
   collapsedArrow: {
