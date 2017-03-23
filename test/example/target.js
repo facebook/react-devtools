@@ -393,8 +393,8 @@ var uninspectableProps = {
 };
 var massiveMap = new Map();
 
-for (var i = 200; i--;) {
-  massiveMap.set(`entry-${i}`, i);
+for (var mCount = 200; mCount--;) {
+  massiveMap.set(`entry-${mCount}`, mCount);
 }
 
 
