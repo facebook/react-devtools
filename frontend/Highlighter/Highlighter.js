@@ -59,10 +59,12 @@ class Highlighter {
 
   highlight(node: DOMNode, name?: string) {
     this.removeMultiOverlay();
-    if (!this._overlay) {
-      this._overlay = new Overlay(this._win);
+    if (node.nodeType !== Node.COMMENT_NODE) {
+      if (!this._overlay) {
+        this._overlay = new Overlay(this._win);
+      }
+      this._overlay.inspect(node, name);
     }
-    this._overlay.inspect(node, name);
   }
 
   highlightMany(nodes: Array<DOMNode>) {
@@ -110,7 +112,6 @@ class Highlighter {
     evt.stopPropagation();
     evt.cancelBubble = true;
     this._onSelect(evt.target);
-    return;
   }
 
   onClick(evt: DOMEvent) {
