@@ -49,6 +49,15 @@ class SplitPane extends React.Component {
     };
   }
 
+  componentDidMount() {
+    var node = ReactDOM.findDOMNode(this);
+
+    this.setState({
+      width: this.props.isVertical ? node.offsetWidth * 0.3 : node.offsetWidth * 0.6,
+      height: node.offsetHeight * 0.3,
+    });
+  }
+
   onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
 
@@ -59,11 +68,9 @@ class SplitPane extends React.Component {
   }
 
   render() {
-    var newWidth = this.state.width === this.props.initialWidth ? '50%' : this.state.width;
-    var newHeight = this.state.height === this.props.initialHeight ? '50%' : this.state.height;
     var rightStyle = assign({}, styles.rightPane, {
-      width: this.props.isVertical ? newWidth : '100%',
-      height: this.props.isVertical ? '100%' : newHeight,
+      width: this.props.isVertical ? this.state.width : '100%',
+      height: this.props.isVertical ? '100%' : this.state.height,
       marginLeft: (this.props.isVertical) ? 0 : -3,
     });
 
