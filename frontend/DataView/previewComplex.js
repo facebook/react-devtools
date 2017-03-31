@@ -17,15 +17,22 @@ var valueStyles = require('../value-styles');
 
 function previewComplex(data: Object) {
   if (Array.isArray(data)) {
-    return (
-      <span style={valueStyles.array}>
-        Array[{data.length}]
-      </span>
-    );
+    if (data.length) {
+      return (
+        <span style={valueStyles.array}>
+          Array[{data.length}]
+        </span>
+      );
+    }
+
+    return '[]';
   }
 
   if (!data[consts.type]) {
-    return '{…}';
+    if (Object.keys(data).length > 0) {
+      return '{…}';
+    }
+    return '{}';
   }
 
   var type = data[consts.type];

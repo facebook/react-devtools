@@ -181,16 +181,24 @@ class DataItem extends React.Component {
     });
   }
 
+  isEmpty(value) {
+    return (
+      (Array.isArray(value) && !value.length) ||
+      (!value[consts.type] && Object.keys(value).length === 0)
+    );
+  }
+
   render() {
     var data = this.props.value;
     var otype = typeof data;
 
     var complex = true;
+    var isEmptyComplexValue = this.isEmpty(data);
     var preview;
-    if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean') {
+    if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean' || isEmptyComplexValue) {
       preview = (
         <Simple
-          readOnly={this.props.readOnly}
+          readOnly={isEmptyComplexValue || this.props.readOnly}
           path={this.props.path}
           data={data}
         />
