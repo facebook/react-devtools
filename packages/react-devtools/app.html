@@ -78,7 +78,7 @@
             </div>
         </div>
         <script>
-            var port = 8097;
+            var port = process.env.PORT || 8097;
             var localIp = require('ip').address();
             var $ = document.querySelector.bind(document);
             function selectAll() {
