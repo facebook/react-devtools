@@ -95,7 +95,7 @@ class NativeStyler extends React.Component {
       this.state.style[attr] = val;
     }
     this.props.bridge.send('rn-style:set', {id: this.props.id, attr, val});
-    this.setState(this.state.style);
+    this.setState({style: this.state.style});
   }
 
   _handleStyleRename(oldName: string, newName: string, val: string | number) {
@@ -103,7 +103,7 @@ class NativeStyler extends React.Component {
     delete style[oldName];
     style[newName] = val;
     this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
-    this.setState(this.state.style);
+    this.setState({style});
   }
 
   render() {
