@@ -12,56 +12,51 @@
 
 var React = require('react');
 
-type Props = {
-  style: Object,
-  left: number,
+type BoxMeasurements = {
   top: number,
-  width: number,
-  height: number,
-  margin: Object,
-  padding: Object,
-};
+  left: number,
+  right: number,
+  bottom: number,
+}
 
-type DefaultProps = {};
-
-type BoxProps = {
+type BoxProps = BoxMeasurements & {
   title: string,
-  box: {
-    top: number,
-    left: number,
-    right: number,
-    bottom: number,
-  },
   children: React$Element,
 };
 
 var Box = (props: BoxProps) => {
-  var box = props.box;
+  var {title, children, top, left, right, bottom} = props;
   return (
     <div style={styles.box}>
       <div style={styles.row}>
-        <span style={styles.label}>{props.title}</span>
-        <span style={styles.boxText}>{box.top}</span>
+        <span style={styles.label}>{title}</span>
+        <span style={styles.boxText}>{top}</span>
       </div>
       <div style={styles.row}>
-        <span style={styles.boxText}>{box.left}</span>
-        {props.children}
-        <span style={styles.boxText}>{box.right}</span>
+        <span style={styles.boxText}>{left}</span>
+        {children}
+        <span style={styles.boxText}>{right}</span>
       </div>
-      <div style={styles.boxText}>{box.bottom}</div>
+      <div style={styles.boxText}>{bottom}</div>
     </div>
   );
 };
 
 class BoxInspector extends React.Component {
-  props: Props;
-  defaultProps: DefaultProps;
+  props: {
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    margin: BoxMeasurements,
+    padding: BoxMeasurements,
+  };
 
   render() {
     const {left, top, width, height, margin, padding} = this.props;
     return (
-      <Box title="margin" box={margin}>
-        <Box title="padding" box={padding}>
+      <Box title="margin" {...margin}>
+        <Box title="padding" {...padding}>
           <div style={styles.measureLayout}>
             <span style={styles.innerText}>
               ({left}, {top})
