@@ -257,10 +257,10 @@ class Panel extends React.Component {
     if (!this.state.isReact) {
       return (
         <div style={styles.loading}>
-          <h2 style={styles.errorMessage}>Unable to find React…</h2>
+          <h2>Looking for React…</h2>
           {showFileUrlWarningMessage &&
             <div style={styles.troubleshootingHint}>
-              Please enable 'Allow access to file URLs' permission for the devtools extension
+              Please check if the devtools extension has 'Allow access to file URLs' permission
             </div>
           }
         </div>
@@ -343,9 +343,6 @@ var styles = {
     color: '#888',
     padding: 30,
     flex: 1,
-  },
-  errorMessage: {
-    color: '#f38b00',
   },
   troubleshootingHint: {
     fontSize: 14,
