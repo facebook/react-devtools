@@ -45,6 +45,7 @@ class NativeStyler extends React.Component {
   props: Props;
   defaultProps: DefaultProps;
   state: State;
+  _styleGet: (result: StyleResult) => void;
 
   constructor(props: Object) {
     super(props);
@@ -52,7 +53,7 @@ class NativeStyler extends React.Component {
   }
 
   componentWillMount() {
-    (this:any)._styleGet = this._styleGet.bind(this);
+    this._styleGet = this._styleGet.bind(this);
     if (this.props.measureSupport) {
       this.props.bridge.on('rn-style:measure', this._styleGet);
       this.props.bridge.send('rn-style:measure', this.props.id);
