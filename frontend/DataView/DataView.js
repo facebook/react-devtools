@@ -188,7 +188,6 @@ class DataItem extends React.Component {
   render() {
     var data = this.props.value;
     var otype = typeof data;
-
     var complex = true;
     var preview;
     if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean') {
@@ -204,10 +203,11 @@ class DataItem extends React.Component {
       preview = previewComplex(data);
     }
 
-    var open = this.state.open && (!data || data[consts.inspected] !== false);
-
+    var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
+    var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
-    if (complex) {
+
+    if (complex && inspectable) {
       opener = (
         <div
           onClick={this.toggleOpen.bind(this)}
@@ -230,15 +230,16 @@ class DataItem extends React.Component {
 
     var children = null;
     if (complex && open) {
+      var readOnly = this.props.readOnly || (data[consts.meta] && data[consts.meta].readOnly);
       // TODO path
       children = (
         <div style={styles.children}>
           <DataView
-            data={this.props.value}
+            data={data}
             path={this.props.path}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -255,7 +256,7 @@ class DataItem extends React.Component {
           {opener}
           <div
             style={assign({}, styles.name, complex && styles.complexName)}
-            onClick={this.toggleOpen.bind(this)}
+            onClick={inspectable && this.toggleOpen.bind(this)}
           >
             {name}:
           </div>
