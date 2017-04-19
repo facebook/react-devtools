@@ -175,7 +175,9 @@ function walkRoots(roots, onMount, onRoot, isPre013) {
 function walkNode(element, onMount, isPre013) {
   var data = isPre013 ? getData012(element) : getData(element);
   if (data.children && Array.isArray(data.children)) {
-    data.children.forEach(child => walkNode(child, onMount, isPre013));
+    data.children
+      .filter(child => child !== null)
+      .forEach(child => walkNode(child, onMount, isPre013));
   }
   onMount(element, data);
 }
