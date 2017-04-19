@@ -28,8 +28,10 @@ class QueriesTab extends React.Component {
       contents = (
         <SplitPane
           initialWidth={500}
+          initialHeight={500}
           left={() => <QueryList />}
           right={() => <QueryViewer />}
+          isVertical={false}
         />
       );
     }
