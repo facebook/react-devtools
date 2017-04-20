@@ -155,7 +155,7 @@ class Node extends React.Component {
                 {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
                 {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
                 {node.get('props') && <Props key="props" props={node.get('props')}/>}
-                {isCollapsed && '/'}
+                {isCollapsed && <span style={tagStyle}> /</span>}
                 <span style={tagStyle}>&gt;</span>
               </span>
               {!isCollapsed && [
