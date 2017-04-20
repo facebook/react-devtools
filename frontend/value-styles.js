@@ -32,7 +32,7 @@ module.exports = {
   },
 
   date: {
-    color: '#1c00cf',
+    color: 'rgb(33, 33, 33)',
   },
 
   number: {
