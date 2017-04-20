@@ -14,6 +14,7 @@ var {EventEmitter} = require('events');
 
 var assign = require('object-assign');
 var guid = require('../utils/guid');
+var getIn = require('./getIn');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -417,12 +418,6 @@ class Agent extends EventEmitter {
     this.emit('refreshMultiOverlay');
     this._scrollUpdate = false;
   }
-}
-
-function getIn(base, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, base);
 }
 
 module.exports = Agent;

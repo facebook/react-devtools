@@ -24,29 +24,45 @@ function previewComplex(data: Object) {
     );
   }
 
-  if (!data[consts.type]) {
-    return '{…}';
-  }
+  switch (data[consts.type]) {
+    case 'function':
+      return (
+        <span style={valueStyles.func}>
+          {data[consts.name] || 'fn'}()
+        </span>
+      );
+    case 'object':
+      return (
+        <span style={valueStyles.object}>
+          {data[consts.name] + '{…}'}
+        </span>
+      );
+    case 'symbol':
+      return (
+        <span style={valueStyles.symbol}>
+          {data[consts.name]}
+        </span>
+      );
+    case 'iterator':
+      return (
+        <span style={valueStyles.object}>
+          {data[consts.name] + '(…)'}
+        </span>
+      );
 
-  var type = data[consts.type];
-  if (type === 'function') {
-    return (
-      <span style={valueStyles.func}>
-        {data[consts.name] || 'fn'}()
-      </span>
-    );
-  } else if (type === 'object') {
-    return (
-      <span style={valueStyles.object}>
-        {data[consts.name] + '{…}'}
-      </span>
-    );
-  } else if (type === 'symbol') {
-    return (
-      <span style={valueStyles.symbol}>
-        {data[consts.name]}
-      </span>
-    );
+    case 'array_buffer':
+    case 'data_view':
+    case 'array':
+    case 'typed_array':
+      return (
+        <span style={valueStyles.array}>
+          {`${data[consts.name]}[${data[consts.meta].length}]`}
+        </span>
+      );
+
+    case undefined:
+    case null:
+      return '{…}';
   }
   return null;
 }

@@ -19,6 +19,14 @@ var TabbedPane = require('./TabbedPane');
 
 import type MenuItem from './ContextMenu';
 
+type Props = {};
+
+type State = {
+  isVertical: boolean,
+};
+
+var IS_VERTICAL_BREAKPOINT = 500;
+
 class Container extends React.Component {
   props: {
     reload: () => void,
@@ -37,14 +45,54 @@ class Container extends React.Component {
     },
     extraTabs: {[key: string]: () => React$Element},
   };
+  state: State;
+  resizeTimeout: ?number;
+
+  constructor(props: Props) {
+    super(props);
+
+    this.state = {
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+    };
+  }
+
+  componentDidMount() {
+    window.addEventListener('resize', this.handleResize, false);
+    this.setState({
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+    });
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('resize', this.handleResize);
+    clearTimeout(this.resizeTimeout);
+  }
+
+  // $FlowFixMe future versions of Flow can infer this
+  handleResize = (e: Event): void => {
+    if (!this.resizeTimeout) {
+      this.resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
+    }
+  };
+
+  // $FlowFixMe future versions of Flow can infer this
+  handleResizeTimeout = (): void => {
+    this.resizeTimeout = null;
+
+    this.setState({
+      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+    });
+  };
 
   render() {
     var tabs = {
       Elements: () => (
         <SplitPane
-          initialWidth={300}
+          initialWidth={10}
+          initialHeight={10}
           left={() => <SearchPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
+          isVertical={this.state.isVertical}
         />
       ),
       ...this.props.extraTabs,
