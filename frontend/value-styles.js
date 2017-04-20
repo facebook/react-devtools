@@ -31,6 +31,10 @@ module.exports = {
     color: '#1c00cf',
   },
 
+  date: {
+    color: 'rgb(33, 33, 33)',
+  },
+
   number: {
     color: '#1c00cf',
   },

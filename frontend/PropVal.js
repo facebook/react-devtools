@@ -73,6 +73,8 @@ function previewProp(val: any, nested: boolean) {
   }
 
   switch (val[consts.type]) {
+    case 'date':
+      return <span style={valueStyles.date}>{val[consts.name]}</span>;
     case 'function':
       return <span style={valueStyles.func}>{val[consts.name] || 'fn'}()</span>;
     case 'object':
