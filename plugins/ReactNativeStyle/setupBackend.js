@@ -43,11 +43,20 @@ function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[newName]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
-    if (el && el.setNativeProps) {
-      el.setNativeProps({ style: newStyle });
+    if (data && data.updater && data.updater.setNativeProps) {
+      data.updater.setNativeProps({ style: newStyle });
     } else {
-      console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+      // <hack>
+      // We can remove this when we stop supporting RN versions
+      // before https://github.com/facebook/react-devtools/pull/528.
+      // Newer versions use `updater.setNativeProps` instead.
+      var el = agent.reactElements.get(id);
+      if (el && el.setNativeProps) {
+        el.setNativeProps({ style: newStyle });
+      } else {
+        console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+      }
+      // </hack>
     }
     return;
   }
@@ -84,11 +93,20 @@ function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
-    if (el && el.setNativeProps) {
-      el.setNativeProps({ style: newStyle });
+    if (data && data.updater && data.updater.setNativeProps) {
+      data.updater.setNativeProps({ style: newStyle });
     } else {
-      console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+      // <hack>
+      // We can remove this when we stop supporting RN versions
+      // before https://github.com/facebook/react-devtools/pull/528.
+      // Newer versions use `updater.setNativeProps` instead.
+      var el = agent.reactElements.get(id);
+      if (el && el.setNativeProps) {
+        el.setNativeProps({ style: newStyle });
+      } else {
+        console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+      }
+      // </hack>
     }
     return;
   }

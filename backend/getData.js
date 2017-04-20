@@ -112,6 +112,15 @@ function getData(element: Object): DataType {
     }
   }
 
+  if (typeof element.setNativeProps === 'function') {
+    // For editing styles in RN
+    updater = {
+      setNativeProps(nativeProps) {
+        element.setNativeProps(nativeProps);
+      },
+    };
+  }
+
   return {
     nodeType,
     type,
