@@ -43,7 +43,7 @@ function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[newName]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
+    var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
       el.setNativeProps({ style: newStyle });
     } else {
@@ -84,7 +84,7 @@ function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
+    var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
       el.setNativeProps({ style: newStyle });
     } else {
