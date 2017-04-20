@@ -68,12 +68,16 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
     var margin = (style && resolveBoxStyle('margin', style)) || blank;
     var padding = (style && resolveBoxStyle('padding', style)) || blank;
     bridge.send('rn-style:measure', {
-      id, style,
+      style,
       measureLayout: {
-        x, y,
-        width, height,
-        left, top,
-        margin, padding,
+        x,
+        y,
+        width,
+        height,
+        left,
+        top,
+        margin,
+        padding,
       },
     });
   });
