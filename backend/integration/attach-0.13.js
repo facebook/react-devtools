@@ -60,10 +60,10 @@ function setup(hook) {
   return handlers;
 }
 
-function wrapElement(hook, internalInstance) {
+function wrapElement(hook, element) {
   var extras = attachRenderer(hook, 'abc', renderer);
   var node = document.createElement('div');
-  React.render(internalInstance, node);
+  React.render(element, node);
   extras.cleanup();
   React.unmountComponentAtNode(node);
 }
