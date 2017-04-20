@@ -10,6 +10,8 @@
  */
 'use strict';
 
+var resolveBoxStyle = require('./resolveBoxStyle');
+
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
@@ -17,7 +19,6 @@ module.exports = function setupRNStyle(
   bridge: Bridge,
   agent: Agent,
   resolveRNStyle: (style: number) => ?Object,
-  resolveBoxStyle: ?(name: string, style: Object) => ?Object,
 ) {
   bridge.onCall('rn-style:get', id => {
     var node = agent.elementData.get(id);
@@ -28,21 +29,17 @@ module.exports = function setupRNStyle(
   });
 
   bridge.on('rn-style:measure', id => {
-    measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
+    measureStyle(agent, bridge, resolveRNStyle, id);
   });
 
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
-    if (resolveBoxStyle) {
-      measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
-    }
+    measureStyle(agent, bridge, resolveRNStyle, id);
   });
 
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
-    if (resolveBoxStyle) {
-      measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id);
-    }
+    measureStyle(agent, bridge, resolveRNStyle, id);
   });
 };
 
@@ -53,7 +50,7 @@ var blank = {
   bottom: 0,
 };
 
-function measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
+function measureStyle(agent, bridge, resolveRNStyle, id) {
   var node = agent.elementData.get(id);
   if (!node || !node.props) {
     bridge.send('rn-style:measure', {});
@@ -62,14 +59,14 @@ function measureStyle(agent, bridge, resolveRNStyle, resolveBoxStyle, id) {
   const style = resolveRNStyle(node.props.style);
 
   var instance = node.publicInstance;
-  if (!resolveBoxStyle || !instance || !instance.measure) {
+  if (!instance || !instance.measure) {
     bridge.send('rn-style:measure', {style});
     return;
   }
 
   instance.measure((x, y, width, height, left, top) => {
-    var margin = style && resolveBoxStyle && resolveBoxStyle('margin', style) || blank;
-    var padding = style && resolveBoxStyle && resolveBoxStyle('padding', style) || blank;
+    var margin = (style && resolveBoxStyle('margin', style)) || blank;
+    var padding = (style && resolveBoxStyle('padding', style)) || blank;
     bridge.send('rn-style:measure', {
       id, style,
       measureLayout: {

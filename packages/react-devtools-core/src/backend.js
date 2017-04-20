@@ -14,7 +14,6 @@ type ConnectOptions = {
   host?: string,
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
-  resolveBoxStyle?: (name: string, style: Object) => ?Object,
   isAppActive?: () => boolean,
 };
 
@@ -48,7 +47,6 @@ function connectToDevTools(options: ?ConnectOptions) {
     host = 'localhost',
     port = 8097,
     resolveRNStyle = null,
-    resolveBoxStyle = null,
     isAppActive = () => true,
   } = options || {};
 
@@ -83,7 +81,7 @@ function connectToDevTools(options: ?ConnectOptions) {
         ws.send(JSON.stringify(data));
       },
     };
-    setupBackend(wall, resolveRNStyle, resolveBoxStyle);
+    setupBackend(wall, resolveRNStyle);
   };
 
   var hasClosed = false;
@@ -125,7 +123,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   }
 }
 
-function setupBackend(wall, resolveRNStyle, resolveBoxStyle) {
+function setupBackend(wall, resolveRNStyle) {
   wall.onClose(() => {
     if (agent) {
       agent.emit('shutdown');
@@ -140,12 +138,12 @@ function setupBackend(wall, resolveRNStyle, resolveBoxStyle) {
   var bridge = new Bridge(wall);
   var agent = new Agent(window, {
     rnStyle: !!resolveRNStyle,
-    rnStyleMeasure: !!resolveBoxStyle,
+    rnStyleMeasure: !!resolveRNStyle,
   });
   agent.addBridge(bridge);
 
   if (resolveRNStyle) {
-    setupRNStyle(bridge, agent, resolveRNStyle, resolveBoxStyle);
+    setupRNStyle(bridge, agent, resolveRNStyle);
   }
 
   setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
