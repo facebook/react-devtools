@@ -26,19 +26,19 @@ type Props = {
   // TODO: typecheck bridge interface
   bridge: any;
   id: any;
-  measureSupport: boolean;
+  supportsMeasure: boolean;
 };
 
 type DefaultProps = {};
 
 type State = {
   style: ?Object;
-  measureLayout: ?Object;
+  measuredLayout: ?Object;
 };
 
 type StyleResult = {
   style: Object;
-  measureLayout: ?Object;
+  measuredLayout: ?Object;
 };
 
 class NativeStyler extends React.Component {
@@ -49,12 +49,12 @@ class NativeStyler extends React.Component {
 
   constructor(props: Object) {
     super(props);
-    this.state = {style: null, measureLayout: null};
+    this.state = {style: null, measuredLayout: null};
   }
 
   componentWillMount() {
     this._styleGet = this._styleGet.bind(this);
-    if (this.props.measureSupport) {
+    if (this.props.supportsMeasure) {
       this.props.bridge.on('rn-style:measure', this._styleGet);
       this.props.bridge.send('rn-style:measure', this.props.id);
     } else {
@@ -65,7 +65,7 @@ class NativeStyler extends React.Component {
   }
 
   componentWillUnmount() {
-    if (this.props.measureSupport) {
+    if (this.props.supportsMeasure) {
       this.props.bridge.off('rn-style:measure', this._styleGet);
     }
   }
@@ -77,7 +77,7 @@ class NativeStyler extends React.Component {
     this.setState({style: null});
     this.props.bridge.send('rn-style:get', nextProps.id);
 
-    if (this.props.measureSupport) {
+    if (this.props.supportsMeasure) {
       this.props.bridge.send('rn-style:measure', nextProps.id);
     } else {
       this.props.bridge.call('rn-style:get', nextProps.id, style => {
@@ -87,8 +87,8 @@ class NativeStyler extends React.Component {
   }
 
   _styleGet(result: StyleResult) {
-    var {style, measureLayout} = result;
-    this.setState({style, measureLayout});
+    var {style, measuredLayout} = result;
+    this.setState({style, measuredLayout});
   }
 
   _handleStyleChange(attr: string, val: string | number) {
@@ -113,7 +113,7 @@ class NativeStyler extends React.Component {
     }
     return (
       <div style={styles.container}>
-        {this.state.measureLayout && <BoxInspector {...this.state.measureLayout} />}
+        {this.state.measuredLayout && <BoxInspector {...this.state.measuredLayout} />}
         <StyleEdit
           style={this.state.style}
           onRename={this._handleStyleRename.bind(this)}

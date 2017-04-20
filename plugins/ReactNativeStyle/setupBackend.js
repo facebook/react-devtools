@@ -69,7 +69,7 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
     var padding = (style && resolveBoxStyle('padding', style)) || blank;
     bridge.send('rn-style:measure', {
       style,
-      measureLayout: {
+      measuredLayout: {
         x,
         y,
         width,
