@@ -80,7 +80,7 @@ class NativeStyler extends React.Component {
     if (this.props.measureSupport) {
       this.props.bridge.send('rn-style:measure', nextProps.id);
     } else {
-      this.props.bridge.call('rn-style:get', nextProps, style => {
+      this.props.bridge.call('rn-style:get', nextProps.id, style => {
         this.setState({style});
       });
     }
