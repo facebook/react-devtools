@@ -343,7 +343,7 @@ var styles = {
   guideline: {
     position: 'absolute',
     width: '1px',
-    background: 'rgba(0,0,0,0.025)',
+    background: 'none',
     top: '17px',
     left: '18px',
     bottom: '15px',
