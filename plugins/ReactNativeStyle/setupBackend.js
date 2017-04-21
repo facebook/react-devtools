@@ -34,12 +34,12 @@ module.exports = function setupRNStyle(
 
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
-    measureStyle(agent, bridge, resolveRNStyle, id);
+    setTimeout(() => measureStyle(agent, bridge, resolveRNStyle, id));
   });
 
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
-    measureStyle(agent, bridge, resolveRNStyle, id);
+    setTimeout(() => measureStyle(agent, bridge, resolveRNStyle, id));
   });
 };
 
