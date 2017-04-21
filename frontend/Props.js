@@ -11,12 +11,13 @@
 'use strict';
 
 var React = require('react');
+var assign = require('object-assign');
 var PropVal = require('./PropVal');
 
 class Props extends React.Component {
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
-    return nextProps.props !== this.props.props;
+    return nextProps.props !== this.props.props || nextProps.selected !== this.props.selected;
   }
 
   render() {
@@ -30,30 +31,44 @@ class Props extends React.Component {
     });
 
     var items = [];
+    var propNameStyle = assign(
+      {},
+      styles.propName,
+      this.props.selected && styles.propNameSelected
+    );
+
     names.slice(0, 3).forEach(name => {
       items.push(
         <span key={name} style={styles.prop}>
-          <span style={styles.propName}>{name}</span>
+          <span style={propNameStyle}>{name}</span>
           =
-          <PropVal val={props[name]}/>
+          <PropVal val={props[name]} selected={this.props.selected}/>
         </span>
       );
     });
 
     if (names.length > 3) {
-      items.push('…');
+      var ellipsisStyle = this.props.selected ? styles.ellipsisSelected : null;
+      items.push(<span style={ellipsisStyle}>…</span>);
     }
     return <span>{items}</span>;
   }
 }
 
 var styles = {
+  ellipsisSelected: {
+    color: '#ccc',
+  },
+
   prop: {
     paddingLeft: 5,
   },
 
   propName: {
     color: '#994500',
+  },
+  propNameSelected: {
+    color: '#ccc',
   },
 };
 

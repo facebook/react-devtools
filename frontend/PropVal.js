@@ -22,6 +22,7 @@ class PropVal extends React.Component {
   props: {
     val: any,
     nested?: boolean,
+    selected?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -35,21 +36,27 @@ class PropVal extends React.Component {
   }
 
   render() {
-    return previewProp(this.props.val, !!this.props.nested);
+    return previewProp(this.props.val, !!this.props.nested, !!this.props.selected);
   }
 }
 
-function previewProp(val: any, nested: boolean) {
+var selectedStyle = {
+  color: 'white',
+};
+
+function previewProp(val: any, nested: boolean, selected: boolean) {
   if (typeof val === 'number') {
-    return <span style={valueStyles.number}>{val}</span>;
+    const style = selected ? selectedStyle : valueStyles.number;
+    return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
 
+    const style = selected ? selectedStyle : valueStyles.string;
     return (
-      <span style={valueStyles.string}>
+      <span style={style}>
         <span style={{ color: 'rgb(168, 148, 166)' }}>"</span>
           {val}
         <span style={{ color: 'rgb(168, 148, 166)' }}>"</span>
@@ -57,52 +64,71 @@ function previewProp(val: any, nested: boolean) {
     );
   }
   if (typeof val === 'boolean') {
-    return <span style={valueStyles.bool}>{'' + val}</span>;
+    const style = selected ? selectedStyle : valueStyles.bool;
+    return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
     if (nested) {
-      return <span style={valueStyles.array}>[({val.length})]</span>;
+      const style = selected ? selectedStyle : valueStyles.array;
+      return <span style={style}>[({val.length})]</span>;
     }
-    return previewArray(val);
+    return previewArray(val, selected);
   }
   if (!val) {
-    return <span style={valueStyles.empty}>{'' + val}</span>;
+    const style = selected ? selectedStyle : valueStyles.empty;
+    return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
-    return <span>…</span>;
+    const style = selected ? selectedStyle : null;
+    return <span style={style}>…</span>;
   }
 
   switch (val[consts.type]) {
-    case 'date':
-      return <span style={valueStyles.date}>{val[consts.name]}</span>;
-    case 'function':
-      return <span style={valueStyles.func}>{val[consts.name] || 'fn'}()</span>;
-    case 'object':
-      return <span style={valueStyles.object}>{val[consts.name] + '{…}'}</span>;
-    case 'array':
-      return <span>Array[{val[consts.meta].length}]</span>;
+    case 'date': {
+      const style = selected ? selectedStyle : valueStyles.date;
+      return <span style={style}>{val[consts.name]}</span>;
+    }
+    case 'function': {
+      const style = selected ? selectedStyle : valueStyles.func;
+      return <span style={style}>{val[consts.name] || 'fn'}()</span>;
+    }
+    case 'object': {
+      const style = selected ? selectedStyle : valueStyles.object;
+      return <span style={style}>{val[consts.name] + '{…}'}</span>;
+    }
+    case 'array': {
+      const style = selected ? selectedStyle : null;
+      return <span style={style}>Array[{val[consts.meta].length}]</span>;
+    }
     case 'typed_array':
     case 'array_buffer':
-    case 'data_view':
-      return <span style={valueStyles.object}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
-    case 'iterator':
-      return <span style={valueStyles.object}>{val[consts.name] + '(…)'}</span>;
-    case 'symbol':
+    case 'data_view': {
+      const style = selected ? selectedStyle : valueStyles.object;
+      return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
+    }
+    case 'iterator': {
+      const style = selected ? selectedStyle : valueStyles.object;
+      return <span style={style}>{val[consts.name] + '(…)'}</span>;
+    }
+    case 'symbol': {
+      const style = selected ? selectedStyle : valueStyles.symbol;
       // the name is "Symbol(something)"
-      return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
+      return <span style={style}>{val[consts.name]}</span>;
+    }
   }
 
   if (nested) {
-    return <span>{'{…}'}</span>;
+    const style = selected ? selectedStyle : null;
+    return <span style={style}>{'{…}'}</span>;
   }
 
-  return previewObject(val);
+  return previewObject(val, selected);
 }
 
-function previewArray(val) {
+function previewArray(val, selected) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} />;
+    items['n' + i] = <PropVal val={item} nested={true} selected={selected} />;
     items['c' + i] = ', ';
   });
   if (val.length > 3) {
@@ -110,20 +136,22 @@ function previewArray(val) {
   } else {
     delete items['c' + (val.length - 1)];
   }
+  var style = selected ? selectedStyle : valueStyles.array;
   return (
-    <span style={valueStyles.array}>
+    <span style={style}>
       [{createFragment(items)}]
     </span>
   );
 }
 
-function previewObject(val) {
+function previewObject(val, selected) {
   var names = Object.keys(val);
   var items = {};
+  var attrStyle = selected ? selectedStyle : valueStyles.attr;
   names.slice(0, 3).forEach((name, i) => {
-    items['k' + i] = <span style={valueStyles.attr}>{name}</span>;
+    items['k' + i] = <span style={attrStyle}>{name}</span>;
     items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} />;
+    items['v' + i] = <PropVal val={val[name]} nested={true} selected={selected} />;
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
@@ -131,8 +159,9 @@ function previewObject(val) {
   } else {
     delete items['m' + (names.length - 1)];
   }
+  var style = selected ? selectedStyle : valueStyles.object;
   return (
-    <span style={valueStyles.object}>
+    <span style={style}>
       {'{'}{createFragment(items)}{'}'}
     </span>
   );

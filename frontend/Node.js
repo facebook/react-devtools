@@ -75,7 +75,7 @@ class Node extends React.Component {
       return (
         <span>
           {children.map(child =>
-            <WrappedNode key={child} id={child} depth={this.props.depth} />
+            <WrappedNode key={child} id={child} depth={this.props.depth}/>
           )}
         </span>
       );
@@ -86,6 +86,8 @@ class Node extends React.Component {
     }
 
     var collapsed = node.get('collapsed');
+    var selected = this.props.selected;
+    var tagTextStyle = assign({}, styles.tagText, selected && styles.tagTextSelected);
 
     var leftPad = {
       paddingLeft: 3 + (this.props.depth + 1) * 10,
@@ -95,7 +97,7 @@ class Node extends React.Component {
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      this.props.selected && (collapsed || !this.props.isBottomTagSelected) && styles.headSelect,
+      selected && (collapsed || !this.props.isBottomTagSelected) && styles.headSelect,
       leftPad
     );
 
@@ -113,7 +115,7 @@ class Node extends React.Component {
       if (nodeType === 'Text') {
         var text = node.get('text');
         tag =
-          <span style={styles.tagText}>
+          <span style={tagTextStyle}>
             <span style={styles.openTag}>
               "
             </span>
@@ -124,7 +126,7 @@ class Node extends React.Component {
           </span>;
       } else if (nodeType === 'Empty') {
         tag =
-          <span style={styles.tagText}>
+          <span style={tagTextStyle}>
             <span style={styles.falseyLiteral}>null</span>
           </span>;
       }
@@ -139,7 +141,13 @@ class Node extends React.Component {
 
     var isCustom = nodeType === 'Composite';
 
-    var tagStyle = isCustom ? styles.customTagName : styles.tagName;
+    var topTagStyle = selected && !this.props.isBottomTagSelected ?
+      styles.selectedTagName :
+      (isCustom ? styles.customTagName : styles.tagName);
+
+    var bottomTagStyle = selected && this.props.isBottomTagSelected ?
+      styles.selectedTagName :
+      (isCustom ? styles.customTagName : styles.tagName);
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
@@ -149,19 +157,27 @@ class Node extends React.Component {
       return (
         <div style={styles.container}>
           <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
-            <span style={styles.tagText}>
+            <span style={tagTextStyle}>
               <span style={styles.openTag}>
-                <span style={tagStyle}>&lt;{name}</span>
-                {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
-                {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
-                {node.get('props') && <Props key="props" props={node.get('props')}/>}
-                {isCollapsed && <span style={tagStyle}> /</span>}
-                <span style={tagStyle}>&gt;</span>
+                <span style={topTagStyle}>&lt;{name}</span>
+                {node.get('key') &&
+                  <Props key="key" props={{'key': node.get('key')}} selected={selected}/>
+                }
+                {node.get('ref') &&
+                  <Props key="ref" props={{'ref': node.get('ref')}} selected={selected}/>
+                }
+                {node.get('props') &&
+                  <Props key="props" props={node.get('props')} selected={selected}/>
+                }
+                {isCollapsed && <span style={topTagStyle}> /</span>}
+                <span style={topTagStyle}>&gt;</span>
               </span>
               {!isCollapsed && [
-                <span key="content" style={styles.textContent}>{content}</span>,
+                <span key="content" style={styles.textContent}>
+                  {content}
+                </span>,
                 <span key="close" style={styles.closeTag}>
-                  <span style={tagStyle}>&lt;/{name}&gt;</span>
+                  <span style={topTagStyle}>&lt;/{name}&gt;</span>
                 </span>,
               ]}
             </span>
@@ -172,7 +188,7 @@ class Node extends React.Component {
 
     var closeTag = (
       <span style={styles.closeTag}>
-        <span style={tagStyle}>
+        <span style={collapsed ? topTagStyle : bottomTagStyle}>
           &lt;/{'' + node.get('name')}&gt;
         </span>
       </span>
@@ -189,12 +205,14 @@ class Node extends React.Component {
       assign(
         {},
         styles.collapsedArrow,
-        hasState && styles.collapsedArrowStateful
+        hasState && styles.collapsedArrowStateful,
+        selected && styles.collapsedArrowSelected
       ) :
       assign(
         {},
         styles.expandedArrow,
-        hasState && styles.expandedArrowStateful
+        hasState && styles.expandedArrowStateful,
+        selected && styles.expandedArrowSelected
       );
 
     var collapser =
@@ -202,21 +220,27 @@ class Node extends React.Component {
         title={hasState ? 'This component is stateful.' : null}
         onClick={this.props.onToggleCollapse} style={collapserStyle}
       >
-        <span style={arrowStyle} />
+        <span style={arrowStyle}/>
       </span>;
 
     var head = (
       <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
         {collapser}
-        <span style={styles.tagText}>
+        <span style={tagTextStyle}>
           <span style={styles.openTag}>
-            <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
-            {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
-            {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
-            {node.get('props') && <Props key="props" props={node.get('props')}/>}
-            <span style={tagStyle}>&gt;</span>
+            <span style={topTagStyle}>&lt;{'' + node.get('name')}</span>
+            {node.get('key') &&
+              <Props key="key" props={{'key': node.get('key')}} selected={selected}/>
+            }
+            {node.get('ref') &&
+              <Props key="ref" props={{'ref': node.get('ref')}} selected={selected}/>
+            }
+            {node.get('props') &&
+              <Props key="props" props={node.get('props')} selected={selected}/>
+            }
+            <span style={topTagStyle}>&gt;</span>
           </span>
-          {collapsed && '…'}
+          {collapsed && <span style={styles.textContent}>…</span>}
           {collapsed && closeTag}
         </span>
       </div>
@@ -234,7 +258,7 @@ class Node extends React.Component {
       {},
       styles.tail,
       this.props.hovered && styles.headHover,
-      this.props.selected && this.props.isBottomTagSelected && styles.headSelect,
+      selected && this.props.isBottomTagSelected && styles.headSelect,
       leftPad
     );
 
@@ -242,7 +266,7 @@ class Node extends React.Component {
       <div style={styles.container}>
         {head}
         <div style={styles.children}>
-          {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id} />)}
+          {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id}/>)}
         </div>
         <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
           {closeTag}
@@ -330,9 +354,11 @@ var styles = {
   tagName: {
     color: '#777',
   },
-
   customTagName: {
     color: 'rgb(136, 18, 128)',
+  },
+  selectedTagName: {
+    color: 'white'
   },
 
   openTag: {
@@ -342,9 +368,12 @@ var styles = {
     flex: 1,
     whiteSpace: 'nowrap',
   },
+  tagTextSelected: {
+    color: 'white'
+  },
 
   headSelect: {
-    backgroundColor: '#ccc',
+    backgroundColor: 'rgb(56, 121, 217)',
   },
 
   collapser: {
@@ -363,6 +392,9 @@ var styles = {
   collapsedArrowStateful: {
     borderColor: 'transparent transparent transparent #e55',
   },
+  collapsedArrowSelected: {
+    borderColor: 'transparent transparent transparent white',
+  },
 
   expandedArrow: {
     borderColor: '#555 transparent transparent transparent',
@@ -375,9 +407,12 @@ var styles = {
   expandedArrowStateful: {
     borderColor: '#e55 transparent transparent transparent',
   },
+  expandedArrowSelected: {
+    borderColor: 'white transparent transparent transparent',
+  },
 
   headHover: {
-    backgroundColor: '#eee',
+    backgroundColor: '#ebf2fb',
   },
 };
 
