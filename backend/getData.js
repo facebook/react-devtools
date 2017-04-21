@@ -31,6 +31,7 @@ function getData(internalInstance: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
+  var reactTag = null;;
   // If the parent is a native node without rendered children, but with
   // multiple string children, then the `element` that gets passed in here is
   // a plain value -- a string or number.
@@ -112,6 +113,10 @@ function getData(internalInstance: Object): DataType {
     }
   }
 
+  if (nodeType === 'Native') {
+    reactTag = element._rootNodeID;
+  }
+
   return {
     nodeType,
     type,
@@ -126,6 +131,7 @@ function getData(internalInstance: Object): DataType {
     text,
     updater,
     publicInstance,
+    reactTag,
   };
 }
 

@@ -230,7 +230,8 @@ class Store extends EventEmitter {
             var node = this.get(item);
             return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) ||
               (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
-              (typeof node.get('children') === 'string' && node.get('children').toLowerCase().indexOf(needle) !== -1);
+              (typeof node.get('children') === 'string' && node.get('children').toLowerCase().indexOf(needle) !== -1) ||
+              (node.get('reactTag') != null && node.get('reactTag').toString().indexOf(needle) === 0);
           });
       } else {
         this.searchRoots = this._nodes.entrySeq()

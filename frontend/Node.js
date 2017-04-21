@@ -85,6 +85,10 @@ class Node extends React.Component {
       children = this.props.wrappedChildren;
     }
 
+    var reactTag = this.props.node.get('reactTag');
+    var name = reactTag == null
+      ? `${this.props.node.get('name')}`
+      : `${this.props.node.get('name')}(${reactTag})`;
     var collapsed = node.get('collapsed');
 
     var leftPad = {
@@ -143,7 +147,6 @@ class Node extends React.Component {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      var name = node.get('name');
       var content = children;
       var isCollapsed = content === null || content === undefined;
       return (
@@ -173,7 +176,7 @@ class Node extends React.Component {
     var closeTag = (
       <span style={styles.closeTag}>
         <span style={tagStyle}>
-          &lt;/{'' + node.get('name')}&gt;
+          &lt;/{'' + name}&gt;
         </span>
       </span>
     );
@@ -210,7 +213,7 @@ class Node extends React.Component {
         {collapser}
         <span style={styles.tagText}>
           <span style={styles.openTag}>
-            <span style={tagStyle}>&lt;{'' + node.get('name')}</span>
+            <span style={tagStyle}>&lt;{'' + name}</span>
             {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
             {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
             {node.get('props') && <Props key="props" props={node.get('props')}/>}
