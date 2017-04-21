@@ -470,7 +470,7 @@ class Store extends EventEmitter {
   changeBananaSlug(state: ControlState) {
     this.bananaslugState = state;
     this.emit('bananaslugchange');
-    invariant(state.toJS);
+    invariant(state.toJS, 'the state must be immutable record');
     this._bridge.send('bananaslugchange', state.toJS());
   }
 
