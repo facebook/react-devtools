@@ -146,6 +146,7 @@ class Node extends React.Component {
     if (!children || typeof children === 'string' || !children.length) {
       var name = node.get('name');
       var content = children;
+      var isCollapsed = content === null || content === undefined;
       return (
         <div style={containerStyles}>
           <div style={styles.head} ref={h => this._head = h} {...tagEvents}>
@@ -156,11 +157,11 @@ class Node extends React.Component {
                 {node.get('key') && <Props key="key" props={{'key': node.get('key')}}/>}
                 {node.get('ref') && <Props key="ref" props={{'ref': node.get('ref')}}/>}
                 {node.get('props') && <Props key="props" props={node.get('props')}/>}
-                {!content && '/'}
+                {isCollapsed && ' /'}
                 <span style={tagStyle}></span>
                 &gt;
               </span>
-              {content && [
+              {!isCollapsed && [
                 <span key="content" style={styles.textContent}>{content}</span>,
                 <span key="close" style={closeTagStyle}>
                   &lt;

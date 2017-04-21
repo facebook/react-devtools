@@ -35,20 +35,76 @@ type DataViewProps = {
 class DataView extends React.Component {
   props: DataViewProps;
 
+  renderSparseArrayHole(count: number, key: string) {
+    return (
+      <li key={key}>
+        <div style={styles.head}>
+          <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+            undefined × {count}
+          </div>
+        </div>
+      </li>
+    );
+  }
+
+  renderItem(name: string, key: string) {
+    return (
+      <DataItem
+        key={key}
+        name={name}
+        path={this.props.path.concat([name])}
+        startOpen={this.props.startOpen}
+        inspect={this.props.inspect}
+        showMenu={this.props.showMenu}
+        readOnly={this.props.readOnly}
+        value={this.props.data[name]} />
+    );
+  }
+
   render() {
     var data = this.props.data;
     if (!data) {
       return <div style={styles.missing}>null</div>;
     }
-    var names = Object.keys(data);
-    if (!this.props.noSort) {
-      names.sort(alphanumericSort);
+
+    var isArray = Array.isArray(data);
+    var elements = [];
+    if (isArray) {
+      // Iterate over array, filling holes with special items
+      var lastIndex = -1;
+      data.forEach((item, i) => {
+        if (lastIndex < i - 1) {
+          // Have we skipped over a hole?
+          var holeCount = (i - 1) - lastIndex;
+          elements.push(
+            this.renderSparseArrayHole(holeCount, i + '-hole')
+          );
+        }
+        elements.push(this.renderItem(i, i));
+        lastIndex = i;
+      });
+      if (lastIndex < data.length - 1) {
+        // Is there a hole at the end?
+        var holeCount = (data.length - 1) - lastIndex;
+        elements.push(
+          this.renderSparseArrayHole(holeCount, lastIndex + '-hole')
+        );
+      }
+    } else {
+      // Iterate over a regular object
+      var names = Object.keys(data);
+      if (!this.props.noSort) {
+        names.sort(alphanumericSort);
+      }
+      names.forEach((name, i) => {
+        elements.push(this.renderItem(name, name));
+      });
     }
-    var path = this.props.path;
-    if (!names.length) {
+
+    if (!elements.length) {
       return (
         <div style={styles.empty}>
-          {Array.isArray(data) ? 'Empty array' : 'Empty object'}
+          {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
     }
@@ -57,9 +113,9 @@ class DataView extends React.Component {
       <ul style={styles.container}>
         {data[consts.proto] &&
           <DataItem
-            name={'__proto__'}
-            path={path.concat(['__proto__'])}
             key={'__proto__'}
+            name={'__proto__'}
+            path={this.props.path.concat(['__proto__'])}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
@@ -67,18 +123,7 @@ class DataView extends React.Component {
             value={this.props.data[consts.proto]}
           />}
 
-        {names.map((name, i) => (
-          <DataItem
-            name={name}
-            path={path.concat([name])}
-            key={name}
-            startOpen={this.props.startOpen}
-            inspect={this.props.inspect}
-            showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
-            value={this.props.data[name]}
-          />
-        ))}
+        {elements}
       </ul>
     );
   }
@@ -136,10 +181,13 @@ class DataItem extends React.Component {
     });
   }
 
+  toggleBooleanValue(e) {
+    this.context.onChange(this.props.path, e.target.checked);
+  }
+
   render() {
     var data = this.props.value;
     var otype = typeof data;
-
     var complex = true;
     var preview;
     if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean') {
@@ -155,10 +203,11 @@ class DataItem extends React.Component {
       preview = previewComplex(data);
     }
 
-    var open = this.state.open && (!data || data[consts.inspected] !== false);
-
+    var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
+    var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
-    if (complex) {
+
+    if (complex && inspectable) {
       opener = (
         <div
           onClick={this.toggleOpen.bind(this)}
@@ -168,19 +217,29 @@ class DataItem extends React.Component {
             <span style={styles.collapsedArrow} />}
         </div>
       );
+    } else if (otype === 'boolean' && !this.props.readOnly) {
+      opener = (
+        <input
+          checked={data}
+          onChange={this.toggleBooleanValue.bind(this)}
+          style={styles.toggler}
+          type="checkbox"
+        />
+      );
     }
 
     var children = null;
     if (complex && open) {
+      var readOnly = this.props.readOnly || (data[consts.meta] && data[consts.meta].readOnly);
       // TODO path
       children = (
         <div style={styles.children}>
           <DataView
-            data={this.props.value}
+            data={data}
             path={this.props.path}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -197,14 +256,14 @@ class DataItem extends React.Component {
           {opener}
           <div
             style={assign({}, styles.name, complex && styles.complexName)}
-            onClick={this.toggleOpen.bind(this)}
+            onClick={inspectable && this.toggleOpen.bind(this)}
           >
-            {this.props.name}:
+            {name}:
           </div>
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
-                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+                this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
             style={styles.preview}
@@ -217,6 +276,10 @@ class DataItem extends React.Component {
     );
   }
 }
+
+DataItem.contextTypes = {
+  onChange: React.PropTypes.func,
+};
 
 function alphanumericSort(a: string, b: string): number {
   if ('' + (+a) === a) {
@@ -261,6 +324,12 @@ var styles = {
     top: 4,
   },
 
+  toggler: {
+    left: -15,
+    position: 'absolute',
+    top: -1,
+  },
+
   collapsedArrow: {
     borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
     borderStyle: 'solid',
@@ -287,6 +356,10 @@ var styles = {
   name: {
     color: '#666',
     margin: '2px 3px',
+  },
+
+  sparseArrayFiller: {
+    fontStyle: 'italic',
   },
 
   complexName: {

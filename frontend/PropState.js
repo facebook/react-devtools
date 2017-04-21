@@ -37,12 +37,10 @@ class PropState extends React.Component {
     }
     return (
       <div style={styles.source}>
-        <div style={styles.sourceName}>
-          {source.fileName}
-        </div>
-        <div style={styles.sourcePos}>
+        {source.fileName}
+        <span style={styles.sourcePos}>
           :{source.lineNumber}
-        </div>
+        </span>
       </div>
     );
   }
@@ -88,11 +86,12 @@ class PropState extends React.Component {
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
+    var isComposite = this.props.node.get('nodeType') === 'Composite';
 
     return (
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
-        hint="($r in the console)">
+        hint={isComposite ? '($r in the console)' : null}>
         {key &&
           <DetailPaneSection
             title="Key"
@@ -194,12 +193,9 @@ var WrappedPropState = decorate({
 var styles = {
   source: {
     padding: '5px 10px',
-    display: 'flex',
-    flexDirection: 'row',
-  },
-
-  sourceName: {
     color: 'blue',
+    overflow: 'auto',
+    overflowWrap: 'break-word',
   },
 
   sourcePos: {

@@ -13,11 +13,11 @@
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 
-function getData012(element: Object): DataType {
+function getData012(internalInstance: Object): DataType {
   var children = null;
-  var props = element.props;
-  var state = element.state;
-  var context = element.context;
+  var props = internalInstance.props;
+  var state = internalInstance.state;
+  var context = internalInstance.context;
   var updater = null;
   var name = null;
   var type = null;
@@ -26,32 +26,32 @@ function getData012(element: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
-  if (element._renderedComponent) {
+  if (internalInstance._renderedComponent) {
     nodeType = 'Wrapper';
-    children = [element._renderedComponent];
+    children = [internalInstance._renderedComponent];
     if (context && Object.keys(context).length === 0) {
       context = null;
     }
-  } else if (element._renderedChildren) {
-    name = element.constructor.displayName;
-    children = childrenList(element._renderedChildren);
+  } else if (internalInstance._renderedChildren) {
+    name = internalInstance.constructor.displayName;
+    children = childrenList(internalInstance._renderedChildren);
   } else if (typeof props.children === 'string') {
     // string children
-    name = element.constructor.displayName;
+    name = internalInstance.constructor.displayName;
     children = props.children;
     nodeType = 'Native';
   }
 
-  if (!props && element._currentElement && element._currentElement.props) {
-    props = element._currentElement.props;
+  if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
+    props = internalInstance._currentElement.props;
   }
 
-  if (element._currentElement) {
-    type = element._currentElement.type;
-    if (element._currentElement.key) {
-      key = String(element._currentElement.key);
+  if (internalInstance._currentElement) {
+    type = internalInstance._currentElement.type;
+    if (internalInstance._currentElement.key) {
+      key = String(internalInstance._currentElement.key);
     }
-    ref = element._currentElement.ref;
+    ref = internalInstance._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
     } else {
@@ -64,7 +64,7 @@ function getData012(element: Object): DataType {
   }
 
   if (!name) {
-    name = element.constructor.displayName || 'No display name';
+    name = internalInstance.constructor.displayName || 'No display name';
     nodeType = 'Composite';
   }
 
@@ -75,15 +75,15 @@ function getData012(element: Object): DataType {
     name = null;
   }
 
-  if (element.forceUpdate) {
+  if (internalInstance.forceUpdate) {
     updater = {
-      setState: element.setState.bind(element),
-      forceUpdate: element.forceUpdate.bind(element),
-      setInProps: element.forceUpdate && setInProps.bind(null, element),
-      setInState: element.forceUpdate && setInState.bind(null, element),
-      setInContext: element.forceUpdate && setInContext.bind(null, element),
+      setState: internalInstance.setState.bind(internalInstance),
+      forceUpdate: internalInstance.forceUpdate.bind(internalInstance),
+      setInProps: internalInstance.forceUpdate && setInProps.bind(null, internalInstance),
+      setInState: internalInstance.forceUpdate && setInState.bind(null, internalInstance),
+      setInContext: internalInstance.forceUpdate && setInContext.bind(null, internalInstance),
     };
-    publicInstance = element;
+    publicInstance = internalInstance;
   }
 
   return {

@@ -71,29 +71,31 @@ function previewProp(val: any, nested: boolean) {
   if (typeof val !== 'object') {
     return <span>…</span>;
   }
-  if (val[consts.type]) {
-    var type = val[consts.type];
-    if (type === 'function') {
-      return (
-        <span style={valueStyles.func}>
-          {val[consts.name] || 'fn'}()
-        </span>
-      );
-    }
-    if (type === 'object') {
+
+  switch (val[consts.type]) {
+    case 'date':
+      return <span style={valueStyles.date}>{val[consts.name]}</span>;
+    case 'function':
+      return <span style={valueStyles.func}>{val[consts.name] || 'fn'}()</span>;
+    case 'object':
       return <span style={valueStyles.object}>{val[consts.name] + '{…}'}</span>;
-    }
-    if (type === 'array') {
+    case 'array':
       return <span>Array[{val[consts.meta].length}]</span>;
-    }
-    if (type === 'symbol') {
+    case 'typed_array':
+    case 'array_buffer':
+    case 'data_view':
+      return <span style={valueStyles.object}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
+    case 'iterator':
+      return <span style={valueStyles.object}>{val[consts.name] + '(…)'}</span>;
+    case 'symbol':
       // the name is "Symbol(something)"
       return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
-    }
   }
+
   if (nested) {
     return <span>{'{…}'}</span>;
   }
+
   return previewObject(val);
 }
 

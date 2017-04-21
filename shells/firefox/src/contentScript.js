@@ -36,7 +36,7 @@ function connectToBackend() {
   });
 
   window.addEventListener('message', function(evt) {
-    if (evt.source !== window || !evt.data || evt.data.source !== 'react-devtools-bridge') {
+    if (evt.source !== document.defaultView || !evt.data || evt.data.source !== 'react-devtools-bridge') {
       return;
     }
 

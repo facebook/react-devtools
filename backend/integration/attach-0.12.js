@@ -33,16 +33,16 @@ var renderer = renderers[Object.keys(renderers)[0]];
 function tracker(hook) {
   var els = new Map();
   var roots = new Set();
-  hook.on('root', ({element}) => roots.add(element));
-  hook.on('unmount', ({element}) => {
-    roots.delete(element);
-    els.delete(element);
+  hook.on('root', ({internalInstance}) => roots.add(internalInstance));
+  hook.on('unmount', ({internalInstance}) => {
+    roots.delete(internalInstance);
+    els.delete(internalInstance);
   });
-  hook.on('mount', ({element, data}) => {
-    els.set(element, [data]);
+  hook.on('mount', ({internalInstance, data}) => {
+    els.set(internalInstance, [data]);
   });
-  hook.on('update', ({element, data}) => {
-    els.get(element).push(data);
+  hook.on('update', ({internalInstance, data}) => {
+    els.get(internalInstance).push(data);
   });
   return {els, roots};
 }
@@ -60,10 +60,10 @@ function setup(hook) {
   return handlers;
 }
 
-function wrapElement(hook, element) {
+function wrapElement(hook, internalInstance) {
   var extras = attachRenderer(hook, 'abc', renderer);
   var node = document.createElement('div');
-  React.render(element, node);
+  React.render(internalInstance, node);
   setTimeout(() => {
     extras.cleanup();
     React.unmountComponentAtNode(node);
@@ -141,8 +141,8 @@ test('attaching late should work', t => {
 test('should unmount everything', t => {
   var hook = new EventEmitter();
   var els = new Set();
-  hook.on('mount', ({element}) => els.add(element));
-  hook.on('unmount', ({element}) => els.delete(element));
+  hook.on('mount', ({internalInstance}) => els.add(internalInstance));
+  hook.on('unmount', ({internalInstance}) => els.delete(internalInstance));
 
   var node = document.createElement('div');
   wrapRender(hook, () => {
@@ -180,8 +180,8 @@ test('Double render', t => {
   var hook = new EventEmitter();
   var handlers = setup(hook);
   var els = new Set();
-  hook.on('mount', ({element}) => els.add(element));
-  hook.on('unmount', ({element}) => els.delete(element));
+  hook.on('mount', ({internalInstance}) => els.add(internalInstance));
+  hook.on('unmount', ({internalInstance}) => els.delete(internalInstance));
 
   wrapNode(node => {
     wrapRender(hook, () => {
