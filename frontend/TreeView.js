@@ -74,7 +74,7 @@ class TreeView extends React.Component {
           <div ref={n => this.node = n} style={styles.scroll}>
             <div style={styles.scrollContents}>
               {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
-                <Node key={id} id={id} depth={0} />
+                <Node key={id} id={id} />
               )).toJS()}
               <span>Some results not shown. Narrow your search criteria to find them</span>
             </div>
@@ -88,7 +88,7 @@ class TreeView extends React.Component {
         <div ref={n => this.node = n} style={styles.scroll}>
           <div style={styles.scrollContents}>
             {this.props.roots.map(id => (
-              <Node key={id} id={id} depth={0} />
+              <Node key={id} id={id} />
             )).toJS()}
           </div>
         </div>
@@ -106,7 +106,6 @@ var styles = {
   container: {
     fontFamily: 'Menlo, Consolas, monospace',
     fontSize: '11px',
-    lineHeight: 1.3,
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
@@ -118,12 +117,13 @@ var styles = {
   },
 
   scroll: {
-    padding: '5px',
+    padding: '3px 3px 3px 0',
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
     display: 'flex',
     alignItems: 'flex-start',
+    flexDirection: 'column',
   },
 
   scrollContents: {
@@ -131,6 +131,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
+    width: '100%',
   },
 
   noSearchResults: {
