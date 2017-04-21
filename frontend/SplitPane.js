@@ -61,9 +61,22 @@ class SplitPane extends React.Component {
   onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
 
+    // TODO: I don't understand what this is doing.
+    // It's probably related to margin and padding but it's necessary to avoid jumps:
+    // https://github.com/facebook/react-devtools/issues/611
+    // I can live with this for now but we should fix it.
+    // How I verify that it works:
+    // https://d2ppvlu71ri8gs.cloudfront.net/items/2R3J2I1S2N3s341i3c2R/Screen%20Recording%202017-04-21%20at%2004.43%20PM.gif?v=3410952d
+    // (it should be smooth without jumps)
+    const MAGIC = 10 + 3;
+
     this.setState(prevState => ({
-      width: !this.props.isVertical ? prevState.width : (node.offsetLeft + node.offsetWidth) - x,
-      height: this.props.isVertical ? prevState.height : (node.offsetTop + node.offsetHeight) - y,
+      width: !this.props.isVertical ?
+        prevState.width :
+        (node.offsetLeft + node.offsetWidth - x - MAGIC),
+      height: this.props.isVertical ?
+        prevState.height :
+        (node.offsetTop + node.offsetHeight - y - MAGIC),
     }));
   }
 
