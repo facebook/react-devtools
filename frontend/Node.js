@@ -242,12 +242,6 @@ class Node extends React.Component {
       this.props.selected && this.props.isBottomTagSelected && styles.fillSelect,
     );
 
-    var guidelineStyles = assign(
-      {},
-      styles.guideline,
-      this.props.selected && styles.selectedGuideline,
-    );
-
     return (
       <div style={containerStyles}>
         {head}
@@ -258,7 +252,7 @@ class Node extends React.Component {
           {closeTag}
           <div style={tailBackgroundStyles}></div>
         </div>
-        <div style={guidelineStyles}></div>
+        {this.props.selected && <div style={styles.guideline}></div>}
       </div>
     );
   }
@@ -343,14 +337,10 @@ var styles = {
   guideline: {
     position: 'absolute',
     width: '1px',
-    background: 'none',
+    background: '#a9c5ef',
     top: '17px',
     left: '18px',
     bottom: '15px',
-  },
-
-  selectedGuideline: {
-    background: '#a9c5ef',
   },
 
   head: {
