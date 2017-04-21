@@ -86,11 +86,12 @@ class PropState extends React.Component {
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
+    var isComposite = this.props.node.get('nodeType') === 'Composite';
 
     return (
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
-        hint="($r in the console)">
+        hint={isComposite ? '($r in the console)' : null}>
         {key &&
           <DetailPaneSection
             title="Key"
