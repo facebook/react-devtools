@@ -16,6 +16,7 @@ var path = require('path');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
+var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -28,6 +29,12 @@ var config = {
   alreadyFoundReact: true,
   inject(done) {
     done(wall);
+  },
+  showComponentSource(vbl, source) {
+    if (!source) {
+      return;
+    }
+    launchEditor(source.fileName, source.lineNumber);
   },
 };
 

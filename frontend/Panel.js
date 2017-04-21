@@ -36,7 +36,7 @@ export type Props = {
   reload?: () => void,
 
   // optionals
-  showComponentSource?: () => void,
+  showComponentSource?: (vbl: string, source?: Object) => void,
   reloadSubscribe?: (reloadFn: () => void) => () => void,
   showAttrSource?: (path: Array<string>) => void,
   executeFn?: (path: Array<string>) => void,
@@ -146,14 +146,14 @@ class Panel extends React.Component {
     this.props.showComponentSource(vbl || '$r');
   }
 
-  viewSource(id: string) {
+  viewSource(id: string, node?: Object) {
     if (!this._bridge) {
       return;
     }
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       invariant(this.props.showComponentSource, 'cannot view source if props.showComponentSource is not supplied');
-      this.props.showComponentSource('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst');
+      this.props.showComponentSource('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst', node && node.get('source'));
     }, 100);
   }
 
@@ -265,7 +265,7 @@ class Panel extends React.Component {
             return [this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
               key: 'showSource',
               title: 'Show Source',
-              action: () => this.viewSource(id),
+              action: () => this.viewSource(id, node),
             }, this.props.selectElement && this._store.capabilities.dom && {
               key: 'showInElementsPane',
               title: 'Show in Elements Pane',
