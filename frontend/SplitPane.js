@@ -61,49 +61,43 @@ class SplitPane extends React.Component {
   onMove(x: number, y: number) {
     var node = ReactDOM.findDOMNode(this);
 
-    // TODO: I don't understand what this is doing.
-    // It's probably related to margin and padding but it's necessary to avoid jumps:
-    // https://github.com/facebook/react-devtools/issues/611
-    // I can live with this for now but we should fix it.
-    // How I verify that it works:
-    // https://d2ppvlu71ri8gs.cloudfront.net/items/2R3J2I1S2N3s341i3c2R/Screen%20Recording%202017-04-21%20at%2004.43%20PM.gif?v=3410952d
-    // (it should be smooth without jumps)
-    const MAGIC = 10 + 3;
-
     this.setState(prevState => ({
       width: !this.props.isVertical ?
         prevState.width :
-        (node.offsetLeft + node.offsetWidth - x - MAGIC),
+        (node.offsetLeft + node.offsetWidth - x),
       height: this.props.isVertical ?
         prevState.height :
-        (node.offsetTop + node.offsetHeight - y - MAGIC),
+        (node.offsetTop + node.offsetHeight - y),
     }));
   }
 
   render() {
-    var rightStyle = assign({}, styles.rightPane, {
-      width: this.props.isVertical ? this.state.width : '100%',
-      height: this.props.isVertical ? '100%' : this.state.height,
-      marginLeft: (this.props.isVertical) ? 0 : -3,
-    });
-
     var containerStyles = this.props.isVertical ? styles.container : styles.containerVertical;
     var draggerStyles = this.props.isVertical ? styles.dragger : styles.draggerVertical;
-
+    var rightStyles = assign({}, containerStyles, {
+      width: this.props.isVertical ? this.state.width : '100%',
+      height: this.props.isVertical ? '100%' : this.state.height,
+      flex: 'initial',
+      minHeight: 100,
+      minWidth: 150,
+      marginLeft: (this.props.isVertical) ? 0 : -3,
+    });
     return (
       <div style={containerStyles}>
         <div style={styles.leftPane}>
           {this.props.left()}
         </div>
-        <Draggable
-          style={draggerStyles}
-          onStart={() => this.setState({moving: true})}
-          onMove={(x, y) => this.onMove(x, y)}
-          onStop={() => this.setState({moving: false})}>
-          <div style={styles.draggerInner} />
-        </Draggable>
-        <div style={rightStyle}>
-          {this.props.right()}
+        <div style={rightStyles}>
+            <Draggable
+              style={draggerStyles}
+              onStart={() => this.setState({moving: true})}
+              onMove={(x, y) => this.onMove(x, y)}
+              onStop={() => this.setState({moving: false})}>
+              <div style={styles.draggerInner} />
+            </Draggable>
+            <div style={styles.rightPane}>
+              {this.props.right()}
+            </div>
         </div>
       </div>
     );
@@ -148,8 +142,7 @@ var styles = {
   rightPane: {
     display: 'flex',
     marginLeft: -3,
-    minWidth: 100,
-    minHeight: 100,
+    width: '100%',
     padding: 5,
   },
 
