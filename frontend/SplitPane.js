@@ -88,16 +88,16 @@ class SplitPane extends React.Component {
           {this.props.left()}
         </div>
         <div style={rightStyles}>
-            <Draggable
-              style={draggerStyles}
-              onStart={() => this.setState({moving: true})}
-              onMove={(x, y) => this.onMove(x, y)}
-              onStop={() => this.setState({moving: false})}>
-              <div style={styles.draggerInner} />
-            </Draggable>
-            <div style={styles.rightPane}>
-              {this.props.right()}
-            </div>
+          <Draggable
+            style={draggerStyles}
+            onStart={() => this.setState({moving: true})}
+            onMove={(x, y) => this.onMove(x, y)}
+            onStop={() => this.setState({moving: false})}>
+            <div style={styles.draggerInner} />
+          </Draggable>
+          <div style={styles.rightPane}>
+            {this.props.right()}
+          </div>
         </div>
       </div>
     );
