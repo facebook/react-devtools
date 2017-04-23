@@ -26,6 +26,9 @@ var keyCodes = {
   '38': 'up',
   '39': 'right',
   '40': 'down',
+
+  '69': 'expand',
+  '67': 'collapse',
 };
 
 module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) => void {
@@ -43,6 +46,14 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
       return;
     }
     e.preventDefault();
+    if (direction === 'expand') {
+      store.toggle(false);
+      return;
+    }
+    if (direction === 'collapse') {
+      store.toggle(true);
+      return;
+    }
     var dest = getDest(direction, store);
     if (!dest) {
       return;

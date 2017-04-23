@@ -340,6 +340,14 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
+  toggle(value) {
+    var id = this.selected;
+    if (!id) {
+      return;
+    }
+    this._toggleDeepChildren(id, value);
+  }
+
   setProps(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setProps', {id, path, value});
   }
@@ -533,6 +541,22 @@ class Store extends EventEmitter {
       }
       pid = this._parents.get(pid);
     }
+  }
+
+  _toggleDeepChildren(id: ElementID, value: boolean) {
+    var node = this._nodes.get(id);
+    if (!node) {
+      return;
+    }
+    if (!(node.get('collapsed') === value)) {
+      this._nodes = this._nodes.setIn([id, 'collapsed'], value);
+      this.emit(id);
+    }
+    var children = node.get('children');
+    if (children && children.forEach) {
+      children.forEach(cid => this._toggleDeepChildren(cid, value));
+    }
+    
   }
 
   _mountComponent(data: DataType) {
