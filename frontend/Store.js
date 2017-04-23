@@ -340,7 +340,7 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
-  toggle(value) {
+  toggle(value: boolean) {
     var id = this.selected;
     if (!id) {
       return;
