@@ -32,29 +32,118 @@ type PropsType = {
   onSelect: () => void,
 };
 
+type StateType = {
+  isWindowFocused: boolean,
+};
+
 class Node extends React.Component {
   _head: ?HTMLElement;
   _tail: ?HTMLElement;
+  _ownerWindow: any;
 
   context: Object;
   props: PropsType;
+  state: StateType = {
+    isWindowFocused: true,
+  };
+
   static contextTypes: Object;
 
-  shouldComponentUpdate(nextProps: PropsType) {
-    return nextProps !== this.props;
+  shouldComponentUpdate(nextProps: PropsType, nextState: StateType) {
+    return (
+      nextProps !== this.props ||
+      nextState.isWindowFocused !== this.state.isWindowFocused
+    );
   }
 
   componentDidMount() {
     if (this.props.selected) {
       this.ensureInView();
+      // This is done lazily so we only have one subscription at a time at most.
+      // We'll unsubscribe and resubscribe depending on props.selected in componentDidUpdate().
+      this.subscribeToWindowFocus();
     }
   }
 
   componentDidUpdate(prevProps) {
     if (this.props.selected && !prevProps.selected) {
+      // Gaining selection.
       this.ensureInView();
+      this.subscribeToWindowFocus();
+    } else if (!this.props.selected && prevProps.selected) {
+      // Losing selection.
+      this.unsubscribeFromWindowFocus();
     }
   }
+
+  componentWillUnmount() {
+    if (this.props.selected) {
+      this.unsubscribeFromWindowFocus();
+    }
+    this._ownerWindow = null;
+  }
+
+  findOwnerWindow() {
+    if (!this._head) {
+      return null;
+    }
+    var doc = this._head.ownerDocument;
+    if (!doc) {
+      return null;
+    }
+    var win = doc.defaultView;
+    if (!win) {
+      return null;
+    }
+    return win;
+  }
+
+  subscribeToWindowFocus() {
+    if (!this._ownerWindow) {
+      // Lazily find the window first time we subscribed.
+      this._ownerWindow = this.findOwnerWindow();
+      if (!this._ownerWindow) {
+        return;
+      }
+    }
+    var win = this._ownerWindow;
+    win.addEventListener('focus', this._handleWindowFocus);
+    win.addEventListener('blur', this._handleWindowBlur);
+    // Make sure our initial state is right.
+    if (this.props.selected) {
+      this.setState({
+        isWindowFocused: win.document.hasFocus(),
+      });
+    }
+  }
+
+  unsubscribeFromWindowFocus() {
+    if (!this._ownerWindow) {
+      return;
+    }
+    var win = this._ownerWindow;
+    win.removeEventListener('focus', this._handleWindowFocus);
+    win.removeEventListener('blur', this._handleWindowBlur);
+  }
+
+  _handleWindowFocus = () => {
+    // We're coming from a global window event handler so React
+    // hasn't processed the events yet. We likely have a click
+    // selecting another node, which would cause flicker if we update
+    // right now. So instead we wait just enough for UI to process
+    // events and update the selected note. (I know it's not pretty.)
+    setTimeout(() => {
+      if (!this._ownerWindow) {
+        return;
+      }
+      var doc = this._ownerWindow.document;
+      this.setState({isWindowFocused: doc.hasFocus()});
+    }, 50);
+  };
+
+  _handleWindowBlur = () => {
+    this.setState({isWindowFocused: false});
+  };
 
   ensureInView() {
     var node = this.props.isBottomTagSelected ? this._tail : this._head;
@@ -87,17 +176,23 @@ class Node extends React.Component {
 
     var collapsed = node.get('collapsed');
     var selected = this.props.selected;
-    var tagTextStyle = assign({}, styles.tagText, selected && styles.tagTextSelected);
+    var isWindowFocused = this.state.isWindowFocused;
+    var inverted = selected && isWindowFocused;
 
     var leftPad = {
       paddingLeft: 3 + (this.props.depth + 1) * 10,
       paddingRight: 3,
     };
+
+    var headSelectStyle = isWindowFocused ?
+      styles.headSelectInverted :
+      styles.headSelectInactive;
+
     var headStyles = assign(
       {},
       styles.head,
       this.props.hovered && styles.headHover,
-      selected && (collapsed || !this.props.isBottomTagSelected) && styles.headSelect,
+      selected && (collapsed || !this.props.isBottomTagSelected) && headSelectStyle,
       leftPad
     );
 
@@ -111,6 +206,11 @@ class Node extends React.Component {
 
     var nodeType = node.get('nodeType');
     if (nodeType === 'Text' || nodeType === 'Empty') {
+      const tagTextStyle = assign(
+        {},
+        styles.tagText,
+        inverted && styles.tagTextInverted
+      );
       var tag;
       if (nodeType === 'Text') {
         var text = node.get('text');
@@ -141,13 +241,17 @@ class Node extends React.Component {
 
     var isCustom = nodeType === 'Composite';
 
-    var topTagStyle = selected && !this.props.isBottomTagSelected ?
-      styles.selectedTagName :
+    var topTagStyle = inverted && !this.props.isBottomTagSelected ?
+      styles.invertedTagName :
       (isCustom ? styles.customTagName : styles.tagName);
-
-    var bottomTagStyle = selected && this.props.isBottomTagSelected ?
-      styles.selectedTagName :
+    var bottomTagStyle = inverted && this.props.isBottomTagSelected ?
+      styles.invertedTagName :
       (isCustom ? styles.customTagName : styles.tagName);
+    var topTagTextStyle = assign(
+      {},
+      styles.tagText,
+      inverted && !this.props.isBottomTagSelected && styles.tagTextInverted
+    );
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
@@ -157,17 +261,17 @@ class Node extends React.Component {
       return (
         <div style={styles.container}>
           <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
-            <span style={tagTextStyle}>
+            <span style={topTagTextStyle}>
               <span style={styles.openTag}>
                 <span style={topTagStyle}>&lt;{name}</span>
                 {node.get('key') &&
-                  <Props key="key" props={{'key': node.get('key')}} selected={selected}/>
+                  <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
                 {node.get('ref') &&
-                  <Props key="ref" props={{'ref': node.get('ref')}} selected={selected}/>
+                  <Props key="ref" props={{'ref': node.get('ref')}} inverted={inverted}/>
                 }
                 {node.get('props') &&
-                  <Props key="props" props={node.get('props')} selected={selected}/>
+                  <Props key="props" props={node.get('props')} inverted={inverted}/>
                 }
                 {isCollapsed && <span style={topTagStyle}> /</span>}
                 <span style={topTagStyle}>&gt;</span>
@@ -201,18 +305,19 @@ class Node extends React.Component {
       styles.collapser,
       {left: leftPad.paddingLeft - 12},
     );
+    var headInverted = inverted && !this.props.isBottomTagSelected;
     var arrowStyle = node.get('collapsed') ?
       assign(
         {},
         styles.collapsedArrow,
         hasState && styles.collapsedArrowStateful,
-        selected && styles.collapsedArrowSelected
+        headInverted && styles.collapsedArrowInverted
       ) :
       assign(
         {},
         styles.expandedArrow,
         hasState && styles.expandedArrowStateful,
-        selected && styles.expandedArrowSelected
+        headInverted && styles.expandedArrowInverted
       );
 
     var collapser =
@@ -226,17 +331,17 @@ class Node extends React.Component {
     var head = (
       <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
         {collapser}
-        <span style={tagTextStyle}>
+        <span style={topTagTextStyle}>
           <span style={styles.openTag}>
             <span style={topTagStyle}>&lt;{'' + node.get('name')}</span>
             {node.get('key') &&
-              <Props key="key" props={{'key': node.get('key')}} selected={selected}/>
+              <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
             }
             {node.get('ref') &&
-              <Props key="ref" props={{'ref': node.get('ref')}} selected={selected}/>
+              <Props key="ref" props={{'ref': node.get('ref')}} inverted={headInverted}/>
             }
             {node.get('props') &&
-              <Props key="props" props={node.get('props')} selected={selected}/>
+              <Props key="props" props={node.get('props')} inverted={headInverted}/>
             }
             <span style={topTagStyle}>&gt;</span>
           </span>
@@ -258,7 +363,7 @@ class Node extends React.Component {
       {},
       styles.tail,
       this.props.hovered && styles.headHover,
-      selected && this.props.isBottomTagSelected && styles.headSelect,
+      selected && this.props.isBottomTagSelected && headSelectStyle,
       leftPad
     );
 
@@ -357,8 +462,8 @@ var styles = {
   customTagName: {
     color: 'rgb(136, 18, 128)',
   },
-  selectedTagName: {
-    color: 'white'
+  invertedTagName: {
+    color: 'white',
   },
 
   openTag: {
@@ -368,12 +473,15 @@ var styles = {
     flex: 1,
     whiteSpace: 'nowrap',
   },
-  tagTextSelected: {
-    color: 'white'
+  tagTextInverted: {
+    color: 'white',
   },
 
-  headSelect: {
+  headSelectInverted: {
     backgroundColor: 'rgb(56, 121, 217)',
+  },
+  headSelectInactive: {
+    backgroundColor: 'rgb(218, 218, 218)',
   },
 
   collapser: {
@@ -392,7 +500,7 @@ var styles = {
   collapsedArrowStateful: {
     borderColor: 'transparent transparent transparent #e55',
   },
-  collapsedArrowSelected: {
+  collapsedArrowInverted: {
     borderColor: 'transparent transparent transparent white',
   },
 
@@ -407,7 +515,7 @@ var styles = {
   expandedArrowStateful: {
     borderColor: '#e55 transparent transparent transparent',
   },
-  expandedArrowSelected: {
+  expandedArrowInverted: {
     borderColor: 'white transparent transparent transparent',
   },
 

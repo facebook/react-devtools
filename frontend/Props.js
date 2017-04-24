@@ -17,7 +17,7 @@ var PropVal = require('./PropVal');
 class Props extends React.Component {
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
-    return nextProps.props !== this.props.props || nextProps.selected !== this.props.selected;
+    return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 
   render() {
@@ -34,7 +34,7 @@ class Props extends React.Component {
     var propNameStyle = assign(
       {},
       styles.propName,
-      this.props.selected && styles.propNameSelected
+      this.props.inverted && styles.propNameInverted
     );
 
     names.slice(0, 3).forEach(name => {
@@ -42,13 +42,13 @@ class Props extends React.Component {
         <span key={'prop-' + name} style={styles.prop}>
           <span style={propNameStyle}>{name}</span>
           =
-          <PropVal val={props[name]} selected={this.props.selected}/>
+          <PropVal val={props[name]} inverted={this.props.inverted}/>
         </span>
       );
     });
 
     if (names.length > 3) {
-      var ellipsisStyle = this.props.selected ? styles.ellipsisSelected : null;
+      var ellipsisStyle = this.props.inverted ? styles.ellipsisInverted : null;
       items.push(<span key="ellipsis" style={ellipsisStyle}>…</span>);
     }
     return <span>{items}</span>;
@@ -56,7 +56,7 @@ class Props extends React.Component {
 }
 
 var styles = {
-  ellipsisSelected: {
+  ellipsisInverted: {
     color: '#ccc',
   },
 
@@ -67,7 +67,7 @@ var styles = {
   propName: {
     color: '#994500',
   },
-  propNameSelected: {
+  propNameInverted: {
     color: '#ccc',
   },
 };
