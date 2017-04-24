@@ -86,7 +86,6 @@ class PropState extends React.Component {
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
-    var nodeType = this.props.node.get('nodeType');
     var hasDollarR = nodeType === 'Composite' || nodeType === 'Native';
 
     return (
