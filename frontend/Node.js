@@ -40,10 +40,6 @@ class Node extends React.Component {
   props: PropsType;
   static contextTypes: Object;
 
-  shouldComponentUpdate(nextProps: PropsType) {
-    return nextProps !== this.props;
-  }
-
   componentDidMount() {
     if (this.props.selected) {
       this.ensureInView();
