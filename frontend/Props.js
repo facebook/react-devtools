@@ -39,7 +39,7 @@ class Props extends React.Component {
 
     names.slice(0, 3).forEach(name => {
       items.push(
-        <span key={name} style={styles.prop}>
+        <span key={'prop-' + name} style={styles.prop}>
           <span style={propNameStyle}>{name}</span>
           =
           <PropVal val={props[name]} selected={this.props.selected}/>
@@ -49,7 +49,7 @@ class Props extends React.Component {
 
     if (names.length > 3) {
       var ellipsisStyle = this.props.selected ? styles.ellipsisSelected : null;
-      items.push(<span style={ellipsisStyle}>…</span>);
+      items.push(<span key="ellipsis" style={ellipsisStyle}>…</span>);
     }
     return <span>{items}</span>;
   }
