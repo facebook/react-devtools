@@ -45,7 +45,6 @@ var styles = {
     userSelect: 'none',
   },
   header: {
-    backgroundColor: '#efefef',
     padding: 5,
     flexShrink: 0,
     display: 'flex',
