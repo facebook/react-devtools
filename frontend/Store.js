@@ -65,7 +65,7 @@ const DEFAULT_PLACEHOLDER = 'Search by Component Name';
  * - toggleCollapse
  * - setProps/State/Context
  * - makeGlobal(id, path)
- * - setHover(id, isHovered)
+ * - setHover(id, isHovered, isBottomTag)
  * - selectTop(id)
  * - selectBottom(id)
  * - select(id)
@@ -92,6 +92,7 @@ class Store extends EventEmitter {
   regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
+  isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
   refreshSearch: boolean;
@@ -121,6 +122,7 @@ class Store extends EventEmitter {
     this.selected = null;
     this.selectedTab = 'Elements';
     this.breadcrumbHead = null;
+    this.isBottomTagHovered = false;
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
@@ -356,10 +358,11 @@ class Store extends EventEmitter {
     this._bridge.send('makeGlobal', {id, path});
   }
 
-  setHover(id: ElementID, isHovered: boolean) {
+  setHover(id: ElementID, isHovered: boolean, isBottomTag: boolean) {
     if (isHovered) {
       var old = this.hovered;
       this.hovered = id;
+      this.isBottomTagHovered = isBottomTag;
       if (old) {
         this.emit(old);
       }
@@ -368,6 +371,7 @@ class Store extends EventEmitter {
       this.highlight(id);
     } else if (this.hovered === id) {
       this.hideHighlight();
+      this.isBottomTagHovered = false;
     }
   }
 

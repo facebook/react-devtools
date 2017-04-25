@@ -23,9 +23,11 @@ type PropsType = {
   selected: boolean,
   node: Map,
   depth: number,
+  isBottomTagHovered: boolean,
   isBottomTagSelected: boolean,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
+  onHoverBottom: (isHovered: boolean) => void,
   onContextMenu: () => void,
   onToggleCollapse: () => void,
   onSelectBottom: () => void,
@@ -176,6 +178,7 @@ class Node extends React.Component {
 
     var collapsed = node.get('collapsed');
     var selected = this.props.selected;
+    var hovered = this.props.hovered;
     var isWindowFocused = this.state.isWindowFocused;
     var inverted = selected && isWindowFocused;
 
@@ -193,17 +196,24 @@ class Node extends React.Component {
     var headStyles = assign(
       {},
       styles.head,
-      this.props.hovered && styles.headHover,
+      hovered && (collapsed || !this.props.isBottomTagHovered) && styles.headHover,
       selected && (collapsed || !this.props.isBottomTagSelected) && headSelectStyle,
       leftPad
     );
 
-    var tagEvents = {
-      onMouseOver: () => this.props.onHover(true),
-      onMouseOut: () => this.props.onHover(false),
+    var headEvents = {
       onContextMenu: this.props.onContextMenu,
       onDoubleClick: this.props.onToggleCollapse,
+      onMouseOver: () => this.props.onHover(true),
+      onMouseOut: () => this.props.onHover(false),
       onMouseDown: this.props.onSelect,
+    };
+    var tailEvents = {
+      onContextMenu: this.props.onContextMenu,
+      onDoubleClick: this.props.onToggleCollapse,
+      onMouseOver: () => this.props.onHoverBottom(true),
+      onMouseOut: () => this.props.onHoverBottom(false),
+      onMouseDown: this.props.onSelectBottom,
     };
 
     var nodeType = node.get('nodeType');
@@ -234,7 +244,7 @@ class Node extends React.Component {
       }
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
             {tag}
           </div>
         </div>
@@ -262,7 +272,7 @@ class Node extends React.Component {
       var isCollapsed = content === null || content === undefined;
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...tagEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
             <span style={topTagTextStyle}>
               <span style={styles.openTag}>
                 <span style={topTagStyle}>&lt;{name}</span>
@@ -331,7 +341,7 @@ class Node extends React.Component {
       </span>;
 
     var head = (
-      <div ref={h => this._head = h} style={headStyles} {...tagEvents}>
+      <div ref={h => this._head = h} style={headStyles} {...headEvents}>
         {collapser}
         <span style={topTagTextStyle}>
           <span style={styles.openTag}>
@@ -364,7 +374,7 @@ class Node extends React.Component {
     var tailStyles = assign(
       {},
       styles.tail,
-      this.props.hovered && styles.headHover,
+      hovered && this.props.isBottomTagHovered && styles.headHover,
       selected && this.props.isBottomTagSelected && headSelectStyle,
       leftPad
     );
@@ -379,7 +389,7 @@ class Node extends React.Component {
         zIndex: selected ? 1 : 0,
       },
       styles.guideline,
-      this.props.hovered && styles.guidelineHover,
+      hovered && styles.guidelineHover,
       selected && styles.guidelineSelect,
     );
 
@@ -390,7 +400,7 @@ class Node extends React.Component {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
+        <div ref={t => this._tail = t} style={tailStyles} {...tailEvents}>
           {closeTag}
         </div>
       </div>
@@ -418,12 +428,14 @@ var WrappedNode = decorate({
       wrappedChildren,
       selected: store.selected === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
+      isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
       },
-      onHover: isHovered => store.setHover(props.id, isHovered),
+      onHover: isHovered => store.setHover(props.id, isHovered, false),
+      onHoverBottom: isHovered => store.setHover(props.id, isHovered, true),
       onSelect: e => {
         store.selectTop(props.id);
       },

@@ -119,7 +119,7 @@ module.exports = decorate({
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
-      hover: (id, isHovered) => store.setHover(id, isHovered),
+      hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),
     };
