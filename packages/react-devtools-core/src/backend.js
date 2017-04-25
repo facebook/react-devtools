@@ -17,13 +17,6 @@ type ConnectOptions = {
   isAppActive?: () => boolean,
 };
 
-// TODO: why?
-if (!window.performance) {
-  window.performance = {
-    now: () => Date.now(),
-  };
-}
-
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
 var installGlobalHook = require('../../../backend/installGlobalHook');
@@ -36,6 +29,7 @@ installGlobalHook(window);
 installRelayHook(window);
 
 if (window.document) {
+  // This shell is universal, and might be used inside a web app.
   window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('react-devtools', agent => {
     var setupHighlighter = require('../../../frontend/Highlighter/setup');
     setupHighlighter(agent);
