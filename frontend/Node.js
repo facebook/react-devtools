@@ -372,6 +372,11 @@ class Node extends React.Component {
     var guidelineStyle = assign(
       {
         left: leftPad.paddingLeft - 7,
+        // Bring it in front of the hovered children, but make sure
+        // hovering over parents doesn't draw on top of selected
+        // guideline even when we've selected the closing tag.
+        // When unsure, refer to how Chrome does it (it's subtle!)
+        zIndex: selected ? 1 : 0,
       },
       styles.guideline,
       this.props.hovered && styles.guidelineHover,
@@ -381,13 +386,13 @@ class Node extends React.Component {
     return (
       <div style={styles.container}>
         {head}
+        <div style={guidelineStyle} />
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id}/>)}
         </div>
         <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
           {closeTag}
         </div>
-        <div style={guidelineStyle} />
       </div>
     );
   }
@@ -456,7 +461,7 @@ var styles = {
 
   head: {
     cursor: 'default',
-    borderTop: '1px solid #fff',
+    borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
   },
@@ -465,8 +470,6 @@ var styles = {
     borderRadius: 20,
   },
   headSelect: {
-    // Bring it in front of the hover guideline on parents.
-    zIndex: 1,
     borderRadius: 0,
   },
   headSelectInverted: {
@@ -477,7 +480,7 @@ var styles = {
   },
 
   tail: {
-    borderTop: '1px solid #fff',
+    borderTop: '1px solid transparent',
     cursor: 'default',
   },
 
