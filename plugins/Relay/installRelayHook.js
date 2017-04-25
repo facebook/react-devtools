@@ -14,6 +14,15 @@
  * NOTE: This file cannot `require` any other modules. We `.toString()` the
  *       function in some places and inject the source into the page.
  */
+
+var performance = window.performance;
+var performanceNow;
+if (performance && typeof performance.now === 'function') {
+  performanceNow = () => performance.now();
+} else {
+  performanceNow = () => Date.now();
+}
+
 function installRelayHook(window: Object) {
   const TEXT_CHUNK_LENGTH = 500;
 
@@ -69,14 +78,14 @@ function installRelayHook(window: Object) {
       response => {
         emit('relay:success', {
           id: id,
-          end: performance.now(),
+          end: performanceNow(),
           response: response.response,
         });
       },
       error => {
         emit('relay:failure', {
           id: id,
-          end: performance.now(),
+          end: performanceNow(),
           error: error,
         });
       },
@@ -107,13 +116,13 @@ function installRelayHook(window: Object) {
       requestNumber++;
       emit(
         'relay:pending',
-        [recordRequest('mutation', performance.now(), mutation, requestNumber)]
+        [recordRequest('mutation', performanceNow(), mutation, requestNumber)]
       );
     });
 
     decorate(NetworkLayer, 'sendQueries', queries => {
       requestNumber++;
-      const start = performance.now();
+      const start = performanceNow();
       emit(
         'relay:pending',
         queries.map(query => recordRequest('query', start, query, requestNumber))

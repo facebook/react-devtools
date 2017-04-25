@@ -15,14 +15,7 @@ var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBa
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
-var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
-
-// TODO: check to see if we're in RN before doing this?
-setInterval(function() {
-  // this is needed to force refresh on react native
-}, 100);
-
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
@@ -56,21 +49,13 @@ function setup(hook) {
     },
   };
 
-  var isReactNative = !!hook.resolveRNStyle;
-
   var bridge = new Bridge(wall);
-  var agent = new Agent(window, {
-    rnStyle: isReactNative,
-  });
+  var agent = new Agent(window);
   agent.addBridge(bridge);
 
   agent.once('connected', () => {
     inject(hook, agent);
   });
-
-  if (isReactNative) {
-    setupRNStyle(bridge, agent, hook.resolveRNStyle);
-  }
 
   setupRelay(bridge, agent, hook);
 
@@ -82,9 +67,6 @@ function setup(hook) {
     listeners = [];
   });
 
-  if (!isReactNative) {
-    setupHighlighter(agent);
-  }
-
+  setupHighlighter(agent);
   BananaSlugBackendManager.init(agent);
 }
