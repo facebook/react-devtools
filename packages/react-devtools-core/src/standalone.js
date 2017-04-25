@@ -30,7 +30,7 @@ var config = {
   inject(done) {
     done(wall);
   },
-  showComponentSource(vbl, source) {
+  showComponentSource(globalPathToInst, globalPathToType, source) {
     if (!source) {
       return;
     }

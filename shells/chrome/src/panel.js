@@ -37,12 +37,12 @@ var config: Props = {
       chrome.devtools.inspectedWindow.eval('inspect(window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$node)');
     }, 100);
   },
-  showComponentSource(vbl) {
-    // if it is an es6 class-based component, (isMounted throws), then inspect
-    // the constructor. Otherwise, inspect the render function.
-    var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
-      Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted').value ?
-        inspect(window.${vbl}.render) : inspect(window.${vbl}.constructor)`;
+  showComponentSource(globalPathToInst, globalPathToType) {
+    // If it is a createClass() component (isMounted doesn't throw), then inspect
+    // the render function. Otherwise, inspect the type.
+    var code = `Object.getOwnPropertyDescriptor(window.${globalPathToInst}.__proto__.__proto__, 'isMounted') &&
+      Object.getOwnPropertyDescriptor(window.${globalPathToInst}.__proto__.__proto__, 'isMounted').value ?
+        inspect(window.${globalPathToInst}.render) : inspect(window.${globalPathToType})`;
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
         console.error('Failed to inspect component', err);

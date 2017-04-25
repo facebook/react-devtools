@@ -36,7 +36,11 @@ export type Props = {
   reload?: () => void,
 
   // optionals
-  showComponentSource?: (vbl: string, source?: Object) => void,
+  showComponentSource?: (
+    globalPathToInst: string,
+    globalPathToType: string,
+    source?: Object
+  ) => void,
   reloadSubscribe?: (reloadFn: () => void) => () => void,
   showAttrSource?: (path: Array<string>) => void,
   executeFn?: (path: Array<string>) => void,
@@ -141,11 +145,6 @@ class Panel extends React.Component {
     this.props.selectElement(id || this._store.selected, this._bridge);
   }
 
-  inspectComponent(vbl: string) {
-    invariant(this.props.showComponentSource, 'cannot inspect component if props.showComponentSource is not supplied');
-    this.props.showComponentSource(vbl || '$r');
-  }
-
   viewSource(id: string, node?: Object) {
     if (!this._bridge) {
       return;
@@ -153,7 +152,11 @@ class Panel extends React.Component {
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       invariant(this.props.showComponentSource, 'cannot view source if props.showComponentSource is not supplied');
-      this.props.showComponentSource('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst', node && node.get('source'));
+      this.props.showComponentSource(
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst',
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$type',
+        node && node.get('source')
+      );
     }, 100);
   }
 
