@@ -567,7 +567,7 @@ var styles = {
   guidelineSelect: {
     backgroundColor: '#a9c5ef',
     opacity: 1,
-  }
+  },
 
 };
 
