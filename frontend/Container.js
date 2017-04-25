@@ -44,7 +44,7 @@ class Container extends React.Component {
       ) => ?Array<MenuItem>,
     },
     extraTabs: {[key: string]: () => React$Element},
-    onViewSource: (id: string, node: ?Object) => void,
+    onViewElementSource: (id: string, node: ?Object) => void,
   };
   state: State;
   resizeTimeout: ?number;
@@ -94,7 +94,7 @@ class Container extends React.Component {
           left={() => <SearchPane reload={this.props.reload} />}
           right={() => (
             <PropState
-              onViewSource={this.props.onViewSource}
+              onViewElementSource={this.props.onViewElementSource}
               extraPanes={this.props.extraPanes}
             />
           )}

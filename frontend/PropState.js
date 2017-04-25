@@ -31,7 +31,7 @@ class PropState extends React.Component {
   }
 
   renderSource(): ?React.Element {
-    const {id, node, onViewSource} = this.props;
+    const {id, node, onViewElementSource} = this.props;
     var source = node.get('source');
     if (!source) {
       return null;
@@ -39,7 +39,7 @@ class PropState extends React.Component {
     return (
       <div
         style={styles.source}
-        onClick={() => onViewSource(id, node)}
+        onClick={() => onViewElementSource(id, source)}
       >
         {source.fileName}
         <span style={styles.sourcePos}>
