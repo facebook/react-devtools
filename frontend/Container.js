@@ -119,7 +119,7 @@ var DEFAULT_MENU_ITEMS = {
     if (store.capabilities.scroll) {
       items.push({
         key: 'scrollToNode',
-        title: 'Scroll to Node',
+        title: 'Scroll to node',
         action: () => store.scrollToNode(id),
       });
     }

@@ -38,11 +38,17 @@ var config: Props = {
     }, 100);
   },
   showComponentSource(globalPathToInst, globalPathToType) {
-    // If it is a createClass() component (isMounted doesn't throw), then inspect
-    // the render function. Otherwise, inspect the type.
-    var code = `Object.getOwnPropertyDescriptor(window.${globalPathToInst}.__proto__.__proto__, 'isMounted') &&
-      Object.getOwnPropertyDescriptor(window.${globalPathToInst}.__proto__.__proto__, 'isMounted').value ?
-        inspect(window.${globalPathToInst}.render) : inspect(window.${globalPathToType})`;
+    var code = `
+      if (
+        window.${globalPathToType} &&
+        window.${globalPathToType}.prototype &&
+        window.${globalPathToType}.prototype.isReactComponent
+      ) {
+        inspect(window.${globalPathToInst}.render);
+      } else {
+        inspect(window.${globalPathToType});
+      }
+    `;
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
         console.error('Failed to inspect component', err);

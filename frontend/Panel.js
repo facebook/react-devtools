@@ -39,8 +39,11 @@ export type Props = {
   showComponentSource?: (
     globalPathToInst: string,
     globalPathToType: string,
-    source?: Object
   ) => void,
+  showElementSource?: (
+    source: Object
+  ) => void,
+
   reloadSubscribe?: (reloadFn: () => void) => () => void,
   showAttrSource?: (path: Array<string>) => void,
   executeFn?: (path: Array<string>) => void,
@@ -145,7 +148,7 @@ class Panel extends React.Component {
     this.props.selectElement(id || this._store.selected, this._bridge);
   }
 
-  viewSource(id: string, node?: Object) {
+  viewComponentSource(id: string) {
     if (!this._bridge) {
       return;
     }
@@ -154,9 +157,19 @@ class Panel extends React.Component {
       invariant(this.props.showComponentSource, 'cannot view source if props.showComponentSource is not supplied');
       this.props.showComponentSource(
         '__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst',
-        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$type',
-        node && node.get('source')
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$type'
       );
+    }, 100);
+  }
+
+  viewElementSource(id: string, source: Object) {
+    if (!this._bridge) {
+      return;
+    }
+    this._bridge.send('putSelectedInstance', id);
+    setTimeout(() => {
+      invariant(this.props.showElementSource, 'cannot view source if props.showElementSource is not supplied');
+      this.props.showElementSource(source);
     }, 100);
   }
 
@@ -254,7 +267,7 @@ class Panel extends React.Component {
             }
             return [this.props.showAttrSource && {
               key: 'showSource',
-              title: 'Show Source',
+              title: 'Show function source',
               // $FlowFixMe showAttrSource is provided
               action: () => this.props.showAttrSource(path),
             }, this.props.executeFn && {
@@ -265,14 +278,18 @@ class Panel extends React.Component {
             }];
           },
           tree: (id, node) => {
-            return [this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
-              key: 'showSource',
-              title: 'Show Source',
-              action: () => this.viewSource(id, node),
-            }, this.props.selectElement && this._store.capabilities.dom && {
-              key: 'showInElementsPane',
-              title: 'Show in Elements Pane',
+            return [this.props.selectElement && this._store.capabilities.dom && {
+              key: 'findDOMNode',
+              title: 'Find the DOM node',
               action: () => this.sendSelection(id),
+            }, this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
+              key: 'showComponentSource',
+              title: 'Show ' + node.get('name') + ' source',
+              action: () => this.viewComponentSource(id),
+            }, this.props.showElementSource && node.get('source') && {
+              key: 'showElementSource',
+              title: 'Show <' + node.get('name') + ' /> in source',
+              action: () => this.viewElementSource(id, node.get('source')),
             }];
           },
         }}

@@ -30,10 +30,7 @@ var config = {
   inject(done) {
     done(wall);
   },
-  showComponentSource(globalPathToInst, globalPathToType, source) {
-    if (!source) {
-      return;
-    }
+  showElementSource(source) {
     launchEditor(source.fileName, source.lineNumber);
   },
 };
