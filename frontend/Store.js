@@ -90,6 +90,7 @@ class Store extends EventEmitter {
   bananaslugState: ?ControlState;
   colorizerState: ?ControlState;
   regexState: ?ControlState;
+  hideWrappersState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
@@ -131,6 +132,7 @@ class Store extends EventEmitter {
     this.bananaslugState = null;
     this.colorizerState = null;
     this.regexState = null;
+    this.hideWrappersState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
@@ -500,6 +502,11 @@ class Store extends EventEmitter {
     this.emit('regexchange');
     this.refreshSearch = true;
     this.changeSearch(this.searchText);
+  }
+
+  toggleHideWrappers(state: ControlState) {
+    this.hideWrappersState = state;
+    this.emit('hidewrapperschange');
   }
 
   // Private stuff

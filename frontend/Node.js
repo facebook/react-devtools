@@ -15,6 +15,7 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
+var shouldSkipToChildRendering = require('../plugins/Wrappers/shouldSkipToChildRendering');
 
 import type {Map} from 'immutable';
 
@@ -161,6 +162,10 @@ class Node extends React.Component {
       return <span>Node was deleted</span>;
     }
     var children = node.get('children');
+
+    if (this.props.skipToChildRendering) {
+      return <WrappedNode key={children[0]} depth={this.props.depth} id={children[0]} />;
+    }
 
     if (node.get('nodeType') === 'Wrapper') {
       return (
@@ -414,7 +419,7 @@ Node.contextTypes = {
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id];
+    return [props.id, 'hidewrapperschange'];
   },
   props(store, props) {
     var node = store.get(props.id);
@@ -423,9 +428,11 @@ var WrappedNode = decorate({
       var child = store.get(node.get('children')[0]);
       wrappedChildren = child && child.get('children');
     }
+
     return {
       node,
       wrappedChildren,
+      skipToChildRendering: shouldSkipToChildRendering(node, store),
       selected: store.selected === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,

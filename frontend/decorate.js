@@ -56,7 +56,8 @@ module.exports = function(options: Options, Component: any): any {
   var storeKey = options.store || 'store';
   class Wrapper extends React.Component {
     _listeners: Array<string>;
-    _update: () => void;
+    _update: () => boolean|void;
+    _mounted: boolean;
     state: State;
 
     constructor(props) {
@@ -64,12 +65,16 @@ module.exports = function(options: Options, Component: any): any {
       this.state = {};
     }
 
+    componentDidMount() {
+      this._mounted = true;
+    }
+
     componentWillMount() {
       if (!this.context[storeKey]) {
         console.warn('no store on context...');
         return;
       }
-      this._update = () => this.forceUpdate();
+      this._update = () => this._mounted && this.forceUpdate();
       if (!options.listeners) {
         return;
       }
@@ -87,6 +92,7 @@ module.exports = function(options: Options, Component: any): any {
       this._listeners.forEach(evt => {
         this.context[storeKey].off(evt, this._update);
       });
+      this._mounted = false;
     }
 
     shouldComponentUpdate(nextProps, nextState) {
