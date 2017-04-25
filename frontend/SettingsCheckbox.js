@@ -82,7 +82,7 @@ var styles = {
   },
   container: {
     WebkitUserSelect: 'none',
-    cursor: 'pointer',
+    cursor: 'default',
     display: 'inline-block',
     fontSize: '12px',
     outline: 'none',

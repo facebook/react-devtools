@@ -166,7 +166,7 @@ var styles = {
     right: '10px',
     top: '8px',
     color: 'white',
-    backgroundColor: 'rgb(255, 137, 137)',
+    backgroundColor: '#bbb',
     lineHeight: '0',
   },
 
