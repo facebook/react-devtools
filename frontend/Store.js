@@ -105,6 +105,8 @@ class Store extends EventEmitter {
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
+    rnStyle?: boolean,
+    rnStyleMeasure?: boolean,
   };
 
   constructor(bridge: Bridge) {

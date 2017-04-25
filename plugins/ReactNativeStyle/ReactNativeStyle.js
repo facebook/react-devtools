@@ -12,6 +12,7 @@
 
 var React = require('react');
 var StyleEdit = require('./StyleEdit');
+var BoxInspector = require('./BoxInspector');
 
 function shallowClone(obj) {
   var nobj = {};
@@ -25,28 +26,48 @@ type Props = {
   // TODO: typecheck bridge interface
   bridge: any;
   id: any;
+  supportsMeasure: boolean;
 };
 
 type DefaultProps = {};
 
 type State = {
   style: ?Object;
+  measuredLayout: ?Object;
+};
+
+type StyleResult = {
+  style: Object;
+  measuredLayout: ?Object;
 };
 
 class NativeStyler extends React.Component {
   props: Props;
   defaultProps: DefaultProps;
   state: State;
+  _styleGet: (result: StyleResult) => void;
 
   constructor(props: Object) {
     super(props);
-    this.state = {style: null};
+    this.state = {style: null, measuredLayout: null};
   }
 
   componentWillMount() {
-    this.props.bridge.call('rn-style:get', this.props.id, style => {
-      this.setState({style});
-    });
+    this._styleGet = this._styleGet.bind(this);
+    if (this.props.supportsMeasure) {
+      this.props.bridge.on('rn-style:measure', this._styleGet);
+      this.props.bridge.send('rn-style:measure', this.props.id);
+    } else {
+      this.props.bridge.call('rn-style:get', this.props.id, style => {
+        this.setState({style});
+      });
+    }
+  }
+
+  componentWillUnmount() {
+    if (this.props.supportsMeasure) {
+      this.props.bridge.off('rn-style:measure', this._styleGet);
+    }
   }
 
   componentWillReceiveProps(nextProps: Object) {
@@ -54,9 +75,20 @@ class NativeStyler extends React.Component {
       return;
     }
     this.setState({style: null});
-    this.props.bridge.call('rn-style:get', nextProps.id, style => {
-      this.setState({style});
-    });
+    this.props.bridge.send('rn-style:get', nextProps.id);
+
+    if (this.props.supportsMeasure) {
+      this.props.bridge.send('rn-style:measure', nextProps.id);
+    } else {
+      this.props.bridge.call('rn-style:get', nextProps.id, style => {
+        this.setState({style});
+      });
+    }
+  }
+
+  _styleGet(result: StyleResult) {
+    var {style, measuredLayout} = result;
+    this.setState({style, measuredLayout});
   }
 
   _handleStyleChange(attr: string, val: string | number) {
@@ -80,13 +112,24 @@ class NativeStyler extends React.Component {
       return <em>loading</em>;
     }
     return (
-      <StyleEdit
-        style={this.state.style}
-        onRename={this._handleStyleRename.bind(this)}
-        onChange={this._handleStyleChange.bind(this)}
-      />
+      <div style={styles.container}>
+        {this.state.measuredLayout && <BoxInspector {...this.state.measuredLayout} />}
+        <StyleEdit
+          style={this.state.style}
+          onRename={this._handleStyleRename.bind(this)}
+          onChange={this._handleStyleChange.bind(this)}
+        />
+      </div>
     );
   }
 }
+
+var styles = {
+  container: {
+    display: 'flex',
+    alignItems: 'center',
+    flexDirection: 'column',
+  },
+};
 
 module.exports = NativeStyler;
