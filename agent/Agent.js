@@ -171,6 +171,11 @@ class Agent extends EventEmitter {
     // used to "view source in Sources pane"
     bridge.on('putSelectedInstance', id => {
       var node = this.elementData.get(id);
+      if (node) {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = node.type;
+      } else {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = null;
+      }
       if (node && node.publicInstance) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.publicInstance;
       } else {
