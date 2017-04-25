@@ -295,6 +295,7 @@ class Panel extends React.Component {
         }}
         extraPanes={extraPanes}
         extraTabs={extraTabs}
+        onViewSource={(id, node) => this.viewSource(id, node)}
       />
     );
   }

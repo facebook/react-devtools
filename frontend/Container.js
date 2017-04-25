@@ -44,6 +44,7 @@ class Container extends React.Component {
       ) => ?Array<MenuItem>,
     },
     extraTabs: {[key: string]: () => React$Element},
+    onViewSource: (id: string, node: ?Object) => void,
   };
   state: State;
   resizeTimeout: ?number;
@@ -91,7 +92,12 @@ class Container extends React.Component {
           initialWidth={10}
           initialHeight={10}
           left={() => <SearchPane reload={this.props.reload} />}
-          right={() => <PropState extraPanes={this.props.extraPanes} />}
+          right={() => (
+            <PropState
+              onViewSource={this.props.onViewSource}
+              extraPanes={this.props.extraPanes}
+            />
+          )}
           isVertical={this.state.isVertical}
         />
       ),
