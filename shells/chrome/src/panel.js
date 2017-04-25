@@ -42,7 +42,7 @@ var config: Props = {
     // the constructor. Otherwise, inspect the render function.
     var code = `Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted') &&
       Object.getOwnPropertyDescriptor(window.${vbl}.__proto__.__proto__, 'isMounted').value ?
-        inspect(window.${vbl}.render) : inspect(window.${vbl}.constructor)`;
+        inspect(window.${vbl}.render) : inspect(window.${vbl}._reactInternalInstance._currentElement.type)`;
     chrome.devtools.inspectedWindow.eval(code, (res, err) => {
       if (err) {
         console.error('Failed to inspect component', err);
