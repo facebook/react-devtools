@@ -14,14 +14,12 @@ var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
 
-import type {DOMNode} from './types';
-
 var decorate = require('./decorate');
 
 var MAX_SEARCH_ROOTS = 200;
 
 class TreeView extends React.Component {
-  node: ?DOMNode;
+  node: ?HTMLElement;
 
   getChildContext() {
     return {
@@ -29,9 +27,15 @@ class TreeView extends React.Component {
     };
   }
 
-  scrollTo(val, height) {
+  scrollTo(toNode) {
     if (!this.node) {
       return;
+    }
+    var val = 0;
+    var height = toNode.offsetHeight;
+    while (toNode && this.node.contains(toNode)) {
+      val += toNode.offsetTop;
+      toNode = toNode.offsetParent;
     }
     var top = this.node.scrollTop;
     var rel = val - this.node.offsetTop;
@@ -118,7 +122,8 @@ var styles = {
   },
 
   scroll: {
-    padding: '5px',
+    paddingTop: 2,
+    paddingBottom: 2,
     overflow: 'auto',
     minHeight: 0,
     flex: 1,

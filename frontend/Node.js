@@ -150,7 +150,7 @@ class Node extends React.Component {
     if (!node) {
       return;
     }
-    this.context.scrollTo(node.offsetTop, node.offsetHeight);
+    this.context.scrollTo(node);
   }
 
   render() {
@@ -180,13 +180,15 @@ class Node extends React.Component {
     var inverted = selected && isWindowFocused;
 
     var leftPad = {
-      paddingLeft: 3 + (this.props.depth + 1) * 10,
-      paddingRight: 3,
+      paddingLeft: 5 + (this.props.depth + 1) * 10,
+      paddingRight: 5,
     };
 
-    var headSelectStyle = isWindowFocused ?
-      styles.headSelectInverted :
-      styles.headSelectInactive;
+    var headSelectStyle = assign(
+      {},
+      styles.headSelect,
+      isWindowFocused ? styles.headSelectInverted : styles.headSelectInactive
+    );
 
     var headStyles = assign(
       {},
@@ -367,6 +369,15 @@ class Node extends React.Component {
       leftPad
     );
 
+    var guidelineStyle = assign(
+      {
+        left: leftPad.paddingLeft - 7,
+      },
+      styles.guideline,
+      this.props.hovered && styles.guidelineHover,
+      selected && styles.guidelineSelect,
+    );
+
     return (
       <div style={styles.container}>
         {head}
@@ -376,6 +387,7 @@ class Node extends React.Component {
         <div ref={t => this._tail = t} style={tailStyles} {...tagEvents} onMouseDown={this.props.onSelectBottom}>
           {closeTag}
         </div>
+        <div style={guidelineStyle} />
       </div>
     );
   }
@@ -424,11 +436,9 @@ var WrappedNode = decorate({
 }, Node);
 
 var styles = {
-  // TODO(jared): how do people feel about empty style rules? I put them here
-  // in case we need them later, and the corresponding divs refernce them. But
-  // I could remove them if desired.
   container: {
     flexShrink: 0,
+    position: 'relative',
   },
 
   children: {
@@ -449,6 +459,21 @@ var styles = {
     borderTop: '1px solid #fff',
     position: 'relative',
     display: 'flex',
+  },
+  headHover: {
+    backgroundColor: '#ebf2fb',
+    borderRadius: 20,
+  },
+  headSelect: {
+    // Bring it in front of the hover guideline on parents.
+    zIndex: 1,
+    borderRadius: 0,
+  },
+  headSelectInverted: {
+    backgroundColor: 'rgb(56, 121, 217)',
+  },
+  headSelectInactive: {
+    backgroundColor: 'rgb(218, 218, 218)',
   },
 
   tail: {
@@ -475,13 +500,6 @@ var styles = {
   },
   tagTextInverted: {
     color: 'white',
-  },
-
-  headSelectInverted: {
-    backgroundColor: 'rgb(56, 121, 217)',
-  },
-  headSelectInactive: {
-    backgroundColor: 'rgb(218, 218, 218)',
   },
 
   collapser: {
@@ -519,9 +537,23 @@ var styles = {
     borderColor: 'white transparent transparent transparent',
   },
 
-  headHover: {
-    backgroundColor: '#ebf2fb',
+  guideline: {
+    position: 'absolute',
+    width: '1px',
+    backgroundColor: 'rgb(230, 230, 230)',
+    top: 16,
+    bottom: 0,
+    opacity: 0,
+    willChange: 'opacity',
   },
+  guidelineHover: {
+    opacity: 1,
+  },
+  guidelineSelect: {
+    backgroundColor: '#a9c5ef',
+    opacity: 1,
+  }
+
 };
 
 module.exports = WrappedNode;
