@@ -173,12 +173,13 @@ class Agent extends EventEmitter {
       var node = this.elementData.get(id);
       if (node) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = node.type;
+      } else {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = null;
       }
       if (node && node.publicInstance) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.publicInstance;
       } else {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = null;
-        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = null;
       }
     });
     // used to select the inspected node ($0)
