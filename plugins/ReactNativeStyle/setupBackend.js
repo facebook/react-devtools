@@ -10,10 +10,16 @@
  */
 'use strict';
 
+var resolveBoxStyle = require('./resolveBoxStyle');
+
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
-module.exports = function setupRNStyle(bridge: Bridge, agent: Agent, resolveRNStyle: (style: number) => ?Object) {
+module.exports = function setupRNStyle(
+  bridge: Bridge,
+  agent: Agent,
+  resolveRNStyle: (style: number) => ?Object,
+) {
   bridge.onCall('rn-style:get', id => {
     var node = agent.elementData.get(id);
     if (!node || !node.props) {
@@ -22,14 +28,60 @@ module.exports = function setupRNStyle(bridge: Bridge, agent: Agent, resolveRNSt
     return resolveRNStyle(node.props.style);
   });
 
+  bridge.on('rn-style:measure', id => {
+    measureStyle(agent, bridge, resolveRNStyle, id);
+  });
+
   bridge.on('rn-style:rename', ({id, oldName, newName, val}) => {
     renameStyle(agent, id, oldName, newName, val);
+    setTimeout(() => measureStyle(agent, bridge, resolveRNStyle, id));
   });
 
   bridge.on('rn-style:set', ({id, attr, val}) => {
     setStyle(agent, id, attr, val);
+    setTimeout(() => measureStyle(agent, bridge, resolveRNStyle, id));
   });
 };
+
+var blank = {
+  top: 0,
+  left: 0,
+  right: 0,
+  bottom: 0,
+};
+
+function measureStyle(agent, bridge, resolveRNStyle, id) {
+  var node = agent.elementData.get(id);
+  if (!node || !node.props) {
+    bridge.send('rn-style:measure', {});
+    return;
+  }
+  const style = resolveRNStyle(node.props.style);
+
+  var instance = node.publicInstance;
+  if (!instance || !instance.measure) {
+    bridge.send('rn-style:measure', {style});
+    return;
+  }
+
+  instance.measure((x, y, width, height, left, top) => {
+    var margin = (style && resolveBoxStyle('margin', style)) || blank;
+    var padding = (style && resolveBoxStyle('padding', style)) || blank;
+    bridge.send('rn-style:measure', {
+      style,
+      measuredLayout: {
+        x,
+        y,
+        width,
+        height,
+        left,
+        top,
+        margin,
+        padding,
+      },
+    });
+  });
+}
 
 function shallowClone(obj) {
   var nobj = {};
@@ -43,7 +95,7 @@ function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[newName]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
+    var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
       // $FlowFixMe we know that setNativeProps can be called here
       el.setNativeProps({ style: newStyle });
@@ -85,7 +137,7 @@ function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.reactElements.get(id);
+    var el = agent.internalInstancesById.get(id);
     if (el && el.setNativeProps) {
       // $FlowFixMe we know that setNativeProps can be called here
       el.setNativeProps({ style: newStyle });

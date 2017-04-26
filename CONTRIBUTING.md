@@ -10,7 +10,8 @@ The core team will be monitoring for pull requests.
 2. If you've added code that should be tested, add tests!
 3. If you've changed APIs, update the documentation.
 4. Make sure your code lints (`npm run lint`) - we've done our best to make sure these rules match our internal linting guidelines.
-5. If you haven't already, complete the CLA.
+5. Also make sure your code passes flow check(`flow check`).
+6. If you haven't already, complete the CLA.
 
 ### Contributor License Agreement ("CLA")
 

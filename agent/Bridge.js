@@ -13,6 +13,7 @@
 var consts = require('./consts');
 var hydrate = require('./hydrate');
 var dehydrate = require('./dehydrate');
+var getIn = require('./getIn');
 var performanceNow = require('fbjs/lib/performanceNow');
 
 // Custom polyfill that runs the queue with a backoff.
@@ -396,18 +397,30 @@ class Bridge {
 
   _inspectResponse(id: string, path: Array<string>, callback: number) {
     var inspectable = this._inspectables.get(id);
-
     var result = {};
     var cleaned = [];
     var proto = null;
     var protoclean = [];
+
     if (inspectable) {
       var val = getIn(inspectable, path);
       var protod = false;
       var isFn = typeof val === 'function';
-      if (val === null) {
-        throw new Error('Expected val to be defined by now.');
+
+      if (val && typeof val[Symbol.iterator] === 'function') {
+        var iterVal = Object.create({});  // flow throws "object literal incompatible with object type"
+        var count = 0;
+        for (const entry of val) {
+          if (count > 100) {
+            // TODO: replace this if block with better logic to handle large iterables
+            break;
+          }
+          iterVal[count] = entry;
+          count++;
+        }
+        val = iterVal;
       }
+
       Object.getOwnPropertyNames(val).forEach(name => {
         if (!val) {
           return;
@@ -443,12 +456,6 @@ class Bridge {
       args: [result, cleaned, proto, protoclean],
     });
   }
-}
-
-function getIn(base, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, base);
 }
 
 module.exports = Bridge;

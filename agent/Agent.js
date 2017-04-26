@@ -14,6 +14,7 @@ var {EventEmitter} = require('events');
 
 var assign = require('object-assign');
 var guid = require('../utils/guid');
+var getIn = require('./getIn');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -83,22 +84,22 @@ import type Bridge from './Bridge';
 class Agent extends EventEmitter {
   // the window or global -> used to "make a value available in the console"
   global: Object;
-  reactElements: Map<ElementID, OpaqueNodeHandle>;
-  ids: WeakMap<OpaqueNodeHandle, ElementID>;
+  internalInstancesById: Map<ElementID, OpaqueNodeHandle>;
+  idsByInternalInstances: WeakMap<OpaqueNodeHandle, ElementID>;
+  renderers: Map<ElementID, RendererID>;
   elementData: Map<ElementID, DataType>;
   roots: Set<ElementID>;
   reactInternals: {[key: RendererID]: Helpers};
-  capabilities: {[key: string]: boolean};
-  renderers: Map<ElementID, RendererID>;
   _prevSelected: ?NativeType;
   _scrollUpdate: boolean;
+  capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
 
   constructor(global: Object, capabilities?: Object) {
     super();
     this.global = global;
-    this.reactElements = new Map();
-    this.ids = new WeakMap();
+    this.internalInstancesById = new Map();
+    this.idsByInternalInstances = new WeakMap();
     this.renderers = new Map();
     this.elementData = new Map();
     this.roots = new Set();
@@ -170,6 +171,11 @@ class Agent extends EventEmitter {
     // used to "view source in Sources pane"
     bridge.on('putSelectedInstance', id => {
       var node = this.elementData.get(id);
+      if (node) {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = node.type;
+      } else {
+        window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$type = null;
+      }
       if (node && node.publicInstance) {
         window.__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst = node.publicInstance;
       } else {
@@ -210,18 +216,16 @@ class Agent extends EventEmitter {
       console.warn('unable to get the node for scrolling');
       return;
     }
-    var element = node.nodeType === Node.ELEMENT_NODE ?
-      node :
-      node.parentElement;
-    if (!element) {
-      console.warn('unable to get the element for scrolling');
+    var domElement = node.nodeType === Node.ELEMENT_NODE ? node : node.parentElement;
+    if (!domElement) {
+      console.warn('unable to get the domElement for scrolling');
       return;
     }
 
-    if (typeof element.scrollIntoViewIfNeeded === 'function') {
-      element.scrollIntoViewIfNeeded();
-    } else if (typeof element.scrollIntoView === 'function') {
-      element.scrollIntoView();
+    if (typeof domElement.scrollIntoViewIfNeeded === 'function') {
+      domElement.scrollIntoViewIfNeeded();
+    } else if (typeof domElement.scrollIntoView === 'function') {
+      domElement.scrollIntoView();
     }
     this.highlight(id);
   }
@@ -248,7 +252,7 @@ class Agent extends EventEmitter {
   }
 
   getNodeForID(id: ElementID): ?Object {
-    var component = this.reactElements.get(id);
+    var component = this.internalInstancesById.get(id);
     if (!component) {
       return null;
     }
@@ -336,25 +340,22 @@ class Agent extends EventEmitter {
     console.log('$tmp =', value);
   }
 
-  getId(element: OpaqueNodeHandle): ElementID {
-    if (typeof element !== 'object' || !element) {
-      return element;
+  getId(internalInstance: OpaqueNodeHandle): ElementID {
+    if (typeof internalInstance !== 'object' || !internalInstance) {
+      return internalInstance;
     }
-    if (!this.ids.has(element)) {
-      const id = guid();
-      this.ids.set(element, id);
-      this.reactElements.set(id, element);
-      return id;
+    if (!this.idsByInternalInstances.has(internalInstance)) {
+      this.idsByInternalInstances.set(internalInstance, guid());
+      this.internalInstancesById.set(
+        this.idsByInternalInstances.get(internalInstance),
+        internalInstance
+      );
     }
-    const id = this.ids.get(element);
-    if (typeof id !== 'string') {
-      throw new Error('Expected ID to exist by now.');
-    }
-    return id;
+    return this.idsByInternalInstances.get(internalInstance);
   }
 
-  addRoot(renderer: RendererID, element: OpaqueNodeHandle) {
-    var id = this.getId(element);
+  addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
+    var id = this.getId(internalInstance);
     this.roots.add(id);
     this.emit('root', id);
   }
@@ -396,7 +397,7 @@ class Agent extends EventEmitter {
     this.roots.delete(id);
     this.renderers.delete(id);
     this.emit('unmount', id);
-    this.ids.delete(component);
+    this.idsByInternalInstances.delete(component);
   }
 
   _onScroll() {
@@ -410,12 +411,6 @@ class Agent extends EventEmitter {
     this.emit('refreshMultiOverlay');
     this._scrollUpdate = false;
   }
-}
-
-function getIn(base, path) {
-  return path.reduce((obj, attr) => {
-    return obj ? obj[attr] : null;
-  }, base);
 }
 
 module.exports = Agent;

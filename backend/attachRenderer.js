@@ -79,13 +79,13 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
 
   // React DOM
   if (renderer.Mount._renderNewRootComponent) {
-    oldRenderRoot = decorateResult(renderer.Mount, '_renderNewRootComponent', (element) => {
-      hook.emit('root', {renderer: rid, element});
+    oldRenderRoot = decorateResult(renderer.Mount, '_renderNewRootComponent', (internalInstance) => {
+      hook.emit('root', {renderer: rid, internalInstance});
     });
   // React Native
   } else if (renderer.Mount.renderComponent) {
-    oldRenderComponent = decorateResult(renderer.Mount, 'renderComponent', element => {
-      hook.emit('root', {renderer: rid, element: element._reactInternalInstance});
+    oldRenderComponent = decorateResult(renderer.Mount, 'renderComponent', internalInstance => {
+      hook.emit('root', {renderer: rid, internalInstance: internalInstance._reactInternalInstance});
     });
   }
 
@@ -102,40 +102,40 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
         // (do we have access to DOMComponent here?) so that we don't have to
         // setTimeout.
         setTimeout(() => {
-          hook.emit('mount', {element: this, data: getData012(this), renderer: rid});
+          hook.emit('mount', {internalInstance: this, data: getData012(this), renderer: rid});
         }, 0);
       },
       updateComponent() {
         setTimeout(() => {
-          hook.emit('update', {element: this, data: getData012(this), renderer: rid});
+          hook.emit('update', {internalInstance: this, data: getData012(this), renderer: rid});
         }, 0);
       },
       unmountComponent() {
-        hook.emit('unmount', {element: this, renderer: rid});
+        hook.emit('unmount', {internalInstance: this, renderer: rid});
         rootNodeIDMap.delete(this._rootNodeID, this);
       },
     });
   } else if (renderer.Reconciler) {
     oldMethods = decorateMany(renderer.Reconciler, {
-      mountComponent(element, rootID, transaction, context) {
-        var data = getData(element);
-        rootNodeIDMap.set(element._rootNodeID, element);
-        hook.emit('mount', {element, data, renderer: rid});
+      mountComponent(internalInstance, rootID, transaction, context) {
+        var data = getData(internalInstance);
+        rootNodeIDMap.set(internalInstance._rootNodeID, internalInstance);
+        hook.emit('mount', {internalInstance, data, renderer: rid});
       },
-      performUpdateIfNecessary(element, nextChild, transaction, context) {
-        hook.emit('update', {element, data: getData(element), renderer: rid});
+      performUpdateIfNecessary(internalInstance, nextChild, transaction, context) {
+        hook.emit('update', {internalInstance, data: getData(internalInstance), renderer: rid});
       },
-      receiveComponent(element, nextChild, transaction, context) {
-        hook.emit('update', {element, data: getData(element), renderer: rid});
+      receiveComponent(internalInstance, nextChild, transaction, context) {
+        hook.emit('update', {internalInstance, data: getData(internalInstance), renderer: rid});
       },
-      unmountComponent(element) {
-        hook.emit('unmount', {element, renderer: rid});
-        rootNodeIDMap.delete(element._rootNodeID, element);
+      unmountComponent(internalInstance) {
+        hook.emit('unmount', {internalInstance, renderer: rid});
+        rootNodeIDMap.delete(internalInstance._rootNodeID, internalInstance);
       },
     });
   }
 
-  extras.walkTree = function(visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) {
+  extras.walkTree = function(visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (internalInstance: OpaqueNodeHandle) => void) {
     var onMount = (component, data) => {
       rootNodeIDMap.set(component._rootNodeID, component);
       visit(component, data);
@@ -172,12 +172,12 @@ function walkRoots(roots, onMount, onRoot, isPre013) {
   }
 }
 
-function walkNode(element, onMount, isPre013) {
-  var data = isPre013 ? getData012(element) : getData(element);
+function walkNode(internalInstance, onMount, isPre013) {
+  var data = isPre013 ? getData012(internalInstance) : getData(internalInstance);
   if (data.children && Array.isArray(data.children)) {
     data.children.forEach(child => walkNode(child, onMount, isPre013));
   }
-  onMount(element, data);
+  onMount(internalInstance, data);
 }
 
 function decorateResult(obj, attr, fn) {

@@ -35,7 +35,7 @@ describe('dehydrate', () => {
     var cleaned = [];
     var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c']]);
-    expect(result.a.b.c).toEqual({type: 'object', name: '', meta: null});
+    expect(result.a.b.c).toEqual({type: 'object', name: '', meta: {}});
   });
 
   it('cleans a deeply nested array', () => {
@@ -53,6 +53,14 @@ describe('dehydrate', () => {
     var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c'], ['a', 'b', 'd']]);
     expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
-    expect(result.a.b.d).toEqual({type: 'object', name: 'Something', meta: null});
+    expect(result.a.b.d).toEqual({type: 'object', name: 'Something', meta: {}});
+  });
+
+  it('returns readable name for dates', () => {
+    var d = new Date();
+    var object = {a: d };
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(result.a).toEqual({type: 'date', name: d.toString(), meta: {uninspectable: true}});
   });
 });

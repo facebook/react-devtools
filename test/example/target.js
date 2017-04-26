@@ -13,7 +13,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-
+var Immutable = require('immutable');
 var assign = require('object-assign');
 var guid = require('../../utils/guid');
 
@@ -300,14 +300,103 @@ var styles = {
   },
 };
 
-class Something {
-  doot() {
-    return 10;
-  }
+// Test Properties for previewing pane
+var emptyProps = {
+  emptyObj: {},
+  emptySet: new Set(),
+  emptyMap: new Map(),
+};
+var primitiveProps = {
+  aString: 'Hello',
+  bool: true,
+  num: 1312,
+  unknown: undefined,
+  notThere: null,
+};
+var complexProps = {
+  array: [1, 2, 3, 4],
+  set: new Set(['a', 2, 'c', 4]),
+  simpleMap: new Map([
+    ['a', true],
+    ['b', [1, 2, 3]],
+    ['c', { k1: 'v1', k2: 'v2' }],
+    [1, 789],
+    [2, 654],
+    [3, null],
+  ]),
+  objMap: new Map([
+    [{ a: 'a'}, true],
+    [{ a: 'a'}, false],
+    [{ b: 'b'}, [1, 2, 3]],
+    [{ c: 'c'}, { k1: 'v1', k2: 'v2' }],
+  ]),
+  nestedObj: {
+    a: {
+      ab: {
+        aba: 1,
+        abb: 2,
+        abc: 3,
+      },
+    },
+    b: {
+      ba: 1,
+      bb: [
+        1,
+        2,
+        3,
+        4,
+        {
+          x: 1,
+          y: 'hello',
+          z: false,
+        },
+      ],
+    },
+    c: 1,
+  },
+  twoDimMatrix: [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9],
+  ],
+  tuplesArray: [
+    [1, 2],
+    [3, 4],
+    [5, 6],
+    [7, 8],
+    [9, 10],
+  ],
+  tuplesSet: new Set([
+    [1, 2],
+    [3, 4],
+    [5, 6],
+    [7, 8],
+    [9, 10],
+  ]),
+  typedArray: Int8Array.from([128, -127, 255]),
+  immutableThings: Immutable.fromJS({
+    a: [
+      { hello: 'there' },
+      'fixed',
+      true,
+    ],
+    b: 123,
+    c: {
+      '1': 'xyz',
+      xyz: 1,
+    },
+  }),
+};
+var uninspectableProps = {
+  a: new ArrayBuffer(256),
+  b: new DataView(new ArrayBuffer(128)),
+};
+var massiveMap = new Map();
+
+for (var mCount = 200; mCount--;) {
+  massiveMap.set(`entry-${mCount}`, mCount);
 }
 
-var someVal = new Something();
-someVal.awesome = 2;
 
 class Wrap extends React.Component {
   render() {
@@ -325,16 +414,21 @@ class Wrap extends React.Component {
         <span val={null}/>
         <span val={undefined}/>
         <div>&lt;</div>*/}
-        <OldStyle awesome={2}/>
         <DeeplyNested />
+        <PropTester awesome={2}/>
+        <PropTester {...emptyProps}/>
+        <PropTester {...primitiveProps}/>
+        <PropTester {...complexProps}/>
+        <PropTester {...uninspectableProps}/>
+        <PropTester massiveMap={massiveMap}/>
       </div>
     );
   }
 }
 
-var OldStyle = React.createClass({
+var PropTester = React.createClass({
   render() {
-    return <div style={styles.container}>OldStyle {this.props.awesome}</div>;
+    return null;
   },
 });
 
@@ -429,4 +523,4 @@ class Target extends React.Component {
 
 var node = document.createElement('div');
 document.body.appendChild(node);
-ReactDOM.render(<Wrap more={['a', 2, 'c', 4]} str="thing" awesome={1} />, node);
+ReactDOM.render(<Wrap />, node);

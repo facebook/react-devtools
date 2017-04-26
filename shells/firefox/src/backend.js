@@ -28,7 +28,7 @@ if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__.reactDevtoolsAgent) {
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
-  if (evt.source !== window || evt.data && evt.data.source !== 'react-devtools-reporter') {
+  if (evt.source !== document.defaultView || evt.data && evt.data.source !== 'react-devtools-reporter') {
     return;
   }
 

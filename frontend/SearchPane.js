@@ -81,6 +81,8 @@ class SearchPane extends React.Component {
 
   onKeyDown(key) {
     if (key === 'Enter' && this.input) {
+      // switch focus to tree view
+      this.input.blur();
       this.props.selectFirstSearchResult();
     }
   }
@@ -163,7 +165,7 @@ var styles = {
     right: '10px',
     top: '8px',
     color: 'white',
-    backgroundColor: 'rgb(255, 137, 137)',
+    backgroundColor: '#bbb',
     lineHeight: '0',
   },
 

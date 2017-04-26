@@ -36,7 +36,14 @@ export type Props = {
   reload?: () => void,
 
   // optionals
-  showComponentSource?: () => void,
+  showComponentSource?: (
+    globalPathToInst: string,
+    globalPathToType: string,
+  ) => void,
+  showElementSource?: (
+    source: Object
+  ) => void,
+
   reloadSubscribe?: (reloadFn: () => void) => () => void,
   showAttrSource?: (path: Array<string>) => void,
   executeFn?: (path: Array<string>) => void,
@@ -141,19 +148,28 @@ class Panel extends React.Component {
     this.props.selectElement(id || this._store.selected, this._bridge);
   }
 
-  inspectComponent(vbl: string) {
-    invariant(this.props.showComponentSource, 'cannot inspect component if props.showComponentSource is not supplied');
-    this.props.showComponentSource(vbl || '$r');
-  }
-
-  viewSource(id: string) {
+  viewComponentSource(id: string) {
     if (!this._bridge) {
       return;
     }
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       invariant(this.props.showComponentSource, 'cannot view source if props.showComponentSource is not supplied');
-      this.props.showComponentSource('__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst');
+      this.props.showComponentSource(
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$inst',
+        '__REACT_DEVTOOLS_GLOBAL_HOOK__.$type'
+      );
+    }, 100);
+  }
+
+  viewElementSource(id: string, source: Object) {
+    if (!this._bridge) {
+      return;
+    }
+    this._bridge.send('putSelectedInstance', id);
+    setTimeout(() => {
+      invariant(this.props.showElementSource, 'cannot view source if props.showElementSource is not supplied');
+      this.props.showElementSource(source);
     }, 100);
   }
 
@@ -239,7 +255,7 @@ class Panel extends React.Component {
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge));
+      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure));
     }
     return (
       <Container
@@ -251,7 +267,7 @@ class Panel extends React.Component {
             }
             return [this.props.showAttrSource && {
               key: 'showSource',
-              title: 'Show Source',
+              title: 'Show function source',
               // $FlowFixMe showAttrSource is provided
               action: () => this.props.showAttrSource(path),
             }, this.props.executeFn && {
@@ -262,14 +278,18 @@ class Panel extends React.Component {
             }];
           },
           tree: (id, node) => {
-            return [this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
-              key: 'showSource',
-              title: 'Show Source',
-              action: () => this.viewSource(id),
-            }, this.props.selectElement && this._store.capabilities.dom && {
-              key: 'showInElementsPane',
-              title: 'Show in Elements Pane',
+            return [this.props.selectElement && this._store.capabilities.dom && {
+              key: 'findDOMNode',
+              title: 'Find the DOM node',
               action: () => this.sendSelection(id),
+            }, this.props.showComponentSource && node.get('nodeType') === 'Composite' && {
+              key: 'showComponentSource',
+              title: 'Show ' + node.get('name') + ' source',
+              action: () => this.viewComponentSource(id),
+            }, this.props.showElementSource && node.get('source') && {
+              key: 'showElementSource',
+              title: 'Show <' + node.get('name') + ' /> in source',
+              action: () => this.viewElementSource(id, node.get('source')),
             }];
           },
         }}
@@ -284,7 +304,7 @@ Panel.childContextTypes = {
   store: React.PropTypes.object,
 };
 
-var panelRNStyle = bridge => (node, id) => {
+var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
     return <strong key="rnstyle">No style</strong>;
@@ -292,7 +312,7 @@ var panelRNStyle = bridge => (node, id) => {
   return (
     <div key="rnstyle">
       <h3>React Native Style Editor</h3>
-      <NativeStyler id={id} bridge={bridge} />
+      <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
     </div>
   );
 };
