@@ -20,20 +20,13 @@ var {PropTypes} = React;
 
 var decorate = require('./decorate');
 
-type EventLike = {
-  keyCode: number,
-  target: Node,
-  preventDefault: () => void,
-  stopPropagation: () => void,
-};
-
 type State = {
   focused: boolean,
 };
 
 class SearchPane extends React.Component {
   input: ?HTMLElement;
-  _key: (evt: EventLike) => void;
+  _key: (evt: any) => void;
   state: State;
 
   constructor(props) {
@@ -43,14 +36,20 @@ class SearchPane extends React.Component {
 
   componentDidMount() {
     this._key = this.onDocumentKeyDown.bind(this);
-    var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    var DOMNode = ReactDOM.findDOMNode(this);
+    var doc = DOMNode && DOMNode.ownerDocument;
     // capture=true is needed to prevent chrome devtools console popping up
-    doc.addEventListener('keydown', this._key, true);
+    if (doc) {
+      doc.addEventListener('keydown', this._key, true);
+    }
   }
 
   componentWillUnmount() {
-    var doc = ReactDOM.findDOMNode(this).ownerDocument;
-    doc.removeEventListener('keydown', this._key, true);
+    var DOMNode = ReactDOM.findDOMNode(this);
+    var doc = DOMNode && DOMNode.ownerDocument;
+    if (doc) {
+      doc.removeEventListener('keydown', this._key, true);
+    }
   }
 
   onDocumentKeyDown(e) {

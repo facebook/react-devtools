@@ -18,8 +18,8 @@ var assign = require('object-assign');
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React$Element,
-  right: () => React$Element,
+  left: () => React$Element<*>,
+  right: () => React$Element<*>,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,

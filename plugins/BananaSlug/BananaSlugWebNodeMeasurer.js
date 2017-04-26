@@ -35,21 +35,22 @@ class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
     if (!node || typeof node.getBoundingClientRect !== 'function') {
       return DUMMY;
     }
-
+    var documentElement = document.documentElement;
     var rect = node.getBoundingClientRect();
-    var scrollX = Math.max(
+
+    var scrollX = documentElement ? Math.max(
       document.body ? document.body.scrollLeft : 0,
-      document.documentElement.scrollLeft,
+      documentElement.scrollLeft,
       window.pageXOffset || 0,
       window.scrollX || 0,
-    );
+    ) : 0;
 
-    var scrollY = Math.max(
+    var scrollY = documentElement ? Math.max(
       document.body ? document.body.scrollTop : 0,
-      document.documentElement.scrollTop,
+      documentElement.scrollTop,
       window.pageYOffset || 0,
       window.scrollY || 0,
-    );
+    ) : 0;
 
     return {
       bottom: rect.bottom,

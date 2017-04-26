@@ -298,7 +298,7 @@ class Agent extends EventEmitter {
     return null;
   }
 
-  _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setProps({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInProps) {
       data.updater.setInProps(path, value);
@@ -307,7 +307,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setState({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInState) {
       data.updater.setInState(path, value);
@@ -316,7 +316,7 @@ class Agent extends EventEmitter {
     }
   }
 
-  _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
+  _setContext({id, path, value}: {id: ElementID, path: Array<string | number>, value: any}) {
     var data = this.elementData.get(id);
     if (data && data.updater && data.updater.setInContext) {
       data.updater.setInContext(path, value);

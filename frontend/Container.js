@@ -30,8 +30,8 @@ var IS_VERTICAL_BREAKPOINT = 500;
 class Container extends React.Component {
   props: {
     reload: () => void,
-    extraPanes: Array<(node: Object) => React$Element>,
-    extraTabs: ?{[key: string]: () => React$Element},
+    extraPanes: Array<(node: Object) => React$Element<*>>,
+    extraTabs: ?{[key: string]: () => React$Element<*>},
     menuItems: {
       tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
       attr?: (
@@ -43,7 +43,7 @@ class Container extends React.Component {
         store: Object
       ) => ?Array<MenuItem>,
     },
-    extraTabs: {[key: string]: () => React$Element},
+    extraTabs: {[key: string]: () => React$Element<*>},
   };
   state: State;
   resizeTimeout: ?number;

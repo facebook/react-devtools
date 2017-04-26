@@ -61,7 +61,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       }
     };
 
-    extras.getReactElementFromNative = function(node) {
+    extras.getReactElementFromNative = function(node: Object) {
       var id = renderer.Mount.getID(node);
       while (node && node.parentNode && !id) {
         node = node.parentNode;

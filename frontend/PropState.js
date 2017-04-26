@@ -30,7 +30,7 @@ class PropState extends React.Component {
     };
   }
 
-  renderSource(): ?React.Element {
+  renderSource(): ?React.Element<any> {
     var source = this.props.node.get('source');
     if (!source) {
       return null;
@@ -45,7 +45,7 @@ class PropState extends React.Component {
     );
   }
 
-  render(): React.Element {
+  render(): React.Element<any> {
     if (!this.props.node) {
       // TODO(jared): style this
       return <span style={styles.noSelection}>No selection</span>;
