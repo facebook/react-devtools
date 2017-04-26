@@ -13,7 +13,7 @@
 const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 const immutable = require('immutable');
 
-import type {Measurement} from './BananaSlugTypes';
+import type {Measurement} from './TraceUpdatesTypes';
 
 // How long the measurement can be cached in ms.
 const DURATION = 800;
@@ -35,7 +35,7 @@ const MeasurementRecord = Record({
 
 var _id = 100;
 
-class BananaSlugAbstractNodeMeasurer {
+class TraceUpdatesAbstractNodeMeasurer {
   _callbacks: Map<Node, (v: Measurement) => void>;
   _ids: Map<string, Node>;
   _isRequesting: boolean;
@@ -158,4 +158,4 @@ class BananaSlugAbstractNodeMeasurer {
   }
 }
 
-module.exports = BananaSlugAbstractNodeMeasurer;
+module.exports = TraceUpdatesAbstractNodeMeasurer;

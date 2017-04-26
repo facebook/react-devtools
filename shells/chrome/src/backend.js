@@ -11,7 +11,7 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
-var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBackendManager');
+var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
@@ -68,5 +68,5 @@ function setup(hook) {
   });
 
   setupHighlighter(agent);
-  BananaSlugBackendManager.init(agent);
+  TraceUpdatesBackendManager.init(agent);
 }
