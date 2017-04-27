@@ -17,20 +17,12 @@ var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
 
-type EventLike = {
-  keyCode: number,
-  target: Node,
-  preventDefault: () => void,
-  stopPropagation: () => void,
-};
-
 type State = {
   focused: boolean,
 };
 
-class SearchPane extends React.Component {
+class LeftPane extends React.Component {
   input: ?HTMLElement;
-  _key: (evt: EventLike) => void;
   state: State;
 
   render() {
@@ -43,7 +35,7 @@ class SearchPane extends React.Component {
   }
 }
 
-SearchPane.propTypes = {
+LeftPane.propTypes = {
   reload: PropTypes.func,
 };
 
@@ -56,4 +48,4 @@ var styles = {
   },
 };
 
-module.exports = SearchPane;
+module.exports = LeftPane;

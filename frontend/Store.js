@@ -263,7 +263,7 @@ class Store extends EventEmitter {
     this.highlightSearch();
     this.refreshSearch = false;
 
-    // SearchPane input depends on this change being flushed synchronously.
+    // Search input depends on this change being flushed synchronously.
     this.flush();
   }
 

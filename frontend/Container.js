@@ -13,7 +13,7 @@
 var ContextMenu = require('./ContextMenu');
 var PropState = require('./PropState');
 var React = require('react');
-var SearchPane = require('./SearchPane');
+var LeftPane = require('./LeftPane');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
@@ -90,7 +90,7 @@ class Container extends React.Component {
         <SplitPane
           initialWidth={10}
           initialHeight={10}
-          left={() => <SearchPane reload={this.props.reload} />}
+          left={() => <LeftPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
           isVertical={this.state.isVertical}
         />

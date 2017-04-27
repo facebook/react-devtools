@@ -17,7 +17,15 @@ var {PropTypes} = React;
 
 var decorate = require('./decorate');
 
+type EventLike = {
+  keyCode: number,
+  target: Node,
+  preventDefault: () => void,
+  stopPropagation: () => void,
+};
+
 class SettingsPane extends React.Component {
+  _key: (evt: EventLike) => void;
 
   constructor(props) {
     super(props);
