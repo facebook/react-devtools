@@ -268,7 +268,6 @@ class Node extends React.Component {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      var name = node.get('name');
       var content = children;
       var isCollapsed = content === null || content === undefined;
       return (
@@ -303,10 +302,28 @@ class Node extends React.Component {
       );
     }
 
+    var name = node.get('name') + '';
+    var searchText = this.props.searchText;
+
+    // If the user's filtering then highlight search terms in the tag name.
+    // This will serve as a visual reminder that the visible tree is filtered.
+    // We only highlight the first occurrence; it's is probably fine.
+    if (searchText) {
+      var index = name.toLowerCase().indexOf(searchText.toLowerCase());
+      if (index >= 0) {
+        name =
+          <span>
+            <span>{name.substr(0, index)}</span>
+            <span style={styles.tagNameHighlight}>{name.substr(index, searchText.length)}</span>
+            <span>{name.substr(index + searchText.length)}</span>
+          </span>;
+      }
+    }
+
     var closeTag = (
       <span style={styles.closeTag}>
         <span style={collapsed ? topTagStyle : bottomTagStyle}>
-          &lt;/{'' + node.get('name')}&gt;
+          &lt;/{name}&gt;
         </span>
       </span>
     );
@@ -340,20 +357,6 @@ class Node extends React.Component {
       >
         <span style={arrowStyle}/>
       </span>;
-
-    var name = node.get('name') + '';
-    var searchText = this.props.searchText;
-    if (searchText) {
-      var index = name.toLowerCase().indexOf(searchText.toLowerCase());
-      if (index >= 0) {
-        name =
-          <span>
-            <span>{name.substr(0, index)}</span>
-            <span style={{ backgroundColor: 'yellow' }}>{name.substr(index, searchText.length)}</span>
-            <span>{name.substr(index + searchText.length)}</span>
-          </span>;
-      }
-    }
 
     var head = (
       <div ref={h => this._head = h} style={headStyles} {...headEvents}>
@@ -520,6 +523,11 @@ var styles = {
   },
   invertedTagName: {
     color: 'white',
+  },
+
+  tagNameHighlight: {
+    backgroundColor: 'yellow',
+    color: 'black',
   },
 
   openTag: {
