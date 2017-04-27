@@ -16,13 +16,13 @@ var SettingsCheckbox = require('../../frontend/SettingsCheckbox');
 
 var Wrapped = decorate({
   listeners() {
-    return ['bananaslugchange'];
+    return ['traceupdatesstatechange'];
   },
   props(store) {
     return {
-      state: store.bananaslugState,
+      state: store.traceupdatesState,
       text: 'Trace React Updates',
-      onChange: state => store.changeBananaSlug(state),
+      onChange: state => store.changeTraceUpdates(state),
     };
   },
 }, SettingsCheckbox);

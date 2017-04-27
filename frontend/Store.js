@@ -87,7 +87,7 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
-  bananaslugState: ?ControlState;
+  traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   regexState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -128,7 +128,7 @@ class Store extends EventEmitter {
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
-    this.bananaslugState = null;
+    this.traceupdatesState = null;
     this.colorizerState = null;
     this.regexState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
@@ -473,11 +473,11 @@ class Store extends EventEmitter {
     });
   }
 
-  changeBananaSlug(state: ControlState) {
-    this.bananaslugState = state;
-    this.emit('bananaslugchange');
+  changeTraceUpdates(state: ControlState) {
+    this.traceupdatesState = state;
+    this.emit('traceupdatesstatechange');
     invariant(state.toJS);
-    this._bridge.send('bananaslugchange', state.toJS());
+    this._bridge.send('traceupdatesstatechange', state.toJS());
   }
 
   changeColorizer(state: ControlState) {

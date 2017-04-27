@@ -194,7 +194,7 @@ class Agent extends EventEmitter {
       }
     });
     bridge.on('scrollToNode', id => this.scrollToNode(id));
-    bridge.on('bananaslugchange', value => this.emit('bananaslugchange', value));
+    bridge.on('traceupdatesstatechange', value => this.emit('traceupdatesstatechange', value));
     bridge.on('colorizerchange', value => this.emit('colorizerchange', value));
 
     /** Events sent to the frontend **/
