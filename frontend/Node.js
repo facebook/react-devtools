@@ -24,8 +24,8 @@ type PropsType = {
   node: Map,
   depth: number,
   isBottomTagHovered: boolean,
-  searchText: ?string,
   isBottomTagSelected: boolean,
+  searchText: ?string,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
@@ -307,17 +307,27 @@ class Node extends React.Component {
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
-    // We only highlight the first occurrence; it's is probably fine.
     if (searchText) {
-      var index = name.toLowerCase().indexOf(searchText.toLowerCase());
-      if (index >= 0) {
-        name =
-          <span>
-            <span>{name.substr(0, index)}</span>
-            <span style={styles.tagNameHighlight}>{name.substr(index, searchText.length)}</span>
-            <span>{name.substr(index + searchText.length)}</span>
-          </span>;
+      // Convert search text into a case-insensitive regex to make string-splitting easier.
+      // This should be safe to do even for non-regex searches because at this point,
+      // False positives would have been filtered out of the tree.
+      var needle = new RegExp(searchText, 'i');
+
+      var unmatched = name.split(needle);
+      var matched = name.match(needle);
+      var pieces = [
+        <span key={0}>{unmatched.shift()}</span>
+      ];
+      while (unmatched.length > 0) {
+        pieces.push(
+          <span key={pieces.length} style={styles.tagNameHighlight}>{matched.shift()}</span>
+        );
+        pieces.push(
+          <span key={pieces.length}>{unmatched.shift()}</span>
+        );
       }
+
+      name = <span>{pieces}</span>;
     }
 
     var closeTag = (
@@ -467,7 +477,10 @@ var WrappedNode = decorate({
     };
   },
   shouldUpdate(nextProps, prevProps) {
-    return nextProps.id !== prevProps.id || nextProps.searchText !== prevProps.searchText;
+    return (
+      nextProps.id !== prevProps.id ||
+      nextProps.searchText !== prevProps.searchText
+    );
   },
 }, Node);
 
