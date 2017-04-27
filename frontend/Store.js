@@ -29,7 +29,7 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search components';
+const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -89,7 +89,6 @@ class Store extends EventEmitter {
   // Public state
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
-  regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
@@ -130,7 +129,6 @@ class Store extends EventEmitter {
     this.capabilities = {};
     this.traceupdatesState = null;
     this.colorizerState = null;
-    this.regexState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
@@ -227,7 +225,7 @@ class Store extends EventEmitter {
       if (
         this.searchRoots &&
         needle.indexOf(this.searchText.toLowerCase()) === 0 &&
-        (!this.regexState || !this.regexState.enabled)
+        (!this.searchText || this.searchText.charAt(0) !== '/')
       ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
@@ -493,13 +491,6 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
-  }
-
-  changeRegex(state: ControlState) {
-    this.regexState = state;
-    this.emit('regexchange');
-    this.refreshSearch = true;
-    this.changeSearch(this.searchText);
   }
 
   // Private stuff

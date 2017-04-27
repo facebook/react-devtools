@@ -11,7 +11,6 @@
 
 var TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
-var RegexFrontendControl = require('../plugins/Regex/RegexFrontendControl');
 var React = require('react');
 var ReactDOM = require('react-dom');
 var {PropTypes} = React;
@@ -86,28 +85,25 @@ class SettingsPane extends React.Component {
           <ColorizerFrontendControl {...this.props} />
         </div>
 
-        <div style={styles.searchOptionsWrapper}>
-          <RegexFrontendControl {...this.props} />
-          <div style={styles.searchInputWrapper}>
-            <input
-              style={inputStyle}
-              ref={i => this.input = i}
-              value={this.props.searchText}
-              onFocus={() => this.setState({focused: true})}
-              onBlur={() => this.setState({focused: false})}
-              onKeyDown={e => this.onKeyDown(e.key)}
-              placeholder={this.props.placeholderText}
-              onChange={e => this.props.onChangeSearch(e.target.value)}
-            />
-            <div style={styles.placeholder}>
-              <SearchIcon />
-            </div>
-            {!!this.props.searchText && (
-              <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
-                &times;
-              </div>
-            )}
+        <div style={styles.searchInputWrapper}>
+          <input
+            style={inputStyle}
+            ref={i => this.input = i}
+            value={this.props.searchText}
+            onFocus={() => this.setState({focused: true})}
+            onBlur={() => this.setState({focused: false})}
+            onKeyDown={e => this.onKeyDown(e.key)}
+            placeholder={this.props.placeholderText}
+            onChange={e => this.props.onChangeSearch(e.target.value)}
+          />
+          <div style={styles.placeholder}>
+            <SearchIcon />
           </div>
+          {!!this.props.searchText && (
+            <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+              &times;
+            </div>
+          )}
         </div>
       </div>
     );
@@ -164,11 +160,6 @@ var styles = {
     flexGrow: 1,
   },
 
-  searchOptionsWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-  },
-
   searchInputWrapper: {
     display: 'flex',
     alignItems: 'center',
@@ -216,6 +207,7 @@ var styles = {
     outline: 'none',
     borderRadius: '4px',
     paddingLeft: '1.25rem',
+    width: '150px',
   },
 
   highlightedInput: {

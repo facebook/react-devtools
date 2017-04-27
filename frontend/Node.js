@@ -15,6 +15,7 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
+var searchTextToRegExp = require('./searchTextToRegExp');
 
 import type {Map} from 'immutable';
 
@@ -311,7 +312,7 @@ class Node extends React.Component {
       // Convert search text into a case-insensitive regex to make string-splitting easier.
       // This should be safe to do even for non-regex searches because at this point,
       // False positives would have been filtered out of the tree.
-      var needle = new RegExp(searchText, 'i');
+      var needle = searchTextToRegExp(searchText);
 
       var unmatched = name.split(needle);
       var matched = name.match(needle);
