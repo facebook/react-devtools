@@ -220,7 +220,7 @@ var styles = {
 
   highlightedInput: {
     border: '1px solid #99c6f4',
-    boxShadow: '0 0 1px 1px #81aedc'
+    boxShadow: '0 0 1px 1px #81aedc',
   },
 };
 
