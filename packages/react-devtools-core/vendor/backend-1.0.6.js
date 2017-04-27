@@ -205,8 +205,8 @@
                     }
                 }), bridge.on("scrollToNode", function(id) {
                     return _this3.scrollToNode(id);
-                }), bridge.on("traceupdatesstatechange", function(value) {
-                    return _this3.emit("traceupdatesstatechange", value);
+                }), bridge.on("bananaslugchange", function(value) {
+                    return _this3.emit("bananaslugchange", value);
                 }), bridge.on("colorizerchange", function(value) {
                     return _this3.emit("colorizerchange", value);
                 }), this.on("root", function(id) {
