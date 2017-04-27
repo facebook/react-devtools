@@ -29,7 +29,7 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search by Component Name';
+const DEFAULT_PLACEHOLDER = 'Search components';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of

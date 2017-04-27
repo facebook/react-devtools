@@ -81,22 +81,33 @@ class SettingsPane extends React.Component {
     return (
       <div style={styles.container}>
         <TraceUpdatesFrontendControl {...this.props} />
-        <ColorizerFrontendControl {...this.props} />
-        <RegexFrontendControl {...this.props} />
-        <div style={styles.searchBox}>
-          <input
-            style={inputStyle}
-            ref={i => this.input = i}
-            value={this.props.searchText}
-            onFocus={() => this.setState({focused: true})}
-            onBlur={() => this.setState({focused: false})}
-            onKeyDown={e => this.onKeyDown(e.key)}
-            placeholder={this.props.placeholderText}
-            onChange={e => this.props.onChangeSearch(e.target.value)}
-          />
-          {!!this.props.searchText && <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
-            &times;
-          </div>}
+        
+        <div style={styles.growToFill}>
+          <ColorizerFrontendControl {...this.props} />
+        </div>
+
+        <div style={styles.searchOptionsWrapper}>
+          <RegexFrontendControl {...this.props} />
+          <div style={styles.searchInputWrapper}>
+            <input
+              style={inputStyle}
+              ref={i => this.input = i}
+              value={this.props.searchText}
+              onFocus={() => this.setState({focused: true})}
+              onBlur={() => this.setState({focused: false})}
+              onKeyDown={e => this.onKeyDown(e.key)}
+              placeholder={this.props.placeholderText}
+              onChange={e => this.props.onChangeSearch(e.target.value)}
+            />
+            <div style={styles.placeholder}>
+              <SearchIcon />
+            </div>
+            {!!this.props.searchText && (
+              <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+                &times;
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );
@@ -124,6 +135,18 @@ var Wrapped = decorate({
   },
 }, SettingsPane);
 
+function SearchIcon() {
+  return (
+    <svg
+      style={styles.searchIcon}
+      version="1.1"
+      viewBox="0 0 32 32"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <path d="M31.008 27.231l-7.58-6.447c-0.784-0.705-1.622-1.029-2.299-0.998 1.789-2.096 2.87-4.815 2.87-7.787 0-6.627-5.373-12-12-12s-12 5.373-12 12 5.373 12 12 12c2.972 0 5.691-1.081 7.787-2.87-0.031 0.677 0.293 1.515 0.998 2.299l6.447 7.58c1.104 1.226 2.907 1.33 4.007 0.23s0.997-2.903-0.23-4.007zM12 20c-4.418 0-8-3.582-8-8s3.582-8 8-8 8 3.582 8 8-3.582 8-8 8z"></path>
+    </svg>
+  );
+}
 
 var styles = {
   container: {
@@ -137,11 +160,34 @@ var styles = {
     position: 'relative',
   },
 
-  searchBox: {
+  growToFill: {
+    flexGrow: 1,
+  },
+
+  searchOptionsWrapper: {
+    display: 'flex',
+    alignItems: 'center',
+  },
+
+  searchInputWrapper: {
     display: 'flex',
     alignItems: 'center',
     flexShrink: 0,
     position: 'relative',
+  },
+
+  placeholder: {
+    position: 'absolute',
+    cursor: 'pointer',
+    left: '0.25rem',
+    right: '0.25rem',
+    color: '#bbb',
+    display: 'flex',
+    alignItems: 'center',
+    fontSize: '12px',
+    whiteSpace: 'pre',
+    overflow: 'hidden',
+    pointerEvents: 'none',
   },
 
   cancelButton: {
@@ -153,6 +199,15 @@ var styles = {
     color: '#bbb',
   },
 
+  searchIcon: {
+    display: 'inline-block',
+    width: '1em',
+    height: '1em',
+    strokeWidth: 0,
+    stroke: 'currentColor',
+    fill: 'currentColor',
+  },
+
   input: {
     flex: 1,
     fontSize: '12px',
@@ -160,6 +215,7 @@ var styles = {
     border: '1px solid #ccc',
     outline: 'none',
     borderRadius: '4px',
+    paddingLeft: '1.25rem',
   },
 
   highlightedInput: {

@@ -21,7 +21,7 @@ var Wrapped = decorate({
   props(store) {
     return {
       state: store.regexState,
-      text: 'Use Regular Expressions',
+      text: 'RegExp',
       onChange: state => store.changeRegex(state),
     };
   },
