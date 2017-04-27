@@ -24,6 +24,7 @@ type PropsType = {
   node: Map,
   depth: number,
   isBottomTagHovered: boolean,
+  searchText: ?string,
   isBottomTagSelected: boolean,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
@@ -340,12 +341,26 @@ class Node extends React.Component {
         <span style={arrowStyle}/>
       </span>;
 
+    var name = node.get('name') + '';
+    var searchText = this.props.searchText;
+    if (searchText) {
+      var index = name.toLowerCase().indexOf(searchText.toLowerCase());
+      if (index >= 0) {
+        name =
+          <span>
+            <span>{name.substr(0, index)}</span>
+            <span style={{ backgroundColor: 'yellow' }}>{name.substr(index, searchText.length)}</span>
+            <span>{name.substr(index + searchText.length)}</span>
+          </span>;
+      }
+    }
+
     var head = (
       <div ref={h => this._head = h} style={headStyles} {...headEvents}>
         {collapser}
         <span style={topTagTextStyle}>
           <span style={styles.openTag}>
-            <span style={topTagStyle}>&lt;{'' + node.get('name')}</span>
+            <span style={topTagStyle}>&lt;{name}</span>
             {node.get('key') &&
               <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
             }
@@ -430,6 +445,7 @@ var WrappedNode = decorate({
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
+      searchText: props.searchText,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
@@ -448,7 +464,7 @@ var WrappedNode = decorate({
     };
   },
   shouldUpdate(nextProps, prevProps) {
-    return nextProps.id !== prevProps.id;
+    return nextProps.id !== prevProps.id || nextProps.searchText !== prevProps.searchText;
   },
 }, Node);
 
