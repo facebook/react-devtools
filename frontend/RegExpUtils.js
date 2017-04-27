@@ -10,16 +10,37 @@
  */
 'use strict';
 
+/**
+ * Convert the specified search text to a RegExp.
+ */
 function searchTextToRegExp(needle: string): RegExp {
+  return new RegExp(trimSearchText(needle), 'i');
+}
+
+/**
+ * Should the current search text be converted to a RegExp?
+ */
+function shouldSearchUseRegex(needle: ?string): boolean {
+  return !!needle && needle.charAt(0) === '/' && trimSearchText(needle).length > 0;
+}
+
+/**
+ * '/foo/' => 'foo'
+ * '/bar' => 'bar'
+ * 'baz' => 'baz'
+ */
+function trimSearchText(needle: string): string {
   if (needle.charAt(0) === '/') {
     needle = needle.substr(1);
   }
-
   if (needle.charAt(needle.length - 1) === '/') {
     needle = needle.substr(0, needle.length - 1);
   }
-
-  return new RegExp(needle, 'i');
+  return needle;
 }
 
-module.exports = searchTextToRegExp;
+module.exports = {
+  searchTextToRegExp,
+  shouldSearchUseRegex,
+  trimSearchText,
+};

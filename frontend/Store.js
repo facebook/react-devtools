@@ -16,6 +16,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
+var RegExpUtils = require('./RegExpUtils');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID} from './types';
@@ -225,7 +226,7 @@ class Store extends EventEmitter {
       if (
         this.searchRoots &&
         needle.indexOf(this.searchText.toLowerCase()) === 0 &&
-        (!this.searchText || this.searchText.charAt(0) !== '/')
+        !RegExpUtils.shouldSearchUseRegex(text)
       ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
