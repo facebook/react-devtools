@@ -267,6 +267,34 @@ class Node extends React.Component {
       inverted && !this.props.isBottomTagSelected && styles.tagTextInverted
     );
 
+    var name = node.get('name') + '';
+    var searchText = this.props.searchText;
+
+    // If the user's filtering then highlight search terms in the tag name.
+    // This will serve as a visual reminder that the visible tree is filtered.
+    if (searchText) {
+      // Convert search text into a case-insensitive regex to make string-splitting easier.
+      // This should be safe to do even for non-regex searches because at this point,
+      // False positives would have been filtered out of the tree.
+      var needle = searchTextToRegExp(searchText);
+
+      var unmatched = name.split(needle);
+      var matched = name.match(needle);
+      var pieces = [
+        <span key={0}>{unmatched.shift()}</span>,
+      ];
+      while (unmatched.length > 0) {
+        pieces.push(
+          <span key={pieces.length} style={styles.tagNameHighlight}>{matched.shift()}</span>
+        );
+        pieces.push(
+          <span key={pieces.length}>{unmatched.shift()}</span>
+        );
+      }
+
+      name = <span>{pieces}</span>;
+    }
+
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
       var content = children;
@@ -301,34 +329,6 @@ class Node extends React.Component {
           </div>
         </div>
       );
-    }
-
-    var name = node.get('name') + '';
-    var searchText = this.props.searchText;
-
-    // If the user's filtering then highlight search terms in the tag name.
-    // This will serve as a visual reminder that the visible tree is filtered.
-    if (searchText) {
-      // Convert search text into a case-insensitive regex to make string-splitting easier.
-      // This should be safe to do even for non-regex searches because at this point,
-      // False positives would have been filtered out of the tree.
-      var needle = searchTextToRegExp(searchText);
-
-      var unmatched = name.split(needle);
-      var matched = name.match(needle);
-      var pieces = [
-        <span key={0}>{unmatched.shift()}</span>,
-      ];
-      while (unmatched.length > 0) {
-        pieces.push(
-          <span key={pieces.length} style={styles.tagNameHighlight}>{matched.shift()}</span>
-        );
-        pieces.push(
-          <span key={pieces.length}>{unmatched.shift()}</span>
-        );
-      }
-
-      name = <span>{pieces}</span>;
     }
 
     var closeTag = (
