@@ -220,7 +220,7 @@ class Store extends EventEmitter {
     if (needle === this.searchText.toLowerCase() && !this.refreshSearch) {
       return;
     }
-    if (!text) {
+    if (!text || RegExpUtils.trimSearchText(text).length === 0) {
       this.searchRoots = null;
     } else {
       if (
@@ -481,9 +481,6 @@ class Store extends EventEmitter {
 
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
-    this.placeholderText = this.colorizerState.enabled
-      ? 'Highlight by Component Name'
-      : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
