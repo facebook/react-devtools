@@ -316,7 +316,7 @@ class Node extends React.Component {
       var unmatched = name.split(needle);
       var matched = name.match(needle);
       var pieces = [
-        <span key={0}>{unmatched.shift()}</span>
+        <span key={0}>{unmatched.shift()}</span>,
       ];
       while (unmatched.length > 0) {
         pieces.push(
