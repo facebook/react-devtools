@@ -159,11 +159,12 @@ var styles = {
     padding: '4px',
     border: '1px solid #ccc',
     outline: 'none',
+    borderRadius: '4px',
   },
 
   highlightedInput: {
     border: '1px solid #99c6f4',
-    outline: '1px solid #81aedc',
+    boxShadow: '0 0 1px 1px #81aedc'
   },
 };
 
