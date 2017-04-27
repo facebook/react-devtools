@@ -30,6 +30,7 @@ var styles = {
   container: {
     backgroundColor: '#efefef',
     padding: '5px 0 0 5px',
+    borderBottom: '1px solid rgb(204, 204, 204)',
     display: 'flex',
     flexWrap: 'wrap',
     flexShrink: 0,

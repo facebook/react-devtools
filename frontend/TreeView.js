@@ -122,8 +122,7 @@ var styles = {
   },
 
   scroll: {
-    paddingTop: 2,
-    paddingBottom: 2,
+    paddingTop: 3,
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
