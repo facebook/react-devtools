@@ -128,22 +128,24 @@ var Wrapped = decorate({
 var styles = {
   container: {
     backgroundColor: '#efefef',
-    padding: '5px 0 0 5px',
+    padding: '4px 8px',
     borderBottom: '1px solid rgb(204, 204, 204)',
     display: 'flex',
     flexWrap: 'wrap',
     flexShrink: 0,
+    alignItems: 'center',
     position: 'relative',
   },
 
   searchBox: {
     display: 'flex',
+    alignItems: 'center',
     flexShrink: 0,
     position: 'relative',
   },
 
   cancelButton: {
-    fontSize: '13px',
+    fontSize: '14px',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -152,8 +154,7 @@ var styles = {
     height: '20px',
     position: 'absolute',
     cursor: 'pointer',
-    right: '10px',
-    top: '8px',
+    right: '6px',
     color: 'white',
     backgroundColor: '#bbb',
     lineHeight: '0',
@@ -161,18 +162,15 @@ var styles = {
 
   input: {
     flex: 1,
-    fontSize: '16px',
-    padding: '8px',
-    border: 'none',
-    transition: 'border-top-color .2s ease, background-color .2s ease',
-    borderTop: '1px solid #ccc',
-    borderTopColor: '#ccc',
+    fontSize: '14px',
+    padding: '6px',
+    border: '1px solid #ccc',
     outline: 'none',
   },
 
   highlightedInput: {
-    borderTopColor: 'aqua',
-    backgroundColor: '#EEFFFE',
+    border: '1px solid #99c6f4',
+    outline: '1px solid #81aedc',
   },
 };
 

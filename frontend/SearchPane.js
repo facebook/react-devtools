@@ -13,7 +13,6 @@
 'use strict';
 
 var React = require('react');
-var ReactDOM = require('react-dom');
 var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
