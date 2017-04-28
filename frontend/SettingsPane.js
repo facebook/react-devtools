@@ -196,7 +196,9 @@ var styles = {
   searchIcon: {
     position: 'absolute',
     display: 'inline-block',
+    pointerEvents: 'none',
     left: '0.25rem',
+    top: 0,
     width: '1em',
     height: '100%',
     strokeWidth: 0,
