@@ -69,7 +69,9 @@ function doublePipe(one, two) {
 }
 
 chrome.runtime.onMessage.addListener((req, sender) => {
-  if (sender.tab && req.runningReact) {
+  // This is sent from the hook content script.
+  // It tells us a renderer has attached.
+  if (sender.tab && req.hasDetectedReact) {
     chrome.tabs.query({
       currentWindow: true,
       active: true,

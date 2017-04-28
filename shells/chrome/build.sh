@@ -14,7 +14,6 @@ rsync -R \
   build/backend.js \
   build/background.js \
   build/contentScript.js \
-  build/detector.js \
   build/inject.js \
   build/main.js \
   build/panel.js \
