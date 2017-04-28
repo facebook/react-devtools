@@ -27,6 +27,10 @@ type State = {
 
 var IS_VERTICAL_BREAKPOINT = 500;
 
+function shouldUseVerticalLayout(window) {
+  return window.innerWidth < IS_VERTICAL_BREAKPOINT;
+}
+
 class Container extends React.Component {
   props: {
     reload: () => void,
@@ -52,14 +56,14 @@ class Container extends React.Component {
     super(props);
 
     this.state = {
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     };
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize, false);
     this.setState({
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     });
   }
 
@@ -80,7 +84,7 @@ class Container extends React.Component {
     this.resizeTimeout = null;
 
     this.setState({
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     });
   };
 

@@ -162,7 +162,7 @@ function SearchIcon() {
 
 var styles = {
   container: {
-    backgroundColor: '#efefef',
+    backgroundColor: 'rgb(243, 243, 243)',
     padding: '4px 4px',
     borderBottom: '1px solid rgb(204, 204, 204)',
     display: 'flex',
