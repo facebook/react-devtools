@@ -37,8 +37,15 @@ declare var chrome: {
     executeScript: (tabId: number, options: Object, fn: () => void) => void,
     query: (options: Object, fn: (tabArray: Array<Object>) => void) => void,
   },
-  pageAction: {
-    show: (tabId: number) => void,
+  browserAction: {
+    setIcon: ({
+      tabId: number,
+      path: {[key: string]: string}
+    }),
+    setPopup: ({
+      tabId: sender.tab.id,
+      popup: string,
+    }) => void,
   },
   runtime: {
     getURL: (path: string) => string,

@@ -71,15 +71,21 @@ function doublePipe(one, two) {
 chrome.runtime.onMessage.addListener((req, sender) => {
   // This is sent from the hook content script.
   // It tells us a renderer has attached.
-  if (sender.tab && req.hasDetectedReact) {
-    chrome.tabs.query({
-      currentWindow: true,
-      active: true,
-    }, (tabArray) => {
-      if (tabArray.length) {
-        chrome.pageAction.show(tabArray[0].id);
-      }
-    }
-   );
+  if (req.hasDetectedReact && sender.tab) {
+    // We use browserAction instead of pageAction because this lets us
+    // display a custom default popup when React is *not* detected.
+    // It is specified in the manifest.
+    chrome.browserAction.setIcon({
+      tabId: sender.tab.id,
+      path: {
+        '48': 'icons/icon48.png',
+        // I'm not using our 128 icon here because it is weird.
+        // We should fix it to show the right thing.
+      },
+    });
+    chrome.browserAction.setPopup({
+      tabId: sender.tab.id,
+      popup: 'popups/detected.html'
+    })
   }
 });
