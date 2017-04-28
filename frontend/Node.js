@@ -25,6 +25,7 @@ type PropsType = {
   depth: number,
   isBottomTagHovered: boolean,
   isBottomTagSelected: boolean,
+  searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
@@ -265,9 +266,31 @@ class Node extends React.Component {
       inverted && !this.props.isBottomTagSelected && styles.tagTextInverted
     );
 
+    var name = node.get('name') + '';
+    var searchRegExp = this.props.searchRegExp;
+
+    // If the user's filtering then highlight search terms in the tag name.
+    // This will serve as a visual reminder that the visible tree is filtered.
+    if (searchRegExp) {
+      var unmatched = name.split(searchRegExp);
+      var matched = name.match(searchRegExp);
+      var pieces = [
+        <span key={0}>{unmatched.shift()}</span>,
+      ];
+      while (unmatched.length > 0) {
+        pieces.push(
+          <span key={pieces.length} style={styles.tagNameHighlight}>{matched.shift()}</span>
+        );
+        pieces.push(
+          <span key={pieces.length}>{unmatched.shift()}</span>
+        );
+      }
+
+      name = <span>{pieces}</span>;
+    }
+
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      var name = node.get('name');
       var content = children;
       var isCollapsed = content === null || content === undefined;
       return (
@@ -305,7 +328,7 @@ class Node extends React.Component {
     var closeTag = (
       <span style={styles.closeTag}>
         <span style={collapsed ? topTagStyle : bottomTagStyle}>
-          &lt;/{'' + node.get('name')}&gt;
+          &lt;/{name}&gt;
         </span>
       </span>
     );
@@ -345,7 +368,7 @@ class Node extends React.Component {
         {collapser}
         <span style={topTagTextStyle}>
           <span style={styles.openTag}>
-            <span style={topTagStyle}>&lt;{'' + node.get('name')}</span>
+            <span style={topTagStyle}>&lt;{name}</span>
             {node.get('key') &&
               <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
             }
@@ -430,6 +453,7 @@ var WrappedNode = decorate({
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
+      searchRegExp: props.searchRegExp,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
@@ -448,7 +472,10 @@ var WrappedNode = decorate({
     };
   },
   shouldUpdate(nextProps, prevProps) {
-    return nextProps.id !== prevProps.id;
+    return (
+      nextProps.id !== prevProps.id ||
+      nextProps.searchRegExp !== prevProps.searchRegExp
+    );
   },
 }, Node);
 
@@ -504,6 +531,11 @@ var styles = {
   },
   invertedTagName: {
     color: 'white',
+  },
+
+  tagNameHighlight: {
+    backgroundColor: 'yellow',
+    color: 'black',
   },
 
   openTag: {

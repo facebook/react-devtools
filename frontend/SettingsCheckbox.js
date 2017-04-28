@@ -78,7 +78,7 @@ class SettingsCheckbox extends React.Component {
 var styles = {
   checkbox: {
     pointerEvents: 'none',
-    margin: '0 5px 0 0',
+    marginRight: '5px',
   },
   container: {
     WebkitUserSelect: 'none',
@@ -88,7 +88,7 @@ var styles = {
     outline: 'none',
     fontFamily: 'sans-serif',
     userSelect: 'none',
-    margin: '0 10px 5px 0',
+    marginRight: '10px',
   },
 };
 
