@@ -114,9 +114,7 @@ class SettingsPane extends React.Component {
             placeholder={this.props.placeholderText}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
-          <div style={styles.placeholder}>
-            <SearchIcon />
-          </div>
+          <SearchIcon />
           {!!searchText && (
             <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
               &times;
@@ -185,40 +183,30 @@ var styles = {
     position: 'relative',
   },
 
-  placeholder: {
-    position: 'absolute',
-    cursor: 'pointer',
-    left: '0.25rem',
-    right: '0.25rem',
-    color: '#bbb',
-    display: 'flex',
-    alignItems: 'center',
-    fontSize: '12px',
-    whiteSpace: 'pre',
-    overflow: 'hidden',
-    pointerEvents: 'none',
-  },
-
   cancelButton: {
     fontSize: '16px',
-    padding: '0.5rem',
+    padding: '0 0.5rem',
     position: 'absolute',
     cursor: 'pointer',
     right: 0,
+    lineHeight: '28px',
     color: '#bbb',
   },
 
   searchIcon: {
+    position: 'absolute',
     display: 'inline-block',
+    left: '0.25rem',
     width: '1em',
-    height: '1em',
+    height: '100%',
     strokeWidth: 0,
-    stroke: 'currentColor',
-    fill: 'currentColor',
+    stroke: '#bbb',
+    fill: '#bbb',
+    lineHeight: '28px',
+    fontSize: '12px',
   },
 
   input: {
-    flex: 1,
     fontSize: '12px',
     padding: '4px',
     border: '1px solid #ccc',
