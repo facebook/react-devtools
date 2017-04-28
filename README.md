@@ -70,7 +70,9 @@ please read the [Contributing document](CONTRIBUTING.md).
 
 ### The React Tab Doesn't Show Up
 
-If you are running your app from `file://` URL, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page.
+If you are running your app from a local `file://` URL, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page. You can find it by opening Settings > Extensions:
+
+![Allow access to file URLs](http://i.imgur.com/Yt1rmUp.png)
 
 The "React" tab won't show up if the site doesn't use React, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization.
 
