@@ -15,7 +15,6 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
-var RegExpUtils = require('./RegExpUtils');
 
 import type {Map} from 'immutable';
 
@@ -26,7 +25,7 @@ type PropsType = {
   depth: number,
   isBottomTagHovered: boolean,
   isBottomTagSelected: boolean,
-  searchText: ?string,
+  searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
@@ -268,18 +267,13 @@ class Node extends React.Component {
     );
 
     var name = node.get('name') + '';
-    var searchText = this.props.searchText;
+    var searchRegExp = this.props.searchRegExp;
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
-    if (searchText) {
-      // Convert search text into a case-insensitive regex to make string-splitting easier.
-      // This should be safe to do even for non-regex searches because at this point,
-      // False positives would have been filtered out of the tree.
-      var needle = RegExpUtils.searchTextToRegExp(searchText);
-
-      var unmatched = name.split(needle);
-      var matched = name.match(needle);
+    if (searchRegExp) {
+      var unmatched = name.split(searchRegExp);
+      var matched = name.match(searchRegExp);
       var pieces = [
         <span key={0}>{unmatched.shift()}</span>,
       ];
@@ -459,7 +453,7 @@ var WrappedNode = decorate({
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
-      searchText: props.searchText,
+      searchRegExp: props.searchRegExp,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
@@ -480,7 +474,7 @@ var WrappedNode = decorate({
   shouldUpdate(nextProps, prevProps) {
     return (
       nextProps.id !== prevProps.id ||
-      nextProps.searchText !== prevProps.searchText
+      nextProps.searchRegExp !== prevProps.searchRegExp
     );
   },
 }, Node);

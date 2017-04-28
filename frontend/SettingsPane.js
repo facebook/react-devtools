@@ -13,6 +13,7 @@ var TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesF
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var RegExpUtils = require('./RegExpUtils');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
@@ -80,9 +81,18 @@ class SettingsPane extends React.Component {
   }
 
   render() {
+    var searchText = this.props.searchText;
+
     var inputStyle = styles.input;
-    if (this.props.searchText || this.state.focused) {
-      inputStyle = {...inputStyle, ...styles.highlightedInput};
+    if (searchText || this.state.focused) {
+      inputStyle = Object.assign({}, inputStyle, styles.highlightedInput);
+    }
+    if (
+      searchText &&
+      RegExpUtils.shouldSearchUseRegex(searchText) &&
+      !RegExpUtils.isValidRegex(searchText)
+    ) {
+      inputStyle = Object.assign({}, inputStyle, styles.errorInput);
     }
 
     return (
@@ -97,7 +107,7 @@ class SettingsPane extends React.Component {
           <input
             style={inputStyle}
             ref={i => this.input = i}
-            value={this.props.searchText}
+            value={searchText}
             onFocus={() => this.setState({focused: true})}
             onBlur={() => this.setState({focused: false})}
             onKeyDown={e => this.onKeyDown(e.key)}
@@ -107,7 +117,7 @@ class SettingsPane extends React.Component {
           <div style={styles.placeholder}>
             <SearchIcon />
           </div>
-          {!!this.props.searchText && (
+          {!!searchText && (
             <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
               &times;
             </div>
@@ -221,6 +231,11 @@ var styles = {
   highlightedInput: {
     border: '1px solid #99c6f4',
     boxShadow: '0 0 1px 1px #81aedc',
+  },
+
+  errorInput: {
+    backgroundColor: '#fff0f0',
+    border: '1px solid red',
   },
 };
 

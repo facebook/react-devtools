@@ -40,8 +40,12 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
 
 function validString(str: string, needle: string, regex: boolean): boolean {
   if (regex) {
-    var regExp = RegExpUtils.searchTextToRegExp(needle);
-    return regExp.test(str.toLowerCase());
+    try {
+      var regExp = RegExpUtils.searchTextToRegExp(needle);
+      return regExp.test(str.toLowerCase());
+    } catch (error) {
+      return false;
+    }
   }
   return str.toLowerCase().indexOf(needle) !== -1;
 }

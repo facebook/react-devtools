@@ -10,6 +10,18 @@
  */
 'use strict';
 
+function isValidRegex(needle: ?string): boolean {
+  let isValid = true;
+
+  try {
+    searchTextToRegExp(needle);
+  } catch (error) {
+    isValid = false;
+  }
+
+  return isValid;
+}
+
 /**
  * Convert the specified search text to a RegExp.
  */
@@ -40,6 +52,7 @@ function trimSearchText(needle: string): string {
 }
 
 module.exports = {
+  isValidRegex,
   searchTextToRegExp,
   shouldSearchUseRegex,
   trimSearchText,
