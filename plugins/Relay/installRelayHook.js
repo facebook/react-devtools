@@ -13,17 +13,18 @@
 /**
  * NOTE: This file cannot `require` any other modules. We `.toString()` the
  *       function in some places and inject the source into the page.
+ * Also do not declare any variables in top level scope!
  */
 
-var performance = window.performance;
-var performanceNow;
-if (performance && typeof performance.now === 'function') {
-  performanceNow = () => performance.now();
-} else {
-  performanceNow = () => Date.now();
-}
-
 function installRelayHook(window: Object) {
+  var performance = window.performance;
+  var performanceNow;
+  if (performance && typeof performance.now === 'function') {
+    performanceNow = () => performance.now();
+  } else {
+    performanceNow = () => Date.now();
+  }
+
   const TEXT_CHUNK_LENGTH = 500;
 
   var hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
