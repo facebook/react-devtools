@@ -60,6 +60,9 @@ function setup() {
   };
 
   var hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
+  // Note: this is only useful for react-native-web (and equivalents).
+  // They would have to set this field directly on the hook.
   var isRNStyleEnabled = !!hook.resolveRNStyle;
 
   var bridge = new Bridge(wall);
