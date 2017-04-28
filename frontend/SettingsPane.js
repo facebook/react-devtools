@@ -13,7 +13,7 @@ var TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesF
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 var React = require('react');
 var ReactDOM = require('react-dom');
-var RegExpUtils = require('./RegExpUtils');
+var SearchUtils = require('./SearchUtils');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
@@ -89,8 +89,8 @@ class SettingsPane extends React.Component {
     }
     if (
       searchText &&
-      RegExpUtils.shouldSearchUseRegex(searchText) &&
-      !RegExpUtils.isValidRegex(searchText)
+      SearchUtils.shouldSearchUseRegex(searchText) &&
+      !SearchUtils.isValidRegex(searchText)
     ) {
       inputStyle = Object.assign({}, inputStyle, styles.errorInput);
     }

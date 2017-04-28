@@ -26,7 +26,7 @@ function isValidRegex(needle: ?string): boolean {
  * Convert the specified search text to a RegExp.
  */
 function searchTextToRegExp(needle: string): RegExp {
-  return new RegExp(trimSearchText(needle), 'i');
+  return new RegExp(trimSearchText(needle), 'gi');
 }
 
 /**

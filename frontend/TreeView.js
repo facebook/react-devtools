@@ -13,7 +13,7 @@
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
-var RegExpUtils = require('./RegExpUtils');
+var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
 
@@ -75,8 +75,8 @@ class TreeView extends React.Component {
 
     // Convert search text into a case-insensitive regex for match-highlighting.
     var searchText = this.props.searchText;
-    var searchRegExp = RegExpUtils.isValidRegex(searchText)
-      ? RegExpUtils.searchTextToRegExp(searchText)
+    var searchRegExp = SearchUtils.isValidRegex(searchText)
+      ? SearchUtils.searchTextToRegExp(searchText)
       : null;
 
     if (this.props.searching && this.props.roots.count() > MAX_SEARCH_ROOTS) {

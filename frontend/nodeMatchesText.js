@@ -10,7 +10,7 @@
  */
 'use strict';
 
-var RegExpUtils = require('./RegExpUtils');
+var SearchUtils = require('./SearchUtils');
 
 import type {Map} from 'immutable';
 import type Store from './Store';
@@ -21,7 +21,7 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
   if (node.get('nodeType') === 'Native' && wrapper && wrapper.get('nodeType') === 'NativeWrapper') {
     return false;
   }
-  var useRegex = RegExpUtils.shouldSearchUseRegex(needle);
+  var useRegex = SearchUtils.shouldSearchUseRegex(needle);
   if (name) {
     if (node.get('nodeType') !== 'Wrapper') {
       return validString(name, needle, useRegex);
@@ -41,7 +41,7 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
 function validString(str: string, needle: string, regex: boolean): boolean {
   if (regex) {
     try {
-      var regExp = RegExpUtils.searchTextToRegExp(needle);
+      var regExp = SearchUtils.searchTextToRegExp(needle);
       return regExp.test(str.toLowerCase());
     } catch (error) {
       return false;
