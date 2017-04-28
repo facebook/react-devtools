@@ -1,4 +1,6 @@
-document.addEventListener('DOMContentLoaded', function () {
+/* globals chrome */
+
+document.addEventListener('DOMContentLoaded', function() {
   var links = document.getElementsByTagName('a');
   for (var i = 0; i < links.length; i++) {
     (function() {

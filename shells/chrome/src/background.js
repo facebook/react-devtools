@@ -85,7 +85,7 @@ chrome.runtime.onMessage.addListener((req, sender) => {
     });
     chrome.browserAction.setPopup({
       tabId: sender.tab.id,
-      popup: 'popups/detected.html'
-    })
+      popup: 'popups/detected.html',
+    });
   }
 });
