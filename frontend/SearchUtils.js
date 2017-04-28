@@ -13,10 +13,12 @@
 function isValidRegex(needle: ?string): boolean {
   let isValid = true;
 
-  try {
-    searchTextToRegExp(needle);
-  } catch (error) {
-    isValid = false;
+  if (needle) {
+    try {
+      searchTextToRegExp(needle);
+    } catch (error) {
+      isValid = false;
+    }
   }
 
   return isValid;
