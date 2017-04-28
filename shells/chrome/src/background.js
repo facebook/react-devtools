@@ -73,8 +73,10 @@ chrome.runtime.onMessage.addListener((req, sender) => {
     chrome.tabs.query({
       currentWindow: true,
       active: true,
-    }, function(tabArray) {
-      chrome.pageAction.show(tabArray[0].id);
+    }, (tabArray) => {
+      if (tabArray.length) {
+        chrome.pageAction.show(tabArray[0].id);
+      }
     }
    );
   }
