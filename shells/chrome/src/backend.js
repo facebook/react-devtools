@@ -11,9 +11,10 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
-var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBackendManager');
+var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
+var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRelay = require('../../../plugins/Relay/backend');
 
@@ -49,13 +50,23 @@ function setup(hook) {
     },
   };
 
+  // Note: this is only useful for react-native-web (and equivalents).
+  // They would have to set this field directly on the hook.
+  var isRNStyleEnabled = !!hook.resolveRNStyle;
+
   var bridge = new Bridge(wall);
-  var agent = new Agent(window);
+  var agent = new Agent(window, {
+    rnStyle: isRNStyleEnabled,
+  });
   agent.addBridge(bridge);
 
   agent.once('connected', () => {
     inject(hook, agent);
   });
+
+  if (isRNStyleEnabled) {
+    setupRNStyle(bridge, agent, hook.resolveRNStyle);
+  }
 
   setupRelay(bridge, agent, hook);
 
@@ -68,5 +79,5 @@ function setup(hook) {
   });
 
   setupHighlighter(agent);
-  BananaSlugBackendManager.init(agent);
+  TraceUpdatesBackendManager.init(agent);
 }

@@ -11,8 +11,9 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
-var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBackendManager');
+var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../../agent/Bridge');
+var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRelay = require('../../../plugins/Relay/backend');
 
@@ -58,8 +59,16 @@ function setup() {
     },
   };
 
+  var hook = window.__REACT_DEVTOOLS_GLOBAL_HOOK__;
+
+  // Note: this is only useful for react-native-web (and equivalents).
+  // They would have to set this field directly on the hook.
+  var isRNStyleEnabled = !!hook.resolveRNStyle;
+
   var bridge = new Bridge(wall);
-  var agent = new Agent(window);
+  var agent = new Agent(window, {
+    rnStyle: isRNStyleEnabled,
+  });
   agent.addBridge(bridge);
 
   var _connectTimeout = setTimeout(function() {
@@ -67,7 +76,7 @@ function setup() {
   }, 1000);
 
   agent.once('connected', () => {
-    inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
+    inject(hook, agent);
     clearTimeout(_connectTimeout);
   });
 
@@ -78,11 +87,15 @@ function setup() {
     listeners = [];
   });
 
-  setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  if (isRNStyleEnabled) {
+    setupRNStyle(bridge, agent, hook.resolveRNStyle);
+  }
+
+  setupRelay(bridge, agent, hook);
 
   if (window.document && window.document.createElement) {
     setupHighlighter(agent);
   }
 
-  BananaSlugBackendManager.init(agent);
+  TraceUpdatesBackendManager.init(agent);
 }

@@ -74,7 +74,7 @@ var styles = {
     padding: 0,
     margin: 0,
     maxHeight: '80px',
-    overflow: 'scroll',
+    overflow: 'auto',
   },
 
   selected: {

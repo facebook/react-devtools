@@ -35,9 +35,21 @@ declare var chrome: {
   },
   tabs: {
     executeScript: (tabId: number, options: Object, fn: () => void) => void,
+    query: (options: Object, fn: (tabArray: Array<Object>) => void) => void,
+  },
+  browserAction: {
+    setIcon: ({
+      tabId: number,
+      path: {[key: string]: string}
+    }),
+    setPopup: ({
+      tabId: sender.tab.id,
+      popup: string,
+    }) => void,
   },
   runtime: {
     getURL: (path: string) => string,
+    sendMessage: (config: Object) => void,
     connect: (config: Object) => {
       disconnect: () => void,
       onMessage: {
@@ -55,6 +67,13 @@ declare var chrome: {
           tab: {
             id: number,
           },
+        },
+      }) => void) => void,
+    },
+    onMessage: {
+      addListener: (fn: (req: Object, sender: {
+        tab: {
+          id: number,
         },
       }) => void) => void,
     },

@@ -15,7 +15,7 @@ const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 
 import type {
   Measurement,
-} from './BananaSlugTypes';
+} from './TraceUpdatesTypes';
 
 // How long the measurement should be presented for.
 const DURATION = 250;
@@ -27,7 +27,7 @@ const MetaData = Record({
   hit: 0,
 });
 
-class BananaSlugAbstractNodePresenter {
+class TraceUpdatesAbstractNodePresenter {
   _clearTimer: number;
   _draw: () => void;
   _drawing: boolean;
@@ -140,4 +140,4 @@ class BananaSlugAbstractNodePresenter {
   }
 }
 
-module.exports = BananaSlugAbstractNodePresenter;
+module.exports = TraceUpdatesAbstractNodePresenter;

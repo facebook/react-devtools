@@ -11,7 +11,7 @@
 
 'use strict';
 
-const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
+const TraceUpdatesAbstractNodePresenter = require('./TraceUpdatesAbstractNodePresenter');
 
 const OUTLINE_COLOR = '#f0f0f0';
 
@@ -71,9 +71,9 @@ function drawBorder(ctx, measurement, borderWidth, borderColor) {
   ctx.setLineDash([0]);
 }
 
-const CANVAS_NODE_ID = 'BananaSlugWebNodePresenter';
+const CANVAS_NODE_ID = 'TraceUpdatesWebNodePresenter';
 
-class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
+class TraceUpdatesWebNodePresenter extends TraceUpdatesAbstractNodePresenter {
   _canvas: any;
 
   constructor() {
@@ -150,4 +150,4 @@ class BananaSlugWebNodePresenter extends BananaSlugAbstractNodePresenter {
   }
 }
 
-module.exports = BananaSlugWebNodePresenter;
+module.exports = TraceUpdatesWebNodePresenter;
