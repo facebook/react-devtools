@@ -13,6 +13,7 @@
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
+var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
 
@@ -72,13 +73,24 @@ class TreeView extends React.Component {
       }
     }
 
+    // Convert search text into a case-insensitive regex for match-highlighting.
+    var searchText = this.props.searchText;
+    var searchRegExp = SearchUtils.isValidRegex(searchText)
+      ? SearchUtils.searchTextToRegExp(searchText)
+      : null;
+
     if (this.props.searching && this.props.roots.count() > MAX_SEARCH_ROOTS) {
       return (
         <div style={styles.container}>
           <div ref={n => this.node = n} style={styles.scroll}>
             <div style={styles.scrollContents}>
               {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
-                <Node key={id} id={id} depth={0} />
+                <Node
+                  depth={0}
+                  id={id}
+                  key={id}
+                  searchRegExp={searchRegExp}
+                />
               )).toJS()}
               <span>Some results not shown. Narrow your search criteria to find them</span>
             </div>
@@ -92,7 +104,12 @@ class TreeView extends React.Component {
         <div ref={n => this.node = n} style={styles.scroll}>
           <div style={styles.scrollContents}>
             {this.props.roots.map(id => (
-              <Node key={id} id={id} depth={0} />
+              <Node
+                depth={0}
+                id={id}
+                key={id}
+                searchRegExp={searchRegExp}
+              />
             )).toJS()}
           </div>
         </div>
@@ -153,6 +170,7 @@ var WrappedTreeView = decorate({
     return {
       roots: store.searchRoots || store.roots,
       searching: !!store.searchRoots,
+      searchText: store.searchText,
     };
   },
 }, TreeView);

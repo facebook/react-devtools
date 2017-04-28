@@ -16,6 +16,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
+var SearchUtils = require('./SearchUtils');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID} from './types';
@@ -29,7 +30,7 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search by Component Name';
+const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -89,7 +90,6 @@ class Store extends EventEmitter {
   // Public state
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
-  regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
@@ -130,7 +130,6 @@ class Store extends EventEmitter {
     this.capabilities = {};
     this.traceupdatesState = null;
     this.colorizerState = null;
-    this.regexState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
@@ -221,13 +220,13 @@ class Store extends EventEmitter {
     if (needle === this.searchText.toLowerCase() && !this.refreshSearch) {
       return;
     }
-    if (!text) {
+    if (!text || SearchUtils.trimSearchText(text).length === 0) {
       this.searchRoots = null;
     } else {
       if (
         this.searchRoots &&
         needle.indexOf(this.searchText.toLowerCase()) === 0 &&
-        (!this.regexState || !this.regexState.enabled)
+        !SearchUtils.shouldSearchUseRegex(text)
       ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
@@ -264,7 +263,7 @@ class Store extends EventEmitter {
     this.highlightSearch();
     this.refreshSearch = false;
 
-    // SearchPane input depends on this change being flushed synchronously.
+    // Search input depends on this change being flushed synchronously.
     this.flush();
   }
 
@@ -482,9 +481,6 @@ class Store extends EventEmitter {
 
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
-    this.placeholderText = this.colorizerState.enabled
-      ? 'Highlight by Component Name'
-      : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
@@ -493,13 +489,6 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
-  }
-
-  changeRegex(state: ControlState) {
-    this.regexState = state;
-    this.emit('regexchange');
-    this.refreshSearch = true;
-    this.changeSearch(this.searchText);
   }
 
   // Private stuff

@@ -21,7 +21,7 @@ var Wrapped = decorate({
   props(store) {
     return {
       state: store.traceupdatesState,
-      text: 'Trace React Updates',
+      text: 'Highlight Updates',
       onChange: state => store.changeTraceUpdates(state),
     };
   },

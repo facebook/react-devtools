@@ -80,13 +80,13 @@ If your app is inside an iframe, a Chrome extension, React Native, or in another
 
 Chrome apps are currently not inspectable.
 
-### Does "Trace React Updates" trace renders?
+### Does "Highlight Updates" trace renders?
 
 Yes, but it's also tracing if a component *may* render.
 In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
 ![](https://facebook.github.io/react/img/docs/should-component-update.png)
 
-Here "Trace React Updates" will draw a border around every node but C4 and C5.
+Here "Highlight Updates" will draw a border around every node but C4 and C5.
 Why does it trace components that don't actually update? (via shouldComponentUpdate() -> false) 
 This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
 The higher the rate of updates happening per second the more the color changes from blue to red.

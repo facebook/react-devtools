@@ -46,6 +46,7 @@ var styles = {
   },
   header: {
     padding: 5,
+    maxHeight: 38,
     flexShrink: 0,
     display: 'flex',
     alignItems: 'center',
