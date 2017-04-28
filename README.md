@@ -80,6 +80,8 @@ please read the [Contributing document](CONTRIBUTING.md).
 
 **If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment**, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools). Chrome apps are currently not inspectable.
 
+**If you still have issues** please [report them](https://github.com/facebook/react-devtools/issues/new). Don't forget to specify your OS, browser version, extension version, and the exact instructions to reproduce the issue with a screenshot.
+
 ### Does "Highlight Updates" trace renders?
 
 Yes, but it's also tracing if a component *may* render.
