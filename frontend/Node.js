@@ -412,7 +412,8 @@ class Node extends React.Component {
         zIndex: selected ? 1 : 0,
       },
       styles.guideline,
-      hovered && styles.guidelineHover,
+      // Only show hover for the top tag, or it gets too noisy.
+      hovered && !this.props.isBottomTagHovered && styles.guidelineHover,
       selected && styles.guidelineSelect,
     );
 
