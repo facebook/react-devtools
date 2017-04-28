@@ -20,6 +20,7 @@ module.exports = {
     inject: './src/GlobalHook.js',
     contentScript: './src/contentScript.js',
     panel: './src/panel.js',
+    detector: './src/detector.js',
   },
   output: {
     path: __dirname + '/build',

@@ -67,3 +67,15 @@ function doublePipe(one, two) {
   one.onDisconnect.addListener(shutdown);
   two.onDisconnect.addListener(shutdown);
 }
+
+chrome.runtime.onMessage.addListener((req, sender) => {
+  if (sender.tab && req.runningReact) {
+    chrome.tabs.query({
+      currentWindow: true,
+      active: true,
+    }, function(tabArray) {
+      chrome.pageAction.show(tabArray[0].id);
+    }
+   );
+  }
+});

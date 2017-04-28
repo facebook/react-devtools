@@ -4,7 +4,7 @@
   "description": "Adds React debugging tools to the Chrome Developer Tools.",
   "version": "2.1.0",
   "minimum_chrome_version": "43",
-  "browser_action": {
+  "page_action": {
     "default_icon": "icons/icon48.png"
   },
   "icons": {
@@ -33,6 +33,11 @@
       "matches": ["<all_urls>"],
       "js": ["build/inject.js"],
       "run_at": "document_start"
+    },
+    {
+      "matches": ["<all_urls>"],
+      "js": ["build/detector.js"],
+      "run_at": "document_idle"
     }
   ]
 }
