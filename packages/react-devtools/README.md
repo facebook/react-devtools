@@ -14,7 +14,11 @@ Install the `react-devtools` package globally:
 npm install -g react-devtools
 ```
 
-Now run `react-devtools` from the terminal to launch the standalone DevTools app.
+Now run `react-devtools` from the terminal to launch the standalone DevTools app:
+
+```
+react-devtools
+```
 
 If you're using React Native 0.43 or higher, it should connect to your simulator within a few seconds.
 
@@ -30,7 +34,11 @@ Install the `react-devtools` package globally:
 npm install -g react-devtools
 ```
 
-Now run `react-devtools` from the terminal to launch the standalone DevTools app.
+Now run `react-devtools` from the terminal to launch the standalone DevTools app:
+
+```
+react-devtools
+```
 
 Finally, add `<script src="http://localhost:8097"></script>` as the very first `<script>` tag in the `<head>` of your page when developing. This will ensure the developer tools are connected. Don’t forget to remove it before deploying to production!
 
