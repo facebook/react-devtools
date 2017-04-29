@@ -41,9 +41,7 @@ Add a script to your `package.json`:
   }
 ```
 
-Finally, you need to import `'react-devtools'` as **the very first module in the entry point of your app**. It is important that it comes before `react-dom`, or otherwise it won’t connect.
-
-If you use Webpack, the easiest way to do this is to **edit your development Webpack configuration** to put it before every `entry`:
+Finally, you need to import `'react-devtools'` as **the very first module in the entry point of your app**. It is important that it comes before `react-dom`, or otherwise it won’t connect. If you use Webpack, the easiest way to do this is to **edit your development Webpack configuration** to put it before every `entry`:
 
 ```js
 // webpack.config.dev.js
