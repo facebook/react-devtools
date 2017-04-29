@@ -12,7 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-
+var transfer = require('js-transfer');
 var assign = require('object-assign');
 var flash = require('../flash');
 var valueStyles = require('../value-styles');
@@ -191,7 +191,7 @@ function textToValue(txt) {
     return undefined;
   }
   try {
-    return JSON.parse(txt);
+    return transfer.parse(txt);
   } catch (e) {
     return BAD_INPUT;
   }
@@ -203,7 +203,7 @@ function valueToText(value) {
   } else if (typeof value === 'number') {
     return value.toString();
   }
-  return JSON.stringify(value);
+  return transfer.stringify(value);
 }
 
 module.exports = Simple;

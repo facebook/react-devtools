@@ -19,6 +19,7 @@ var Panel = require('../../../frontend/Panel');
 var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var transfer = require('js-transfer');
 
 var node = null;
 var onStatusChange = function noop() {};
@@ -80,7 +81,7 @@ function initialize(socket) {
       // </hack>
       return;
     }
-    var data = JSON.parse(evt.data);
+    var data = transfer.parse(evt.data);
     listeners.forEach((fn) => fn(data));
   };
 
@@ -90,7 +91,7 @@ function initialize(socket) {
     },
     send(data) {
       if (socket.readyState === socket.OPEN) {
-        socket.send(JSON.stringify(data));
+        socket.send(transfer.stringify(data));
       }
     },
     disconnect() {
