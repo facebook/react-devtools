@@ -12,7 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var transfer = require('js-transfer');
+var transfer = require('../../packages/js-transfer');
 var assign = require('object-assign');
 var flash = require('../flash');
 var valueStyles = require('../value-styles');
