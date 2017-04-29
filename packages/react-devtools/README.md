@@ -41,21 +41,9 @@ Add a script to your `package.json`:
   }
 ```
 
-Finally, you need to import `'react-devtools'` as **the very first module in the entry point of your app**. It is important that it comes before `react-dom`, or otherwise it won’t connect. If you use Webpack, the easiest way to do this is to **edit your development Webpack configuration** to put it before every `entry`:
+Finally, add `<script src="http://localhost:8097"></script>` as the very first `<script>` tag in the `<head>` of your page when developing. This will ensure the developer tools are connected. Don’t forget to remove it before deploying to production!
 
-```js
-// webpack.config.dev.js
-
-module.exports = {
-  entry: [
-    'react-devtools', // Put it first
-    './src/index',    // Your app
-    // ...
-```
-
-Make sure you **only do this for the development coniguration**, or you’ll ship the DevTools code to production.
-
-If you don’t use Webpack, you can manually `import 'react-devtools'` before any other imports in your app, but be careful to remove that statement every time you finish debugging.
+>Note: instead of adding a `<script>` tag, you can alternatively `import 'react-devtools'` in your entry point before all other imports, but make sure to remove this code before deploying to production, as it carries a large DevTools client with it. If you use Webpack and have control over its configuration, it could be reasonable to make `'react-devtools'` the first item in the `entry` array of the development-only configuration.
 
 ## Advanced
 
