@@ -187,9 +187,6 @@ function textToValue(txt) {
   if (!txt.length) {
     return BAD_INPUT;
   }
-  if (txt === 'undefined') {
-    return undefined;
-  }
   try {
     return transfer.parse(txt);
   } catch (e) {
@@ -198,9 +195,7 @@ function textToValue(txt) {
 }
 
 function valueToText(value) {
-  if (value === undefined) {
-    return 'undefined';
-  } else if (typeof value === 'number') {
+  if (typeof value === 'number') {
     return value.toString();
   }
   return transfer.stringify(value);
