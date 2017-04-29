@@ -212,7 +212,7 @@ class Panel extends React.Component {
   }
 
   componentDidUpdate() {
-    if (!this.state.isReact) {
+    if (!this.state.isReact && this.state.loading) {
       if (!this._checkTimeout) {
         this._checkTimeout = setTimeout(() => {
           this._checkTimeout = null;
@@ -257,10 +257,10 @@ class Panel extends React.Component {
     if (!this.state.isReact) {
       return (
         <div style={styles.loading}>
-          <h2>Looking for React…</h2>
+          <h2>React was not detected on this page.</h2>
           {showFileUrlWarningMessage &&
             <div style={styles.troubleshootingHint}>
-              Please check if the devtools extension has 'Allow access to file URLs' permission
+              If this seems wrong, follow the <a href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up" target="_blank">troubleshooting instructions</a>.
             </div>
           }
         </div>
