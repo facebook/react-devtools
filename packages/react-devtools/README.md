@@ -40,7 +40,17 @@ Now run `react-devtools` from the terminal to launch the standalone DevTools app
 react-devtools
 ```
 
-Finally, add `<script src="http://localhost:8097"></script>` as the very first `<script>` tag in the `<head>` of your page when developing. This will ensure the developer tools are connected. Don’t forget to remove it before deploying to production!
+Finally, add `<script src="http://localhost:8097"></script>` as the very first `<script>` tag in the `<head>` of your page when developing:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="http://localhost:8097"></script>
+```
+
+This will ensure the developer tools are connected.  
+**Don’t forget to remove it before deploying to production!**
 
 >Note: if you prefer to avoid global installations, you can add `react-devtools` as a project dependency. With Yarn, you can run `yarn add react-devtools`, and then run `yarn react-devtools` from your project folder to open the DevTools. With npm, you can run `npm install --save react-devtools`, add `"react-devtools": "react-devtools"` to the `scripts` section in your `package.json`, and then run `npm run react-devtools` from your project folder to open the DevTools. 
 
