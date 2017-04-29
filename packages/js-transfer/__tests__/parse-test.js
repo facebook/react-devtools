@@ -34,7 +34,8 @@ describe('transfer.parse', () => {
     var d = new Date();
     var object = { a: d };
     var result = transfer.parse(transfer.stringify(object));
-    expect(result).toEqual(object);
+    // Dates are parsed into UTC strings like in JSON
+    expect(new Date(result.a)).toEqual(object.a);
   });
 
   it('preserves undefined in arrays', () => {
