@@ -18,7 +18,7 @@ Now run `react-devtools` from the terminal to launch the standalone DevTools app
 
 If you're using React Native 0.43 or higher, it should connect to your simulator within a few seconds.
 
->Note: alternatively, you can install `react-devtools` as a `devDependency` and add it to `scripts` in your `package.json` if you prefer so.
+> Note: if prefer to avoid global installations, you can add `react-devtools` as a project dependency. If you use Yarn, you can run `yarn add react-devtools` and then run `yarn react-devtools` from your project folder to open them. If you use npm, you can run `npm install --save react-devtools`, add `"react-devtools": "react-devtools"` to the `scripts` section in your `package.json`, and then run `npm run react-devtools` from your project folder.
 
 ## Usage with React DOM
 
