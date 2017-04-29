@@ -66,4 +66,16 @@ describe('transfer.parse', () => {
     var result = transfer.parse(transfer.stringify(object));
     expect(result).toEqual(object);
   });
+
+  it('preserves null', () => {
+    var object = [null, 3, null];
+    var result = transfer.parse(transfer.stringify(object));
+    expect(result).toEqual(object);
+  });
+
+  it('preserves object properties whose value is undefined', () => {
+    var object = { a: undefined };
+    var result = transfer.parse(transfer.stringify(object));
+    expect(result).toEqual(object);
+  });
 });
