@@ -1,0 +1,15 @@
+{
+  "name": "js-transfer",
+  "version": "1.0.0",
+  "description": "JSON2 stringify and parse with support for undefined,NaN,Infinity,-Infinity",
+  "main": "index.js",
+  "author": "David Furlong <dvfurlong@gmail.com>",
+  "license": "BSD-3-Clause",
+  "repository": {
+    "url": "https://github.com/facebook/react-devtools.git",
+    "type": "git"
+  },
+  "files": [
+    "index.js"
+  ]
+}
