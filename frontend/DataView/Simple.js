@@ -123,8 +123,6 @@ class Simple extends React.Component {
     var typeStyle;
     if (type === 'boolean') {
       typeStyle = valueStyles.bool;
-    } else if (!this.props.data) {
-      typeStyle = valueStyles.empty;
     } else if (type === 'string') {
       typeStyle = valueStyles.string;
       if (data.length > 200) {
@@ -132,6 +130,8 @@ class Simple extends React.Component {
       }
     } else if (type === 'number') {
       typeStyle = valueStyles.number;
+    } else if (!this.props.data) {
+      typeStyle = valueStyles.empty;
     }
     style = assign({}, style, typeStyle);
     if (!this.props.readOnly) {
