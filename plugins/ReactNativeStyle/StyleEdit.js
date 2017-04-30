@@ -54,23 +54,28 @@ class StyleEdit extends React.Component {
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.attr}>
             <BlurInput
+              type="attr"
               value={name}
               onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
             />
             :
             <BlurInput
+              type="value"
               value={this.props.style[name]}
               onChange={val => this.onChange(name, val)}
             />
+            ;
           </li>
         ))}
         <li style={styles.attr}>
           <BlurInput
+            type="attr"
             value={this.state.newAttr}
             onChange={newAttr => this.setState({newAttr: '' + newAttr})}
           />
           :
           {this.state.newAttr && <BlurInput
+            type="value"
             value={''}
             onChange={val => this.onNew(val)}
           />}
@@ -87,7 +92,9 @@ var styles = {
     margin: 0,
   },
   attr: {
-    padding: 2,
+    display: 'flex',
+    alignItems: 'center',
+    margin: '2px 0px 2px 10px',
   },
 };
 
