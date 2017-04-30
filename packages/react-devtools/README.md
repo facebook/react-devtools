@@ -1,47 +1,60 @@
 # `react-devtools`
 
-If you need to debug a React page somewhere other than Chrome on desktop (a mobile browser, an embedded webview, safari, etc), the `react-devtools` package is for you! It is also useful if your app is inside an iframe.
+If you need to debug a React page somewhere other than Chrome on desktop (a mobile browser, an embedded webview, Safari, etc), the `react-devtools` package is for you! It is also useful if your app is inside an iframe.
 
 It works both with React DOM and React Native.
 
 <img src="http://i.imgur.com/OZxWlyw.png" width="500" alt="Screenshot of React DevTools running with React Native">
 
-## Usage
+## Usage with React Native
 
-Install the package:
+Install the `react-devtools` package globally:
 
 ```
-npm install --save-dev react-devtools
+npm install -g react-devtools
 ```
 
-Add a script to your `package.json`:
+Now run `react-devtools` from the terminal to launch the standalone DevTools app:
 
-```js
-  "scripts": {
-    // ...
-    "devtools": "react-devtools"
-  }
+```
+react-devtools
 ```
 
-Now run `npm run devtools` to launch the standalone DevTools app.
+If you're using React Native 0.43 or higher, it should connect to your simulator within a few seconds.
 
-The final step depends on your rendering target.
+> Note: if you prefer to avoid global installations, you can add `react-devtools` as a project dependency. With Yarn, you can run `yarn add react-devtools`, and then run `yarn react-devtools` from your project folder to open the DevTools. With npm, you can run `npm install --save react-devtools`, add `"react-devtools": "react-devtools"` to the `scripts` section in your `package.json`, and then run `npm run react-devtools` from your project folder to open the DevTools.
 
-### React Native
+## Usage with React DOM
 
-You don't need to do anything else. Just make sure your app is running in foreground in the simulator, and DevTools will connect to it.
+The standalone shell can also be useful with React DOM (for example, to debug apps in Safari, or inside an iframe).
 
-### React DOM
+Install the `react-devtools` package globally:
 
-Add `import 'react-devtools'` to the top of your entry file.
-
-```js
-import 'react-devtools'; // Put it first!
-import ReactDOM from 'react-dom';
+```
+npm install -g react-devtools
 ```
 
-Make sure that your `react-devtools` import comes **before** your `react-dom` import.  
-And **don't forget to remove the import before shipping to production!**
+Now run `react-devtools` from the terminal to launch the standalone DevTools app:
+
+```
+react-devtools
+```
+
+Finally, add `<script src="http://localhost:8097"></script>` as the very first `<script>` tag in the `<head>` of your page when developing:
+
+```html
+<!doctype html>
+<html lang="en">
+  <head>
+    <script src="http://localhost:8097"></script>
+```
+
+This will ensure the developer tools are connected.  
+**Don’t forget to remove it before deploying to production!**
+
+>Note: if you prefer to avoid global installations, you can add `react-devtools` as a project dependency. With Yarn, you can run `yarn add react-devtools`, and then run `yarn react-devtools` from your project folder to open the DevTools. With npm, you can run `npm install --save react-devtools`, add `"react-devtools": "react-devtools"` to the `scripts` section in your `package.json`, and then run `npm run react-devtools` from your project folder to open the DevTools. 
+
+>If you install `react-devtools` as a project dependency, you may also replace the `<script>` suggested above with a JavaScript import (`import 'react-devtools'`). It is important that this import comes before any other imports in your app (especially before `react-dom`). Make sure to remove the import before deploying to production, as it carries a large DevTools client with it. If you use Webpack and have control over its configuration, you could alternatively add `'react-devtools'` as the first item in the `entry` array of the development-only configuration, and then you wouldn’t need to deal either with `<script>` tags or `import` statements.
 
 ## Advanced
 
@@ -53,10 +66,4 @@ If you need to customize host, port, or other settings, see the `react-devtools-
 * Run `npm run backend:watch` and `npm run standalone:watch` in `../react-devtools-core`
 * Run `npm start` in this folder
 * Refresh the app after it has recompiled on change
-
-### React Native
-
-React Native uses `react-devtools-core` as a dependency.
-Unfortunately, due to RN Packager aggressive caching of `node_modules`, it is very inconvenient to develop against it.
-
-The way I do it is by changing [this require](https://github.com/facebook/react-native/blob/167ac4993ab86d15eabc2094f2749818b7659ebc/Libraries/Core/Devtools/setupDevtools.js#L18) to be relative, and then running [`watch-and-rsync`](https://www.npmjs.com/package/watch-and-rsync)` -o=start -s=../react-devtools-core -t=~/<YOUR PATH TO PROJECT DIR>/react-native/Libraries/Core/Devtools/react-devtools-core`. This circumvents RN Packager caching, and if you are also runing `npm run backend:watch` in `../react-devtools-core`, rebuilds on each change.
+* For React Native, copy `react-devtools-core` to its `node_modules` to test your changes

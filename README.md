@@ -1,39 +1,34 @@
 # React Developer Tools [![Build Status](https://travis-ci.org/facebook/react-devtools.svg?branch=master)](https://travis-ci.org/facebook/react-devtools)
 
-React Developer Tools is a system that allows you to inspect a React Renderer,
-including the Component hierarchy, props, state, and more.
+React Developer Tools lets you inspect the React component hierarchy, including component props and state.
 
-There are shells for Chrome (adding it to the Chrome devtools), Firefox,
-Atom/Nuclide, and as a standalone Electron app.
+It exists both as a browser extension (for [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) and [Firefox](https://addons.mozilla.org/firefox/addon/react-devtools/)), and as a [standalone app](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools) (works with other environments including Safari, IE, and React Native).
 
 ![](/images/devtools-full.gif)
 
 ## Installation
 
 ### Pre-packaged
+
 The official extensions represent the current stable release.
 
 - [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 - [Firefox extension](https://addons.mozilla.org/firefox/addon/react-devtools/)
-- [Standalone app (supports React Native too!)](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md)
+- [Standalone app (Safari, React Native, etc)](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md)
 
 Opera users can [enable Chrome extensions](https://addons.opera.com/extensions/details/download-chrome-extension-9/) and then install the [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
 
-If you inspect an element or launch the developer tools on a React page, you
-should see an extra tab called **React** in the inspector.
-
-Check out [Contributing](#contributing) if you want to develop the Developer
-Tools or use a pre-prelease version.
-
 ## Usage
 
-### Supporting tools
+The extension icon will light up on the websites using React:
 
-- The babel plugin [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source) is required if you want react devtools to tell you the source file & line number of created react elements. Its display is in the bottom of the right panel if the information is present. Don't forget to disable it in production!
+<img src="http://i.imgur.com/3tuhIgm.png" alt="Extension icon becomes active" width="500">
 
-### React Native
+On such websites, you will see a tab called React in Chrome Developer Tools:
 
-There is a [standalone version](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md) that works with React Native.
+<img src="http://i.imgur.com/jYieRqi.png" alt="React tab in DevTools" width="500">
+
+A quick way to bring up the DevTools is to right-click on the page and press Inspect.
 
 ### Tree View
 
@@ -52,19 +47,23 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 
 ![](/images/devtools-side-pane.gif)
 
-## Contributing
+### Handy Tips
 
-For changes that don't directly involve Chrome/Firefox/etc. APIs, there is a
-"plain" shell that just renders the devtools into an html page along with a
-TodoMVC test app. This is by far the quickest way to develop. Check out
-[the Readme.md](/shells/plain) in `/shells/plain` for info.
+#### Finding Component by a DOM Node
 
-For other shells (Chrome, Firefox, etc.), see the respective directories in `/shells`.
+If you inspect a React element on the page using the regular **Elements** tab, then switch over to the **React** tab, that element will be automatically selected in the React tree.
 
-For a list of good contribution opportunities, check the [good first bug](https://github.com/facebook/react-devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+bug%22) label. We're happy to answer any questions on those issues!
+#### Finding DOM Node by a Component
 
-To read more about the community and guidelines for submitting pull requests,
-please read the [Contributing document](CONTRIBUTING.md).
+You can right-click any React element in the **React** tab, and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
+
+#### Displaying Element Souce
+
+You may include the [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source)  Babel plugin to see the source file and line number of React elements. This information appears in the bottom of the right panel when available. Don't forget to disable it in production! (Tip: if you use [Create React App](https://github.com/facebookincubator/create-react-app) it is already enabled in development.)
+
+#### Usage with React Native and Safari
+
+There is a [standalone version](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md) that works with other environments such as React Native and Safari.
 
 ## FAQ
 
@@ -93,11 +92,19 @@ Why does it trace components that don't actually update? (via shouldComponentUpd
 This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
 The higher the rate of updates happening per second the more the color changes from blue to red.
 
-### ProTips
+## Contributing
 
-If you inspect a React element on the page using the regular **Elements** tab,
-then switch over to the **React** tab, that element will be automatically
-selected in the React tree.
+For changes that don't directly involve Chrome/Firefox/etc. APIs, there is a
+"plain" shell that just renders the devtools into an html page along with a
+TodoMVC test app. This is by far the quickest way to develop. Check out
+[the Readme.md](/shells/plain) in `/shells/plain` for info.
+
+For other shells (Chrome, Firefox, etc.), see the respective directories in `/shells`.
+
+For a list of good contribution opportunities, check the [good first bug](https://github.com/facebook/react-devtools/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+bug%22) label. We're happy to answer any questions on those issues!
+
+To read more about the community and guidelines for submitting pull requests,
+please read the [Contributing document](CONTRIBUTING.md).
 
 ## Debugging (in Chrome)
 
