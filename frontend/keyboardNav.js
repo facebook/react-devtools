@@ -26,9 +26,6 @@ var keyCodes = {
   '38': 'up',
   '39': 'right',
   '40': 'down',
-
-  '69': 'expand',
-  '67': 'collapse',
 };
 
 module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) => void {
@@ -37,7 +34,7 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
     if (win.document.activeElement !== win.document.body) {
       return;
     }
-    if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
+    if (e.shiftKey || e.metaKey) {
       return;
     }
 
@@ -46,12 +43,15 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
       return;
     }
     e.preventDefault();
-    if (direction === 'expand') {
-      store.toggle(false);
+    if ((e.altKey && direction == 'right') || (e.ctrlKey && e.altKey && direction == 'right')) {
+      store.toggleAllChildrenNodes(false);
       return;
     }
-    if (direction === 'collapse') {
-      store.toggle(true);
+    if ((e.altKey && direction == 'left') || (e.ctrlKey && e.altKey && direction == 'left')) {
+      store.toggleAllChildrenNodes(true);
+      return;
+    }
+    if (e.ctrlKey || e.altKey) {
       return;
     }
     var dest = getDest(direction, store);

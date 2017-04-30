@@ -63,6 +63,7 @@ const DEFAULT_PLACEHOLDER = 'Search by Component Name';
  * - hideContextMenu
  * - selectFirstSearchResult
  * - toggleCollapse
+ * - toggleAllChildrenNodes
  * - setProps/State/Context
  * - makeGlobal(id, path)
  * - setHover(id, isHovered)
@@ -340,7 +341,7 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
-  toggle(value: boolean) {
+  toggleAllChildrenNodes(value: boolean) {
     var id = this.selected;
     if (!id) {
       return;
@@ -556,7 +557,7 @@ class Store extends EventEmitter {
     if (children && children.forEach) {
       children.forEach(cid => this._toggleDeepChildren(cid, value));
     }
-    
+
   }
 
   _mountComponent(data: DataType) {
