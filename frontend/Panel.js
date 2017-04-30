@@ -268,7 +268,14 @@ class Panel extends React.Component {
   }
 
   render() {
+    if (this.state.loading) {
+      return <Loading />;
+    }
+    if (!this.state.isReact) {
+      return <ReactNotDetected />;
+    }
     var theme = this._store ? this._store.theme : Themes.ChromeDefault;
+    
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
@@ -282,8 +289,19 @@ class Panel extends React.Component {
     }
     if (!this.state.isReact) {
       return (
-        <div style={loadingStyle(theme)}>
-          <h2>Looking for React…</h2>
+        <div style={styles.loading}>
+          <h2>React was not detected on this page.</h2>
+          <p>
+            If this seems wrong, follow the
+            {' '}
+            <a
+              href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up"
+              target="_blank"
+            >
+              troubleshooting instructions
+            </a>
+            .
+          </p>
         </div>
       );
     }
