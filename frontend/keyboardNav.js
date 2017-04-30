@@ -43,11 +43,11 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
       return;
     }
     e.preventDefault();
-    if ((e.altKey && direction == 'right') || (e.ctrlKey && e.altKey && direction == 'right')) {
+    if ((e.altKey && direction === 'right') || (e.ctrlKey && e.altKey && direction === 'right')) {
       store.toggleAllChildrenNodes(false);
       return;
     }
-    if ((e.altKey && direction == 'left') || (e.ctrlKey && e.altKey && direction == 'left')) {
+    if ((e.altKey && direction === 'left') || (e.ctrlKey && e.altKey && direction === 'left')) {
       store.toggleAllChildrenNodes(true);
       return;
     }
