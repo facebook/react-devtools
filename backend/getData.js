@@ -71,7 +71,9 @@ function getData(internalInstance: Object): DataType {
     ref = internalInstance._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
-      publicInstance = internalInstance.getPublicInstance();
+      if (typeof internalInstance.getPublicInstance === 'function') {
+        publicInstance = internalInstance.getPublicInstance();
+      }
     } else if (typeof type === 'function') {
       nodeType = 'Composite';
       name = getDisplayName(type);

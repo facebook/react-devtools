@@ -38,12 +38,12 @@ declare var chrome: {
     query: (options: Object, fn: (tabArray: Array<Object>) => void) => void,
   },
   browserAction: {
-    setIcon: ({
+    setIcon: (options: {
       tabId: number,
       path: {[key: string]: string}
-    }),
-    setPopup: ({
-      tabId: sender.tab.id,
+    }) => void,
+    setPopup: (options: {
+      tabId: number,
       popup: string,
     }) => void,
   },

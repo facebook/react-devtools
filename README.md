@@ -70,15 +70,17 @@ please read the [Contributing document](CONTRIBUTING.md).
 
 ### The React Tab Doesn't Show Up
 
-If you are running your app from `file://` URL, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page.
+**If you are running your app from a local `file://` URL**, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page. You can find it by opening Settings > Extensions:
 
-The "React" tab won't show up if the site doesn't use React, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization.
+![Allow access to file URLs](http://i.imgur.com/Yt1rmUp.png)
 
-You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
+**The React tab won't show up if the site doesn't use React**, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization. You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
 
-If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools).
+**If your app is inside of CodePen**, make sure you are registered. Then press Fork (if it's not your pen), and then choose Change View > Debug. The Debug view is inspectable with DevTools because it doesn't use an iframe.
 
-Chrome apps are currently not inspectable.
+**If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment**, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools). Chrome apps are currently not inspectable.
+
+**If you still have issues** please [report them](https://github.com/facebook/react-devtools/issues/new). Don't forget to specify your OS, browser version, extension version, and the exact instructions to reproduce the issue with a screenshot.
 
 ### Does "Highlight Updates" trace renders?
 
