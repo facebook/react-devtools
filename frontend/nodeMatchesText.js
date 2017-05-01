@@ -47,7 +47,7 @@ function validString(str: string, needle: string, regex: boolean): boolean {
       return false;
     }
   }
-  return str.toLowerCase().indexOf(needle) !== -1;
+  return SearchUtils.isFuzzyMatch(needle, str);
 }
 
 module.exports = nodeMatchesText;

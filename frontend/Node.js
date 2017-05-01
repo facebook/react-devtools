@@ -15,6 +15,7 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 var Props = require('./Props');
+var SearchUtils = require('./SearchUtils');
 
 import type {Map} from 'immutable';
 
@@ -25,6 +26,7 @@ type PropsType = {
   depth: number,
   isBottomTagHovered: boolean,
   isBottomTagSelected: boolean,
+  searchText: ?string,
   searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
@@ -267,14 +269,31 @@ class Node extends React.Component {
     );
 
     var name = node.get('name') + '';
+    var searchText = this.props.searchText;
     var searchRegExp = this.props.searchRegExp;
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
-    if (searchRegExp) {
+    var shouldSearchUseRegex = SearchUtils.shouldSearchUseRegex(searchText);
+    var pieces = [];
+
+    if (!shouldSearchUseRegex && searchText) {
+      var fuzzyMatches = SearchUtils.getFuzzyMatches(searchText, name);
+      pieces = name.split('').map((item, itemIndex) => <span
+          key={itemIndex}
+          style={fuzzyMatches.includes(itemIndex) ? styles.tagNameHighlight : null}
+        >
+          {item}
+        </span>
+      );
+
+      name = <span>{pieces}</span>;
+    }
+
+    if (shouldSearchUseRegex && searchRegExp) {
       var unmatched = name.split(searchRegExp);
       var matched = name.match(searchRegExp);
-      var pieces = [
+      pieces = [
         <span key={0}>{unmatched.shift()}</span>,
       ];
       while (unmatched.length > 0) {

@@ -231,9 +231,9 @@ class Store extends EventEmitter {
         this.searchRoots = this.searchRoots
           .filter(item => {
             var node = this.get(item);
-            return (node.get('name') && node.get('name').toLowerCase().indexOf(needle) !== -1) ||
-              (node.get('text') && node.get('text').toLowerCase().indexOf(needle) !== -1) ||
-              (typeof node.get('children') === 'string' && node.get('children').toLowerCase().indexOf(needle) !== -1);
+            return (node.get('name') && SearchUtils.isFuzzyMatch(needle, node.get('name'))) ||
+              (node.get('text') && SearchUtils.isFuzzyMatch(needle, node.get('text'))) ||
+              (typeof node.get('children') === 'string' && SearchUtils.isFuzzyMatch(needle, node.get('children')));
           });
       } else {
         this.searchRoots = this._nodes.entrySeq()

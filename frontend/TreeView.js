@@ -89,6 +89,7 @@ class TreeView extends React.Component {
                   depth={0}
                   id={id}
                   key={id}
+                  searchText={searchText}
                   searchRegExp={searchRegExp}
                 />
               )).toJS()}
@@ -108,6 +109,7 @@ class TreeView extends React.Component {
                 depth={0}
                 id={id}
                 key={id}
+                searchText={searchText}
                 searchRegExp={searchRegExp}
               />
             )).toJS()}
