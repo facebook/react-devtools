@@ -30,14 +30,14 @@ var Box = (props: BoxProps) => {
     <div style={styles.box}>
       <div style={styles.row}>
         <span style={styles.label}>{title}</span>
-        <span style={styles.boxText}>{top}</span>
+        <span style={styles.boxText}>{+top.toFixed(3)}</span>
       </div>
       <div style={styles.row}>
-        <span style={styles.boxText}>{left}</span>
+        <span style={styles.boxText}>{+left.toFixed(3)}</span>
         {children}
-        <span style={styles.boxText}>{right}</span>
+        <span style={styles.boxText}>{+right.toFixed(3)}</span>
       </div>
-      <div style={styles.boxText}>{bottom}</div>
+      <div style={styles.boxText}>{+bottom.toFixed(3)}</div>
     </div>
   );
 };
@@ -59,10 +59,10 @@ class BoxInspector extends React.Component {
         <Box title="padding" {...padding}>
           <div style={styles.measureLayout}>
             <span style={styles.innerText}>
-              ({left}, {top})
+              ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
             <span style={styles.innerText}>
-              {width} &times; {height}
+              {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
         </Box>
@@ -93,7 +93,7 @@ var styles = {
   box: {
     padding: 8,
     margin: 8,
-    width: 200,
+    width: 208,
     border: '1px solid grey',
     alignItems: 'center',
   },
