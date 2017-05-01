@@ -4,7 +4,7 @@ If you need to debug a React page somewhere other than Chrome on desktop (a mobi
 
 It works both with React DOM and React Native.
 
-<img src="http://i.imgur.com/OZxWlyw.png" width="500" alt="Screenshot of React DevTools running with React Native">
+<img src="http://i.imgur.com/IXeHiZD.png" width="500" alt="Screenshot of React DevTools running with React Native">
 
 ## Usage with React Native
 
@@ -23,6 +23,16 @@ react-devtools
 If you're using React Native 0.43 or higher, it should connect to your simulator within a few seconds.
 
 > Note: if you prefer to avoid global installations, you can add `react-devtools` as a project dependency. With Yarn, you can run `yarn add react-devtools`, and then run `yarn react-devtools` from your project folder to open the DevTools. With npm, you can run `npm install --save react-devtools`, add `"react-devtools": "react-devtools"` to the `scripts` section in your `package.json`, and then run `npm run react-devtools` from your project folder to open the DevTools.
+
+### Integration with React Native Inspector
+
+First, [enable keyboard shortcuts](https://facebook.github.io/react-native/docs/debugging.html#enabling-keyboard-shortcuts) and click `Command+I` to bring up the Inspector. (Alternatively you can open the [in-app developer menu](https://facebook.github.io/react-native/docs/debugging.html#accessing-the-in-app-developer-menu) and choose "Show Inspector".)
+
+Without `react-devtools`, Inspector is displayed inline in your app. However, if `react-devtools` is running, the Inspector inside the simulator will enter a special collapsed mode, and instead use the DevTools as primary UI. In this mode, clicking on something in the simulator will bring up the relevant components in the DevTools:
+
+![Using DevTools with RN Inspector](https://d2ppvlu71ri8gs.cloudfront.net/items/2S251a1W070s3b280z09/Screen%20Recording%202017-05-01%20at%2019.56.gif?v=53ae234e)
+
+You can press `Command+I` again in the simulator to exit the Inspector.
 
 ## Usage with React DOM
 
