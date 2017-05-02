@@ -64,6 +64,7 @@ const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
  * - hideContextMenu
  * - selectFirstSearchResult
  * - toggleCollapse
+ * - toggleAllChildrenNodes
  * - setProps/State/Context
  * - makeGlobal(id, path)
  * - setHover(id, isHovered, isBottomTag)
@@ -343,6 +344,14 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
+  toggleAllChildrenNodes(value: boolean) {
+    var id = this.selected;
+    if (!id) {
+      return;
+    }
+    this._toggleDeepChildren(id, value);
+  }
+
   setProps(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setProps', {id, path, value});
   }
@@ -527,6 +536,21 @@ class Store extends EventEmitter {
         return;
       }
       pid = this._parents.get(pid);
+    }
+  }
+
+  _toggleDeepChildren(id: ElementID, value: boolean) {
+    var node = this._nodes.get(id);
+    if (!node) {
+      return;
+    }
+    if (node.get('collapsed') !== value) {
+      this._nodes = this._nodes.setIn([id, 'collapsed'], value);
+      this.emit(id);
+    }
+    var children = node.get('children');
+    if (children && children.forEach) {
+      children.forEach(cid => this._toggleDeepChildren(cid, value));
     }
   }
 
