@@ -32,6 +32,11 @@ function installGlobalHook(window: Object) {
         // React DOM Stack
         var toString = Function.prototype.toString;
         var code = toString.call(renderer.Mount._renderNewRootComponent);
+        // Filter out bad results (if that is even possible):
+        if (code.indexOf('function') !== 0) {
+          // Hope for the best if we're not sure.
+          return 'production';
+        }
         // React DOM Stack < 15.1.0
         // If it contains "storedMeasure" call, it's wrapped in ReactPerf (DEV only).
         // This would be true even if it's minified, as method name still matches.
