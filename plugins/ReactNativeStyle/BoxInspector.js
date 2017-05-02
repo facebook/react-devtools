@@ -28,10 +28,8 @@ var Box = (props: BoxProps) => {
   var {title, children, top, left, right, bottom} = props;
   return (
     <div style={styles.box}>
-      <div style={styles.row}>
-        <span style={styles.label}>{title}</span>
-        <span style={styles.boxText}>{+top.toFixed(3)}</span>
-      </div>
+      <span style={styles.label}>{title}</span>
+      <div style={styles.boxText}>{+top.toFixed(3)}</div>
       <div style={styles.row}>
         <span style={styles.boxText}>{+left.toFixed(3)}</span>
         {children}
@@ -58,10 +56,10 @@ class BoxInspector extends React.Component {
       <Box title="margin" {...margin}>
         <Box title="padding" {...padding}>
           <div style={styles.measureLayout}>
-            <span style={styles.innerText}>
+            <span style={styles.positionText}>
               ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
-            <span style={styles.innerText}>
+            <span style={styles.dimenText}>
               {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
@@ -78,23 +76,28 @@ var styles = {
     justifyContent: 'space-between',
   },
   label: {
-    flex: 1,
-    color: 'rgb(255,100,0)',
+    position: 'absolute',
+    color: '#c41a16',
   },
   measureLayout: {
     display: 'flex',
     flexDirection: 'column',
     margin: 4,
   },
-  innerText: {
-    color: 'blue',
+  dimenText: {
+    color: '#1c00cf',
+    textAlign: 'center',
+  },
+  positionText: {
+    color: '#bbb',
+    fontSize: 10,
     textAlign: 'center',
   },
   box: {
     padding: 8,
-    margin: '8px 0px',
-    width: 200,
-    border: '1px solid grey',
+    margin: 8,
+    width: 184,
+    border: '1px dashed grey',
     alignItems: 'center',
     alignSelf: 'center',
   },
