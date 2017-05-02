@@ -557,7 +557,6 @@ class Store extends EventEmitter {
     if (children && children.forEach) {
       children.forEach(cid => this._toggleDeepChildren(cid, value));
     }
-
   }
 
   _mountComponent(data: DataType) {
