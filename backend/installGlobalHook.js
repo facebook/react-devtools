@@ -22,31 +22,50 @@ function installGlobalHook(window: Object) {
   }
   function detectReactBuildType(renderer) {
     try {
-      if (renderer.findFiberByHostInstance) {
-        // TODO: React DOM Fiber (16+)
-        // https://github.com/facebook/react/issues/9569
-        // For now pretend it's always production.
+      var toString = Function.prototype.toString;
+      if (typeof renderer.version === 'string') {
+        // React DOM Fiber (16+)
+        if (renderer.bundleType > 0) {
+          // This is not a production build.
+          // We are currently only using 0 (PROD) and 1 (DEV)
+          // but might add 2 (PROFILE) in the future.
+          return 'development';
+        }
+        // The above should cover envification, but we should still make sure
+        // that the bundle code has been uglified.
+        var findFiberCode = toString.call(renderer.findFiberByHostInstance);
+        // Filter out bad results (if that is even possible):
+        if (findFiberCode.indexOf('function') !== 0) {
+          // Hope for the best if we're not sure.
+          return 'production';
+        }
+        // By now we know that it's envified--but what if it's not minified?
+        // This can be bad too, as it means DEV code is still there.
+        // Let's check the first argument. It should be a single letter.
+        if (!(/function[\s\w]*\(\w[,\)]/.test(findFiberCode))) {
+          return 'development';
+        }
+        // We're good.
         return 'production';
       }
       if (renderer.Mount && renderer.Mount._renderNewRootComponent) {
         // React DOM Stack
-        var toString = Function.prototype.toString;
-        var code = toString.call(renderer.Mount._renderNewRootComponent);
+        var renderRootCode = toString.call(renderer.Mount._renderNewRootComponent);
         // Filter out bad results (if that is even possible):
-        if (code.indexOf('function') !== 0) {
+        if (renderRootCode.indexOf('function') !== 0) {
           // Hope for the best if we're not sure.
           return 'production';
         }
         // React DOM Stack < 15.1.0
         // If it contains "storedMeasure" call, it's wrapped in ReactPerf (DEV only).
         // This would be true even if it's minified, as method name still matches.
-        if (code.indexOf('storedMeasure') !== -1) {
+        if (renderRootCode.indexOf('storedMeasure') !== -1) {
           return 'development';
         }
         // React DOM Stack >= 15.1.0, < 16
         // If it contains a warning message, it's a DEV build.
         // This would be true even if it's minified, as the message would stay.
-        if (code.indexOf('should be a pure function') !== -1) {
+        if (renderRootCode.indexOf('should be a pure function') !== -1) {
           return 'development';
         }
         // By now we know that it's envified--but what if it's not minified?
@@ -56,16 +75,17 @@ function installGlobalHook(window: Object) {
         // versions, and if it doesn't have arguments, it's wrapped in ReactPerf
         // (which also indicates a DEV build, although we should've filtered
         // that out earlier).
-        if (!(/function\s*\(\w\,/.test(code))) {
+        if (!(/function\s*\(\w\,/.test(renderRootCode))) {
           return 'development';
         }
         // Seems like we're using the production version.
         // Now let's check if we're still on 0.14 or lower:
-        if (code.indexOf('._registerComponent') !== -1) {
-          // TODO: figure out a future proof way of doing these checks.
-          // For example we could pass the React version to inject() call.
-          // Our rule of thumb is that a version released more than a year
-          // ago is considered outdated.
+        if (renderRootCode.indexOf('._registerComponent') !== -1) {
+          // TODO: we can remove the condition above once 16
+          // is older than a year. Since this branch only runs
+          // for Stack, we can flip it completely when Stack
+          // is old enough. The branch for Fiber is above,
+          // and it can check renderer.version directly.
           return 'outdated';
         }
         // We're all good.
