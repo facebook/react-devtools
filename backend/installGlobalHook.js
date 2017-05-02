@@ -54,8 +54,16 @@ function installGlobalHook(window: Object) {
         if (!(/function\s*\(\w\,/.test(code))) {
           return 'development';
         }
-        // Seems like we're good.
-        // TODO: check for outdated versions too.
+        // Seems like we're using the production version.
+        // Now let's check if we're still on 0.14 or lower:
+        if (code.indexOf('._registerComponent') !== -1) {
+          // TODO: figure out a future proof way of doing these checks.
+          // For example we could pass the React version to inject() call.
+          // Our rule of thumb is that a version released more than a year
+          // ago is considered outdated.
+          return 'outdated';
+        }
+        // We're all good.
         return 'production';
       }
     } catch (err) {
