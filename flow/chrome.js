@@ -66,6 +66,7 @@ declare var chrome: {
         sender: {
           tab: {
             id: number,
+            url: string,
           },
         },
       }) => void) => void,
@@ -74,6 +75,7 @@ declare var chrome: {
       addListener: (fn: (req: Object, sender: {
         tab: {
           id: number,
+          url: string,
         },
       }) => void) => void,
     },

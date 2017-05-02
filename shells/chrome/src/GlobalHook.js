@@ -28,13 +28,17 @@ window.addEventListener('message', function(evt) {
   if (evt.source === window && evt.data && evt.data.source === 'react-devtools-detector') {
     chrome.runtime.sendMessage({
       hasDetectedReact: true,
+      reactBuildType: evt.data.reactBuildType,
     });
   }
 });
 
 var detectReact = `
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('renderer', function() {
-  window.postMessage({source: 'react-devtools-detector'}, '*');
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('renderer', function(evt) {
+  window.postMessage({
+    source: 'react-devtools-detector',
+    reactBuildType: evt.reactBuildType,
+  }, '*');
 });
 `;
 var saveNativeValues = `
