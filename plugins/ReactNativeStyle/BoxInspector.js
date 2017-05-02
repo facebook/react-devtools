@@ -92,10 +92,11 @@ var styles = {
   },
   box: {
     padding: 8,
-    margin: 8,
+    margin: '8px 0px',
     width: 200,
     border: '1px solid grey',
     alignItems: 'center',
+    alignSelf: 'center',
   },
   boxText: {
     textAlign: 'center',

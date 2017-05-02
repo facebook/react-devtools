@@ -127,6 +127,7 @@ class NativeStyler extends React.Component {
 var styles = {
   container: {
     display: 'flex',
+    flexDirection: 'column',
   },
 };
 
