@@ -549,7 +549,7 @@ class Store extends EventEmitter {
     if (!node) {
       return;
     }
-    if (!(node.get('collapsed') === value)) {
+    if (node.get('collapsed') !== value) {
       this._nodes = this._nodes.setIn([id, 'collapsed'], value);
       this.emit(id);
     }
