@@ -35,7 +35,6 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 - Arrow keys or hjkl for navigation
 - Right click a component to show in elements pane, scroll into view, show
   source, etc.
-- Use the search bar to find components by name
 - A red collapser means the component has state/context
 
 ![](/images/devtools-tree-view.png)
@@ -46,6 +45,12 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 - Updates are highlighted
 
 ![](/images/devtools-side-pane.gif)
+
+### Search Bar
+
+- Use the search bar to find components by name
+
+![](/images/devtools-search.gif)
 
 ### Handy Tips
 
