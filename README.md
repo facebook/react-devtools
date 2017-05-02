@@ -50,7 +50,7 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 
 - Use the search bar to find components by name
 
-![](/images/devtools-search.gif)
+![](/images/devtools-search-new.gif)
 
 ### Handy Tips
 
