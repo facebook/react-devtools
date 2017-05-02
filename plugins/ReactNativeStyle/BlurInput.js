@@ -18,17 +18,19 @@ import type {DOMEvent, DOMNode} from '../../frontend/types';
 type Props = {
   onChange: (text: string|number) => any;
   value: string|number;
+  type: string;
 };
 type DefaultProps = {};
 type State = {
   text: string;
+  editing: boolean;
 };
 
 class BlurInput extends React.Component {
   props: Props;
   defaultProps: DefaultProps;
   state: State;
-  node: ?DOMNode;
+  node: DOMNode;
 
   constructor(props: Object) {
     super(props);
@@ -43,10 +45,6 @@ class BlurInput extends React.Component {
   }
 
   startEditing() {
-    if (this.props.readOnly) {
-      return;
-    }
-
     this.setState({
       editing: true,
       text: valueToText(this.props.value),
@@ -136,9 +134,6 @@ class BlurInput extends React.Component {
       typeStyle = valueStyles.value;
     }
     style = assign({}, style, typeStyle);
-    if (!this.props.readOnly) {
-      assign(style, styles.editable);
-    }
     return (
       <div
         onClick={this.startEditing.bind(this)}
@@ -154,9 +149,6 @@ var styles = {
     display: 'flex',
     marginLeft: 8,
     whiteSpace: 'pre-wrap',
-  },
-
-  editable: {
     cursor: 'pointer',
   },
 
