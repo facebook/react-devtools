@@ -9,6 +9,7 @@
  */
 'use strict';
 
+var DarkModeFrontendControl = require('../plugins/DarkMode/DarkModeFrontendControl');
 var TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 var React = require('react');
@@ -97,6 +98,7 @@ class SettingsPane extends React.Component {
 
     return (
       <div style={styles.container}>
+        <DarkModeFrontendControl {...this.props} />
         <TraceUpdatesFrontendControl {...this.props} />
         
         <div style={styles.growToFill}>
