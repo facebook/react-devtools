@@ -32,6 +32,11 @@ function installGlobalHook(window: Object) {
         // React DOM Stack
         var toString = Function.prototype.toString;
         var code = toString.call(renderer.Mount._renderNewRootComponent);
+        // Filter out bad results (if that is even possible):
+        if (code.indexOf('function') !== 0) {
+          // Hope for the best if we're not sure.
+          return 'production';
+        }
         // React DOM Stack < 15.1.0
         // If it contains "storedMeasure" call, it's wrapped in ReactPerf (DEV only).
         // This would be true even if it's minified, as method name still matches.
@@ -54,8 +59,16 @@ function installGlobalHook(window: Object) {
         if (!(/function\s*\(\w\,/.test(code))) {
           return 'development';
         }
-        // Seems like we're good.
-        // TODO: check for outdated versions too.
+        // Seems like we're using the production version.
+        // Now let's check if we're still on 0.14 or lower:
+        if (code.indexOf('._registerComponent') !== -1) {
+          // TODO: figure out a future proof way of doing these checks.
+          // For example we could pass the React version to inject() call.
+          // Our rule of thumb is that a version released more than a year
+          // ago is considered outdated.
+          return 'outdated';
+        }
+        // We're all good.
         return 'production';
       }
     } catch (err) {
