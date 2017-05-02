@@ -20,20 +20,61 @@ function installGlobalHook(window: Object) {
   if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
     return;
   }
+  function detectReactBuildType(renderer) {
+    try {
+      if (renderer.findFiberByHostInstance) {
+        // TODO: React DOM Fiber (16+)
+        // https://github.com/facebook/react/issues/9569
+        // For now pretend it's always production.
+        return 'production';
+      }
+      if (renderer.Mount && renderer.Mount._renderNewRootComponent) {
+        // React DOM Stack
+        var toString = Function.prototype.toString;
+        var code = toString.call(renderer.Mount._renderNewRootComponent);
+        // React DOM Stack < 15.1.0
+        // If it contains "storedMeasure" call, it's wrapped in ReactPerf (DEV only).
+        // This would be true even if it's minified, as method name still matches.
+        if (code.indexOf('storedMeasure') !== -1) {
+          return 'development';
+        }
+        // React DOM Stack >= 15.1.0, < 16
+        // If it contains a warning message, it's a DEV build.
+        // This would be true even if it's minified, as the message would stay.
+        if (code.indexOf('should be a pure function') !== -1) {
+          return 'development';
+        }
+        // By now we know that it's envified--but what if it's not minified?
+        // This can be bad too, as it means DEV code is still there.
+        // Let's check the first argument. It should be a single letter.
+        // We know this function gets more than one argument in all supported
+        // versions, and if it doesn't have arguments, it's wrapped in ReactPerf
+        // (which also indicates a DEV build, although we should've filtered
+        // that out earlier).
+        if (!(/function\s*\(\w\,/.test(code))) {
+          return 'development';
+        }
+        // Seems like we're good.
+        // TODO: check for outdated versions too.
+        return 'production';
+      }
+    } catch (err) {
+      // Weird environments may exist.
+      // This code needs a higher fault tolerance
+      // because it runs even with closed DevTools.
+      // TODO: should we catch errors in all injected code, and not just this part?
+    }
+    return 'production';
+  }
   const hook = ({
     // Shared between Stack and Fiber:
     _renderers: {},
     helpers: {},
     inject: function(renderer) {
-      if (typeof renderer.version === 'number' && renderer.version > 1) {
-        // This Fiber version is too new and not supported yet.
-        // The version field is declared in ReactFiberDevToolsHook.
-        // Only Fiber releases have the version field.
-        return null;
-      }
       var id = Math.random().toString(16).slice(2);
       hook._renderers[id] = renderer;
-      hook.emit('renderer', {id, renderer});
+      var reactBuildType = detectReactBuildType(renderer);
+      hook.emit('renderer', {id, renderer, reactBuildType});
       return id;
     },
     _listeners: {},
