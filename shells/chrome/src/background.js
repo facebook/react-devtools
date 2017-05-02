@@ -78,10 +78,10 @@ chrome.runtime.onMessage.addListener((req, sender) => {
     chrome.browserAction.setIcon({
       tabId: sender.tab.id,
       path: {
-        16: 'icons/16-production.png',
-        32: 'icons/32-production.png',
-        48: 'icons/48-production.png',
-        128: 'icons/128-production.png',
+        '16': 'icons/16-production.png',
+        '32': 'icons/32-production.png',
+        '48': 'icons/48-production.png',
+        '128': 'icons/128-production.png',
       },
     });
     chrome.browserAction.setPopup({
