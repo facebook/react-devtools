@@ -115,6 +115,7 @@ class BlurInput extends React.Component {
       return (
         <input
           autoFocus={true}
+          size="15"
           value={this.state.text}
           ref={i => this.node = i}
           style={styles.input}
@@ -151,7 +152,7 @@ class BlurInput extends React.Component {
 var styles = {
   simple: {
     display: 'flex',
-    marginLeft: 2,
+    marginLeft: 8,
     whiteSpace: 'pre-wrap',
   },
 
@@ -163,7 +164,7 @@ var styles = {
     boxSizing: 'border-box',
     border: 'none',
     padding: 0,
-    marginLeft: 2,
+    marginLeft: 8,
     outline: 'none',
     boxShadow: '0 0 3px #ccc',
     fontFamily: 'monospace',
