@@ -71,7 +71,10 @@ function getData(internalInstance: Object): DataType {
     ref = internalInstance._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
-      if (typeof internalInstance.getPublicInstance === 'function') {
+      if (
+        typeof internalInstance._domID === 'number' &&
+        typeof internalInstance.getPublicInstance === 'function'
+      ) {
         publicInstance = internalInstance.getPublicInstance();
       }
     } else if (typeof type === 'function') {
