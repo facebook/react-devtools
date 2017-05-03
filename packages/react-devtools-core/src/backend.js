@@ -24,7 +24,7 @@ var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
-var transfer = require('js-transfer');
+var jsan = require('jsan');
 
 installGlobalHook(window);
 installRelayHook(window);
@@ -73,7 +73,7 @@ function connectToDevTools(options: ?ConnectOptions) {
         closeListeners.push(fn);
       },
       send(data) {
-        ws.send(transfer.stringify(data));
+        ws.send(jsan.stringify(data));
       },
     };
     setupBackend(wall, resolveRNStyle);
@@ -99,7 +99,7 @@ function connectToDevTools(options: ?ConnectOptions) {
     }
     // </hack>
     try {
-      data = transfer.parse(evt.data);
+      data = jsan.parse(evt.data);
     } catch (e) {
       console.error('failed to parse json: ' + evt.data);
       return;
