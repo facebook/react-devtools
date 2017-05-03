@@ -43,7 +43,7 @@ function installGlobalHook(window: Object) {
         // This can be bad too, as it means DEV code is still there.
         // Let's check the first argument. It should be a single letter.
         if (!(/function[\s\w]*\(\w[,\)]/.test(findFiberCode))) {
-          return 'development';
+          return 'unminified';
         }
         // We're good.
         return 'production';
@@ -56,27 +56,57 @@ function installGlobalHook(window: Object) {
           // Hope for the best if we're not sure.
           return 'production';
         }
-        // React DOM Stack < 15.1.0
+        // Check for React DOM Stack < 15.1.0 in development.
         // If it contains "storedMeasure" call, it's wrapped in ReactPerf (DEV only).
         // This would be true even if it's minified, as method name still matches.
         if (renderRootCode.indexOf('storedMeasure') !== -1) {
           return 'development';
         }
-        // React DOM Stack >= 15.1.0, < 16
-        // If it contains a warning message, it's a DEV build.
-        // This would be true even if it's minified, as the message would stay.
+        // For other versions (and configurations) it's not so easy.
+        // Let's quickly exclude proper production builds.
+        // If it contains a warning message, it's either a DEV build,
+        // or an PROD build without proper dead code elimination.
         if (renderRootCode.indexOf('should be a pure function') !== -1) {
-          return 'development';
+          // Now how do we tell a DEV build from a bad PROD build?
+          // If we see NODE_ENV, we're going to assume this is a dev build
+          // because most likely it is referring to an empty shim.
+          if (renderRootCode.indexOf('NODE_ENV') !== -1) {
+            return 'development';
+          }
+          // If we see "development", we're dealing with an envified DEV build
+          // (such as the official React DEV UMD).
+          if (renderRootCode.indexOf('development') !== -1) {
+            return 'development';
+          }
+          // I've seen process.env.NODE_ENV !== 'production' being smartly
+          // replaced by `true` in DEV by Webpack. I don't know how that
+          // works but we can safely guard against it because `true` was
+          // never used in the function source since it was written.
+          if (renderRootCode.indexOf('true') !== -1) {
+            return 'development';
+          }
+          // By now either it is a production build that has not been minified,
+          // or (worse) this is a minified development build using non-standard
+          // environment (e.g. "staging"). We're going to look at whether
+          // the function appears minified:
+          if (/function\s*\(\w\,/.test(renderRootCode)) {
+            // This is likely a minified development build.
+            return 'development';
+          } else {
+            // We can't be certain whether this is a development build or not,
+            // but it is definitely unminified.
+            return 'unminified';
+          }
         }
-        // By now we know that it's envified--but what if it's not minified?
-        // This can be bad too, as it means DEV code is still there.
+        // By now we know that it's envified and dead code elimination worked,
+        // but what if it's still not minified? (Is this even possible?)
         // Let's check the first argument. It should be a single letter.
         // We know this function gets more than one argument in all supported
         // versions, and if it doesn't have arguments, it's wrapped in ReactPerf
         // (which also indicates a DEV build, although we should've filtered
         // that out earlier).
         if (!(/function\s*\(\w\,/.test(renderRootCode))) {
-          return 'development';
+          return 'unminified';
         }
         // Seems like we're using the production version.
         // Now let's check if we're still on 0.14 or lower:
