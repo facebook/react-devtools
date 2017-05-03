@@ -85,11 +85,18 @@ function installGlobalHook(window: Object) {
           if (renderRootCode.indexOf('true') !== -1) {
             return 'development';
           }
-          // There might be other ways to mess up the configuration,
-          // but we're going to lean towards avoiding false positives
-          // in more dubious cases, and just say it's not minified
-          // (which still gives us the red icon).
-          return 'unminified';
+          // By now either it is a production build that has not been minified,
+          // or (worse) this is a minified development build using non-standard
+          // environment (e.g. "staging"). We're going to look at whether
+          // the function appears minified:
+          if (/function\s*\(\w\,/.test(renderRootCode)) {
+            // This is likely a minified development build.
+            return 'development';
+          } else {
+            // We can't be certain whether this is a development build or not,
+            // but it is definitely unminified.
+            return 'unminified';
+          }
         }
         // By now we know that it's envified and dead code elimination worked,
         // but what if it's still not minified? (Is this even possible?)
