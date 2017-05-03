@@ -91,7 +91,18 @@ function initialize(socket) {
     },
     send(data) {
       if (socket.readyState === socket.OPEN) {
-        socket.send(jsan.stringify(data));
+        socket.send(jsan.stringify(data, null, null, {
+          'date': true,
+          'function': true,
+          'regex': true,
+          'undefined': true,
+          'error': true,
+          'symbol': true,
+          'map': true,
+          'set': true,
+          'nan': true,
+          'infinity': true,
+        }));
       }
     },
     disconnect() {

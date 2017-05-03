@@ -312,6 +312,9 @@ var primitiveProps = {
   num: 1312,
   unknown: undefined,
   notThere: null,
+  infinity: Infinity,
+  negInfinity: -Infinity,
+  nan: NaN,
 };
 var complexProps = {
   array: [1, 2, 3, 4],
@@ -323,6 +326,7 @@ var complexProps = {
     [1, 789],
     [2, 654],
     [3, null],
+    [4, undefined],
   ]),
   objMap: new Map([
     [{ a: 'a'}, true],

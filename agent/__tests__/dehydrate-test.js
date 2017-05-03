@@ -30,6 +30,62 @@ describe('dehydrate', () => {
     expect(result).toEqual(object);
   });
 
+  it('preserves undefined in arrays', () => {
+    var object = {a: [undefined, 3, undefined, undefined, 6, 0] };
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves undefined', () => {
+    var object = {x: undefined};
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves NaN', () => {
+    var object = [NaN, 3, 8];
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves Infinity', () => {
+    var object = [Infinity, 3, 8];
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves -Infinity', () => {
+    var object = [-Infinity, 3, 8];
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves null', () => {
+    var object = [null, 3, null];
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
+  it('preserves object properties whose value is undefined', () => {
+    var object = { a: undefined };
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(cleaned).toEqual([]);
+    expect(result).toEqual(object);
+  });
+
   it('cleans a deeply nested object', () => {
     var object = {a: {b: {c: {d: 4}}}};
     var cleaned = [];

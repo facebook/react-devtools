@@ -73,7 +73,18 @@ function connectToDevTools(options: ?ConnectOptions) {
         closeListeners.push(fn);
       },
       send(data) {
-        ws.send(jsan.stringify(data));
+        ws.send(jsan.stringify(data, null, null, {
+          'date': true,
+          'function': true,
+          'regex': true,
+          'undefined': true,
+          'error': true,
+          'symbol': true,
+          'map': true,
+          'set': true,
+          'nan': true,
+          'infinity': true,
+        }));
       },
     };
     setupBackend(wall, resolveRNStyle);

@@ -198,7 +198,18 @@ function valueToText(value) {
   if (typeof value === 'number') {
     return value.toString();
   }
-  return jsan.stringify(value);
+  return jsan.stringify(value, null, null, {
+    'date': true,
+    'function': true,
+    'regex': true,
+    'undefined': true,
+    'error': true,
+    'symbol': true,
+    'map': true,
+    'set': true,
+    'nan': true,
+    'infinity': true,
+  });
 }
 
 module.exports = Simple;
