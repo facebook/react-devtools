@@ -71,11 +71,11 @@ function getData(internalInstance: Object): DataType {
     ref = internalInstance._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
-      if (
-        typeof internalInstance._domID === 'number' &&
-        typeof internalInstance.getPublicInstance === 'function'
-      ) {
-        publicInstance = internalInstance.getPublicInstance();
+      if (internalInstance._nativeNode != null) {
+        publicInstance = internalInstance._nativeNode;
+      }
+      if (internalInstance._hostNode != null) {
+        publicInstance = internalInstance._hostNode;
       }
     } else if (typeof type === 'function') {
       nodeType = 'Composite';
