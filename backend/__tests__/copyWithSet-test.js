@@ -37,4 +37,16 @@ describe('copyWithSet', function() {
     var res = copyWithSet([0, 1, {2: {3: [4, 5, {6: {7: 8}}, 9], 10: 11}}, 12], [2, '2', '3', 2, '6', '7'], 'moose');
     expect(res).toEqual([0, 1, {2: {3: [4, 5, {6: {7: 'moose'}}, 9], 10: 11}}, 12]);
   });
+
+  it('must copy descriptors', function() {
+    var obj = {
+      _name: 'foo',
+      get name() {
+        return this._name + 'bar';
+      },
+    };
+
+    var res = copyWithSet(obj, ['a'], 'b');
+    expect(res.name).toEqual('foobar');
+  });
 });
