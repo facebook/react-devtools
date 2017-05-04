@@ -12,6 +12,7 @@ var app = require('electron').app; // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow; // Module to create native browser window.
 var path = require('path');
 var updateNotifier = require('update-notifier');
+var chalk = require('chalk');
 
 var pkg = require('./package.json');
 
@@ -23,7 +24,13 @@ var notifier = updateNotifier({
 
 if (notifier.update) {
   console.log('Update available ' + notifier.update.current + ' => ' + notifier.update.latest);
-  console.log('Run npm install -g react-devtools to update');
+  console.log(
+    'Run ' +
+      chalk.styles.cyan.open +
+      'npm install -g react-devtools' +
+      chalk.styles.cyan.close +
+      ' to update'
+  );
 }
 
 var mainWindow = null;
