@@ -36,7 +36,9 @@ function trackSelection() {
   gDevTools.on('inspector-init', (_, toolbox, panelFrame) => {
     toolbox.once('inspector-ready', (eid, panel) => {
       panel.selection.on('new-node-front', (ev, val, reason) => {
-        passSelectedNode(wc.hud.ui.jsterm);
+        if (wc) {
+          passSelectedNode(wc.hud.ui.jsterm);
+        }
       });
     });
   });

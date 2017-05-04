@@ -13,7 +13,7 @@
 var ContextMenu = require('./ContextMenu');
 var PropState = require('./PropState');
 var React = require('react');
-var SearchPane = require('./SearchPane');
+var LeftPane = require('./LeftPane');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
@@ -26,6 +26,10 @@ type State = {
 };
 
 var IS_VERTICAL_BREAKPOINT = 500;
+
+function shouldUseVerticalLayout(window) {
+  return window.innerWidth < IS_VERTICAL_BREAKPOINT;
+}
 
 class Container extends React.Component {
   props: {
@@ -52,14 +56,14 @@ class Container extends React.Component {
     super(props);
 
     this.state = {
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     };
   }
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize, false);
     this.setState({
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     });
   }
 
@@ -80,7 +84,7 @@ class Container extends React.Component {
     this.resizeTimeout = null;
 
     this.setState({
-      isVertical: (window.innerWidth > IS_VERTICAL_BREAKPOINT),
+      isVertical: shouldUseVerticalLayout(window),
     });
   };
 
@@ -90,7 +94,7 @@ class Container extends React.Component {
         <SplitPane
           initialWidth={10}
           initialHeight={10}
-          left={() => <SearchPane reload={this.props.reload} />}
+          left={() => <LeftPane reload={this.props.reload} />}
           right={() => <PropState extraPanes={this.props.extraPanes} />}
           isVertical={this.state.isVertical}
         />
@@ -119,7 +123,7 @@ var DEFAULT_MENU_ITEMS = {
     if (store.capabilities.scroll) {
       items.push({
         key: 'scrollToNode',
-        title: 'Scroll to Node',
+        title: 'Scroll to node',
         action: () => store.scrollToNode(id),
       });
     }

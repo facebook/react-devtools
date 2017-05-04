@@ -43,10 +43,18 @@ type DOMNode = {};
 
 export type AnyFn = (...args: Array<any>) => any;
 
+type BundleType =
+  // PROD
+  | 0
+  // DEV
+  | 1;
+
 export type ReactRenderer = {
   // Fiber
   findHostInstanceByFiber: (fiber: Object) => ?NativeType,
   findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
+  version: string,
+  bundleType: BundleType,
 
   // Stack
   Reconciler: {

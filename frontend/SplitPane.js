@@ -25,10 +25,6 @@ type Props = {
   isVertical: bool,
 };
 
-type DefaultProps = {
-  isVertical: true,
-};
-
 type State = {
   moving: boolean,
   width: number,
@@ -37,7 +33,6 @@ type State = {
 
 class SplitPane extends React.Component {
   props: Props;
-  defaultProps: DefaultProps;
   state: State;
 
   constructor(props: Props) {
@@ -53,8 +48,8 @@ class SplitPane extends React.Component {
     var node = ReactDOM.findDOMNode(this);
 
     this.setState({
-      width: this.props.isVertical ? node.offsetWidth * 0.3 : node.offsetWidth * 0.6,
-      height: node.offsetHeight * 0.3,
+      width: Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3)),
+      height: Math.floor(node.offsetHeight * 0.3),
     });
   }
 
@@ -62,35 +57,51 @@ class SplitPane extends React.Component {
     var node = ReactDOM.findDOMNode(this);
 
     this.setState(prevState => ({
-      width: !this.props.isVertical ? prevState.width : (node.offsetLeft + node.offsetWidth) - x,
-      height: this.props.isVertical ? prevState.height : (node.offsetTop + node.offsetHeight) - y,
+      width: this.props.isVertical ?
+        prevState.width :
+        Math.floor(node.offsetLeft + node.offsetWidth - x),
+      height: !this.props.isVertical ?
+        prevState.height :
+        Math.floor(node.offsetTop + node.offsetHeight - y),
     }));
   }
 
   render() {
-    var rightStyle = assign({}, styles.rightPane, {
-      width: this.props.isVertical ? this.state.width : '100%',
-      height: this.props.isVertical ? '100%' : this.state.height,
-      marginLeft: (this.props.isVertical) ? 0 : -3,
+    var containerStyles = this.props.isVertical ?
+      styles.containerVertical : styles.containerHorizontal;
+    var draggerStyles = assign({}, styles.dragger,
+      this.props.isVertical ?
+        styles.draggerVertical :
+        styles.draggerHorizontal
+    );
+    var draggerInnerStyles = assign({}, styles.draggerInner,
+      this.props.isVertical ?
+        styles.draggerInnerVertical :
+        styles.draggerInnerHorizontal
+    );
+    var rightStyles = assign({}, containerStyles, {
+      width: this.props.isVertical ? '100%' : this.state.width,
+      height: this.props.isVertical ? this.state.height : '100%',
+      flex: 'initial',
+      minHeight: 120,
+      minWidth: 150,
     });
-
-    var containerStyles = this.props.isVertical ? styles.container : styles.containerVertical;
-    var draggerStyles = this.props.isVertical ? styles.dragger : styles.draggerVertical;
-
     return (
       <div style={containerStyles}>
         <div style={styles.leftPane}>
           {this.props.left()}
         </div>
-        <Draggable
-          style={draggerStyles}
-          onStart={() => this.setState({moving: true})}
-          onMove={(x, y) => this.onMove(x, y)}
-          onStop={() => this.setState({moving: false})}>
-          <div style={styles.draggerInner} />
-        </Draggable>
-        <div style={rightStyle}>
-          {this.props.right()}
+        <div style={rightStyles}>
+          <Draggable
+            style={draggerStyles}
+            onStart={() => this.setState({moving: true})}
+            onMove={(x, y) => this.onMove(x, y)}
+            onStop={() => this.setState({moving: false})}>
+            <div style={draggerInnerStyles} />
+          </Draggable>
+          <div style={styles.rightPane}>
+            {this.props.right()}
+          </div>
         </div>
       </div>
     );
@@ -98,7 +109,7 @@ class SplitPane extends React.Component {
 }
 
 var styles = {
-  container: {
+  containerHorizontal: {
     display: 'flex',
     minWidth: 0,
     flex: 1,
@@ -112,41 +123,47 @@ var styles = {
   },
 
   dragger: {
-    padding: '0 3px',
-    cursor: 'ew-resize',
     position: 'relative',
     zIndex: 1,
+  },
+
+  draggerHorizontal: {
+    padding: '0px 3px',
+    margin: '0px -3px',
+    cursor: 'ew-resize',
   },
 
   draggerVertical: {
-    backgroundColor: '#efefef',
-    padding: '3px 0',
+    padding: '3px 0px',
+    margin: '-3px 0px',
     cursor: 'ns-resize',
-    position: 'relative',
-    zIndex: 1,
   },
 
   draggerInner: {
-    backgroundColor: '#ccc',
+    backgroundColor: 'rgb(163, 163, 163)',
+  },
+
+  draggerInnerHorizontal: {
     height: '100%',
-    width: 1,
+    width: '1px',
+  },
+
+  draggerInnerVertical: {
+    height: '1px',
+    width: '100%',
   },
 
   rightPane: {
     display: 'flex',
-    marginLeft: -3,
-    minWidth: 100,
-    minHeight: 100,
-    padding: 5,
+    width: '100%',
+    padding: 4,
   },
 
   leftPane: {
     display: 'flex',
-    marginRight: -3,
     minWidth: '50%',
     minHeight: '50%',
     flex: 1,
-    borderBottom: '1px solid #ccc',
   },
 };
 

@@ -2,14 +2,24 @@
   "manifest_version": 2,
   "name": "React Developer Tools",
   "description": "Adds React debugging tools to the Chrome Developer Tools.",
-  "version": "2.0.12",
+  "version": "2.1.7",
   "minimum_chrome_version": "43",
-  "browser_action": {
-    "default_icon": "icons/icon48.png"
-  },
   "icons": {
-    "48": "icons/icon48.png",
-    "128": "icons/icon128.png"
+    "16": "icons/16-production.png",
+    "32": "icons/32-production.png",
+    "48": "icons/48-production.png",
+    "128": "icons/128-production.png"
+  },
+
+  "browser_action": {
+    "default_icon": {
+      "16": "icons/16-disabled.png",
+      "32": "icons/32-disabled.png",
+      "48": "icons/48-disabled.png",
+      "128": "icons/128-disabled.png"
+    },
+
+    "default_popup": "popups/not-detected.html"
   },
 
   "devtools_page": "main.html",

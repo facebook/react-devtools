@@ -74,7 +74,7 @@ var styles = {
     padding: 0,
     margin: 0,
     maxHeight: '80px',
-    overflow: 'scroll',
+    overflow: 'auto',
   },
 
   selected: {
@@ -119,7 +119,7 @@ module.exports = decorate({
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
-      hover: (id, isHovered) => store.setHover(id, isHovered),
+      hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),
     };

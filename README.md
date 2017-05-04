@@ -1,46 +1,40 @@
 # React Developer Tools [![Build Status](https://travis-ci.org/facebook/react-devtools.svg?branch=master)](https://travis-ci.org/facebook/react-devtools)
 
-React Developer Tools is a system that allows you to inspect a React Renderer,
-including the Component hierarchy, props, state, and more.
+React Developer Tools lets you inspect the React component hierarchy, including component props and state.
 
-There are shells for Chrome (adding it to the Chrome devtools), Firefox,
-Atom/Nuclide, and as a standalone Electron app.
+It exists both as a browser extension (for [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) and [Firefox](https://addons.mozilla.org/firefox/addon/react-devtools/)), and as a [standalone app](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools) (works with other environments including Safari, IE, and React Native).
 
 ![](/images/devtools-full.gif)
 
 ## Installation
 
 ### Pre-packaged
+
 The official extensions represent the current stable release.
 
 - [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi)
 - [Firefox extension](https://addons.mozilla.org/firefox/addon/react-devtools/)
-- [Standalone app (supports React Native too!)](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md)
+- [Standalone app (Safari, React Native, etc)](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md)
 
 Opera users can [enable Chrome extensions](https://addons.opera.com/extensions/details/download-chrome-extension-9/) and then install the [Chrome extension](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi).
 
-If you inspect an element or launch the developer tools on a React page, you
-should see an extra tab called **React** in the inspector.
-
-Check out [Contributing](#contributing) if you want to develop the Developer
-Tools or use a pre-prelease version.
-
 ## Usage
 
-### Supporting tools
+The extension icon will light up on the websites using React:
 
-- The babel plugin [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source) is required if you want react devtools to tell you the source file & line number of created react elements. Its display is in the bottom of the right panel if the information is present. Don't forget to disable it in production!
+<img src="http://i.imgur.com/3tuhIgm.png" alt="Extension icon becomes active" width="500">
 
-### React Native
+On such websites, you will see a tab called React in Chrome Developer Tools:
 
-There is a [standalone version](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md) that works with React Native.
+<img src="http://i.imgur.com/jYieRqi.png" alt="React tab in DevTools" width="500">
+
+A quick way to bring up the DevTools is to right-click on the page and press Inspect.
 
 ### Tree View
 
 - Arrow keys or hjkl for navigation
 - Right click a component to show in elements pane, scroll into view, show
   source, etc.
-- Use the search bar to find components by name
 - A red collapser means the component has state/context
 
 ![](/images/devtools-tree-view.png)
@@ -51,6 +45,57 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 - Updates are highlighted
 
 ![](/images/devtools-side-pane.gif)
+
+### Search Bar
+
+- Use the search bar to find components by name
+
+![](/images/devtools-search-new.gif)
+
+### Handy Tips
+
+#### Finding Component by a DOM Node
+
+If you inspect a React element on the page using the regular **Elements** tab, then switch over to the **React** tab, that element will be automatically selected in the React tree.
+
+#### Finding DOM Node by a Component
+
+You can right-click any React element in the **React** tab, and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
+
+#### Displaying Element Souce
+
+You may include the [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source)  Babel plugin to see the source file and line number of React elements. This information appears in the bottom of the right panel when available. Don't forget to disable it in production! (Tip: if you use [Create React App](https://github.com/facebookincubator/create-react-app) it is already enabled in development.)
+
+#### Usage with React Native and Safari
+
+There is a [standalone version](https://github.com/facebook/react-devtools/blob/master/packages/react-devtools/README.md) that works with other environments such as React Native and Safari.
+
+## FAQ
+
+### The React Tab Doesn't Show Up
+
+**If you are running your app from a local `file://` URL**, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page. You can find it by opening Settings > Extensions:
+
+![Allow access to file URLs](http://i.imgur.com/Yt1rmUp.png)
+
+**The React tab won't show up if the site doesn't use React**, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization. You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
+
+**If your app is inside of CodePen**, make sure you are registered. Then press Fork (if it's not your pen), and then choose Change View > Debug. The Debug view is inspectable with DevTools because it doesn't use an iframe.
+
+**If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment**, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools). Chrome apps are currently not inspectable.
+
+**If you still have issues** please [report them](https://github.com/facebook/react-devtools/issues/new). Don't forget to specify your OS, browser version, extension version, and the exact instructions to reproduce the issue with a screenshot.
+
+### Does "Highlight Updates" trace renders?
+
+Yes, but it's also tracing if a component *may* render.
+In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
+![](https://facebook.github.io/react/img/docs/should-component-update.png)
+
+Here "Highlight Updates" will draw a border around every node but C4 and C5.
+Why does it trace components that don't actually update? (via shouldComponentUpdate() -> false) 
+This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
+The higher the rate of updates happening per second the more the color changes from blue to red.
 
 ## Contributing
 
@@ -65,37 +110,6 @@ For a list of good contribution opportunities, check the [good first bug](https:
 
 To read more about the community and guidelines for submitting pull requests,
 please read the [Contributing document](CONTRIBUTING.md).
-
-## FAQ
-
-### The React Tab Doesn't Show Up
-
-If you are running your app from `file://` URL, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page.
-
-The "React" tab won't show up if the site doesn't use React, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization.
-
-You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
-
-If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools).
-
-Chrome apps are currently not inspectable.
-
-### Does "Trace React Updates" trace renders?
-
-Yes, but it's also tracing if a component *may* render.
-In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
-![](https://facebook.github.io/react/img/docs/should-component-update.png)
-
-Here "Trace React Updates" will draw a border around every node but C4 and C5.
-Why does it trace components that don't actually update? (via shouldComponentUpdate() -> false) 
-This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
-The higher the rate of updates happening per second the more the color changes from blue to red.
-
-### ProTips
-
-If you inspect a React element on the page using the regular **Elements** tab,
-then switch over to the **React** tab, that element will be automatically
-selected in the React tree.
 
 ## Debugging (in Chrome)
 

@@ -1,4 +1,4 @@
 <!--
-  Note: Unfortunately it is unlikely that an issue will get fixed
-  if you don’t provide a minimal project reproducing it. Thanks!
+  Note: It is much more likely that your issue will get fixed
+  if you also provide a minimal project reproducing it. Thanks!
 -->

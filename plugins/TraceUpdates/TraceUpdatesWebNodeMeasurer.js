@@ -11,11 +11,11 @@
 
 'use strict';
 
-const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
+const TraceUpdatesAbstractNodeMeasurer = require('./TraceUpdatesAbstractNodeMeasurer');
 
 import type {
   Measurement,
-} from './BananaSlugTypes';
+} from './TraceUpdatesTypes';
 
 const DUMMY = {
   bottom: 0,
@@ -30,7 +30,7 @@ const DUMMY = {
   width: 0,
 };
 
-class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
+class TraceUpdatesWebNodeMeasurer extends TraceUpdatesAbstractNodeMeasurer {
   measureImpl(node: any): Measurement {
     if (!node || typeof node.getBoundingClientRect !== 'function') {
       return DUMMY;
@@ -66,4 +66,4 @@ class BananaSlugWebNodeMeasurer extends BananaSlugAbstractNodeMeasurer {
   }
 }
 
-module.exports = BananaSlugWebNodeMeasurer;
+module.exports = TraceUpdatesWebNodeMeasurer;

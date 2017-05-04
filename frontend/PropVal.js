@@ -22,6 +22,7 @@ class PropVal extends React.Component {
   props: {
     val: any,
     nested?: boolean,
+    inverted?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -35,21 +36,27 @@ class PropVal extends React.Component {
   }
 
   render() {
-    return previewProp(this.props.val, !!this.props.nested);
+    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted);
   }
 }
 
-function previewProp(val: any, nested: boolean) {
+var invertedStyle = {
+  color: 'white',
+};
+
+function previewProp(val: any, nested: boolean, inverted: boolean) {
   if (typeof val === 'number') {
-    return <span style={valueStyles.number}>{val}</span>;
+    const style = inverted ? invertedStyle : valueStyles.number;
+    return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
 
+    const style = inverted ? invertedStyle : valueStyles.string;
     return (
-      <span style={valueStyles.string}>
+      <span style={style}>
         <span style={{ color: 'rgb(168, 148, 166)' }}>"</span>
           {val}
         <span style={{ color: 'rgb(168, 148, 166)' }}>"</span>
@@ -57,52 +64,75 @@ function previewProp(val: any, nested: boolean) {
     );
   }
   if (typeof val === 'boolean') {
-    return <span style={valueStyles.bool}>{'' + val}</span>;
+    const style = inverted ? invertedStyle : valueStyles.bool;
+    return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
     if (nested) {
-      return <span style={valueStyles.array}>[({val.length})]</span>;
+      const style = inverted ? invertedStyle : valueStyles.array;
+      return <span style={style}>[({val.length})]</span>;
     }
-    return previewArray(val);
+    return previewArray(val, inverted);
   }
   if (!val) {
-    return <span style={valueStyles.empty}>{'' + val}</span>;
+    const style = inverted ? invertedStyle : valueStyles.empty;
+    return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
-    return <span>…</span>;
+    const style = inverted ? invertedStyle : null;
+    return <span style={style}>…</span>;
   }
 
   switch (val[consts.type]) {
-    case 'function':
-      return <span style={valueStyles.func}>{val[consts.name] || 'fn'}()</span>;
-    case 'object':
-      return <span style={valueStyles.object}>{val[consts.name] + '{…}'}</span>;
-    case 'array':
-      return <span>Array[{val[consts.meta].length}]</span>;
+    case 'date': {
+      const style = inverted ? invertedStyle : valueStyles.date;
+      return <span style={style}>{val[consts.name]}</span>;
+    }
+    case 'function': {
+      const style = inverted ? invertedStyle : valueStyles.func;
+      return <span style={style}>{val[consts.name] || 'fn'}()</span>;
+    }
+    case 'object': {
+      const style = inverted ? invertedStyle : valueStyles.object;
+      return <span style={style}>{val[consts.name] + '{…}'}</span>;
+    }
+    case 'array': {
+      const style = inverted ? invertedStyle : null;
+      return <span style={style}>Array[{val[consts.meta].length}]</span>;
+    }
     case 'typed_array':
     case 'array_buffer':
-    case 'data_view':
-      return <span style={valueStyles.object}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
-    case 'iterator':
-      return <span style={valueStyles.object}>{val[consts.name] + '(…)'}</span>;
-    case 'symbol':
+    case 'data_view': {
+      const style = inverted ? invertedStyle : valueStyles.object;
+      return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
+    }
+    case 'iterator': {
+      const style = inverted ? invertedStyle : valueStyles.object;
+      return <span style={style}>{val[consts.name] + '(…)'}</span>;
+    }
+    case 'symbol': {
+      const style = inverted ? invertedStyle : valueStyles.symbol;
       // the name is "Symbol(something)"
-      return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
-    case 'getter':
-      return <span>(…)</span>;
+      return <span style={style}>{val[consts.name]}</span>;
+    }
+    case 'getter': {
+      const style = inverted ? invertedStyle : valueStyles.object;
+      return <span style={style}>(…)</span>;
+    }
   }
 
   if (nested) {
-    return <span>{'{…}'}</span>;
+    const style = inverted ? invertedStyle : null;
+    return <span style={style}>{'{…}'}</span>;
   }
 
-  return previewObject(val);
+  return previewObject(val, inverted);
 }
 
-function previewArray(val) {
+function previewArray(val, inverted) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} />;
+    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} />;
     items['c' + i] = ', ';
   });
   if (val.length > 3) {
@@ -110,20 +140,22 @@ function previewArray(val) {
   } else {
     delete items['c' + (val.length - 1)];
   }
+  var style = inverted ? invertedStyle : valueStyles.array;
   return (
-    <span style={valueStyles.array}>
+    <span style={style}>
       [{createFragment(items)}]
     </span>
   );
 }
 
-function previewObject(val) {
+function previewObject(val, inverted) {
   var names = Object.keys(val);
   var items = {};
+  var attrStyle = inverted ? invertedStyle : valueStyles.attr;
   names.slice(0, 3).forEach((name, i) => {
-    items['k' + i] = <span style={valueStyles.attr}>{name}</span>;
+    items['k' + i] = <span style={attrStyle}>{name}</span>;
     items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} />;
+    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} />;
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
@@ -131,8 +163,9 @@ function previewObject(val) {
   } else {
     delete items['m' + (names.length - 1)];
   }
+  var style = inverted ? invertedStyle : valueStyles.object;
   return (
-    <span style={valueStyles.object}>
+    <span style={style}>
       {'{'}{createFragment(items)}{'}'}
     </span>
   );

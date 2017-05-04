@@ -16,6 +16,7 @@ var assign = require('object-assign');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
+var SearchUtils = require('./SearchUtils');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID} from './types';
@@ -29,7 +30,7 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search by Component Name';
+const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -63,10 +64,11 @@ const DEFAULT_PLACEHOLDER = 'Search by Component Name';
  * - hideContextMenu
  * - selectFirstSearchResult
  * - toggleCollapse
+ * - toggleAllChildrenNodes
  * - setProps/State/Context
  * - evalGetter
  * - makeGlobal(id, path)
- * - setHover(id, isHovered)
+ * - setHover(id, isHovered, isBottomTag)
  * - selectTop(id)
  * - selectBottom(id)
  * - select(id)
@@ -88,11 +90,11 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
-  bananaslugState: ?ControlState;
+  traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
-  regexState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
+  isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
   refreshSearch: boolean;
@@ -105,6 +107,8 @@ class Store extends EventEmitter {
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
+    rnStyle?: boolean,
+    rnStyleMeasure?: boolean,
   };
 
   constructor(bridge: Bridge) {
@@ -122,12 +126,12 @@ class Store extends EventEmitter {
     this.selected = null;
     this.selectedTab = 'Elements';
     this.breadcrumbHead = null;
+    this.isBottomTagHovered = false;
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
-    this.bananaslugState = null;
+    this.traceupdatesState = null;
     this.colorizerState = null;
-    this.regexState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
@@ -219,13 +223,13 @@ class Store extends EventEmitter {
     if (needle === this.searchText.toLowerCase() && !this.refreshSearch) {
       return;
     }
-    if (!text) {
+    if (!text || SearchUtils.trimSearchText(text).length === 0) {
       this.searchRoots = null;
     } else {
       if (
         this.searchRoots &&
         needle.indexOf(this.searchText.toLowerCase()) === 0 &&
-        (!this.regexState || !this.regexState.enabled)
+        !SearchUtils.shouldSearchUseRegex(text)
       ) {
         this.searchRoots = this.searchRoots
           .filter(item => {
@@ -262,7 +266,7 @@ class Store extends EventEmitter {
     this.highlightSearch();
     this.refreshSearch = false;
 
-    // SearchPane input depends on this change being flushed synchronously.
+    // Search input depends on this change being flushed synchronously.
     this.flush();
   }
 
@@ -342,6 +346,14 @@ class Store extends EventEmitter {
     this.emit(id);
   }
 
+  toggleAllChildrenNodes(value: boolean) {
+    var id = this.selected;
+    if (!id) {
+      return;
+    }
+    this._toggleDeepChildren(id, value);
+  }
+
   setProps(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setProps', {id, path, value});
   }
@@ -362,10 +374,11 @@ class Store extends EventEmitter {
     this._bridge.send('makeGlobal', {id, path});
   }
 
-  setHover(id: ElementID, isHovered: boolean) {
+  setHover(id: ElementID, isHovered: boolean, isBottomTag: boolean) {
     if (isHovered) {
       var old = this.hovered;
       this.hovered = id;
+      this.isBottomTagHovered = isBottomTag;
       if (old) {
         this.emit(old);
       }
@@ -374,6 +387,7 @@ class Store extends EventEmitter {
       this.highlight(id);
     } else if (this.hovered === id) {
       this.hideHighlight();
+      this.isBottomTagHovered = false;
     }
   }
 
@@ -473,18 +487,15 @@ class Store extends EventEmitter {
     });
   }
 
-  changeBananaSlug(state: ControlState) {
-    this.bananaslugState = state;
-    this.emit('bananaslugchange');
+  changeTraceUpdates(state: ControlState) {
+    this.traceupdatesState = state;
+    this.emit('traceupdatesstatechange');
     invariant(state.toJS);
-    this._bridge.send('bananaslugchange', state.toJS());
+    this._bridge.send('traceupdatesstatechange', state.toJS());
   }
 
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
-    this.placeholderText = this.colorizerState.enabled
-      ? 'Highlight by Component Name'
-      : DEFAULT_PLACEHOLDER;
     this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
@@ -493,13 +504,6 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
-  }
-
-  changeRegex(state: ControlState) {
-    this.regexState = state;
-    this.emit('regexchange');
-    this.refreshSearch = true;
-    this.changeSearch(this.searchText);
   }
 
   // Private stuff
@@ -538,6 +542,21 @@ class Store extends EventEmitter {
         return;
       }
       pid = this._parents.get(pid);
+    }
+  }
+
+  _toggleDeepChildren(id: ElementID, value: boolean) {
+    var node = this._nodes.get(id);
+    if (!node) {
+      return;
+    }
+    if (node.get('collapsed') !== value) {
+      this._nodes = this._nodes.setIn([id, 'collapsed'], value);
+      this.emit(id);
+    }
+    var children = node.get('children');
+    if (children && children.forEach) {
+      children.forEach(cid => this._toggleDeepChildren(cid, value));
     }
   }
 

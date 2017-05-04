@@ -35,8 +35,11 @@ function getPropType(data: Object): string | null {
     if (data instanceof ArrayBuffer) {
       return 'array_buffer';
     }
-    if (data[Symbol.iterator] === 'function') {
+    if (typeof data[Symbol.iterator] === 'function') {
       return 'iterator';
+    }
+    if (Object.prototype.toString.call(data) === '[object Date]') {
+      return 'date';
     }
   }
 
@@ -136,11 +139,20 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
     case 'typed_array':
     case 'iterator':
       return createDehydrated(type, data, cleaned, path);
-
+    case 'date':
+      cleaned.push(path);
+      return {
+        name: data.toString(),
+        type: 'date',
+        meta: {
+          uninspectable: true,
+        },
+      };
     case 'object':
       if (level > 2 || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
         return createDehydrated(type, data, cleaned, path);
       } else {
+
         var res = {};
         for (var name in data) {
           if (isPropertyGetter(data, name)) {

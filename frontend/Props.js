@@ -11,12 +11,13 @@
 'use strict';
 
 var React = require('react');
+var assign = require('object-assign');
 var PropVal = require('./PropVal');
 
 class Props extends React.Component {
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
-    return nextProps.props !== this.props.props;
+    return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 
   render() {
@@ -30,30 +31,44 @@ class Props extends React.Component {
     });
 
     var items = [];
+    var propNameStyle = assign(
+      {},
+      styles.propName,
+      this.props.inverted && styles.propNameInverted
+    );
+
     names.slice(0, 3).forEach(name => {
       items.push(
-        <span key={name} style={styles.prop}>
-          <span style={styles.propName}>{name}</span>
+        <span key={'prop-' + name} style={styles.prop}>
+          <span style={propNameStyle}>{name}</span>
           =
-          <PropVal val={props[name]}/>
+          <PropVal val={props[name]} inverted={this.props.inverted}/>
         </span>
       );
     });
 
     if (names.length > 3) {
-      items.push('…');
+      var ellipsisStyle = this.props.inverted ? styles.ellipsisInverted : null;
+      items.push(<span key="ellipsis" style={ellipsisStyle}>…</span>);
     }
     return <span>{items}</span>;
   }
 }
 
 var styles = {
+  ellipsisInverted: {
+    color: '#ccc',
+  },
+
   prop: {
     paddingLeft: 5,
   },
 
   propName: {
     color: '#994500',
+  },
+  propNameInverted: {
+    color: '#ccc',
   },
 };
 
