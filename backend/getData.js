@@ -108,7 +108,9 @@ function getData(internalInstance: Object): DataType {
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
     };
-    publicInstance = inst;
+    if (typeof type === 'function') {
+      publicInstance = inst;
+    }
 
     // TODO: React ART currently falls in this bucket, but this doesn't
     // actually make sense and we should clean this up after stabilizing our
