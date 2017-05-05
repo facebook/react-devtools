@@ -123,8 +123,6 @@ class Simple extends React.Component {
     var typeStyle;
     if (type === 'boolean') {
       typeStyle = valueStyles.bool;
-    } else if (!this.props.data) {
-      typeStyle = valueStyles.empty;
     } else if (type === 'string') {
       typeStyle = valueStyles.string;
       if (data.length > 200) {
@@ -132,6 +130,8 @@ class Simple extends React.Component {
       }
     } else if (type === 'number') {
       typeStyle = valueStyles.number;
+    } else if (!this.props.data) {
+      typeStyle = valueStyles.empty;
     }
     style = assign({}, style, typeStyle);
     if (!this.props.readOnly) {
@@ -188,7 +188,7 @@ function textToValue(txt) {
     return BAD_INPUT;
   }
   try {
-    return jsan.parse(txt);
+    return eval(`(${txt})`); // eslint-disable-line no-eval
   } catch (e) {
     return BAD_INPUT;
   }
@@ -197,6 +197,9 @@ function textToValue(txt) {
 function valueToText(value) {
   if (typeof value === 'number') {
     return value.toString();
+  }
+  if (typeof value === 'undefined') {
+    return String(value);
   }
   return jsan.stringify(value, null, null, {
     'date': true,
