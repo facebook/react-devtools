@@ -94,6 +94,7 @@ var styles = {
     textAlign: 'center',
   },
   box: {
+    position: 'relative',
     padding: 8,
     margin: 8,
     width: 184,
