@@ -312,9 +312,13 @@ var primitiveProps = {
   num: 1312,
   unknown: undefined,
   notThere: null,
+};
+var numberProps = {
   infinity: Infinity,
   negInfinity: -Infinity,
   nan: NaN,
+  float: 1/3,
+  big: Math.pow(10, 100),
 };
 var complexProps = {
   array: [1, 2, 3, 4],
@@ -328,6 +332,7 @@ var complexProps = {
     [3, null],
     [4, undefined],
   ]),
+  date: new Date(),
   objMap: new Map([
     [{ a: 'a'}, true],
     [{ a: 'a'}, false],
@@ -422,6 +427,7 @@ class Wrap extends React.Component {
         <PropTester awesome={2}/>
         <PropTester {...emptyProps}/>
         <PropTester {...primitiveProps}/>
+        <PropTester {...numberProps}/>
         <PropTester {...complexProps}/>
         <PropTester {...uninspectableProps}/>
         <PropTester massiveMap={massiveMap}/>
