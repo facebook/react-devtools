@@ -98,8 +98,8 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data &&
-      !(typeof this.props.data === 'number' && isNaN(this.props.data) &&
-      typeof prevProps.data === 'number' && isNaN(prevProps.data))) {
+    !(typeof this.props.data === 'number' && isNaN(this.props.data) &&
+    typeof prevProps.data === 'number' && isNaN(prevProps.data))) {
       flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
     }
   }
