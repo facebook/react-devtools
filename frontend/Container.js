@@ -17,6 +17,8 @@ var LeftPane = require('./LeftPane');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
+require('./theme.js');
+
 import type MenuItem from './ContextMenu';
 
 type Props = {};
@@ -102,7 +104,7 @@ class Container extends React.Component {
       ...this.props.extraTabs,
     };
     return (
-      <div style={styles.container}>
+      <div className='DevTools' style={styles.container}>
         <TabbedPane tabs={tabs} />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
       </div>
@@ -143,8 +145,6 @@ var styles = {
     flex: 1,
     display: 'flex',
     minWidth: 0,
-    backgroundColor: 'white',
-    color: 'rgb(48, 57, 66)',
   },
 };
 

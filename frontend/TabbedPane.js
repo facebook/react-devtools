@@ -28,17 +28,19 @@ class TabbedPane extends React.Component {
     }
     return (
       <div style={styles.container}>
-        <ul style={styles.tabs}>
+        <ul className='TabBar' style={styles.tabs}>
           {tabs.map((name, i) => {
             var style = styles.tab;
+            var className = 'Tab';
             if (name === this.props.selected) {
               style = assign({}, style, styles.selectedTab);
+              className += ' ActiveTab';
             }
             if (i === tabs.length - 1) {
               style = assign({}, style, styles.lastTab);
             }
             return (
-              <li key={name + i} style={style} onClick={() => this.props.setSelectedTab(name)}>
+              <li key={name + i} className={className} style={style} onClick={() => this.props.setSelectedTab(name)}>
                 {name}
               </li>
             );
@@ -63,24 +65,19 @@ var styles = {
     display: 'flex',
     flexShrink: 0,
     listStyle: 'none',
-    backgroundColor: '#eee',
-    borderBottom: '1px solid rgb(163, 163, 163)',
     margin: 0,
-    padding: '0 2px',
+    padding: '0',
   },
   tab: {
-    padding: '2px 4px',
+    padding: '0.25rem 0.5rem',
     lineHeight: '15px',
     fontSize: 12,
     fontFamily: "'Lucida Grande', sans-serif",
     cursor: 'pointer',
-    borderLeft: '1px solid rgb(163, 163, 163)',
   },
   lastTab: {
-    borderRight: '1px solid rgb(163, 163, 163)',
   },
   selectedTab: {
-    backgroundColor: 'white',
   },
   body: {
     flex: 1,

@@ -96,7 +96,7 @@ class SettingsPane extends React.Component {
     }
 
     return (
-      <div style={styles.container}>
+      <div className='Toolbar' style={styles.container}>
         <TraceUpdatesFrontendControl {...this.props} />
         
         <div style={styles.growToFill}>
@@ -162,9 +162,7 @@ function SearchIcon() {
 
 var styles = {
   container: {
-    backgroundColor: 'rgb(243, 243, 243)',
-    padding: '4px 4px',
-    borderBottom: '1px solid rgb(204, 204, 204)',
+    padding: '0.25rem',
     display: 'flex',
     flexWrap: 'wrap',
     flexShrink: 0,

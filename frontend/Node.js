@@ -13,6 +13,7 @@
 var React = require('react');
 
 var assign = require('object-assign');
+var cn = require('classnames');
 var decorate = require('./decorate');
 var Props = require('./Props');
 
@@ -188,17 +189,15 @@ class Node extends React.Component {
       paddingRight: 5,
     };
 
-    var headSelectStyle = assign(
-      {},
-      styles.headSelect,
-      isWindowFocused ? styles.headSelectInverted : styles.headSelectInactive
-    );
+    var headClassName = cn({
+      inverted: isWindowFocused,
+      NodeSelected: selected,
+      NodeHover: hovered,
+    });
 
     var headStyles = assign(
       {},
       styles.head,
-      hovered && (collapsed || !this.props.isBottomTagHovered) && styles.headHover,
-      selected && (collapsed || !this.props.isBottomTagSelected) && headSelectStyle,
       leftPad
     );
 
@@ -219,23 +218,15 @@ class Node extends React.Component {
 
     var nodeType = node.get('nodeType');
     if (nodeType === 'Text' || nodeType === 'Empty') {
-      const tagTextStyle = assign(
-        {},
-        styles.tagText,
-        inverted && styles.tagTextInverted
-      );
+      const tagTextStyle = styles.tagText;
       var tag;
       if (nodeType === 'Text') {
         var text = node.get('text');
         tag =
-          <span style={tagTextStyle}>
-            <span style={styles.openTag}>
-              "
-            </span>
+          <span className='JsxAttributeTypeString' style={tagTextStyle}>
+            "
             <span style={styles.textContent}>{text}</span>
-            <span style={styles.closeTag}>
-              "
-            </span>
+            "
           </span>;
       } else if (nodeType === 'Empty') {
         tag =
@@ -245,7 +236,7 @@ class Node extends React.Component {
       }
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
+          <div className={headClassName} style={headStyles} ref={h => this._head = h} {...headEvents}>
             {tag}
           </div>
         </div>
@@ -253,18 +244,6 @@ class Node extends React.Component {
     }
 
     var isCustom = nodeType === 'Composite';
-
-    var topTagStyle = inverted && !this.props.isBottomTagSelected ?
-      styles.invertedTagName :
-      (isCustom ? styles.customTagName : styles.tagName);
-    var bottomTagStyle = inverted && this.props.isBottomTagSelected ?
-      styles.invertedTagName :
-      (isCustom ? styles.customTagName : styles.tagName);
-    var topTagTextStyle = assign(
-      {},
-      styles.tagText,
-      inverted && !this.props.isBottomTagSelected && styles.tagTextInverted
-    );
 
     var name = node.get('name') + '';
     var searchRegExp = this.props.searchRegExp;
@@ -279,7 +258,7 @@ class Node extends React.Component {
       ];
       while (unmatched.length > 0) {
         pieces.push(
-          <span key={pieces.length} style={styles.tagNameHighlight}>{matched.shift()}</span>
+          <span key={pieces.length} className='Highlight'>{matched.shift()}</span>
         );
         pieces.push(
           <span key={pieces.length}>{unmatched.shift()}</span>
@@ -295,10 +274,11 @@ class Node extends React.Component {
       var isCollapsed = content === null || content === undefined;
       return (
         <div style={styles.container}>
-          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
-            <span style={topTagTextStyle}>
-              <span style={styles.openTag}>
-                <span style={topTagStyle}>&lt;{name}</span>
+          <div className={headClassName} style={headStyles} ref={h => this._head = h} {...headEvents}>
+            <span>
+              <span>
+                <span className='JsxBracket'>&lt;</span>
+                <span className='JsxTagName'>{name}</span>
                 {node.get('key') &&
                   <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
@@ -308,15 +288,16 @@ class Node extends React.Component {
                 {node.get('props') &&
                   <Props key="props" props={node.get('props')} inverted={inverted}/>
                 }
-                {isCollapsed && <span style={topTagStyle}> /</span>}
-                <span style={topTagStyle}>&gt;</span>
+                <span className='JsxBracket'>{isCollapsed ? ' />' : '>'}</span>
               </span>
               {!isCollapsed && [
                 <span key="content" style={styles.textContent}>
                   {content}
                 </span>,
-                <span key="close" style={styles.closeTag}>
-                  <span style={topTagStyle}>&lt;/{name}&gt;</span>
+                <span key="close">
+                  <span className='JsxBracket'>&lt;</span>
+                  <span className='JsxTagName'>{name}</span>
+                  <span className='JsxBracket'>&gt;</span>
                 </span>,
               ]}
             </span>
@@ -326,10 +307,10 @@ class Node extends React.Component {
     }
 
     var closeTag = (
-      <span style={styles.closeTag}>
-        <span style={collapsed ? topTagStyle : bottomTagStyle}>
-          &lt;/{name}&gt;
-        </span>
+      <span>
+        <span className='JsxBracket'>&lt;/</span>
+        <span className='JsxTagName'>{name}</span>
+        <span className='JsxBracket'>&gt;</span>
       </span>
     );
 
@@ -341,6 +322,10 @@ class Node extends React.Component {
       {left: leftPad.paddingLeft - 12},
     );
     var headInverted = inverted && !this.props.isBottomTagSelected;
+    var arrowClassName = cn({
+      Arrow: !hasState,
+      StatefulArrow: hasState,
+    });
     var arrowStyle = node.get('collapsed') ?
       assign(
         {},
@@ -360,29 +345,28 @@ class Node extends React.Component {
         title={hasState ? 'This component is stateful.' : null}
         onClick={this.props.onToggleCollapse} style={collapserStyle}
       >
-        <span style={arrowStyle}/>
+        <span className={arrowClassName} style={arrowStyle}/>
       </span>;
 
     var head = (
-      <div ref={h => this._head = h} style={headStyles} {...headEvents}>
+      <div ref={h => this._head = h} className={headClassName} style={headStyles} {...headEvents}>
         {collapser}
-        <span style={topTagTextStyle}>
-          <span style={styles.openTag}>
-            <span style={topTagStyle}>&lt;{name}</span>
-            {node.get('key') &&
-              <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
-            }
-            {node.get('ref') &&
-              <Props key="ref" props={{'ref': node.get('ref')}} inverted={headInverted}/>
-            }
-            {node.get('props') &&
-              <Props key="props" props={node.get('props')} inverted={headInverted}/>
-            }
-            <span style={topTagStyle}>&gt;</span>
-          </span>
-          {collapsed && <span style={styles.textContent}>…</span>}
-          {collapsed && closeTag}
+        <span>
+          <span className='JsxBracket'>&lt;</span>
+          <span className='JsxTagName'>{name}</span>
+          {node.get('key') &&
+            <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
+          }
+          {node.get('ref') &&
+            <Props key="ref" props={{'ref': node.get('ref')}} inverted={headInverted}/>
+          }
+          {node.get('props') &&
+            <Props key="props" props={node.get('props')} inverted={headInverted}/>
+          }
+          <span className='JsxBracket'>&gt;</span>
         </span>
+        {collapsed && <span style={styles.textContent}>…</span>}
+        {collapsed && closeTag}
       </div>
     );
 
@@ -394,11 +378,13 @@ class Node extends React.Component {
       );
     }
 
+    var tailClassName = cn({
+      NodeHover: hovered && this.props.isBottomTagHovered,
+      NodeSelected: selected && this.props.isBottomTagSelected,
+    });
     var tailStyles = assign(
       {},
       styles.tail,
-      hovered && this.props.isBottomTagHovered && styles.headHover,
-      selected && this.props.isBottomTagSelected && headSelectStyle,
       leftPad
     );
 
@@ -424,7 +410,7 @@ class Node extends React.Component {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyles} {...tailEvents}>
+        <div ref={t => this._tail = t} className={tailClassName} style={tailStyles} {...tailEvents}>
           {closeTag}
         </div>
       </div>
@@ -496,9 +482,6 @@ var styles = {
     fontStyle: 'italic',
   },
 
-  closeTag: {
-  },
-
   head: {
     cursor: 'default',
     borderTop: '1px solid transparent',
@@ -506,17 +489,10 @@ var styles = {
     display: 'flex',
   },
   headHover: {
-    backgroundColor: '#ebf2fb',
     borderRadius: 20,
   },
   headSelect: {
     borderRadius: 0,
-  },
-  headSelectInverted: {
-    backgroundColor: 'rgb(56, 121, 217)',
-  },
-  headSelectInactive: {
-    backgroundColor: 'rgb(218, 218, 218)',
   },
 
   tail: {
@@ -524,30 +500,9 @@ var styles = {
     cursor: 'default',
   },
 
-  tagName: {
-    color: '#777',
-  },
-  customTagName: {
-    color: 'rgb(136, 18, 128)',
-  },
-  invertedTagName: {
-    color: 'white',
-  },
-
-  tagNameHighlight: {
-    backgroundColor: 'yellow',
-    color: 'black',
-  },
-
-  openTag: {
-  },
-
   tagText: {
     flex: 1,
     whiteSpace: 'nowrap',
-  },
-  tagTextInverted: {
-    color: 'white',
   },
 
   collapser: {
@@ -556,7 +511,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
+    borderColor: 'transparent transparent transparent currentColor',
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -564,10 +519,10 @@ var styles = {
     verticalAlign: 'top',
   },
   collapsedArrowStateful: {
-    borderColor: 'transparent transparent transparent #e55',
+    borderColor: 'transparent transparent transparent currentColor',
   },
   collapsedArrowInverted: {
-    borderColor: 'transparent transparent transparent white',
+    borderColor: 'transparent transparent transparent currentColor',
   },
 
   expandedArrow: {
@@ -579,10 +534,10 @@ var styles = {
     verticalAlign: 'top',
   },
   expandedArrowStateful: {
-    borderColor: '#e55 transparent transparent transparent',
+    borderColor: 'currentColor transparent transparent transparent',
   },
   expandedArrowInverted: {
-    borderColor: 'white transparent transparent transparent',
+    borderColor: 'currentColor transparent transparent transparent',
   },
 
   guideline: {

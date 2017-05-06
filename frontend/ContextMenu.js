@@ -83,10 +83,10 @@ class ContextMenu extends React.Component {
     });
 
     return (
-      <ul style={containerStyle}>
-        {!this.props.items.length && <li style={styles.empty}>No actions</li>}
+      <ul className='ContextMenu' style={containerStyle}>
+        {!this.props.items.length && <li className='ContextMenuItemDisabled' style={styles.empty}>No actions</li>}
         {this.props.items.map((item, i) => item && (
-          <li key={item.key} onClick={evt => this.onClick(i, evt)}>
+          <li className='ContextMenuItem' key={item.key} onClick={evt => this.onClick(i, evt)}>
             <HighlightHover style={styles.item}>
               {item.title}
             </HighlightHover>
@@ -136,20 +136,18 @@ var styles = {
 
   container: {
     position: 'fixed',
-    backgroundColor: 'white',
-    boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
     listStyle: 'none',
     margin: 0,
-    padding: '4px 0',
+    padding: '0.25rem 0',
     fontSize: 14,
-    borderRadius: '3px',
+    borderRadius: '0.25rem',
     overflow: 'hidden',
     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
     zIndex: 1,
   },
 
   item: {
-    padding: '3px 10px',
+    padding: '0.25rem 0.5rem',
     cursor: 'default',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
@@ -157,8 +155,7 @@ var styles = {
   },
 
   empty: {
-    padding: '5px 10px',
-    color: '#888',
+    padding: '0.25rem 0.5rem',
   },
 };
 

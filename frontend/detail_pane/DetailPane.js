@@ -18,7 +18,7 @@ class DetailPane extends React.Component {
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <span style={styles.headerName}>
+          <span className='Header' style={styles.headerName}>
             {this.props.header}
           </span>
           <span style={styles.consoleHint}>{this.props.hint}</span>
@@ -54,7 +54,6 @@ var styles = {
   headerName: {
     flex: 1,
     fontSize: 16,
-    color: 'rgb(184, 0, 161)',
 
     cursor: 'text',
     WebkitUserSelect: 'text',

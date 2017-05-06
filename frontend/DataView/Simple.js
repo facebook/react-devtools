@@ -15,7 +15,6 @@ var ReactDOM = require('react-dom');
 
 var assign = require('object-assign');
 var flash = require('../flash');
-var valueStyles = require('../value-styles');
 
 import type {DOMEvent, DOMNode} from '../types';
 
@@ -120,26 +119,26 @@ class Simple extends React.Component {
     var data = this.props.data;
     var type = typeof data;
     var style = styles.simple;
-    var typeStyle;
+    var typeClassName;
     if (type === 'boolean') {
-      typeStyle = valueStyles.bool;
+      typeClassName = 'CodeBoolean';
     } else if (type === 'string') {
-      typeStyle = valueStyles.string;
+      typeClassName = 'CodeString';
       if (data.length > 200) {
         data = data.slice(0, 200) + '…';
       }
     } else if (type === 'number') {
-      typeStyle = valueStyles.number;
+      typeClassName = 'CodeNumber';
     } else if (!this.props.data) {
-      typeStyle = valueStyles.empty;
+      typeClassName = 'CodeEmpty';
     }
-    style = assign({}, style, typeStyle);
     if (!this.props.readOnly) {
       assign(style, styles.editable);
     }
     return (
       <div
         onClick={this.startEditing.bind(this)}
+        className={typeClassName}
         style={style}>
         {valueToText(data)}
       </div>

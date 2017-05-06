@@ -53,7 +53,7 @@ class TreeView extends React.Component {
       if (this.props.searching) {
         return (
           <div style={styles.container}>
-            <span style={styles.noSearchResults}>No search results</span>
+            <span className='NoContent' style={styles.noSearchResults}>No search results</span>
           </div>
         );
       } else {
@@ -157,8 +157,7 @@ var styles = {
   noSearchResults: {
     fontFamily: 'sans-serif',
     fontSize: '14px',
-    padding: '10px',
-    color: 'rgba(0,0,0,0.4)',
+    padding: '0.5rem',
   },
 };
 

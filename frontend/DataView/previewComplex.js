@@ -13,12 +13,11 @@
 var React = require('react');
 
 var consts = require('../../agent/consts');
-var valueStyles = require('../value-styles');
 
 function previewComplex(data: Object) {
   if (Array.isArray(data)) {
     return (
-      <span style={valueStyles.array}>
+      <span className='CodeArray'>
         Array[{data.length}]
       </span>
     );
@@ -27,31 +26,31 @@ function previewComplex(data: Object) {
   switch (data[consts.type]) {
     case 'function':
       return (
-        <span style={valueStyles.func}>
+        <span className='CodeFunction'>
           {data[consts.name] || 'fn'}()
         </span>
       );
     case 'object':
       return (
-        <span style={valueStyles.object}>
+        <span className='CodeObject'>
           {data[consts.name] + '{…}'}
         </span>
       );
     case 'date':
       return (
-        <span style={valueStyles.date}>
+        <span className='CodeDate'>
           {data[consts.name]}
         </span>
       );
     case 'symbol':
       return (
-        <span style={valueStyles.symbol}>
+        <span className='CodeSymbol'>
           {data[consts.name]}
         </span>
       );
     case 'iterator':
       return (
-        <span style={valueStyles.object}>
+        <span className='CodeObject'>
           {data[consts.name] + '(…)'}
         </span>
       );
@@ -61,7 +60,7 @@ function previewComplex(data: Object) {
     case 'array':
     case 'typed_array':
       return (
-        <span style={valueStyles.array}>
+        <span className='CodeArray'>
           {`${data[consts.name]}[${data[consts.meta].length}]`}
         </span>
       );

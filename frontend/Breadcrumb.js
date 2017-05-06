@@ -13,6 +13,7 @@
 import type Store from './Store';
 import type {ElementID} from './types';
 
+var cn = require('classnames');
 var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
@@ -37,20 +38,18 @@ class Breadcrumb extends React.Component {
 
   render() {
     return (
-      <ul style={styles.container}>
+      <ul className='Breadcrumb' style={styles.container}>
         {this.props.path.map(({ id, node }) => {
           var isSelected = id === this.props.selected;
-          var isHovered = id === this.state.hovered;
-          var style = assign(
-            {},
-            styles.item,
-            node.get('nodeType') === 'Composite' && styles.composite,
-            isHovered && styles.hovered,
-            isSelected && styles.selected,
-          );
+          var className = cn({
+            Breadcrumb: !isSelected,
+            ActiveBreadcrumb: isSelected,
+            CompositeBreadcrumb: node.get('nodeType') === 'Composite',
+          });
           return (
             <li
-              style={style}
+              className={className}
+              style={styles.item}
               key={id}
               onMouseOver={() => this.handleCrumbMouseOver(id)}
               onMouseOut={() => this.handleCrumbMouseOut(id)}
@@ -67,8 +66,6 @@ class Breadcrumb extends React.Component {
 
 var styles = {
   container: {
-    borderTop: '1px solid #ccc',
-    backgroundColor: 'white',
     fontFamily: 'sans-serif',
     listStyle: 'none',
     padding: 0,
@@ -79,24 +76,14 @@ var styles = {
 
   selected: {
     cursor: 'default',
-    backgroundColor: 'rgb(56, 121, 217)',
-    color: 'white',
-  },
-
-  hovered: {
-    backgroundColor: '#d8d8d8',
-  },
-
-  composite: {
-    color: 'rgb(136, 18, 128)',
   },
 
   item: {
-    padding: '3px 7px',
+    padding: '0.25rem 0.5rem',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
-    cursor: 'default',
+    cursor: 'pointer',
     display: 'inline-block',
   },
 };

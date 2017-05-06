@@ -255,7 +255,8 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={assign({}, styles.name, complex && styles.complexName)}
+            className='CodeAttribute'
+            style={assign({}, complex && styles.complexName)}
             onClick={inspectable && this.toggleOpen.bind(this)}
           >
             {name}:

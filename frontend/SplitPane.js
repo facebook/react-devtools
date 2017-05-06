@@ -128,19 +128,18 @@ var styles = {
   },
 
   draggerHorizontal: {
-    padding: '0px 3px',
-    margin: '0px -3px',
+    padding: '0 0.25rem',
+    margin: '0 -0.25rem',
     cursor: 'ew-resize',
   },
 
   draggerVertical: {
-    padding: '3px 0px',
-    margin: '-3px 0px',
+    padding: '0.25rem 0',
+    margin: '-0.25rem 0',
     cursor: 'ns-resize',
   },
 
   draggerInner: {
-    backgroundColor: 'rgb(163, 163, 163)',
   },
 
   draggerInnerHorizontal: {

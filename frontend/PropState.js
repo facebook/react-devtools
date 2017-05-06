@@ -47,8 +47,7 @@ class PropState extends React.Component {
 
   render(): React.Element {
     if (!this.props.node) {
-      // TODO(jared): style this
-      return <span style={styles.noSelection}>No selection</span>;
+      return <span className='NoContent' style={styles.noSelection}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -192,7 +191,7 @@ var WrappedPropState = decorate({
 
 var styles = {
   source: {
-    padding: '5px 10px',
+    padding: '0.25rem 0.5rem',
     color: 'blue',
     overflow: 'auto',
     overflowWrap: 'break-word',
@@ -205,13 +204,11 @@ var styles = {
   noSelection: {
     fontFamily: 'sans-serif',
     margin: 'auto',
-    color: 'rgba(0,0,0,0.4)',
   },
 
   noPropsState: {
     fontWeight: 'bold',
-    padding: '5px',
-    borderTop: '1px solid rgba(0,0,0,0.1)',
+    padding: '0.25rem',
   },
 };
 

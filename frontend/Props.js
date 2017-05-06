@@ -31,16 +31,15 @@ class Props extends React.Component {
     });
 
     var items = [];
-    var propNameStyle = assign(
-      {},
-      styles.propName,
-      this.props.inverted && styles.propNameInverted
-    );
+    var className = 'JsxAttributeName';
+    if (this.props.inverted) {
+      className += ' inverted';
+    }
 
     names.slice(0, 3).forEach(name => {
       items.push(
         <span key={'prop-' + name} style={styles.prop}>
-          <span style={propNameStyle}>{name}</span>
+          <span className={className}>{name}</span>
           =
           <PropVal val={props[name]} inverted={this.props.inverted}/>
         </span>
@@ -62,13 +61,6 @@ var styles = {
 
   prop: {
     paddingLeft: 5,
-  },
-
-  propName: {
-    color: '#994500',
-  },
-  propNameInverted: {
-    color: '#ccc',
   },
 };
 
