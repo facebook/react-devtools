@@ -111,12 +111,13 @@ function installGlobalHook(window: Object) {
         }
         // By now we know that it's envified and dead code elimination worked,
         // but what if it's still not minified? (Is this even possible?)
-        // Let's check the first argument. It should be a single letter.
-        // We know this function gets more than one argument in all supported
-        // versions, and if it doesn't have arguments, it's wrapped in ReactPerf
-        // (which also indicates a DEV build, although we should've filtered
-        // that out earlier).
-        if (!(/function\s*\(\w\,/.test(renderRootCode))) {
+        // Let's check matches for the first argument name.
+        if (
+          // 0.13 to 15
+          renderRootCode.indexOf('nextElement') !== -1 ||
+          // 0.12
+          renderRootCode.indexOf('nextComponent') !== -1
+        ) {
           return 'unminified';
         }
         // Seems like we're using the production version.
