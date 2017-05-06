@@ -39,12 +39,18 @@ function installGlobalHook(window: Object) {
           // Hope for the best if we're not sure.
           return 'production';
         }
+
         // By now we know that it's envified--but what if it's not minified?
         // This can be bad too, as it means DEV code is still there.
-        // Let's check the first argument. It should be a single letter.
-        if (!(/function[\s\w]*\(\w[,\)]/.test(findFiberCode))) {
+
+        // FIXME: this is fragile!
+        // We should replace this check with check on a specially passed
+        // function. This also doesn't detect lack of dead code elimination
+        // (although this is not a problem since flat bundles).
+        if (findFiberCode.indexOf('getClosestInstanceFromNode') !== -1) {
           return 'unminified';
         }
+
         // We're good.
         return 'production';
       }
@@ -88,14 +94,19 @@ function installGlobalHook(window: Object) {
           // By now either it is a production build that has not been minified,
           // or (worse) this is a minified development build using non-standard
           // environment (e.g. "staging"). We're going to look at whether
-          // the function appears minified:
-          if (/function\s*\(\w\,/.test(renderRootCode)) {
-            // This is likely a minified development build.
-            return 'development';
-          } else {
+          // the function argument name is mangled:
+          if (
+            // 0.13 to 15
+            renderRootCode.indexOf('nextElement') !== -1 ||
+            // 0.12
+            renderRootCode.indexOf('nextComponent') !== -1
+          ) {
             // We can't be certain whether this is a development build or not,
             // but it is definitely unminified.
             return 'unminified';
+          } else {
+            // This is likely a minified development build.
+            return 'development';
           }
         }
         // By now we know that it's envified and dead code elimination worked,
