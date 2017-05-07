@@ -21,6 +21,9 @@ var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 
+// TODO (bvaughn) Read from somewhere better :)
+var theme = require('./theme');
+
 var consts = require('../agent/consts');
 
 import type {DOMEvent} from './types';
@@ -83,6 +86,7 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
+      theme: theme,
     };
   }
 
@@ -239,12 +243,16 @@ class Panel extends React.Component {
 
   render() {
     if (this.state.loading) {
+      const loadingStyle = assign({}, styles.loading, {
+        color: theme.base05,
+      });
+
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
       // properly doing so probably requires refactoring how we load the panel
       // and communicate with the bridge.
       return (
-        <div style={styles.loading}>
+        <div style={loadingStyle}>
           <h2>Connecting to React…</h2>
         </div>
       );
@@ -295,12 +303,14 @@ class Panel extends React.Component {
         }}
         extraPanes={extraPanes}
         extraTabs={extraTabs}
+        theme={theme}
       />
     );
   }
 }
 
 Panel.childContextTypes = {
+  theme: React.PropTypes.object,
   store: React.PropTypes.object,
 };
 
@@ -326,7 +336,6 @@ var styles = {
   },
   loading: {
     textAlign: 'center',
-    color: '#888',
     padding: 30,
     flex: 1,
   },

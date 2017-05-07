@@ -18,6 +18,7 @@ var decorate = require('./decorate');
 var Props = require('./Props');
 
 import type {Map} from 'immutable';
+import type {Base16Theme} from './theme';
 
 type PropsType = {
   hovered: boolean,
@@ -45,13 +46,14 @@ class Node extends React.Component {
   _tail: ?HTMLElement;
   _ownerWindow: any;
 
-  context: Object;
+  context: {
+    scrollTo: func,
+    theme: Base16Theme,
+  };
   props: PropsType;
   state: StateType = {
     isWindowFocused: true,
   };
-
-  static contextTypes: Object;
 
   shouldComponentUpdate(nextProps: PropsType, nextState: StateType) {
     return (
@@ -158,6 +160,7 @@ class Node extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
     var node = this.props.node;
     if (!node) {
       return <span>Node was deleted</span>;
@@ -201,6 +204,10 @@ class Node extends React.Component {
       leftPad
     );
 
+    var jsxTagStyle = {
+      color: theme.base08,
+    };
+
     var headEvents = {
       onContextMenu: this.props.onContextMenu,
       onDoubleClick: this.props.onToggleCollapse,
@@ -218,12 +225,14 @@ class Node extends React.Component {
 
     var nodeType = node.get('nodeType');
     if (nodeType === 'Text' || nodeType === 'Empty') {
-      const tagTextStyle = styles.tagText;
+      const tagTextStyle = assign({}, styles.tagText, {
+        color: theme.base0F,
+      });
       var tag;
       if (nodeType === 'Text') {
         var text = node.get('text');
         tag =
-          <span className='JsxAttributeTypeString' style={tagTextStyle}>
+          <span style={tagTextStyle}>
             "
             <span style={styles.textContent}>{text}</span>
             "
@@ -277,8 +286,8 @@ class Node extends React.Component {
           <div className={headClassName} style={headStyles} ref={h => this._head = h} {...headEvents}>
             <span>
               <span>
-                <span className='JsxBracket'>&lt;</span>
-                <span className='JsxTagName'>{name}</span>
+                <span>&lt;</span>
+                <span style={jsxTagStyle}>{name}</span>
                 {node.get('key') &&
                   <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
@@ -288,16 +297,16 @@ class Node extends React.Component {
                 {node.get('props') &&
                   <Props key="props" props={node.get('props')} inverted={inverted}/>
                 }
-                <span className='JsxBracket'>{isCollapsed ? ' />' : '>'}</span>
+                <span>{isCollapsed ? ' />' : '>'}</span>
               </span>
               {!isCollapsed && [
                 <span key="content" style={styles.textContent}>
                   {content}
                 </span>,
                 <span key="close">
-                  <span className='JsxBracket'>&lt;</span>
-                  <span className='JsxTagName'>{name}</span>
-                  <span className='JsxBracket'>&gt;</span>
+                  <span>&lt;</span>
+                  <span style={jsxTagStyle}>{name}</span>
+                  <span>&gt;</span>
                 </span>,
               ]}
             </span>
@@ -308,9 +317,9 @@ class Node extends React.Component {
 
     var closeTag = (
       <span>
-        <span className='JsxBracket'>&lt;/</span>
-        <span className='JsxTagName'>{name}</span>
-        <span className='JsxBracket'>&gt;</span>
+        <span>&lt;/</span>
+        <span style={jsxTagStyle}>{name}</span>
+        <span>&gt;</span>
       </span>
     );
 
@@ -352,8 +361,8 @@ class Node extends React.Component {
       <div ref={h => this._head = h} className={headClassName} style={headStyles} {...headEvents}>
         {collapser}
         <span>
-          <span className='JsxBracket'>&lt;</span>
-          <span className='JsxTagName'>{name}</span>
+          <span>&lt;</span>
+          <span style={jsxTagStyle}>{name}</span>
           {node.get('key') &&
             <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
           }
@@ -363,7 +372,7 @@ class Node extends React.Component {
           {node.get('props') &&
             <Props key="props" props={node.get('props')} inverted={headInverted}/>
           }
-          <span className='JsxBracket'>&gt;</span>
+          <span>&gt;</span>
         </span>
         {collapsed && <span style={styles.textContent}>…</span>}
         {collapsed && closeTag}
@@ -398,9 +407,9 @@ class Node extends React.Component {
         zIndex: selected ? 1 : 0,
       },
       styles.guideline,
+      selected && {borderLeftColor: theme.base02},
       // Only show hover for the top tag, or it gets too noisy.
-      hovered && !this.props.isBottomTagHovered && styles.guidelineHover,
-      selected && styles.guidelineSelect,
+      hovered && !this.props.isBottomTagHovered && {borderLeftColor: theme.base03},
     );
 
     return (
@@ -420,6 +429,7 @@ class Node extends React.Component {
 
 Node.contextTypes = {
   scrollTo: React.PropTypes.func,
+  theme: React.PropTypes.object,
 };
 
 var WrappedNode = decorate({
@@ -526,7 +536,7 @@ var styles = {
   },
 
   expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
+    borderColor: '#555 transparent transparent transparent', // TODO (bvaughn) theme
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
@@ -543,18 +553,12 @@ var styles = {
   guideline: {
     position: 'absolute',
     width: '1px',
-    backgroundColor: 'rgb(230, 230, 230)',
+    borderLeftStyle: 'dotted',
+    borderLeftWidth: '1px',
+    borderLeftColor: 'transparent',
     top: 16,
     bottom: 0,
-    opacity: 0,
     willChange: 'opacity',
-  },
-  guidelineHover: {
-    opacity: 1,
-  },
-  guidelineSelect: {
-    backgroundColor: '#a9c5ef',
-    opacity: 1,
   },
 
 };

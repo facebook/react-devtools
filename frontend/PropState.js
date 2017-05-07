@@ -16,12 +16,19 @@ var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
 var PropVal = require('./PropVal');
 var React = require('react');
+var assign = require('object-assign');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
+import type {Base16Theme} from './theme';
 
 class PropState extends React.Component {
+  context: {
+    onChange: func,
+    theme: Base16Theme,
+  };
+
   getChildContext() {
     return {
       onChange: (path, val) => {
@@ -46,8 +53,13 @@ class PropState extends React.Component {
   }
 
   render(): React.Element {
+    var theme = this.context.theme;
+
     if (!this.props.node) {
-      return <span className='NoContent' style={styles.noSelection}>No selection</span>;
+      var emptyStyle = assign({}, styles.noSelection, {
+        color: theme.base03,
+      });
+      return <span style={emptyStyle}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -152,6 +164,10 @@ class PropState extends React.Component {
   }
 }
 
+PropState.contextTypes = {
+  theme: React.PropTypes.object,
+};
+
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
@@ -192,13 +208,13 @@ var WrappedPropState = decorate({
 var styles = {
   source: {
     padding: '0.25rem 0.5rem',
-    color: 'blue',
+    color: 'blue', // TODO (bvaughn) theme
     overflow: 'auto',
     overflowWrap: 'break-word',
   },
 
   sourcePos: {
-    color: '#777',
+    color: '#777', // TODO (bvaughn) theme
   },
 
   noSelection: {

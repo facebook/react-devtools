@@ -57,7 +57,7 @@ class ElementPanel extends React.Component {
 var styles = {
   dataNode: {
     marginBottom: 5,
-    border: '1px solid #ccc',
+    border: '1px solid #ccc', // TODO (bvaughn) theme
   },
   dataIDs: {
     listStyle: 'none',
@@ -72,14 +72,14 @@ var styles = {
   dataID: {
     cursor: 'pointer',
     padding: '2px 4px',
-    backgroundColor: '#ccc',
+    backgroundColor: '#ccc', // TODO (bvaughn) theme
   },
   queryID: {
     cursor: 'pointer',
     padding: '2px 4px',
   },
   noQueries: {
-    color: '#999',
+    color: '#999', // TODO (bvaughn) theme
     padding: '2px 4px',
   },
 };

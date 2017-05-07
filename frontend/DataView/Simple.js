@@ -97,7 +97,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
-      flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
+      flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1); // TODO (bvaughn) theme
     }
   }
 
@@ -174,7 +174,7 @@ var styles = {
     border: 'none',
     padding: 0,
     outline: 'none',
-    boxShadow: '0 0 3px #ccc',
+    boxShadow: '0 0 3px #ccc', // TODO (bvaughn) theme
     fontFamily: 'monospace',
     fontSize: 'inherit',
   },

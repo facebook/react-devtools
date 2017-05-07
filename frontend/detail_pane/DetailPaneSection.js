@@ -30,7 +30,7 @@ class DetailPaneSection extends React.Component {
 
 var styles = {
   section: {
-    borderTop: '1px solid #eee',
+    borderTop: '1px solid #eee', // TODO (bvaughn) theme
     padding: 5,
     marginBottom: 5,
     flexShrink: 0,

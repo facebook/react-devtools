@@ -44,9 +44,9 @@ class MultiOverlay {
         left: box.left + 'px',
         width: box.width + 'px',
         height: box.height + 'px',
-        border: '2px dotted rgba(200, 100, 100, .8)',
+        border: '2px dotted rgba(200, 100, 100, .8)', // TODO (bvaughn) theme
         boxSizing: 'border-box',
-        backgroundColor: 'rgba(200, 100, 100, .2)',
+        backgroundColor: 'rgba(200, 100, 100, .2)', // TODO (bvaughn) theme
         position: 'fixed',
         zIndex: 10000000,
         pointerEvents: 'none',

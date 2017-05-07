@@ -12,6 +12,7 @@
 
 import type Store from './Store';
 import type {ElementID} from './types';
+import type {Base16Theme} from './theme';
 
 var cn = require('classnames');
 var React = require('react');
@@ -19,6 +20,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
+  context: {theme: Base16Theme};
   state: {hovered: ?string};
 
   constructor(props) {
@@ -37,19 +39,23 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
+    var style = assign({}, styles.container, {
+      backgroundColor: theme.base01,
+    });
     return (
-      <ul className='Breadcrumb' style={styles.container}>
+      <ul style={style}>
         {this.props.path.map(({ id, node }) => {
           var isSelected = id === this.props.selected;
-          var className = cn({
-            Breadcrumb: !isSelected,
-            ActiveBreadcrumb: isSelected,
-            CompositeBreadcrumb: node.get('nodeType') === 'Composite',
-          });
+          var itemStyle = assign({}, styles.item,
+            {backgroundColor: theme.base02},
+            isSelected && {backgroundColor: theme.base03},
+            isSelected && styles.selected,
+            node.get('nodeType') === 'Composite' && {color: theme.base06},
+          );
           return (
             <li
-              className={className}
-              style={styles.item}
+              style={itemStyle}
               key={id}
               onMouseOver={() => this.handleCrumbMouseOver(id)}
               onMouseOut={() => this.handleCrumbMouseOut(id)}
@@ -64,6 +70,10 @@ class Breadcrumb extends React.Component {
   }
 }
 
+Breadcrumb.contextTypes = {
+  theme: React.PropTypes.object,
+};
+
 var styles = {
   container: {
     fontFamily: 'sans-serif',
@@ -72,6 +82,7 @@ var styles = {
     margin: 0,
     maxHeight: '80px',
     overflow: 'auto',
+    marginTop: '2px',
   },
 
   selected: {
@@ -85,6 +96,7 @@ var styles = {
     userSelect: 'none',
     cursor: 'pointer',
     display: 'inline-block',
+    marginRight: '2px',
   },
 };
 

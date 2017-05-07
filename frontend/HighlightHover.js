@@ -38,7 +38,7 @@ class HighlightHover extends React.Component {
         onMouseOver={() => !this.state.hover && this.setState({hover: true})}
         onMouseOut={() => this.state.hover && this.setState({hover: false})}
         style={assign({}, this.props.style, {
-          backgroundColor: this.state.hover ? '#eee' : 'transparent',
+          backgroundColor: this.state.hover ? '#eee' : 'transparent', // TODO (bvaughn) theme
         })}>
         {this.props.children}
       </div>

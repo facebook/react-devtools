@@ -14,7 +14,12 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
+import type {Base16Theme} from './theme';
+
 class TabbedPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     tabs: {[key: string]: () => React$Element},
     selected: string,
@@ -22,25 +27,32 @@ class TabbedPane extends React.Component {
   };
 
   render() {
+    var {theme} = this.context;
     var tabs = Object.keys(this.props.tabs);
     if (tabs.length === 1) {
       return this.props.tabs[tabs[0]]();
     }
+    var tabsStyle = assign({}, styles.tabs, {
+      backgroundColor: theme.base00,
+    });
     return (
       <div style={styles.container}>
-        <ul className='TabBar' style={styles.tabs}>
+        <ul style={tabsStyle}>
           {tabs.map((name, i) => {
-            var style = styles.tab;
-            var className = 'Tab';
+            var style = assign({}, styles.tab, {
+              backgroundColor: theme.base01,
+            });
+
             if (name === this.props.selected) {
-              style = assign({}, style, styles.selectedTab);
-              className += ' ActiveTab';
+              style = assign({}, style, styles.selectedTab, {
+                backgroundColor: theme.base02,
+              });
             }
             if (i === tabs.length - 1) {
               style = assign({}, style, styles.lastTab);
             }
             return (
-              <li key={name + i} className={className} style={style} onClick={() => this.props.setSelectedTab(name)}>
+              <li key={name + i} style={style} onClick={() => this.props.setSelectedTab(name)}>
                 {name}
               </li>
             );
@@ -53,6 +65,10 @@ class TabbedPane extends React.Component {
     );
   }
 }
+
+TabbedPane.contextTypes = {
+  theme: React.PropTypes.object,
+};
 
 var styles = {
   container:{
@@ -67,6 +83,7 @@ var styles = {
     listStyle: 'none',
     margin: 0,
     padding: '0',
+    marginBottom: '2px',
   },
   tab: {
     padding: '0.25rem 0.5rem',
@@ -74,6 +91,7 @@ var styles = {
     fontSize: 12,
     fontFamily: "'Lucida Grande', sans-serif",
     cursor: 'pointer',
+    marginRight: '2px',
   },
   lastTab: {
   },

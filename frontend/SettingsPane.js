@@ -14,9 +14,12 @@ var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendCo
 var React = require('react');
 var ReactDOM = require('react-dom');
 var SearchUtils = require('./SearchUtils');
+var assign = require('object-assign');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
+
+import type {Base16Theme} from './theme';
 
 type EventLike = {
   keyCode: number,
@@ -26,6 +29,10 @@ type EventLike = {
 };
 
 class SettingsPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
+
   _key: (evt: EventLike) => void;
 
   constructor(props) {
@@ -81,22 +88,27 @@ class SettingsPane extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
     var searchText = this.props.searchText;
 
     var inputStyle = styles.input;
     if (searchText || this.state.focused) {
-      inputStyle = Object.assign({}, inputStyle, styles.highlightedInput);
+      inputStyle = assign({}, inputStyle, styles.highlightedInput);
     }
     if (
       searchText &&
       SearchUtils.shouldSearchUseRegex(searchText) &&
       !SearchUtils.isValidRegex(searchText)
     ) {
-      inputStyle = Object.assign({}, inputStyle, styles.errorInput);
+      inputStyle = assign({}, inputStyle, styles.errorInput);
     }
 
+    const style = assign({}, styles.container, {
+      backgroundColor: theme.base01,
+    });
+
     return (
-      <div className='Toolbar' style={styles.container}>
+      <div style={style}>
         <TraceUpdatesFrontendControl {...this.props} />
         
         <div style={styles.growToFill}>
@@ -125,6 +137,10 @@ class SettingsPane extends React.Component {
     );
   }
 }
+
+SettingsPane.contextTypes = {
+  theme: React.PropTypes.object,
+};
 
 SettingsPane.propTypes = {
   searchText: PropTypes.string,
@@ -188,7 +204,7 @@ var styles = {
     cursor: 'pointer',
     right: 0,
     lineHeight: '28px',
-    color: '#bbb',
+    color: '#bbb', // TODO (bvaughn) theme
   },
 
   searchIcon: {
@@ -200,30 +216,30 @@ var styles = {
     width: '1em',
     height: '100%',
     strokeWidth: 0,
-    stroke: '#bbb',
-    fill: '#bbb',
+    stroke: '#bbb', // TODO (bvaughn) theme
+    fill: '#bbb', // TODO (bvaughn) theme
     lineHeight: '28px',
     fontSize: '12px',
   },
 
   input: {
     fontSize: '12px',
-    padding: '4px',
-    border: '1px solid #ccc',
+    padding: '0.25rem',
+    border: '1px solid #ccc', // TODO (bvaughn) theme
     outline: 'none',
-    borderRadius: '4px',
+    borderRadius: '0.25rem',
     paddingLeft: '1.25rem',
     width: '150px',
   },
 
   highlightedInput: {
-    border: '1px solid #99c6f4',
-    boxShadow: '0 0 1px 1px #81aedc',
+    border: '1px solid #99c6f4', // TODO (bvaughn) theme
+    boxShadow: '0 0 1px 1px #81aedc', // TODO (bvaughn) theme
   },
 
   errorInput: {
-    backgroundColor: '#fff0f0',
-    border: '1px solid red',
+    backgroundColor: '#fff0f0', // TODO (bvaughn) theme
+    border: '1px solid red', // TODO (bvaughn) theme
   },
 };
 

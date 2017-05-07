@@ -10,15 +10,30 @@
  */
 'use strict';
 
+var assign = require('object-assign');
 var React = require('react');
 
+import type {Base16Theme} from './theme';
+
 class DetailPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
+
+  static contextTypes = {
+    theme: React.PropTypes.object,
+  };
 
   render(): React.Element {
+    const {theme} = this.context;
+    const headerNameStyle = assign({}, styles.headerName, {
+      color: theme.base08,
+    });
+
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <span className='Header' style={styles.headerName}>
+          <span style={headerNameStyle}>
             {this.props.header}
           </span>
           <span style={styles.consoleHint}>{this.props.hint}</span>

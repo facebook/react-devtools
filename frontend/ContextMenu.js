@@ -17,6 +17,8 @@ var HighlightHover = require('./HighlightHover');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
+import type {Base16Theme} from './theme';
+
 export type MenuItem = {
   key: string,
   title: string,
@@ -26,6 +28,9 @@ export type MenuItem = {
 class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     open: boolean,
     hideContextMenu: () => void,
@@ -77,16 +82,25 @@ class ContextMenu extends React.Component {
       return <div style={styles.hidden} />;
     }
 
+    var theme = this.context.theme;
+
     var containerStyle = assign({}, styles.container, {
       top: this.props.pos.y + 'px',
       left: this.props.pos.x + 'px',
+      backgroundColor: theme.base07,
     });
+    var emptyStyle = assign({}, styles.empty, {
+      color: theme.base03,
+    })
+    var itemStyle = {
+      color: theme.base04,
+    };
 
     return (
-      <ul className='ContextMenu' style={containerStyle}>
-        {!this.props.items.length && <li className='ContextMenuItemDisabled' style={styles.empty}>No actions</li>}
+      <ul style={containerStyle}>
+        {!this.props.items.length && <li style={emptyStyle}>No actions</li>}
         {this.props.items.map((item, i) => item && (
-          <li className='ContextMenuItem' key={item.key} onClick={evt => this.onClick(i, evt)}>
+          <li style={itemStyle} key={item.key} onClick={evt => this.onClick(i, evt)}>
             <HighlightHover style={styles.item}>
               {item.title}
             </HighlightHover>
@@ -96,6 +110,10 @@ class ContextMenu extends React.Component {
     );
   }
 }
+
+ContextMenu.contextTypes = {
+  theme: React.PropTypes.object,
+};
 
 var Wrapped = decorate({
   listeners() {

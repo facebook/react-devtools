@@ -10,6 +10,7 @@
  */
 'use strict';
 
+import type {Base16Theme} from '../theme';
 import type {DOMEvent} from '../types';
 
 var React = require('react');
@@ -130,6 +131,9 @@ class DataView extends React.Component {
 }
 
 class DataItem extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     path: Array<string>,
     inspect: Inspect,
@@ -186,6 +190,7 @@ class DataItem extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
     var data = this.props.value;
     var otype = typeof data;
     var complex = true;
@@ -200,7 +205,7 @@ class DataItem extends React.Component {
       );
       complex = false;
     } else {
-      preview = previewComplex(data);
+      preview = previewComplex(data, theme);
     }
 
     var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
@@ -250,13 +255,17 @@ class DataItem extends React.Component {
       name = name.slice(0, 50) + '…';
     }
 
+    var style = assign({},
+      complex && styles.complexName,
+      {color: theme.base0B},
+    );
+
     return (
       <li>
         <div style={styles.head}>
           {opener}
           <div
-            className='CodeAttribute'
-            style={assign({}, complex && styles.complexName)}
+            style={style}
             onClick={inspectable && this.toggleOpen.bind(this)}
           >
             {name}:
@@ -280,6 +289,7 @@ class DataItem extends React.Component {
 
 DataItem.contextTypes = {
   onChange: React.PropTypes.func,
+  theme: React.PropTypes.object,
 };
 
 function alphanumericSort(a: string, b: string): number {
@@ -306,7 +316,7 @@ var styles = {
   empty: {
     marginLeft: 10,
     padding: '2px 5px',
-    color: '#aaa',
+    color: '#aaa', // TODO (bvaughn) theme
   },
 
   missing: {
@@ -314,7 +324,7 @@ var styles = {
     fontWeight: 'bold',
     marginLeft: 10,
     padding: '2px 5px',
-    color: '#888',
+    color: '#888', // TODO (bvaughn) theme
   },
 
   opener: {
@@ -332,7 +342,7 @@ var styles = {
   },
 
   collapsedArrow: {
-    borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
+    borderColor: 'transparent transparent transparent rgb(110, 110, 110)', // TODO (bvaughn) theme
     borderStyle: 'solid',
     borderWidth: '4px 0 4px 7px',
     display: 'inline-block',
@@ -341,7 +351,7 @@ var styles = {
   },
 
   expandedArrow: {
-    borderColor: 'rgb(110, 110, 110) transparent transparent transparent',
+    borderColor: 'rgb(110, 110, 110) transparent transparent transparent', // TODO (bvaughn) theme
     borderStyle: 'solid',
     borderWidth: '7px 4px 0 4px',
     display: 'inline-block',
@@ -355,7 +365,7 @@ var styles = {
   },
 
   name: {
-    color: '#666',
+    color: '#666', // TODO (bvaughn) theme
     margin: '2px 3px',
   },
 

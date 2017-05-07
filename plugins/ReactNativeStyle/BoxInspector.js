@@ -79,7 +79,7 @@ var styles = {
   },
   label: {
     flex: 1,
-    color: 'rgb(255,100,0)',
+    color: 'rgb(255,100,0)', // TODO (bvaughn) theme
   },
   measureLayout: {
     display: 'flex',
@@ -87,14 +87,14 @@ var styles = {
     margin: 4,
   },
   innerText: {
-    color: 'blue',
+    color: 'blue', // TODO (bvaughn) theme
     textAlign: 'center',
   },
   box: {
     padding: 8,
     margin: 8,
     width: 208,
-    border: '1px solid grey',
+    border: '1px solid grey', // TODO (bvaughn) theme
     alignItems: 'center',
   },
   boxText: {

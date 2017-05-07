@@ -46,9 +46,9 @@ class Overlay {
     this.tip = doc.createElement('div');
     assign(this.tip.style, {
       border: '1px solid #aaa',
-      backgroundColor: 'rgb(255, 255, 178)',
+      backgroundColor: 'rgb(255, 255, 178)', // TODO (bvaughn) theme
       fontFamily: 'sans-serif',
-      color: 'orange',
+      color: 'orange', // TODO (bvaughn) theme
       padding: '3px 5px',
       position: 'fixed',
       fontSize: '10px',
@@ -57,13 +57,13 @@ class Overlay {
     this.nameSpan = doc.createElement('span');
     this.tip.appendChild(this.nameSpan);
     assign(this.nameSpan.style, {
-      color:   'rgb(136, 18, 128)',
+      color:   'rgb(136, 18, 128)', // TODO (bvaughn) theme
       marginRight: '5px',
     });
     this.dimSpan = doc.createElement('span');
     this.tip.appendChild(this.dimSpan);
     assign(this.dimSpan.style, {
-      color: '#888',
+      color: '#888', // TODO (bvaughn) theme
     });
 
     this.container.style.zIndex = 10000000;
@@ -273,10 +273,10 @@ function boxWrap(dims, what, node) {
 }
 
 var overlayStyles = {
-  background: 'rgba(120, 170, 210, 0.7)',
-  padding: 'rgba(77, 200, 0, 0.3)',
-  margin: 'rgba(255, 155, 0, 0.3)',
-  border: 'rgba(255, 200, 50, 0.3)',
+  background: 'rgba(120, 170, 210, 0.7)', // TODO (bvaughn) theme
+  padding: 'rgba(77, 200, 0, 0.3)', // TODO (bvaughn) theme
+  margin: 'rgba(255, 155, 0, 0.3)', // TODO (bvaughn) theme
+  border: 'rgba(255, 200, 50, 0.3)', // TODO (bvaughn) theme
 };
 
 module.exports = Overlay;

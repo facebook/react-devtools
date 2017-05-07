@@ -58,10 +58,10 @@ class Query extends React.Component {
 }
 
 var statusColors = {
-  pending: 'orange',
-  success: 'green',
-  failure: 'red',
-  error: '#aaa',
+  pending: 'orange', // TODO (bvaughn) theme
+  success: 'green', // TODO (bvaughn) theme
+  failure: 'red', // TODO (bvaughn) theme
+  error: '#aaa', // TODO (bvaughn) theme
 };
 
 var baseContainer = {
@@ -76,7 +76,7 @@ var baseTD = {
   whiteSpace: 'nowrap',
   'padding': '1px 4px',
   'lineHeight': '17px',
-  'borderLeft': '1px solid #e1e1e1',
+  'borderLeft': '1px solid #e1e1e1', // TODO (bvaughn) theme
 };
 
 var styles = {
@@ -84,13 +84,13 @@ var styles = {
 
   containerSelected: {
     ...baseContainer,
-    backgroundColor: '#3879d9',
-    color: 'white',
+    backgroundColor: '#3879d9', // TODO (bvaughn) theme
+    color: 'white', // TODO (bvaughn) theme
   },
 
   containeroOddRow: {
     ...baseContainer,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: '#f5f5f5', // TODO (bvaughn) theme
   },
 
   td: baseTD,
@@ -110,7 +110,7 @@ var styles = {
     width: 11,
     height: 11,
     borderRadius: 6,
-    backgroundColor: '#aaa',
+    backgroundColor: '#aaa', // TODO (bvaughn) theme
   },
 };
 

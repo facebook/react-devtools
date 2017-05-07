@@ -14,13 +14,19 @@ var React = require('react');
 var assign = require('object-assign');
 var PropVal = require('./PropVal');
 
+import type {Base16Theme} from './theme';
+
 class Props extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
     return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 
   render() {
+    var theme = this.context.theme;
     var props = this.props.props;
     if (!props || typeof props !== 'object') {
       return <span/>;
@@ -31,15 +37,15 @@ class Props extends React.Component {
     });
 
     var items = [];
-    var className = 'JsxAttributeName';
-    if (this.props.inverted) {
-      className += ' inverted';
-    }
+    // TODO (bvaughn) Handle inverted
+    var attributeNameStyle = {
+      color: theme.base0F,
+    };
 
     names.slice(0, 3).forEach(name => {
       items.push(
         <span key={'prop-' + name} style={styles.prop}>
-          <span className={className}>{name}</span>
+          <span style={attributeNameStyle}>{name}</span>
           =
           <PropVal val={props[name]} inverted={this.props.inverted}/>
         </span>
@@ -53,6 +59,10 @@ class Props extends React.Component {
     return <span>{items}</span>;
   }
 }
+
+Props.contextTypes = {
+  theme: React.PropTypes.object,
+};
 
 var styles = {
   ellipsisInverted: {

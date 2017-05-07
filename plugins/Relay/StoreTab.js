@@ -57,7 +57,7 @@ var styles = {
   },
   loading: {
     textAlign: 'center',
-    color: '#aaa',
+    color: '#aaa', // TODO (bvaughn) theme
   },
 };
 

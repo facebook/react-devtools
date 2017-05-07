@@ -53,27 +53,37 @@ class StyleEdit extends React.Component {
       <ul style={styles.container}>
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.attr}>
-            <BlurInput
-              value={name}
-              onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
-            />
+            <div style={styles.InputWrapper}>
+              <BlurInput
+                value={name}
+                onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
+              />
+            </div>
             :
-            <BlurInput
-              value={this.props.style[name]}
-              onChange={val => this.onChange(name, val)}
-            />
+            <div style={styles.InputWrapper}>
+              <BlurInput
+                value={this.props.style[name]}
+                onChange={val => this.onChange(name, val)}
+              />
+            </div>
           </li>
         ))}
         <li style={styles.attr}>
-          <BlurInput
-            value={this.state.newAttr}
-            onChange={newAttr => this.setState({newAttr: '' + newAttr})}
-          />
+          <div style={styles.InputWrapper}>
+            <BlurInput
+              value={this.state.newAttr}
+              onChange={newAttr => this.setState({newAttr: '' + newAttr})}
+            />
+          </div>
           :
-          {this.state.newAttr && <BlurInput
-            value={''}
-            onChange={val => this.onNew(val)}
-          />}
+          <div style={styles.InputWrapper}>
+            {this.state.newAttr && (
+              <BlurInput
+                value={''}
+                onChange={val => this.onNew(val)}
+              />
+            )}
+          </div>
         </li>
       </ul>
     );
@@ -85,9 +95,16 @@ var styles = {
     listStyle: 'none',
     padding: 0,
     margin: 0,
+    width: '100%',
   },
   attr: {
     padding: 2,
+    display: 'flex',
+    alignContent: 'center',
+  },
+  InputWrapper: {
+    flex: '1 1 100px',
+    display: 'flex',
   },
 };
 

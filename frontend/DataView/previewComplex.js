@@ -14,10 +14,14 @@ var React = require('react');
 
 var consts = require('../../agent/consts');
 
-function previewComplex(data: Object) {
+import type {Base16Theme} from '../theme';
+
+function previewComplex(data: Object, theme: Base16Theme) {
+  const style={ color: theme.base0D };
+
   if (Array.isArray(data)) {
     return (
-      <span className='CodeArray'>
+      <span style={style}>
         Array[{data.length}]
       </span>
     );
@@ -26,31 +30,31 @@ function previewComplex(data: Object) {
   switch (data[consts.type]) {
     case 'function':
       return (
-        <span className='CodeFunction'>
+        <span style={style}>
           {data[consts.name] || 'fn'}()
         </span>
       );
     case 'object':
       return (
-        <span className='CodeObject'>
+        <span style={style}>
           {data[consts.name] + '{…}'}
         </span>
       );
     case 'date':
       return (
-        <span className='CodeDate'>
+        <span style={style}>
           {data[consts.name]}
         </span>
       );
     case 'symbol':
       return (
-        <span className='CodeSymbol'>
+        <span style={style}>
           {data[consts.name]}
         </span>
       );
     case 'iterator':
       return (
-        <span className='CodeObject'>
+        <span style={style}>
           {data[consts.name] + '(…)'}
         </span>
       );
@@ -60,7 +64,7 @@ function previewComplex(data: Object) {
     case 'array':
     case 'typed_array':
       return (
-        <span className='CodeArray'>
+        <span style={style}>
           {`${data[consts.name]}[${data[consts.meta].length}]`}
         </span>
       );
