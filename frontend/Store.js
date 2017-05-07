@@ -138,8 +138,10 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
-    this.theme = theme.default; // TODO (bvaughn) Check localStorage for default
     this.themes = theme.themes;
+
+    // TODO (bvaughn) Potentially refactor this into a user-preferences service
+    this.theme = this._loadSavedTheme();
 
     // for debugging
     window.store = this;
@@ -329,8 +331,11 @@ class Store extends EventEmitter {
   }
 
   changeTheme(themeName: string) {
-    this.theme = this.themes[themeName];
-    this.emit('theme');
+    if (this.themes.hasOwnProperty(themeName)) {
+      this.theme = this.themes[themeName];
+      this.emit('theme');
+      this._saveThemeName(themeName);
+    }
   }
 
   showPreferencesPanel() {
@@ -542,6 +547,26 @@ class Store extends EventEmitter {
       }
       this._bridge.send('requestCapabilities');
     }, 500);
+  }
+
+  _loadSavedTheme() {
+    let themeName;
+
+    try {
+      themeName = localStorage.getItem('themeName');
+    } catch (error) {
+      console.error('Could not read saved theme.', error);
+    }
+
+    return this.themes[themeName || theme.default.name];
+  }
+
+  _saveThemeName(themeName: string) {
+    try {
+      localStorage.setItem('themeName', themeName);
+    } catch (error) {
+      console.error('Could not save theme.', error);
+    }
   }
 
   _revealDeep(id: ElementID) {
