@@ -20,7 +20,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
-  context: {theme: Base16Theme};
+  props: {theme: Base16Theme};
   state: {hovered: ?string};
 
   constructor(props) {
@@ -39,7 +39,7 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    var theme = this.context.theme;
+    var theme = this.props.theme;
     var style = assign({}, styles.container, {
       backgroundColor: theme.base01,
     });
@@ -70,7 +70,7 @@ class Breadcrumb extends React.Component {
   }
 }
 
-Breadcrumb.contextTypes = {
+Breadcrumb.propTypes = {
   theme: React.PropTypes.object,
 };
 
@@ -114,13 +114,14 @@ function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
 }
 
 module.exports = decorate({
-  listeners: () => ['breadcrumbHead', 'selected'],
+  listeners: () => ['breadcrumbHead', 'selected', 'theme'],
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
       hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),
+      theme: store.theme,
     };
   },
 }, Breadcrumb);

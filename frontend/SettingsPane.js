@@ -29,7 +29,7 @@ type EventLike = {
 };
 
 class SettingsPane extends React.Component {
-  context: {
+  props: {
     theme: Base16Theme,
   };
 
@@ -88,7 +88,7 @@ class SettingsPane extends React.Component {
   }
 
   render() {
-    var theme = this.context.theme;
+    var theme = this.props.theme;
     var searchText = this.props.searchText;
 
     var inputStyle = styles.input;
@@ -138,20 +138,17 @@ class SettingsPane extends React.Component {
   }
 }
 
-SettingsPane.contextTypes = {
-  theme: React.PropTypes.object,
-};
-
 SettingsPane.propTypes = {
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
+  theme: React.PropTypes.object,
   onChangeSearch: PropTypes.func,
   placeholderText: PropTypes.string,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['searchText', 'placeholderchange'];
+    return ['searchText', 'placeholderchange', 'theme'];
   },
   props(store) {
     return {
@@ -159,6 +156,7 @@ var Wrapped = decorate({
       placeholderText: store.placeholderText,
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
+      theme: store.theme,
     };
   },
 }, SettingsPane);

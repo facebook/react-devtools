@@ -21,9 +21,6 @@ var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 
-// TODO (bvaughn) Read from somewhere better :)
-var theme = require('./theme');
-
 var consts = require('../agent/consts');
 
 import type {DOMEvent} from './types';
@@ -86,7 +83,6 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
-      theme: theme,
     };
   }
 
@@ -200,6 +196,7 @@ class Panel extends React.Component {
       this._bridge = new Bridge(wall);
 
       this._store = new Store(this._bridge);
+      
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -211,6 +208,9 @@ class Panel extends React.Component {
       this._store.on('connected', () => {
         this.setState({loading: false});
         this.getNewSelection();
+      });
+      this._store.on('theme', () => {
+        this.forceUpdate(); // TODO (bvaughn) Do we even need to do this? Maybe not.
       });
     });
   }
@@ -242,8 +242,9 @@ class Panel extends React.Component {
   }
 
   render() {
+    var theme = this._store ? this._store.theme : {};
     if (this.state.loading) {
-      const loadingStyle = assign({}, styles.loading, {
+      var loadingStyle = assign({}, styles.loading, {
         color: theme.base05,
       });
 
@@ -269,7 +270,7 @@ class Panel extends React.Component {
       <Container
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
-          attr: (id, node, val, path) => {
+          attr: (id, node, path) => {
             if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
               return undefined;
             }
@@ -310,7 +311,6 @@ class Panel extends React.Component {
 }
 
 Panel.childContextTypes = {
-  theme: React.PropTypes.object,
   store: React.PropTypes.object,
 };
 

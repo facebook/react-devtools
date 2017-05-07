@@ -14,10 +14,12 @@ var ContextMenu = require('./ContextMenu');
 var PropState = require('./PropState');
 var React = require('react');
 var LeftPane = require('./LeftPane');
+var PreferencesPanel = require('./PreferencesPanel');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
 var assign = require('object-assign');
+var decorate = require('./decorate');
 
 import type MenuItem from './ContextMenu';
 import type {Base16Theme} from './theme';
@@ -35,9 +37,6 @@ function shouldUseVerticalLayout(window) {
 }
 
 class Container extends React.Component {
-  context: {
-    theme: Base16Theme,
-  };
   props: {
     reload: () => void,
     extraPanes: Array<(node: Object) => React$Element>,
@@ -54,13 +53,10 @@ class Container extends React.Component {
       ) => ?Array<MenuItem>,
     },
     extraTabs: {[key: string]: () => React$Element},
+    theme: Base16Theme,
   };
   state: State;
   resizeTimeout: ?number;
-
-  static contextTypes = {
-    theme: React.PropTypes.object,
-  };
 
   constructor(props: Props) {
     super(props);
@@ -99,7 +95,7 @@ class Container extends React.Component {
   };
 
   render() {
-    const {theme} = this.context;
+    const {theme} = this.props;
 
     var tabs = {
       Elements: () => (
@@ -122,6 +118,7 @@ class Container extends React.Component {
     return (
       <div style={containerStyle}>
         <TabbedPane tabs={tabs} />
+        <PreferencesPanel />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
       </div>
     );

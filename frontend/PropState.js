@@ -26,6 +26,9 @@ import type {Base16Theme} from './theme';
 class PropState extends React.Component {
   context: {
     onChange: func,
+  };
+
+  props: {
     theme: Base16Theme,
   };
 
@@ -53,7 +56,7 @@ class PropState extends React.Component {
   }
 
   render(): React.Element {
-    var theme = this.context.theme;
+    var theme = this.props.theme;
 
     if (!this.props.node) {
       var emptyStyle = assign({}, styles.noSelection, {
@@ -67,7 +70,7 @@ class PropState extends React.Component {
     if (nodeType === 'Text') {
       if (this.props.canEditTextContent) {
         return (
-          <DetailPane>
+          <DetailPane theme={theme}>
             <BlurInput
               value={this.props.node.get('text')}
               onChange={this.props.onChangeText}
@@ -75,9 +78,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane theme={theme} header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane theme={theme} header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;
@@ -102,7 +105,8 @@ class PropState extends React.Component {
     return (
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
-        hint={hasDollarR ? '($r in the console)' : null}>
+        hint={hasDollarR ? '($r in the console)' : null}
+        theme={theme}>
         {key &&
           <DetailPaneSection
             title="Key"
@@ -164,17 +168,13 @@ class PropState extends React.Component {
   }
 }
 
-PropState.contextTypes = {
-  theme: React.PropTypes.object,
-};
-
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
 
 var WrappedPropState = decorate({
   listeners(props, store) {
-    return ['selected', store.selected];
+    return ['selected', 'theme'];
   },
 
   props(store) {
@@ -201,6 +201,7 @@ var WrappedPropState = decorate({
         store.showContextMenu('attr', e, store.selected, node, val, path, name);
       },
       inspect: store.inspect.bind(store, store.selected),
+      theme: store.theme,
     };
   },
 }, PropState);

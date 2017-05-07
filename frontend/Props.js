@@ -12,21 +12,21 @@
 
 var React = require('react');
 var assign = require('object-assign');
+var decorate = require('./decorate');
 var PropVal = require('./PropVal');
 
 import type {Base16Theme} from './theme';
 
 class Props extends React.Component {
-  context: {
+  props: {
     theme: Base16Theme,
   };
-  props: Object;
   shouldComponentUpdate(nextProps: Object): boolean {
     return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 
   render() {
-    var theme = this.context.theme;
+    var theme = this.props.theme;
     var props = this.props.props;
     if (!props || typeof props !== 'object') {
       return <span/>;
@@ -60,9 +60,16 @@ class Props extends React.Component {
   }
 }
 
-Props.contextTypes = {
-  theme: React.PropTypes.object,
-};
+var WrappedProps = decorate({
+  listeners() {
+    return ['theme'];
+  },
+  props(store, props) {
+    return {
+      theme: store.theme,
+    };
+  },
+}, Props);
 
 var styles = {
   ellipsisInverted: {
@@ -74,4 +81,4 @@ var styles = {
   },
 };
 
-module.exports = Props;
+module.exports = WrappedProps;

@@ -11,21 +11,18 @@
 'use strict';
 
 var assign = require('object-assign');
+var decorate = require('../decorate');
 var React = require('react');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from '../theme';
 
 class DetailPane extends React.Component {
-  context: {
+  props: {
     theme: Base16Theme,
   };
 
-  static contextTypes = {
-    theme: React.PropTypes.object,
-  };
-
   render(): React.Element {
-    const {theme} = this.context;
+    const {theme} = this.props;
     const headerNameStyle = assign({}, styles.headerName, {
       color: theme.base08,
     });

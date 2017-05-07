@@ -140,4 +140,14 @@ const Phd = {
 	base0F: '#b08060',
 };
 
-module.exports = Phd;
+module.exports = {
+	default: Dracula, // TODO (bvaughn) Replace default with Chrome-like theme
+	themes: {
+		Apathy,
+		Dracula,
+		GoogleLight,
+		Materia,
+		MexicoLight,
+		Phd,
+	},
+};

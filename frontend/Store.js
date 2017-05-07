@@ -17,8 +17,10 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
+var theme = require('./theme');
 
 import type Bridge from '../agent/Bridge';
+import type {Base16Theme} from './theme';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -96,12 +98,15 @@ class Store extends EventEmitter {
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
+  preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  theme: Base16Theme;
+  themes: { [string]: Base16Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -133,6 +138,8 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
+    this.theme = theme.default; // TODO (bvaughn) Check localStorage for default
+    this.themes = theme.themes;
 
     // for debugging
     window.store = this;
@@ -319,6 +326,21 @@ class Store extends EventEmitter {
   hideContextMenu() {
     this.contextMenu = null;
     this.emit('contextMenu');
+  }
+
+  changeTheme(themeName: string) {
+    this.theme = this.themes[themeName];
+    this.emit('theme');
+  }
+
+  showPreferencesPanel() {
+    this.preferencesPanelShown = true;
+    this.emit('preferencesPanelShown');
+  }
+
+  hidePreferencesPanel() {
+    this.preferencesPanelShown = false;
+    this.emit('preferencesPanelShown');
   }
 
   selectFirstSearchResult() {

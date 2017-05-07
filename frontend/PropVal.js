@@ -14,19 +14,18 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var consts = require('../agent/consts');
+var decorate = require('./decorate');
 var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
 
 import type {Base16Theme} from './theme';
 
 class PropVal extends React.Component {
-  context: {
-    theme: Base16Theme,
-  };
   props: {
     val: any,
     nested?: boolean,
     inverted?: boolean,
+    theme: Base16Theme,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -36,17 +35,13 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
-    flash(node, this.context.theme.base0A, 'transparent', 1);
+    flash(node, this.props.theme.base0A, 'transparent', 1);
   }
 
   render() {
-    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted, this.context.theme);
+    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted, this.props.theme);
   }
 }
-
-PropVal.contextTypes = {
-  theme: React.PropTypes.object,
-};
 
 // TODO (bvaughn) Handle :inverted case
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
@@ -126,11 +121,23 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
   return previewObject(val, inverted, theme);
 }
 
+const WrappedPropVal = decorate({
+  listeners() {
+    return ['theme'];
+  },
+  props(store, props) {
+    return {
+      ...props,
+      theme: store.theme,
+    };
+  },
+}, PropVal);
+
 // TODO (bvaughn) Handle :inverted case
 function previewArray(val, inverted, theme) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} />;
+    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} theme={theme} />;
     items['c' + i] = ', ';
   });
   if (val.length > 3) {
@@ -154,7 +161,7 @@ function previewObject(val, inverted, theme) {
   names.slice(0, 3).forEach((name, i) => {
     items['k' + i] = <span style={attrStyle}>{name}</span>;
     items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} />;
+    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />;
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
@@ -170,4 +177,4 @@ function previewObject(val, inverted, theme) {
   );
 }
 
-module.exports = PropVal;
+module.exports = WrappedPropVal;
