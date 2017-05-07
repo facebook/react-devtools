@@ -11,7 +11,6 @@
 'use strict';
 
 var React = require('react');
-var ReactDOM = require('react-dom');
 var HighlightHover = require('./HighlightHover');
 
 var assign = require('object-assign');
@@ -36,39 +35,20 @@ class ContextMenu extends React.Component {
     }
   };
 
-  componentWillMount() {
-    this._clickout = this.onMouseDown.bind(this);
-  }
+  backdropClickHandler: () => void;
 
-  componentDidUpdate(prevProps) {
-    if (this.props.open && !prevProps.open) {
-      window.addEventListener('mousedown', this._clickout, true);
-    } else if (prevProps.open && !this.props.open) {
-      window.removeEventListener('mousedown', this._clickout, true);
-    }
-  }
+  constructor(props) {
+    super(props);
 
-  componentWillUnmount() {
-    window.removeEventListener('mousedown', this._clickout, true);
-  }
-
-  onMouseDown(evt) {
-    var n = evt.target;
-    var container = ReactDOM.findDOMNode(this);
-    while (n) {
-      if (n === container) {
-        return;
-      }
-      n = n.offsetParent;
-    }
-
-    evt.preventDefault();
-    this.props.hideContextMenu();
+    this.backdropClickHandler = this.backdropClickHandler.bind(this);
   }
 
   onClick(i, evt) {
-    evt.preventDefault();
     this.props.items[i].action();
+  }
+
+  backdropClickHandler(evt) {
+    evt.preventDefault();
     this.props.hideContextMenu();
   }
 
@@ -83,16 +63,18 @@ class ContextMenu extends React.Component {
     });
 
     return (
-      <ul style={containerStyle}>
-        {!this.props.items.length && <li style={styles.empty}>No actions</li>}
-        {this.props.items.map((item, i) => item && (
-          <li key={item.key} onClick={evt => this.onClick(i, evt)}>
-            <HighlightHover style={styles.item}>
-              {item.title}
-            </HighlightHover>
-          </li>
-        ))}
-      </ul>
+      <div style={styles.backdrop} onClick={this.backdropClickHandler}>
+        <ul style={containerStyle}>
+            {!this.props.items.length && <li style={styles.empty}>No actions</li>}
+            {this.props.items.map((item, i) => item && (
+            <li key={item.key} onClick={evt => this.onClick(i, evt)}>
+                <HighlightHover style={styles.item}>
+                {item.title}
+                </HighlightHover>
+            </li>
+            ))}
+        </ul>
+      </div>
     );
   }
 }
@@ -132,6 +114,15 @@ var Wrapped = decorate({
 var styles = {
   hidden: {
     display: 'none',
+  },
+
+  backdrop: {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 0,
   },
 
   container: {
