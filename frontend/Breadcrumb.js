@@ -48,8 +48,7 @@ class Breadcrumb extends React.Component {
         {this.props.path.map(({ id, node }) => {
           var isSelected = id === this.props.selected;
           var itemStyle = assign({}, styles.item,
-            {backgroundColor: theme.base02},
-            isSelected && {backgroundColor: theme.base03},
+            isSelected && {backgroundColor: theme.base02},
             isSelected && styles.selected,
             node.get('nodeType') === 'Composite' && {color: theme.base06},
           );

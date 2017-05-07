@@ -85,7 +85,7 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
       return <span style={style}>{val[consts.name]}</span>;
     }
     case 'function': {
-      var style = {color: theme.base05};
+      var style = {color: theme.base0D};
       return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
     case 'object': {

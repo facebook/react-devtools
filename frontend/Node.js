@@ -192,16 +192,12 @@ class Node extends React.Component {
       paddingRight: 5,
     };
 
-    var headClassName = cn({
-      inverted: isWindowFocused,
-      NodeSelected: selected,
-      NodeHover: hovered,
-    });
-
     var headStyles = assign(
       {},
       styles.head,
-      leftPad
+      leftPad,
+      hovered && {backgroundColor: theme.base01},
+      selected && {backgroundColor: theme.base02},
     );
 
     var jsxTagStyle = {
@@ -245,7 +241,7 @@ class Node extends React.Component {
       }
       return (
         <div style={styles.container}>
-          <div className={headClassName} style={headStyles} ref={h => this._head = h} {...headEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
             {tag}
           </div>
         </div>
@@ -265,9 +261,12 @@ class Node extends React.Component {
       var pieces = [
         <span key={0}>{unmatched.shift()}</span>,
       ];
+      var highlightStyle = {
+        backgroundColor: theme.base02,
+      };
       while (unmatched.length > 0) {
         pieces.push(
-          <span key={pieces.length} className='Highlight'>{matched.shift()}</span>
+          <span key={pieces.length} style={highlightStyle}>{matched.shift()}</span> // TODO (bvaughn) Search highlight
         );
         pieces.push(
           <span key={pieces.length}>{unmatched.shift()}</span>
@@ -283,7 +282,7 @@ class Node extends React.Component {
       var isCollapsed = content === null || content === undefined;
       return (
         <div style={styles.container}>
-          <div className={headClassName} style={headStyles} ref={h => this._head = h} {...headEvents}>
+          <div style={headStyles} ref={h => this._head = h} {...headEvents}>
             <span>
               <span>
                 <span>&lt;</span>
@@ -331,10 +330,6 @@ class Node extends React.Component {
       {left: leftPad.paddingLeft - 12},
     );
     var headInverted = inverted && !this.props.isBottomTagSelected;
-    var arrowClassName = cn({
-      Arrow: !hasState,
-      StatefulArrow: hasState,
-    });
     var arrowStyle = node.get('collapsed') ?
       assign(
         {},
@@ -354,11 +349,11 @@ class Node extends React.Component {
         title={hasState ? 'This component is stateful.' : null}
         onClick={this.props.onToggleCollapse} style={collapserStyle}
       >
-        <span className={arrowClassName} style={arrowStyle}/>
+        <span style={arrowStyle}/>
       </span>;
 
     var head = (
-      <div ref={h => this._head = h} className={headClassName} style={headStyles} {...headEvents}>
+      <div ref={h => this._head = h} style={headStyles} {...headEvents}>
         {collapser}
         <span>
           <span>&lt;</span>
@@ -387,14 +382,14 @@ class Node extends React.Component {
       );
     }
 
-    var tailClassName = cn({
-      NodeHover: hovered && this.props.isBottomTagHovered,
-      NodeSelected: selected && this.props.isBottomTagSelected,
-    });
+    var tailHovered = hovered && this.props.isBottomTagHovered;
+    var tailSelected = selected && this.props.isBottomTagSelected;
     var tailStyles = assign(
       {},
       styles.tail,
-      leftPad
+      leftPad,
+      tailHovered && {backgroundColor: theme.base01},
+      tailSelected && {backgroundColor: theme.base02},
     );
 
     var guidelineStyle = assign(
@@ -419,7 +414,7 @@ class Node extends React.Component {
         <div style={styles.children}>
           {children.map(id => <WrappedNode key={id} depth={this.props.depth + 1} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} className={tailClassName} style={tailStyles} {...tailEvents}>
+        <div ref={t => this._tail = t} style={tailStyles} {...tailEvents}>
           {closeTag}
         </div>
       </div>
