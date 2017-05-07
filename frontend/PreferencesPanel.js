@@ -10,11 +10,6 @@
  */
 'use strict';
 
-// TODO (bvaughn) Click outside to dismiss
-// TODO (bvaughn) Get current default theme
-// TODO (bvaughn) Show list of selectable themes
-// TODO (bvaughn) Update current theme
-
 const React = require('react');
 const ReactDOM = require('react-dom');
 

@@ -139,9 +139,7 @@ class Store extends EventEmitter {
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
     this.themes = theme.themes;
-
-    // TODO (bvaughn) Potentially refactor this into a user-preferences service
-    this.theme = this._loadSavedTheme();
+    this.theme = this._getSavedTheme();
 
     // for debugging
     window.store = this;
@@ -549,7 +547,7 @@ class Store extends EventEmitter {
     }, 500);
   }
 
-  _loadSavedTheme() {
+  _getSavedTheme(): Base16Theme {
     let themeName;
 
     try {
@@ -558,7 +556,11 @@ class Store extends EventEmitter {
       console.error('Could not read saved theme.', error);
     }
 
-    return this.themes[themeName || theme.default.name];
+    if (themeName && this.themes.hasOwnProperty(themeName)) {
+      return this.themes[themeName];
+    } else {
+      return theme.default;
+    }
   }
 
   _saveThemeName(themeName: string) {
