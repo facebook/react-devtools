@@ -265,6 +265,7 @@ class Node extends React.Component {
       styles.tagText,
       inverted && !this.props.isBottomTagSelected && styles.tagTextInverted
     );
+    var nodeIndexStyle = isWindowFocused ? styles.selectedNodeIndex : styles.selectedNodeIndexInverted;
 
     var name = node.get('name') + '';
     var searchRegExp = this.props.searchRegExp;
@@ -319,6 +320,7 @@ class Node extends React.Component {
                   <span style={topTagStyle}>&lt;/{name}&gt;</span>
                 </span>,
               ]}
+              {selected && <span style={nodeIndexStyle}> == $r</span>}
             </span>
           </div>
         </div>
@@ -330,6 +332,9 @@ class Node extends React.Component {
         <span style={collapsed ? topTagStyle : bottomTagStyle}>
           &lt;/{name}&gt;
         </span>
+        {selected && ((collapsed && !this.props.isBottomTagSelected) || this.props.isBottomTagSelected) &&
+          <span style={nodeIndexStyle}> == $r</span>
+        }
       </span>
     );
 
@@ -379,6 +384,9 @@ class Node extends React.Component {
               <Props key="props" props={node.get('props')} inverted={headInverted}/>
             }
             <span style={topTagStyle}>&gt;</span>
+            {selected && !collapsed && !this.props.isBottomTagSelected &&
+              <span style={nodeIndexStyle}> == $r</span>
+            }
           </span>
           {collapsed && <span style={styles.textContent}>…</span>}
           {collapsed && closeTag}
@@ -548,6 +556,13 @@ var styles = {
   },
   tagTextInverted: {
     color: 'white',
+  },
+
+  selectedNodeIndex: {
+    color: '#aec8f2',
+  },
+  selectedNodeIndexInverted: {
+    color: '#575757',
   },
 
   collapser: {
