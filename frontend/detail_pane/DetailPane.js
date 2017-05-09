@@ -14,7 +14,7 @@ var assign = require('object-assign');
 var decorate = require('../decorate');
 var React = require('react');
 
-import type {Base16Theme} from '../theme';
+import type {Base16Theme} from '../Themes/Base16Theme';
 
 class DetailPane extends React.Component {
   props: {
@@ -22,7 +22,7 @@ class DetailPane extends React.Component {
   };
 
   render(): React.Element {
-    const {theme} = this.props;
+    const {theme} = this.context;
     const headerNameStyle = assign({}, styles.headerName, {
       color: theme.base08,
     });
@@ -40,6 +40,10 @@ class DetailPane extends React.Component {
     );
   }
 }
+
+DetailPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
 var styles = {
   container: {

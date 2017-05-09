@@ -16,7 +16,6 @@ var React = require('react');
 var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
-var theme = require('./theme');
 
 var MAX_SEARCH_ROOTS = 200;
 
@@ -124,6 +123,10 @@ TreeView.childContextTypes = {
   scrollTo: React.PropTypes.func,
 };
 
+TreeView.contextTypes = {
+  theme: React.PropTypes.object.isRequired
+};
+
 var styles = {
   container: {
     fontFamily: 'Menlo, Consolas, monospace',
@@ -156,7 +159,7 @@ var styles = {
   },
 
   noSearchResults: {
-    color: theme.base03,
+    color: 'red', // TODO (bvaughn) theme
     fontFamily: 'sans-serif',
     fontSize: '14px',
     padding: '0.5rem',

@@ -18,7 +18,7 @@ var decorate = require('./decorate');
 var Props = require('./Props');
 
 import type {Map} from 'immutable';
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 type PropsType = {
   hovered: boolean,
@@ -28,7 +28,6 @@ type PropsType = {
   isBottomTagHovered: boolean,
   isBottomTagSelected: boolean,
   searchRegExp: ?RegExp,
-  theme: Base16Theme,
   wrappedChildren: ?Array<any>,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
@@ -49,6 +48,7 @@ class Node extends React.Component {
 
   context: {
     scrollTo: func,
+    theme: Base16Theme,
   };
   props: PropsType;
   state: StateType = {
@@ -160,7 +160,7 @@ class Node extends React.Component {
   }
 
   render() {
-    var theme = this.props.theme;
+    var theme = this.context.theme;
     var node = this.props.node;
     if (!node) {
       return <span>Node was deleted</span>;
@@ -424,12 +424,12 @@ class Node extends React.Component {
 
 Node.contextTypes = {
   scrollTo: React.PropTypes.func,
-  theme: React.PropTypes.object,
+  theme: React.PropTypes.object.isRequired,
 };
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id, 'theme'];
+    return [props.id];
   },
   props(store, props) {
     var node = store.get(props.id);
@@ -446,7 +446,6 @@ var WrappedNode = decorate({
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
       searchRegExp: props.searchRegExp,
-      theme: store.theme,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);

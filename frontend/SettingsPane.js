@@ -19,7 +19,7 @@ var {PropTypes} = React;
 
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 type EventLike = {
   keyCode: number,
@@ -29,7 +29,7 @@ type EventLike = {
 };
 
 class SettingsPane extends React.Component {
-  props: {
+  context: {
     theme: Base16Theme,
   };
 
@@ -88,7 +88,7 @@ class SettingsPane extends React.Component {
   }
 
   render() {
-    var theme = this.props.theme;
+    var theme = this.context.theme;
     var searchText = this.props.searchText;
 
     var inputStyle = styles.input;
@@ -143,17 +143,19 @@ class SettingsPane extends React.Component {
   }
 }
 
+SettingsPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 SettingsPane.propTypes = {
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
-  theme: React.PropTypes.object,
   onChangeSearch: PropTypes.func,
   placeholderText: PropTypes.string,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['searchText', 'placeholderchange', 'theme'];
+    return ['searchText', 'placeholderchange'];
   },
   props(store) {
     return {
@@ -164,7 +166,6 @@ var Wrapped = decorate({
       showPreferencesPanel() {
         store.showPreferencesPanel();
       },
-      theme: store.theme,
     };
   },
 }, SettingsPane);

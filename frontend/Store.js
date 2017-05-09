@@ -17,10 +17,11 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
-var theme = require('./theme');
+var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -33,6 +34,7 @@ type ContextMenu = {
 };
 
 const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
+const DEFAULT_THEME_NAME = 'Default';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -138,8 +140,10 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
-    this.themes = theme.themes;
-    this.theme = this._getSavedTheme();
+
+    const themeName = ThemeStore.get() || DEFAULT_THEME_NAME;
+    this.theme = Themes[themeName];
+    this.themes = Themes;
 
     // for debugging
     window.store = this;
@@ -332,7 +336,8 @@ class Store extends EventEmitter {
     if (this.themes.hasOwnProperty(themeName)) {
       this.theme = this.themes[themeName];
       this.emit('theme');
-      this._saveThemeName(themeName);
+
+      ThemeStore.set(themeName);
     }
   }
 
@@ -545,30 +550,6 @@ class Store extends EventEmitter {
       }
       this._bridge.send('requestCapabilities');
     }, 500);
-  }
-
-  _getSavedTheme(): Base16Theme {
-    let themeName;
-
-    try {
-      themeName = localStorage.getItem('themeName');
-    } catch (error) {
-      console.error('Could not read saved theme.', error);
-    }
-
-    if (themeName && this.themes.hasOwnProperty(themeName)) {
-      return this.themes[themeName];
-    } else {
-      return theme.default;
-    }
-  }
-
-  _saveThemeName(themeName: string) {
-    try {
-      localStorage.setItem('themeName', themeName);
-    } catch (error) {
-      console.error('Could not save theme.', error);
-    }
   }
 
   _revealDeep(id: ElementID) {

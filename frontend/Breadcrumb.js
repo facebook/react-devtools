@@ -12,7 +12,7 @@
 
 import type Store from './Store';
 import type {ElementID} from './types';
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 var cn = require('classnames');
 var React = require('react');
@@ -20,7 +20,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
-  props: {theme: Base16Theme};
+  context: {theme: Base16Theme};
   state: {hovered: ?string};
 
   constructor(props) {
@@ -39,7 +39,7 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    var theme = this.props.theme;
+    var theme = this.context.theme;
     var style = assign({}, styles.container, {
       backgroundColor: theme.base01,
     });
@@ -69,8 +69,8 @@ class Breadcrumb extends React.Component {
   }
 }
 
-Breadcrumb.propTypes = {
-  theme: React.PropTypes.object,
+Breadcrumb.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
 };
 
 var styles = {
@@ -113,14 +113,13 @@ function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
 }
 
 module.exports = decorate({
-  listeners: () => ['breadcrumbHead', 'selected', 'theme'],
+  listeners: () => ['breadcrumbHead', 'selected'],
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
       hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),
-      theme: store.theme,
     };
   },
 }, Breadcrumb);

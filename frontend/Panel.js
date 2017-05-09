@@ -55,6 +55,7 @@ type DefaultProps = {};
 type State = {
   loading: boolean,
   isReact: boolean,
+  themeName: ?string,
 };
 
 class Panel extends React.Component {
@@ -74,7 +75,11 @@ class Panel extends React.Component {
 
   constructor(props: Props) {
     super(props);
-    this.state = {loading: true, isReact: this.props.alreadyFoundReact};
+    this.state = {
+      loading: true,
+      isReact: this.props.alreadyFoundReact,
+      themeName: null,
+    };
     this._unMounted = false;
     window.panel = this;
     this.plugins = [];
@@ -83,6 +88,8 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
+      theme: this._store && this._store.theme || {},
+      themes: this._store && this._store.themes || {}
     };
   }
 
@@ -210,7 +217,9 @@ class Panel extends React.Component {
         this.getNewSelection();
       });
       this._store.on('theme', () => {
-        this.forceUpdate(); // TODO (bvaughn) Do we even need to do this? Maybe not.
+        this.setState({
+          themeName: this._store.theme.name
+        });
       });
     });
   }
@@ -268,6 +277,7 @@ class Panel extends React.Component {
     }
     return (
       <Container
+        key={this.state.themeName /* Force deep re-render when theme changes */}
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
           attr: (id, node, path) => {
@@ -312,6 +322,8 @@ class Panel extends React.Component {
 
 Panel.childContextTypes = {
   store: React.PropTypes.object,
+  theme: React.PropTypes.object.isRequired,
+  themes: React.PropTypes.object.isRequired,
 };
 
 var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {

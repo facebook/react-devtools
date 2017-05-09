@@ -22,7 +22,7 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 
 import type MenuItem from './ContextMenu';
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 type Props = {};
 
@@ -158,6 +158,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     minWidth: 0,
+    position: 'relative',
   },
 };
 

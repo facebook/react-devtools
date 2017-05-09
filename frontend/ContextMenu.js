@@ -17,7 +17,7 @@ var HighlightHover = require('./HighlightHover');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 export type MenuItem = {
   key: string,
@@ -28,6 +28,10 @@ export type MenuItem = {
 class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
+  context: {
+    theme: Base16Theme,
+  };
+
   props: {
     open: boolean,
     hideContextMenu: () => void,
@@ -36,7 +40,6 @@ class ContextMenu extends React.Component {
       x: number,
       y: number,
     },
-    theme: Base16Theme,
   };
 
   componentWillMount() {
@@ -80,7 +83,7 @@ class ContextMenu extends React.Component {
       return <div style={styles.hidden} />;
     }
 
-    var theme = this.props.theme;
+    var theme = this.context.theme;
     var containerStyle = assign({}, styles.container, {
       top: this.props.pos.y + 'px',
       left: this.props.pos.x + 'px',
@@ -108,9 +111,13 @@ class ContextMenu extends React.Component {
   }
 }
 
+ContextMenu.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 var Wrapped = decorate({
   listeners() {
-    return ['contextMenu', 'theme'];
+    return ['contextMenu'];
   },
   props(store, props) {
     if (!store.contextMenu) {
@@ -136,7 +143,6 @@ var Wrapped = decorate({
       pos: {x, y},
       hideContextMenu: () => store.hideContextMenu(),
       items,
-      theme: store.theme,
     };
   },
 }, ContextMenu);

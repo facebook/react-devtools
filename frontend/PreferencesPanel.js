@@ -17,19 +17,22 @@ const assign = require('object-assign');
 const decorate = require('./decorate');
 const Store = require('./Store');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 class PreferencesPanel extends React.Component {
+  context: {
+    theme: Base16Theme,
+    themes: { [string]: Base16Theme },
+  };
   props: {
     changeTheme: func,
     hide: func,
     open: bool,
-    theme: Base16Theme,
-    themes: { [string]: Base16Theme },
   };
 
   render() {
-    const {changeTheme, hide, open, theme, themes} = this.props;
+    const {theme, themes} = this.context;
+    const {changeTheme, hide, open} = this.props;
 
     if (!open) {
       return null;
@@ -55,30 +58,27 @@ class PreferencesPanel extends React.Component {
   }
 }
 
+PreferencesPanel.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+  themes: React.PropTypes.object.isRequired,
+};
 PreferencesPanel.propTypes = {
   changeTheme: React.PropTypes.func,
   hide: React.PropTypes.func,
   open: React.PropTypes.bool,
-  theme: React.PropTypes.object,
-  themes: React.PropTypes.object,
 };
 
 const blockClick = event => event.stopPropagation();
 
 const WrappedPreferencesPanel = decorate({
   listeners() {
-    return [
-      'preferencesPanelShown',
-      'theme',
-    ];
+    return ['preferencesPanelShown'];
   },
   props(store, props) {
     return {
       changeTheme: event => store.changeTheme(event.target.value),
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
-      theme: store.theme,
-      themes: store.themes,
     };
   },
 }, PreferencesPanel);

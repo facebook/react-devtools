@@ -21,14 +21,11 @@ var assign = require('object-assign');
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 class PropState extends React.Component {
   context: {
     onChange: func,
-  };
-
-  props: {
     theme: Base16Theme,
   };
 
@@ -56,7 +53,7 @@ class PropState extends React.Component {
   }
 
   render(): React.Element {
-    var theme = this.props.theme;
+    var theme = this.context.theme;
 
     if (!this.props.node) {
       var emptyStyle = assign({}, styles.noSelection, {
@@ -168,13 +165,17 @@ class PropState extends React.Component {
   }
 }
 
+PropState.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
 
 var WrappedPropState = decorate({
   listeners(props, store) {
-    return ['selected', 'theme'];
+    return ['selected'];
   },
 
   props(store) {
@@ -201,7 +202,6 @@ var WrappedPropState = decorate({
         store.showContextMenu('attr', e, store.selected, node, val, path, name);
       },
       inspect: store.inspect.bind(store, store.selected),
-      theme: store.theme,
     };
   },
 }, PropState);

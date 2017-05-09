@@ -18,14 +18,16 @@ var decorate = require('./decorate');
 var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 class PropVal extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     val: any,
     nested?: boolean,
     inverted?: boolean,
-    theme: Base16Theme,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -35,13 +37,17 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
-    flash(node, this.props.theme.base0A, 'transparent', 1);
+    flash(node, this.context.theme.base0A, 'transparent', 1);
   }
 
   render() {
-    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted, this.props.theme);
+    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted, this.context.theme);
   }
 }
+
+PropVal.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
 // TODO (bvaughn) Handle :inverted case
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
@@ -121,18 +127,6 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
   return previewObject(val, inverted, theme);
 }
 
-const WrappedPropVal = decorate({
-  listeners() {
-    return ['theme'];
-  },
-  props(store, props) {
-    return {
-      ...props,
-      theme: store.theme,
-    };
-  },
-}, PropVal);
-
 // TODO (bvaughn) Handle :inverted case
 function previewArray(val, inverted, theme) {
   var items = {};
@@ -177,4 +171,4 @@ function previewObject(val, inverted, theme) {
   );
 }
 
-module.exports = WrappedPropVal;
+module.exports = PropVal;

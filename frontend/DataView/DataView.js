@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Base16Theme} from '../theme';
+import type {Base16Theme} from '../Themes/Base16Theme';
 import type {DOMEvent} from '../types';
 
 var React = require('react');
@@ -32,7 +32,6 @@ type DataViewProps = {
   startOpen?: boolean,
   noSort?: boolean,
   readOnly?: boolean,
-  theme: Base16Theme,
 };
 
 class DataView extends React.Component {
@@ -60,7 +59,6 @@ class DataView extends React.Component {
         inspect={this.props.inspect}
         showMenu={this.props.showMenu}
         readOnly={this.props.readOnly}
-        theme={this.props.theme}
         value={this.props.data[name]} />
     );
   }
@@ -134,6 +132,9 @@ class DataView extends React.Component {
 }
 
 class DataItem extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     path: Array<string>,
     inspect: Inspect,
@@ -143,7 +144,6 @@ class DataItem extends React.Component {
     readOnly?: boolean,
     name: string,
     value: any,
-    theme: Base16Theme,
   };
   defaultProps: {};
   state: {open: boolean, loading: boolean};
@@ -191,7 +191,7 @@ class DataItem extends React.Component {
   }
 
   render() {
-    var theme = this.props.theme;
+    var theme = this.context.theme;
     var data = this.props.value;
     var otype = typeof data;
     var complex = true;
@@ -290,19 +290,8 @@ class DataItem extends React.Component {
 
 DataItem.contextTypes = {
   onChange: React.PropTypes.func,
+  theme: React.PropTypes.object.isRequired,
 };
-
-var WrappedDataView = decorate({
-  listeners() {
-    return ['theme'];
-  },
-  props(store, props) {
-    return {
-      ...props,
-      theme: store.theme,
-    };
-  },
-}, DataView);
 
 function alphanumericSort(a: string, b: string): number {
   if ('' + (+a) === a) {
@@ -401,4 +390,4 @@ var styles = {
   },
 };
 
-module.exports = WrappedDataView;
+module.exports = DataView;

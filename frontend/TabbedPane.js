@@ -15,18 +15,20 @@ var Store = require('./Store');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './theme';
+import type {Base16Theme} from './Themes/Base16Theme';
 
 class TabbedPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     tabs: {[key: string]: () => React$Element},
     selected: string,
     setSelectedTab: (name: string) => void,
-    theme: Base16Theme,
   };
 
   render() {
-    var {theme} = this.props;
+    var {theme} = this.context;
     var tabs = Object.keys(this.props.tabs);
     if (tabs.length === 1) {
       return this.props.tabs[tabs[0]]();
@@ -62,6 +64,10 @@ class TabbedPane extends React.Component {
   }
 }
 
+TabbedPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 var styles = {
   container:{
     flex: 1,
@@ -95,7 +101,7 @@ var styles = {
 };
 
 module.exports = decorate({
-  listeners: () => ['selectedTab', 'theme'],
+  listeners: () => ['selectedTab'],
   shouldUpdate: (props, prevProps) => {
     for (var name in props) {
       if (props[name] !== prevProps[name]) {
@@ -108,7 +114,6 @@ module.exports = decorate({
     return {
       selected: store.selectedTab,
       setSelectedTab: name => store.setSelectedTab(name),
-      theme: store.theme
     };
   },
 }, TabbedPane);
