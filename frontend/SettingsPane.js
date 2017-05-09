@@ -103,12 +103,8 @@ class SettingsPane extends React.Component {
       inputStyle = assign({}, inputStyle, styles.errorInput);
     }
 
-    const style = assign({}, styles.container, {
-      backgroundColor: theme.base01,
-    });
-
     return (
-      <div style={style}>
+      <div style={settingsPaneStyle(theme)}>
         <SettingsMenuButton
           onClick={this.props.showPreferencesPanel}
           theme={theme}
@@ -171,12 +167,8 @@ var Wrapped = decorate({
 }, SettingsPane);
 
 const SettingsMenuButton = ({ onClick, theme }) => {
-  const wrapperStyle = assign({}, styles.settingsMenuButton, {
-    borderRightColor: theme.base02,
-  });
-
   return (
-    <button onClick={onClick} style={wrapperStyle}>
+    <button onClick={onClick} style={settingsMenuButton(theme)}>
       <svg style={styles.settingsMenuIcon} viewBox="0 0 24 24">
         <path d="
           M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
@@ -209,14 +201,30 @@ function SearchIcon() {
   );
 }
 
+const settingsPaneStyle = (theme: Base16Theme) => ({
+  padding: '0.25rem',
+  display: 'flex',
+  flexWrap: 'wrap',
+  flexShrink: 0,
+  alignItems: 'center',
+  position: 'relative',
+  backgroundColor: theme.base01,
+});
+
+const settingsMenuButton = (theme: Base16Theme) => ({
+  display: 'flex',
+  cursor: 'pointer',
+  borderRightStyle: 'solid',
+  borderRightWidth: '1px',
+  paddingRight: '0.5rem',
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
+  borderRightColor: theme.base02,
+});
+
 var styles = {
   container: {
-    padding: '0.25rem',
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexShrink: 0,
-    alignItems: 'center',
-    position: 'relative',
   },
 
   growToFill: {
@@ -279,17 +287,6 @@ var styles = {
     width: '16px',
     height: '16px',
     fill: 'currentColor',
-  },
-
-  settingsMenuButton: {
-    display: 'flex',
-    cursor: 'pointer',
-    borderRightStyle: 'solid',
-    borderRightWidth: '1px',
-    paddingRight: '0.5rem',
-    background: 'none',
-    border: 'none',
-    color: 'inherit',
   },
 };
 

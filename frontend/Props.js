@@ -25,7 +25,7 @@ class Props extends React.Component {
 
   render() {
     var theme = this.context.theme;
-    var props = this.props.props;
+    var {inverted, props} = this.props;
     if (!props || typeof props !== 'object') {
       return <span/>;
     }
@@ -35,24 +35,19 @@ class Props extends React.Component {
     });
 
     var items = [];
-    // TODO (bvaughn) Handle inverted
-    var attributeNameStyle = {
-      color: theme.base0F,
-    };
 
     names.slice(0, 3).forEach(name => {
       items.push(
         <span key={'prop-' + name} style={styles.prop}>
-          <span style={attributeNameStyle}>{name}</span>
+          <span style={attributeNameStyle(theme)}>{name}</span>
           =
-          <PropVal val={props[name]} inverted={this.props.inverted}/>
+          <PropVal val={props[name]} inverted={inverted}/>
         </span>
       );
     });
 
     if (names.length > 3) {
-      var ellipsisStyle = this.props.inverted ? styles.ellipsisInverted : null;
-      items.push(<span key="ellipsis" style={ellipsisStyle}>…</span>);
+      items.push(<span key="ellipsis" style={ellipsisStyle(theme)}>…</span>);
     }
     return <span>{items}</span>;
   }
@@ -62,11 +57,15 @@ Props.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-var styles = {
-  ellipsisInverted: {
-    color: '#ccc',
-  },
+const attributeNameStyle = (theme: Base16Theme) => ({
+  color: theme.base0F,
+});
 
+const ellipsisStyle = (theme: Base16Theme) => ({
+  color: theme.base0F,
+});
+
+const styles = {
   prop: {
     paddingLeft: 5,
   },

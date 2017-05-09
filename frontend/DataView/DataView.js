@@ -16,7 +16,6 @@ import type {DOMEvent} from '../types';
 var React = require('react');
 var Simple = require('./Simple');
 
-var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
@@ -40,7 +39,7 @@ class DataView extends React.Component {
     return (
       <li key={key}>
         <div style={styles.head}>
-          <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+          <div style={styles.sparseArrayHole}>
             undefined × {count}
           </div>
         </div>
@@ -256,17 +255,12 @@ class DataItem extends React.Component {
       name = name.slice(0, 50) + '…';
     }
 
-    var style = assign({},
-      complex && styles.complexName,
-      {color: theme.base0B},
-    );
-
     return (
       <li>
         <div style={styles.head}>
           {opener}
           <div
-            style={style}
+            style={nameStyle(complex, theme)}
             onClick={inspectable && this.toggleOpen.bind(this)}
           >
             {name}:
@@ -302,6 +296,11 @@ function alphanumericSort(a: string, b: string): number {
   }
   return (a < b) ? -1 : 1;
 }
+
+const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
+  cursor: isComplex ? 'pointer' : 'default',
+  color: theme.base0B,
+});
 
 var styles = {
   container: {
@@ -365,17 +364,10 @@ var styles = {
     position: 'relative',
   },
 
-  name: {
+  sparseArrayHole: {
+    fontStyle: 'italic',
     color: '#666', // TODO (bvaughn) theme
     margin: '2px 3px',
-  },
-
-  sparseArrayFiller: {
-    fontStyle: 'italic',
-  },
-
-  complexName: {
-    cursor: 'pointer',
   },
 
   preview: {

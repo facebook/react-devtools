@@ -14,7 +14,6 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var HighlightHover = require('./HighlightHover');
 
-var assign = require('object-assign');
 var decorate = require('./decorate');
 
 import type {Base16Theme} from './Themes/Themes';
@@ -79,29 +78,21 @@ class ContextMenu extends React.Component {
   }
 
   render() {
-    if (!this.props.open) {
+    const {theme} = this.context;
+    const {items, open, pos} = this.props;
+
+    if (!open) {
       return <div style={styles.hidden} />;
     }
 
-    var theme = this.context.theme;
-    var containerStyle = assign({}, styles.container, {
-      top: this.props.pos.y + 'px',
-      left: this.props.pos.x + 'px',
-      backgroundColor: theme.base07,
-    });
-    var emptyStyle = assign({}, styles.empty, {
-      color: theme.base03,
-    });
-    var itemStyle = {
-      color: theme.base04,
-    };
-
     return (
-      <ul style={containerStyle}>
-        {!this.props.items.length && <li style={emptyStyle}>No actions</li>}
-        {this.props.items.map((item, i) => item && (
-          <li style={itemStyle} key={item.key} onClick={evt => this.onClick(i, evt)}>
-            <HighlightHover style={styles.item}>
+      <ul style={containerStyle(pos.x, pos.y, theme)}>
+        {!items.length && (
+          <li style={emptyStyle(theme)}>No actions</li>
+        )}
+        {items.map((item, i) => item && (
+          <li style={listItemStyle(theme)} key={item.key} onClick={evt => this.onClick(i, evt)}>
+            <HighlightHover style={styles.highlightHoverItem}>
               {item.title}
             </HighlightHover>
           </li>
@@ -147,33 +138,42 @@ var Wrapped = decorate({
   },
 }, ContextMenu);
 
+
+const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
+  top: `${yPos}px`,
+  left: `${xPos}px`,
+  position: 'fixed',
+  listStyle: 'none',
+  margin: 0,
+  padding: '0.25rem 0',
+  fontSize: 14,
+  borderRadius: '0.25rem',
+  overflow: 'hidden',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
+  zIndex: 1,
+  backgroundColor: theme.base07,
+});
+
+const emptyStyle = (theme: Base16Theme) => ({
+  padding: '0.25rem 0.5rem',
+  color: theme.base03,
+});
+
+const listItemStyle = (theme: Base16Theme) => ({
+  color: theme.base04,
+});
+
 var styles = {
   hidden: {
     display: 'none',
   },
 
-  container: {
-    position: 'fixed',
-    listStyle: 'none',
-    margin: 0,
-    padding: '0.25rem 0',
-    fontSize: 14,
-    borderRadius: '0.25rem',
-    overflow: 'hidden',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
-    zIndex: 1,
-  },
-
-  item: {
+  highlightHoverItem: {
     padding: '0.25rem 0.5rem',
     cursor: 'default',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
-  },
-
-  empty: {
-    padding: '0.25rem 0.5rem',
   },
 };
 

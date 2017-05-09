@@ -12,7 +12,6 @@
 
 const React = require('react');
 
-const assign = require('object-assign');
 const decorate = require('./decorate');
 
 import type {Base16Theme} from './Themes/Themes';
@@ -50,14 +49,9 @@ class PreferencesPanel extends React.Component {
       return null;
     }
 
-    const panelStyle = assign({}, styles.panel, {
-      backgroundColor: theme.base07,
-      color: theme.base04,
-    });
-
     return (
       <div style={styles.backdrop} onClick={hide}>
-        <div style={panelStyle} onClick={blockClick}>
+        <div style={panelStyle(theme)} onClick={blockClick}>
           <h4 style={styles.header}>Theme</h4>
           <select
             onChange={changeTheme}
@@ -116,6 +110,19 @@ const WrappedPreferencesPanel = decorate({
   },
 }, PreferencesPanel);
 
+const panelStyle = (theme: Base16Theme) => ({
+  width: '150px',
+  maxWidth: '100%',
+  margin: '0.5rem',
+  padding: '0.5rem',
+  borderRadius: '0.25rem',
+  display: 'flex',
+  flexDirection: 'column',
+  alignItems: 'flex-start',
+  backgroundColor: theme.base07,
+  color: theme.base04,
+});
+
 const styles = {
   backdrop: {
     position: 'absolute',
@@ -125,16 +132,6 @@ const styles = {
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(0,0,0,0)',
-  },
-  panel: {
-    width: '150px',
-    maxWidth: '100%',
-    margin: '0.5rem',
-    padding: '0.5rem',
-    borderRadius: '0.25rem',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'flex-start',
   },
   header: {
     margin: '0 0 0.25rem',

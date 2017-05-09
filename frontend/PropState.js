@@ -16,7 +16,6 @@ var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
 var PropVal = require('./PropVal');
 var React = require('react');
-var assign = require('object-assign');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
@@ -56,10 +55,7 @@ class PropState extends React.Component {
     var theme = this.context.theme;
 
     if (!this.props.node) {
-      var emptyStyle = assign({}, styles.noSelection, {
-        color: theme.base03,
-      });
-      return <span style={emptyStyle}>No selection</span>;
+      return <span style={emptyStyle(theme)}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -206,6 +202,12 @@ var WrappedPropState = decorate({
   },
 }, PropState);
 
+const emptyStyle = (theme: Base16Theme) => ({
+  fontFamily: 'sans-serif',
+  margin: 'auto',
+  color: theme.base03,
+});
+
 var styles = {
   source: {
     padding: '0.25rem 0.5rem',
@@ -216,11 +218,6 @@ var styles = {
 
   sourcePos: {
     color: '#777', // TODO (bvaughn) theme
-  },
-
-  noSelection: {
-    fontFamily: 'sans-serif',
-    margin: 'auto',
   },
 
   noPropsState: {

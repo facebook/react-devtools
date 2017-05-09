@@ -20,9 +20,11 @@ var assign = require('object-assign');
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
+var Themes = require('./Themes/Themes');
 
 var consts = require('../agent/consts');
 
+import type {Base16Theme} from './Themes/Themes';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 
@@ -88,7 +90,7 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
-      theme: this._store && this._store.theme || {},
+      theme: this._store && this._store.theme || Themes.Default,
       themes: this._store && this._store.themes || {},
     };
   }
@@ -251,24 +253,20 @@ class Panel extends React.Component {
   }
 
   render() {
-    var theme = this._store ? this._store.theme : {};
+    var theme = this._store ? this._store.theme : Themes.Default;
     if (this.state.loading) {
-      var loadingStyle = assign({}, styles.loading, {
-        color: theme.base05,
-      });
-
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
       // properly doing so probably requires refactoring how we load the panel
       // and communicate with the bridge.
       return (
-        <div style={loadingStyle}>
+        <div style={loadingStyle(theme)}>
           <h2>Connecting to React…</h2>
         </div>
       );
     }
     if (!this.state.isReact) {
-      return <div style={styles.loading}><h2>Looking for React…</h2></div>;
+      return <div style={loadingStyle(theme)}><h2>Looking for React…</h2></div>;
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
@@ -339,18 +337,11 @@ var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
   );
 };
 
-var styles = {
-  chromePane: {
-    display: 'flex',
-  },
-  stretch: {
-    flex: 1,
-  },
-  loading: {
-    textAlign: 'center',
-    padding: 30,
-    flex: 1,
-  },
-};
+const loadingStyle = (theme: Base16Theme) => ({
+  textAlign: 'center',
+  padding: 30,
+  flex: 1,
+  color: theme.base05,
+});
 
 module.exports = Panel;

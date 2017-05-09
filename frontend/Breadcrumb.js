@@ -15,7 +15,6 @@ import type {ElementID} from './types';
 import type {Base16Theme} from './Themes/Themes';
 
 var React = require('react');
-var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
@@ -39,21 +38,19 @@ class Breadcrumb extends React.Component {
 
   render() {
     var theme = this.context.theme;
-    var style = assign({}, styles.container, {
-      backgroundColor: theme.base01,
-    });
     return (
-      <ul style={style}>
+      <ul style={containerStyle(theme)}>
         {this.props.path.map(({ id, node }) => {
-          var isSelected = id === this.props.selected;
-          var itemStyle = assign({}, styles.item,
-            isSelected && {backgroundColor: theme.base02},
-            isSelected && styles.selected,
-            node.get('nodeType') === 'Composite' && {color: theme.base06},
+          const isSelected = id === this.props.selected;
+          const style = itemStyle(
+            isSelected,
+            node.get('nodeType') === 'Composite',
+            theme,
           );
+
           return (
             <li
-              style={itemStyle}
+              style={style}
               key={id}
               onMouseOver={() => this.handleCrumbMouseOver(id)}
               onMouseOut={() => this.handleCrumbMouseOut(id)}
@@ -72,31 +69,28 @@ Breadcrumb.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-var styles = {
-  container: {
-    fontFamily: 'sans-serif',
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    maxHeight: '80px',
-    overflow: 'auto',
-    marginTop: '2px',
-  },
+const containerStyle = (theme: Base16Theme) => ({
+  fontFamily: 'sans-serif',
+  listStyle: 'none',
+  padding: 0,
+  margin: 0,
+  maxHeight: '80px',
+  overflow: 'auto',
+  marginTop: '2px',
+  backgroundColor: theme.base01,
+});
 
-  selected: {
-    cursor: 'default',
-  },
-
-  item: {
-    padding: '0.25rem 0.5rem',
-    WebkitUserSelect: 'none',
-    MozUserSelect: 'none',
-    userSelect: 'none',
-    cursor: 'pointer',
-    display: 'inline-block',
-    marginRight: '2px',
-  },
-};
+const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base16Theme) => ({
+  backgroundColor: isSelected ? theme.base02 : 'transparent',
+  color: isComposite ? theme.base0E : 'inherit',
+  cursor: isSelected ? 'default' : 'pointer',
+  padding: '0.25rem 0.5rem',
+  WebkitUserSelect: 'none',
+  MozUserSelect: 'none',
+  userSelect: 'none',
+  display: 'inline-block',
+  marginRight: '2px',
+});
 
 function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
   var path = [];

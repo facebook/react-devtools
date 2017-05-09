@@ -11,7 +11,6 @@
 'use strict';
 
 var React = require('react');
-var assign = require('object-assign');
 var decorate = require('./decorate');
 
 import type {Base16Theme} from './Themes/Themes';
@@ -32,28 +31,18 @@ class TabbedPane extends React.Component {
     if (tabs.length === 1) {
       return this.props.tabs[tabs[0]]();
     }
-    var tabsStyle = assign({}, styles.tabs, {
-      backgroundColor: theme.base00,
-    });
     return (
       <div style={styles.container}>
-        <ul style={tabsStyle}>
-          {tabs.map((name, i) => {
-            var style = assign({}, styles.tab, {
-              backgroundColor: theme.base01,
-            });
-
-            if (name === this.props.selected) {
-              style = assign({}, style, styles.selectedTab, {
-                backgroundColor: theme.base02,
-              });
-            }
-            return (
-              <li key={name + i} style={style} onClick={() => this.props.setSelectedTab(name)}>
-                {name}
-              </li>
-            );
-          })}
+        <ul style={tabsStyle(theme)}>
+          {tabs.map((name, i) => (
+            <li
+              key={name + i}
+              onClick={() => this.props.setSelectedTab(name)}
+              style={tabStyle(name === this.props.selected, theme)}
+            >
+              {name}
+            </li>
+          ))}
         </ul>
         <div style={styles.body}>
           {this.props.tabs[this.props.selected]()}
@@ -67,30 +56,32 @@ TabbedPane.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
+const tabsStyle = (theme: Base16Theme) => ({
+  display: 'flex',
+  flexShrink: 0,
+  listStyle: 'none',
+  margin: 0,
+  padding: '0',
+  marginBottom: '2px',
+  backgroundColor: theme.base00,
+});
+
+const tabStyle = (isSelected: boolean, theme: Base16Theme) => ({
+  padding: '0.25rem 0.5rem',
+  lineHeight: '15px',
+  fontSize: 12,
+  fontFamily: "'Lucida Grande', sans-serif",
+  cursor: 'pointer',
+  marginRight: '2px',
+  backgroundColor: isSelected ? theme.base02 : theme.base01,
+});
+
 var styles = {
   container:{
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-  },
-  tabs: {
-    display: 'flex',
-    flexShrink: 0,
-    listStyle: 'none',
-    margin: 0,
-    padding: '0',
-    marginBottom: '2px',
-  },
-  tab: {
-    padding: '0.25rem 0.5rem',
-    lineHeight: '15px',
-    fontSize: 12,
-    fontFamily: "'Lucida Grande', sans-serif",
-    cursor: 'pointer',
-    marginRight: '2px',
-  },
-  selectedTab: {
   },
   body: {
     flex: 1,

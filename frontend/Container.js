@@ -18,8 +18,6 @@ var PreferencesPanel = require('./PreferencesPanel');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
-var assign = require('object-assign');
-
 import type MenuItem from './ContextMenu';
 import type {Base16Theme} from './Themes/Themes';
 
@@ -109,13 +107,8 @@ class Container extends React.Component {
       ...this.props.extraTabs,
     };
 
-    const containerStyle = assign({}, styles.container, {
-      backgroundColor: theme.base00,
-      color: theme.base05,
-    });
-
     return (
-      <div style={containerStyle}>
+      <div style={containerStyle(theme)}>
         <TabbedPane tabs={tabs} />
         <PreferencesPanel />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
@@ -152,13 +145,13 @@ var DEFAULT_MENU_ITEMS = {
   },
 };
 
-var styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    minWidth: 0,
-    position: 'relative',
-  },
-};
+const containerStyle = (theme: Base16Theme) => ({
+  backgroundColor: theme.base00,
+  color: theme.base05,
+  flex: 1,
+  display: 'flex',
+  minWidth: 0,
+  position: 'relative',
+});
 
 module.exports = Container;
