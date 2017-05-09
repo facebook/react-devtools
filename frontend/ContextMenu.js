@@ -65,14 +65,14 @@ class ContextMenu extends React.Component {
     return (
       <div style={styles.backdrop} onClick={this.handleBackdropClick}>
         <ul style={containerStyle}>
-            {!this.props.items.length && <li style={styles.empty}>No actions</li>}
-            {this.props.items.map((item, i) => item && (
+          {!this.props.items.length && <li style={styles.empty}>No actions</li>}
+          {this.props.items.map((item, i) => item && (
             <li key={item.key} onClick={evt => this.onClick(i, evt)}>
-                <HighlightHover style={styles.item}>
+              <HighlightHover style={styles.item}>
                 {item.title}
-                </HighlightHover>
+              </HighlightHover>
             </li>
-            ))}
+          ))}
         </ul>
       </div>
     );
