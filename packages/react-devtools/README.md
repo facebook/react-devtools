@@ -26,13 +26,28 @@ If you're using React Native 0.43 or higher, it should connect to your simulator
 
 ### Integration with React Native Inspector
 
-First, [enable keyboard shortcuts](https://facebook.github.io/react-native/docs/debugging.html#enabling-keyboard-shortcuts) and click `Command+I` to bring up the Inspector. (Alternatively you can open the [in-app developer menu](https://facebook.github.io/react-native/docs/debugging.html#accessing-the-in-app-developer-menu) and choose "Show Inspector".)
+You can open the [in-app developer menu](https://facebook.github.io/react-native/docs/debugging.html#accessing-the-in-app-developer-menu) and choose "Show Inspector". It will bring up an overlay that lets you tap on any UI element and see information about it:
 
-Without `react-devtools`, Inspector is displayed inline in your app. However, if `react-devtools` is running, the Inspector inside the simulator will enter a special collapsed mode, and instead use the DevTools as primary UI. In this mode, clicking on something in the simulator will bring up the relevant components in the DevTools:
+![React Native Inspector](http://i.imgur.com/ReFhREb.gif)
 
-![Using DevTools with RN Inspector](https://d2ppvlu71ri8gs.cloudfront.net/items/2S251a1W070s3b280z09/Screen%20Recording%202017-05-01%20at%2019.56.gif?v=53ae234e)
+However, when `react-devtools` is running, Inspector will enter a special collapsed mode, and instead use the DevTools as primary UI. In this mode, clicking on something in the simulator will bring up the relevant components in the DevTools:
 
-You can press `Command+I` again in the simulator to exit the Inspector.
+![React DevTools Inspector Integration](http://i.imgur.com/wVgV9RP.gif)
+
+You can choose "Hide Inspector" in the same menu to exit this mode.
+
+### Inspecting Component Instances
+
+When debugging JavaScript in Chrome, you can inspect the props and state of the React components in the browser console.
+
+First, follow the [instructions for debugging in Chrome](https://facebook.github.io/react-native/docs/debugging.html#chrome-developer-tools) to open the Chrome console.
+
+Make sure that the dropdown in the top left corner of the Chrome console says `debuggerWorker.js`. **This step is essential.**
+
+Then select a React component in React DevTools. There is a search box at the top that helps you find one by name. As soon as you select it, it will be available as `$r` in the Chrome console, letting you inspect its props, state, and instance properties.
+
+![React DevTools Chrome Console Integration](http://i.imgur.com/Cpvhs8i.gif)
+
 
 ## Usage with React DOM
 
