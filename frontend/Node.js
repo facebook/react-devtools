@@ -46,7 +46,7 @@ class Node extends React.Component {
   _ownerWindow: any;
 
   context: {
-    scrollTo: (node: Node) => void,
+    scrollTo: (node: HTMLElement) => void,
     theme: Base16Theme,
   };
   props: PropsType;

@@ -35,6 +35,6 @@ function set(themeName: string): boolean {
 }
 
 module.exports = {
-  get,
-  set,
+  get: get,
+  set: set,
 };

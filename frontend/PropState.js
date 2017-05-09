@@ -67,7 +67,7 @@ class PropState extends React.Component {
     if (nodeType === 'Text') {
       if (this.props.canEditTextContent) {
         return (
-          <DetailPane theme={theme}>
+          <DetailPane>
             <BlurInput
               value={this.props.node.get('text')}
               onChange={this.props.onChangeText}
@@ -75,9 +75,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane theme={theme} header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane theme={theme} header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;

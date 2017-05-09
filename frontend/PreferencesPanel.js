@@ -18,9 +18,11 @@ const decorate = require('./decorate');
 import type {Base16Theme} from './Themes/Base16Theme';
 
 class PreferencesPanel extends React.Component {
+  _selectRef: any;
+
   context: {
     theme: Base16Theme,
-    themes: { [string]: Base16Theme },
+    themes: { [key: string]: Base16Theme },
   };
   props: {
     changeTheme: (themeName: string) => void,

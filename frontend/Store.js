@@ -108,7 +108,7 @@ class Store extends EventEmitter {
   selectedTab: string;
   selected: ?ElementID;
   theme: Base16Theme;
-  themes: { [string]: Base16Theme };
+  themes: { [key: string]: Base16Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {

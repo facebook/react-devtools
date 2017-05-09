@@ -16,7 +16,7 @@ var React = require('react');
 import type {Base16Theme} from '../Themes/Base16Theme';
 
 class DetailPane extends React.Component {
-  props: {
+  context: {
     theme: Base16Theme,
   };
 

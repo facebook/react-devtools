@@ -132,6 +132,7 @@ class DataView extends React.Component {
 
 class DataItem extends React.Component {
   context: {
+    onChange: (path: Array<string>, checked: boolean) => void,
     theme: Base16Theme,
   };
   props: {
