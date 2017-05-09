@@ -10,8 +10,7 @@
  */
 'use strict';
 
-import type {Base16Theme} from '../types';
-import type {DOMEvent} from '../types';
+import type {Base16Theme, DOMEvent} from '../types';
 
 var React = require('react');
 var Simple = require('./Simple');
@@ -33,13 +32,18 @@ type DataViewProps = {
 };
 
 class DataView extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: DataViewProps;
 
   renderSparseArrayHole(count: number, key: string) {
+    const {theme} = this.context;
+
     return (
       <li key={key}>
         <div style={styles.head}>
-          <div style={styles.sparseArrayHole}>
+          <div style={sparseArrayHoleStyle(theme)}>
             undefined × {count}
           </div>
         </div>
@@ -62,9 +66,10 @@ class DataView extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
     var data = this.props.data;
     if (!data) {
-      return <div style={styles.missing}>null</div>;
+      return <div style={missingStyle(theme)}>null</div>;
     }
 
     var isArray = Array.isArray(data);
@@ -103,7 +108,7 @@ class DataView extends React.Component {
 
     if (!elements.length) {
       return (
-        <div style={styles.empty}>
+        <div style={emptyStyle(theme)}>
           {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
@@ -128,6 +133,10 @@ class DataView extends React.Component {
     );
   }
 }
+
+DataView.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
 class DataItem extends React.Component {
   context: {
@@ -190,7 +199,7 @@ class DataItem extends React.Component {
   }
 
   render() {
-    var theme = this.context.theme;
+    const {theme} = this.context;
     var data = this.props.value;
     var otype = typeof data;
     var complex = true;
@@ -218,8 +227,8 @@ class DataItem extends React.Component {
           onClick={this.toggleOpen.bind(this)}
           style={styles.opener}>
           {open ?
-            <span style={styles.expandedArrow} /> :
-            <span style={styles.collapsedArrow} />}
+            <span style={expandedArrowStyle(theme)} /> :
+            <span style={collapsedArrowStyle(theme)} />}
         </div>
       );
     } else if (otype === 'boolean' && !this.props.readOnly) {
@@ -303,6 +312,44 @@ const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
   margin: '2px 3px',
 });
 
+const emptyStyle = (theme: Base16Theme) => ({
+  marginLeft: 10,
+  padding: '2px 5px',
+  color: theme.base02,
+});
+
+const missingStyle = (theme: Base16Theme) => ({
+  fontSize: 12,
+  fontWeight: 'bold',
+  marginLeft: 10,
+  padding: '2px 5px',
+  color: theme.base03,
+});
+
+const collapsedArrowStyle = (theme: Base16Theme) => ({
+  borderColor: `transparent transparent transparent ${theme.base03}`,
+  borderStyle: 'solid',
+  borderWidth: '4px 0 4px 7px',
+  display: 'inline-block',
+  marginLeft: 1,
+  verticalAlign: 'top',
+});
+
+const expandedArrowStyle = (theme: Base16Theme) => ({
+  borderColor: `${theme.base03} transparent transparent transparent`,
+  borderStyle: 'solid',
+  borderWidth: '7px 4px 0 4px',
+  display: 'inline-block',
+  marginTop: 1,
+  verticalAlign: 'top',
+});
+
+const sparseArrayHoleStyle = (theme: Base16Theme) => ({
+  fontStyle: 'italic',
+  color: theme.base03,
+  margin: '2px 3px',
+});
+
 var styles = {
   container: {
     listStyle: 'none',
@@ -312,20 +359,6 @@ var styles = {
   },
 
   children: {
-  },
-
-  empty: {
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#aaa', // TODO (bvaughn) theme
-  },
-
-  missing: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#888', // TODO (bvaughn) theme
   },
 
   opener: {
@@ -342,33 +375,9 @@ var styles = {
     top: -1,
   },
 
-  collapsedArrow: {
-    borderColor: 'transparent transparent transparent rgb(110, 110, 110)', // TODO (bvaughn) theme
-    borderStyle: 'solid',
-    borderWidth: '4px 0 4px 7px',
-    display: 'inline-block',
-    marginLeft: 1,
-    verticalAlign: 'top',
-  },
-
-  expandedArrow: {
-    borderColor: 'rgb(110, 110, 110) transparent transparent transparent', // TODO (bvaughn) theme
-    borderStyle: 'solid',
-    borderWidth: '7px 4px 0 4px',
-    display: 'inline-block',
-    marginTop: 1,
-    verticalAlign: 'top',
-  },
-
   head: {
     display: 'flex',
     position: 'relative',
-  },
-
-  sparseArrayHole: {
-    fontStyle: 'italic',
-    color: '#666', // TODO (bvaughn) theme
-    margin: '2px 3px',
   },
 
   preview: {

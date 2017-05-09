@@ -37,14 +37,15 @@ class PropState extends React.Component {
   }
 
   renderSource(): ?React.Element {
-    var source = this.props.node.get('source');
+    const {theme} = this.context;
+    const source = this.props.node.get('source');
     if (!source) {
       return null;
     }
     return (
-      <div style={styles.source}>
+      <div style={sourceStyle(theme)}>
         {source.fileName}
-        <span style={styles.sourcePos}>
+        <span style={sourcePosStyle(theme)}>
           :{source.lineNumber}
         </span>
       </div>
@@ -208,18 +209,18 @@ const emptyStyle = (theme: Base16Theme) => ({
   color: theme.base03,
 });
 
+const sourceStyle = (theme: Base16Theme) => ({
+  padding: '0.25rem 0.5rem',
+  color: theme.base05,
+  overflow: 'auto',
+  overflowWrap: 'break-word',
+});
+
+const sourcePosStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+});
+
 var styles = {
-  source: {
-    padding: '0.25rem 0.5rem',
-    color: 'blue', // TODO (bvaughn) theme
-    overflow: 'auto',
-    overflowWrap: 'break-word',
-  },
-
-  sourcePos: {
-    color: '#777', // TODO (bvaughn) theme
-  },
-
   noPropsState: {
     fontWeight: 'bold',
     padding: '0.25rem',

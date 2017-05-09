@@ -16,7 +16,7 @@ var ReactDOM = require('react-dom');
 var assign = require('object-assign');
 var flash = require('../flash');
 
-import type {DOMEvent, DOMNode} from '../types';
+import type {Base16Theme, DOMEvent, DOMNode} from '../types';
 
 type State = {
   editing: boolean,
@@ -24,6 +24,10 @@ type State = {
 };
 
 class Simple extends React.Component {
+  context: {
+    onChange: (path: Array<any>, value: any) => void,
+    theme: Base16Theme,
+  };
   state: State;
   input: DOMNode;
 
@@ -97,7 +101,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
-      flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1); // TODO (bvaughn) theme
+      flash(ReactDOM.findDOMNode(this), this.context.theme.base0A, 'transparent', 1);
     }
   }
 
@@ -107,7 +111,7 @@ class Simple extends React.Component {
         <input
           autoFocus={true}
           ref={i => this.input = i}
-          style={styles.input}
+          style={inputStyle(this.context.theme)}
           onChange={e => this.onChange(e)}
           onBlur={() => this.onSubmit(false)}
           onKeyDown={this.onKeyDown.bind(this)}
@@ -154,7 +158,20 @@ Simple.propTypes = {
 
 Simple.contextTypes = {
   onChange: React.PropTypes.func,
+  theme: React.PropTypes.object.isRequired,
 };
+
+const inputStyle = (theme: Base16Theme) => ({
+  flex: 1,
+  minWidth: 50,
+  boxSizing: 'border-box',
+  border: 'none',
+  padding: 0,
+  outline: 'none',
+  boxShadow: `0 0 3px ${theme.base02}`,
+  fontFamily: 'monospace',
+  fontSize: 'inherit',
+});
 
 var styles = {
   simple: {
@@ -162,21 +179,8 @@ var styles = {
     flex: 1,
     whiteSpace: 'pre-wrap',
   },
-
   editable: {
     cursor: 'pointer',
-  },
-
-  input: {
-    flex: 1,
-    minWidth: 50,
-    boxSizing: 'border-box',
-    border: 'none',
-    padding: 0,
-    outline: 'none',
-    boxShadow: '0 0 3px #ccc', // TODO (bvaughn) theme
-    fontFamily: 'monospace',
-    fontSize: 'inherit',
   },
 };
 

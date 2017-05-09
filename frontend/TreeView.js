@@ -17,6 +17,8 @@ var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
 
+import type {Base16Theme} from './types';
+
 var MAX_SEARCH_ROOTS = 200;
 
 class TreeView extends React.Component {
@@ -49,11 +51,13 @@ class TreeView extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
+
     if (!this.props.roots.count()) {
       if (this.props.searching) {
         return (
           <div style={styles.container}>
-            <span style={styles.noSearchResults}>No search results</span>
+            <span style={noSearchResultsStyle(theme)}>No search results</span>
           </div>
         );
       } else {
@@ -127,6 +131,13 @@ TreeView.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
+const noSearchResultsStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+  fontFamily: 'sans-serif',
+  fontSize: '14px',
+  padding: '0.5rem',
+});
+
 var styles = {
   container: {
     fontFamily: 'Menlo, Consolas, monospace',
@@ -156,13 +167,6 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
-  },
-
-  noSearchResults: {
-    color: 'red', // TODO (bvaughn) theme
-    fontFamily: 'sans-serif',
-    fontSize: '14px',
-    padding: '0.5rem',
   },
 };
 

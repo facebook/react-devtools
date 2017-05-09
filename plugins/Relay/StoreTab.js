@@ -11,12 +11,16 @@
 'use strict';
 
 import type {Map} from 'immutable';
+import type {Base16Theme} from '../../frontend/types';
 
 var React = require('react');
 var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
 
 class StoreTab extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     data: Map,
     inspect: (path: Array<string>, cb: () => void) => void,
@@ -25,7 +29,7 @@ class StoreTab extends React.Component {
     if (!this.props.storeData) {
       return (
         <div style={styles.container}>
-          <h3 style={styles.loading}>Loading...</h3>
+          <h3 style={loadingStyle(this.context.theme)}>Loading...</h3>
         </div>
       );
     }
@@ -46,6 +50,15 @@ class StoreTab extends React.Component {
   }
 }
 
+StoreTab.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const loadingStyle = (theme: Base16Theme) => ({
+  textAlign: 'center',
+  color: theme.base03,
+});
+
 var styles = {
   container: {
     fontFamily: 'Menlo, sans-serif',
@@ -54,10 +67,6 @@ var styles = {
     overflow: 'auto',
     fontSize: 12,
     padding: 30,
-  },
-  loading: {
-    textAlign: 'center',
-    color: '#aaa', // TODO (bvaughn) theme
   },
 };
 

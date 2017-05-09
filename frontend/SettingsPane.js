@@ -14,10 +14,10 @@ var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendCo
 var React = require('react');
 var ReactDOM = require('react-dom');
 var SearchUtils = require('./SearchUtils');
-var assign = require('object-assign');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
+var {hexToRgba} = require('./Themes/utils');
 
 import type {Base16Theme} from './types';
 
@@ -91,16 +91,17 @@ class SettingsPane extends React.Component {
     var theme = this.context.theme;
     var searchText = this.props.searchText;
 
-    var inputStyle = styles.input;
-    if (searchText || this.state.focused) {
-      inputStyle = assign({}, inputStyle, styles.highlightedInput);
-    }
+    var inputStyle;
     if (
       searchText &&
       SearchUtils.shouldSearchUseRegex(searchText) &&
       !SearchUtils.isValidRegex(searchText)
     ) {
-      inputStyle = assign({}, inputStyle, styles.errorInput);
+      inputStyle = errorInputStyle(theme);
+    } else if (searchText || this.state.focused) {
+      inputStyle = highlightedInputStyle(theme);
+    } else {
+      inputStyle = baseInputStyle(theme);
     }
 
     return (
@@ -127,9 +128,9 @@ class SettingsPane extends React.Component {
             placeholder={this.props.placeholderText}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
-          <SearchIcon />
+          <SearchIcon theme={theme} />
           {!!searchText && (
-            <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+            <div onClick={this.cancel.bind(this)} style={cancelButtonStyle(theme)}>
               &times;
             </div>
           )}
@@ -168,7 +169,7 @@ var Wrapped = decorate({
 
 const SettingsMenuButton = ({ onClick, theme }) => {
   return (
-    <button onClick={onClick} style={settingsMenuButton(theme)}>
+    <button onClick={onClick} style={settingsMenuButtonStyle(theme)}>
       <svg style={styles.settingsMenuIcon} viewBox="0 0 24 24">
         <path d="
           M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
@@ -188,10 +189,10 @@ const SettingsMenuButton = ({ onClick, theme }) => {
   );
 };
 
-function SearchIcon() {
+function SearchIcon({ theme }) {
   return (
     <svg
-      style={styles.searchIcon}
+      style={searchIconStyle(theme)}
       version="1.1"
       viewBox="0 0 32 32"
       xmlns="http://www.w3.org/2000/svg"
@@ -211,7 +212,7 @@ const settingsPaneStyle = (theme: Base16Theme) => ({
   backgroundColor: theme.base01,
 });
 
-const settingsMenuButton = (theme: Base16Theme) => ({
+const settingsMenuButtonStyle = (theme: Base16Theme) => ({
   display: 'flex',
   cursor: 'pointer',
   borderRightStyle: 'solid',
@@ -223,10 +224,56 @@ const settingsMenuButton = (theme: Base16Theme) => ({
   borderRightColor: theme.base02,
 });
 
-var styles = {
-  container: {
-  },
 
+const cancelButtonStyle = (theme: Base16Theme) => ({
+  fontSize: '16px',
+  padding: '0 0.5rem',
+  position: 'absolute',
+  cursor: 'pointer',
+  right: 0,
+  lineHeight: '28px',
+  color: theme.base02,
+});
+
+const searchIconStyle = (theme: Base16Theme) => ({
+  position: 'absolute',
+  display: 'inline-block',
+  pointerEvents: 'none',
+  left: '0.25rem',
+  top: 0,
+  width: '1em',
+  height: '100%',
+  strokeWidth: 0,
+  stroke: theme.base02,
+  fill: theme.base02,
+  lineHeight: '28px',
+  fontSize: '12px',
+});
+
+const baseInputStyle = (theme: Base16Theme) => ({
+  fontSize: '12px',
+  padding: '0.25rem',
+  border: `1px solid ${theme.base02}`,
+  outline: 'none',
+  borderRadius: '0.25rem',
+  paddingLeft: '1.25rem',
+  width: '150px',
+});
+
+const highlightedInputStyle = (theme: Base16Theme) => ({
+  ...baseInputStyle(theme),
+  border: `1px solid ${theme.base07}`,
+  boxShadow: `0 0 1px 1px ${theme.base07}`,
+});
+
+const errorInputStyle = (theme: Base16Theme) => ({
+  ...baseInputStyle(theme),
+  backgroundColor: hexToRgba(theme.base0C, 0.1),
+  border: `1px solid ${theme.base0C}`,
+  boxShadow: `0 0 1px 1px ${theme.base0C}`,
+});
+
+var styles = {
   growToFill: {
     flexGrow: 1,
   },
@@ -236,51 +283,6 @@ var styles = {
     alignItems: 'center',
     flexShrink: 0,
     position: 'relative',
-  },
-
-  cancelButton: {
-    fontSize: '16px',
-    padding: '0 0.5rem',
-    position: 'absolute',
-    cursor: 'pointer',
-    right: 0,
-    lineHeight: '28px',
-    color: '#bbb', // TODO (bvaughn) theme
-  },
-
-  searchIcon: {
-    position: 'absolute',
-    display: 'inline-block',
-    pointerEvents: 'none',
-    left: '0.25rem',
-    top: 0,
-    width: '1em',
-    height: '100%',
-    strokeWidth: 0,
-    stroke: '#bbb', // TODO (bvaughn) theme
-    fill: '#bbb', // TODO (bvaughn) theme
-    lineHeight: '28px',
-    fontSize: '12px',
-  },
-
-  input: {
-    fontSize: '12px',
-    padding: '0.25rem',
-    border: '1px solid #ccc', // TODO (bvaughn) theme
-    outline: 'none',
-    borderRadius: '0.25rem',
-    paddingLeft: '1.25rem',
-    width: '150px',
-  },
-
-  highlightedInput: {
-    border: '1px solid #99c6f4', // TODO (bvaughn) theme
-    boxShadow: '0 0 1px 1px #81aedc', // TODO (bvaughn) theme
-  },
-
-  errorInput: {
-    backgroundColor: '#fff0f0', // TODO (bvaughn) theme
-    border: '1px solid red', // TODO (bvaughn) theme
   },
 
   settingsMenuIcon: {

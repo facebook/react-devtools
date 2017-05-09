@@ -12,6 +12,8 @@
 
 var React = require('react');
 
+import type {Base16Theme} from '../../frontend/types';
+
 type BoxMeasurements = {
   top: number,
   left: number,
@@ -22,14 +24,15 @@ type BoxMeasurements = {
 type BoxProps = BoxMeasurements & {
   title: string,
   children: React$Element,
+  theme: Base16Theme,
 };
 
 var Box = (props: BoxProps) => {
-  var {title, children, top, left, right, bottom} = props;
+  var {title, children, top, left, right, bottom, theme} = props;
   return (
-    <div style={styles.box}>
+    <div style={boxStyle(theme)}>
       <div style={styles.row}>
-        <span style={styles.label}>{title}</span>
+        <span style={labelStyle(theme)}>{title}</span>
         <span style={styles.boxText}>{+top.toFixed(3)}</span>
       </div>
       <div style={styles.row}>
@@ -43,6 +46,9 @@ var Box = (props: BoxProps) => {
 };
 
 class BoxInspector extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     left: number,
     top: number,
@@ -53,15 +59,16 @@ class BoxInspector extends React.Component {
   };
 
   render() {
+    const {theme} = this.context;
     const {left, top, width, height, margin, padding} = this.props;
     return (
-      <Box title="margin" {...margin}>
-        <Box title="padding" {...padding}>
+      <Box theme={theme} title="margin" {...margin}>
+        <Box theme={theme} title="padding" {...padding}>
           <div style={styles.measureLayout}>
-            <span style={styles.innerText}>
+            <span style={innerTextStyle(theme)}>
               ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
-            <span style={styles.innerText}>
+            <span style={innerTextStyle(theme)}>
               {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
@@ -71,31 +78,38 @@ class BoxInspector extends React.Component {
   }
 }
 
+BoxInspector.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const labelStyle = (theme: Base16Theme) => ({
+  flex: 1,
+  color: theme.base0C,
+});
+
+const innerTextStyle = (theme: Base16Theme) => ({
+  color: theme.base0B,
+  textAlign: 'center',
+});
+
+const boxStyle = (theme: Base16Theme) => ({
+  padding: 8,
+  margin: 8,
+  width: 208,
+  border: `1px dashed ${theme.base05}`,
+  alignItems: 'center',
+});
+
 var styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  label: {
-    flex: 1,
-    color: 'rgb(255,100,0)', // TODO (bvaughn) theme
-  },
   measureLayout: {
     display: 'flex',
     flexDirection: 'column',
     margin: 4,
-  },
-  innerText: {
-    color: 'blue', // TODO (bvaughn) theme
-    textAlign: 'center',
-  },
-  box: {
-    padding: 8,
-    margin: 8,
-    width: 208,
-    border: '1px solid grey', // TODO (bvaughn) theme
-    alignItems: 'center',
   },
   boxText: {
     textAlign: 'center',

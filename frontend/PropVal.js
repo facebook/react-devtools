@@ -48,7 +48,6 @@ PropVal.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-// TODO (bvaughn) Handle :inverted case
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
   var style;
 
@@ -156,7 +155,6 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
   return previewObject(val, inverted, theme);
 }
 
-// TODO (bvaughn) Handle :inverted case
 function previewArray(val, inverted, theme) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
@@ -178,7 +176,6 @@ function previewArray(val, inverted, theme) {
   );
 }
 
-// TODO (bvaughn) Handle :inverted case
 function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
   var items = {};

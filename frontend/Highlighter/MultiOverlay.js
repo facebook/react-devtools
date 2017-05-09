@@ -11,6 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
+
 import type {DOMNode} from '../types';
 
 class MultiOverlay {
@@ -44,9 +45,9 @@ class MultiOverlay {
         left: box.left + 'px',
         width: box.width + 'px',
         height: box.height + 'px',
-        border: '2px dotted rgba(200, 100, 100, .8)', // TODO (bvaughn) theme
+        border: '2px dotted rgba(200, 100, 100, .8)',
         boxSizing: 'border-box',
-        backgroundColor: 'rgba(200, 100, 100, .2)', // TODO (bvaughn) theme
+        backgroundColor: 'rgba(200, 100, 100, .2)',
         position: 'fixed',
         zIndex: 10000000,
         pointerEvents: 'none',
