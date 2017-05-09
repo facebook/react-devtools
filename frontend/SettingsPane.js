@@ -109,7 +109,7 @@ class SettingsPane extends React.Component {
 
     return (
       <div style={style}>
-        <SettingsMenuIcon
+        <SettingsMenuButton
           onClick={this.props.showPreferencesPanel}
           theme={theme}
         />
@@ -170,13 +170,13 @@ var Wrapped = decorate({
   },
 }, SettingsPane);
 
-const SettingsMenuIcon = ({ onClick, theme }) => {
-  const wrapperStyle = assign({}, styles.settingsMenuIconWrapper, {
+const SettingsMenuButton = ({ onClick, theme }) => {
+  const wrapperStyle = assign({}, styles.settingsMenuButton, {
     borderRightColor: theme.base02,
   });
 
   return (
-    <div onClick={onClick} style={wrapperStyle}>
+    <button onClick={onClick} style={wrapperStyle}>
       <svg style={styles.settingsMenuIcon} viewBox="0 0 24 24">
         <path d="
           M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
@@ -192,7 +192,7 @@ const SettingsMenuIcon = ({ onClick, theme }) => {
           18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z
         "></path>
       </svg>
-    </div>
+    </button>
   );
 };
 
@@ -281,14 +281,15 @@ var styles = {
     fill: 'currentColor',
   },
 
-  settingsMenuIconWrapper: {
+  settingsMenuButton: {
     display: 'flex',
     cursor: 'pointer',
-    marginLeft: '0.25rem',
-    marginRight: '0.5rem',
     borderRightStyle: 'solid',
     borderRightWidth: '1px',
     paddingRight: '0.5rem',
+    background: 'none',
+    border: 'none',
+    color: 'inherit',
   },
 };
 

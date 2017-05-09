@@ -28,6 +28,18 @@ class PreferencesPanel extends React.Component {
     open: bool,
   };
 
+  componentDidMount(prevProps, prevState) {
+    if (this.props.open) {
+      this._selectRef.focus();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.open && !prevProps.open) {
+      this._selectRef.focus();
+    }
+  }
+
   render() {
     const {theme, themes} = this.context;
     const {changeTheme, hide, open} = this.props;
@@ -45,15 +57,36 @@ class PreferencesPanel extends React.Component {
       <div style={styles.backdrop} onClick={hide}>
         <div style={panelStyle} onClick={blockClick}>
           <h4 style={styles.header}>Theme</h4>
-          <select onChange={changeTheme} value={theme.name}>
+          <select
+            onChange={changeTheme}
+            onKeyUp={this._onKeyUp}
+            ref={this._setSelectRef}
+            value={theme.name}
+          >
             {Object.keys(themes).map(name => (
               <option key={name} value={name}>{name}</option>
             ))}
           </select>
+          <button
+            onClick={hide}
+            style={styles.closeButton}
+          >
+            Close
+          </button>
         </div>
       </div>
     );
   }
+
+  _onKeyUp = ({ key }) => {
+    if (key === 'Escape') {
+      this.props.hide();
+    }
+  };
+
+  _setSelectRef = (ref) => {
+    this._selectRef = ref;
+  };
 }
 
 PreferencesPanel.contextTypes = {
@@ -97,9 +130,15 @@ const styles = {
     margin: '0.5rem',
     padding: '0.5rem',
     borderRadius: '0.25rem',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'flex-start',
   },
   header: {
     margin: '0 0 0.25rem',
+  },
+  closeButton: {
+    marginTop: '0.5rem',
   },
 };
 
