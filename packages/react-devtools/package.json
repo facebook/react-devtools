@@ -22,9 +22,11 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "chalk": "^1.1.3",
     "cross-spawn": "^5.0.1",
     "electron": "^1.4.15",
     "ip": "^1.1.4",
-    "react-devtools-core": "^2.1.7"
+    "react-devtools-core": "^2.1.7",
+    "update-notifier": "^2.1.0"
   }
 }
