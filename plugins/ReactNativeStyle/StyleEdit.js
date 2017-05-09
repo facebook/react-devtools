@@ -68,7 +68,7 @@ class StyleEdit extends React.Component {
     var attrs = Object.keys(this.props.style);
     return (
       <ul style={styles.container} onClick={e => this.onListClick(e)}>
-        <span style={styles.tag}>element.style</span>
+        <span style={styles.tag}>style</span>
         <span>{' {'}</span>
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.attr}>
