@@ -299,7 +299,7 @@ function alphanumericSort(a: string, b: string): number {
 
 const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
   cursor: isComplex ? 'pointer' : 'default',
-  color: theme.base0B,
+  color: theme.base0C,
 });
 
 var styles = {
