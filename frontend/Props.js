@@ -38,8 +38,8 @@ class Props extends React.Component {
 
     names.slice(0, 3).forEach(name => {
       items.push(
-        <span key={'prop-' + name} style={styles.prop}>
-          <span style={attributeNameStyle(theme)}>{name}</span>
+        <span key={'prop-' + name} style={propStype(inverted, theme)}>
+          <span style={attributeNameStyle(inverted, theme)}>{name}</span>
           =
           <PropVal val={props[name]} inverted={inverted}/>
         </span>
@@ -47,7 +47,7 @@ class Props extends React.Component {
     });
 
     if (names.length > 3) {
-      items.push(<span key="ellipsis" style={ellipsisStyle(theme)}>…</span>);
+      items.push(<span key="ellipsis" style={ellipsisStyle(inverted, theme)}>…</span>);
     }
     return <span>{items}</span>;
   }
@@ -57,18 +57,17 @@ Props.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const attributeNameStyle = (theme: Base16Theme) => ({
-  color: theme.base0F,
+const attributeNameStyle = (isInverted: boolean, theme: Base16Theme) => ({
+  color: isInverted ? theme.base02 : theme.base0F,
 });
 
-const ellipsisStyle = (theme: Base16Theme) => ({
-  color: theme.base0F,
+const ellipsisStyle = (isInverted: boolean, theme: Base16Theme) => ({
+  color: isInverted ? theme.base02 : theme.base0F,
 });
 
-const styles = {
-  prop: {
-    paddingLeft: 5,
-  },
-};
+const propStype = (isInverted: boolean, theme: Base16Theme) => ({
+  paddingLeft: 5,
+  color: isInverted ? theme.base02 : theme.base0F,
+});
 
 module.exports = Props;

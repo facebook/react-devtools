@@ -151,7 +151,7 @@ const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
   overflow: 'hidden',
   fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
   zIndex: 1,
-  backgroundColor: theme.base07,
+  backgroundColor: theme.base01,
 });
 
 const emptyStyle = (theme: Base16Theme) => ({
@@ -160,7 +160,7 @@ const emptyStyle = (theme: Base16Theme) => ({
 });
 
 const listItemStyle = (theme: Base16Theme) => ({
-  color: theme.base04,
+  color: theme.base05,
 });
 
 var styles = {

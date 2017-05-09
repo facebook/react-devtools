@@ -10,16 +10,17 @@
  */
 'use strict';
 
+// TODO (bvaughn) Move to shared types file
 export type Base16Theme = {
   name: string;
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
-  base02: string; // Selection Background
+  base02: string; // Selection Background; *also used for inverted selection foreground in devtools
   base03: string; // Comments, Invisibles, Line Highlighting
   base04: string; // Dark Foreground (Used for status bars)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
   base06: string; // Light Foreground (Not often used)
-  base07: string; // Light Background (Not often used)
+  base07: string; // Light Background (Not often used); *also used for inverted selection in devtools
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
   base0A: string; // Classes, Markup Bold, Search Text Background
@@ -140,7 +141,7 @@ const Default: Base16Theme = {
   base04: '#ffffff',
   base05: '#303942',
   base06: '#881280',
-  base07: '#333333',
+  base07: '#3879d9',
   base08: '#aa0d91',
   base09: '#212121',
   base0A: '#00ff00',

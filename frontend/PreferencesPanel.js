@@ -119,8 +119,8 @@ const panelStyle = (theme: Base16Theme) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  backgroundColor: theme.base07,
-  color: theme.base04,
+  backgroundColor: theme.base01,
+  color: theme.base05,
 });
 
 const styles = {

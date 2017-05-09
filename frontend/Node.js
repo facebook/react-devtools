@@ -200,7 +200,16 @@ class Node extends React.Component {
     const collapsed = node.get('collapsed');
     const inverted = selected && isWindowFocused;
 
-    const sharedHeadStyle = headStyle(depth, hovered, selected, theme);
+    const sharedHeadStyle = headStyle({
+      depth,
+      isBottomTagHovered,
+      isBottomTagSelected,
+      isCollapsed: collapsed,
+      isHovered: hovered,
+      isSelected: selected,
+      isWindowFocused,
+      theme,
+    });
 
     const headEvents = {
       onContextMenu: onContextMenu,
@@ -223,12 +232,12 @@ class Node extends React.Component {
       if (nodeType === 'Text') {
         const text = node.get('text');
         tag =
-          <span style={tagTextStyle(theme)}>
+          <span style={tagTextStyle(inverted, theme)}>
             "{text}"
           </span>;
       } else if (nodeType === 'Empty') {
         tag =
-          <span style={tagTextStyle(theme)}>
+          <span style={tagTextStyle(inverted, theme)}>
             <span style={styles.falseyLiteral}>null</span>
           </span>;
       }
@@ -260,7 +269,7 @@ class Node extends React.Component {
       ];
       while (unmatched.length > 0) {
         pieces.push(
-          <span key={pieces.length} style={highlightStyle(theme)}>{matched.shift()}</span> // TODO (bvaughn) Search highlight
+          <span key={pieces.length} style={highlightStyle(theme)}>{matched.shift()}</span>
         );
         pieces.push(
           <span key={pieces.length}>{unmatched.shift()}</span>
@@ -270,10 +279,9 @@ class Node extends React.Component {
       name = <span>{pieces}</span>;
     }
 
-    const sharedJSXTagStyle = jsxTagStyle(theme);
-
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
+      const jsxSingleLineTagStyle = jsxTagStyle(inverted, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -282,7 +290,7 @@ class Node extends React.Component {
             <span>
               <span>
                 <span>&lt;</span>
-                <span style={sharedJSXTagStyle}>{name}</span>
+                <span style={jsxSingleLineTagStyle}>{name}</span>
                 {node.get('key') &&
                   <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
@@ -300,7 +308,7 @@ class Node extends React.Component {
                 </span>,
                 <span key="close">
                   <span>&lt;</span>
-                  <span style={sharedJSXTagStyle}>{name}</span>
+                  <span style={jsxSingleLineTagStyle}>{name}</span>
                   <span>&gt;</span>
                 </span>,
               ]}
@@ -310,10 +318,11 @@ class Node extends React.Component {
       );
     }
 
+    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), theme);
     const closeTag = (
       <span>
         <span>&lt;/</span>
-        <span style={sharedJSXTagStyle}>{name}</span>
+        <span style={jsxCloseTagStyle}>{name}</span>
         <span>&gt;</span>
       </span>
     );
@@ -329,12 +338,13 @@ class Node extends React.Component {
         <span style={arrowStyle(collapsed, hasState, headInverted, theme)}/>
       </span>;
 
+    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
         <span>
           <span>&lt;</span>
-          <span style={sharedJSXTagStyle}>{name}</span>
+          <span style={jsxOpenTagStyle}>{name}</span>
           {node.get('key') &&
             <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
           }
@@ -359,8 +369,15 @@ class Node extends React.Component {
       );
     }
 
-    const isTailHovered = hovered && isBottomTagHovered;
-    const isTailSelected = selected && isBottomTagSelected;
+    const tailStyleActual = tailStyle({
+      depth,
+      isBottomTagHovered,
+      isBottomTagSelected,
+      isHovered: hovered,
+      isSelected: selected,
+      isWindowFocused,
+      theme,
+    });
 
     return (
       <div style={styles.container}>
@@ -369,7 +386,7 @@ class Node extends React.Component {
         <div>
           {children.map(id => <WrappedNode key={id} depth={depth + 1} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyle(depth, isTailHovered, isTailSelected, theme)} {...tailEvents}>
+        <div ref={t => this._tail = t} style={tailStyleActual} {...tailEvents}>
           {closeTag}
         </div>
       </div>
@@ -429,24 +446,59 @@ var WrappedNode = decorate({
 const calcPaddingLeft = (depth: number) => 5 + (depth + 1) * 10;
 const paddingRight = 5;
 
-const headStyle = (depth: number, isHovered: boolean, isSelected: boolean, theme: Base16Theme) => ({
-  cursor: 'default',
-  borderTop: '1px solid transparent',
-  position: 'relative',
-  display: 'flex',
-  paddingLeft: calcPaddingLeft(depth),
-  paddingRight,
-  backgroundColor: isHovered ? theme.base01 : isSelected ? theme.base02 : 'transparent',
+type headStyleParams = {
+  depth: number,
+  isBottomTagHovered: boolean,
+  isBottomTagSelected: boolean,
+  isCollapsed: boolean,
+  isHovered: boolean,
+  isSelected: boolean,
+  isWindowFocused: boolean,
+  theme: Base16Theme
+};
+
+const headStyle = ({
+  depth,
+  isBottomTagHovered,
+  isBottomTagSelected,
+  isCollapsed,
+  isHovered,
+  isSelected,
+  isWindowFocused,
+  theme,
+}: headStyleParams) => {
+  let backgroundColor;
+  if (isSelected && (isCollapsed || !isBottomTagSelected)) {
+    backgroundColor = isWindowFocused
+      ? theme.base07
+      : theme.base01;
+  } else if (isHovered && (isCollapsed || !isBottomTagHovered)) {
+    backgroundColor = theme.base01;
+  }
+
+  const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
+  const color = isInverted ? theme.base04 : undefined;
+
+  return {
+    cursor: 'default',
+    borderTop: '1px solid transparent',
+    position: 'relative',
+    display: 'flex',
+    paddingLeft: calcPaddingLeft(depth),
+    paddingRight,
+    backgroundColor,
+    color,
+  };
+};
+
+const jsxTagStyle = (inverted: boolean, theme: Base16Theme) => ({
+  color: inverted ? 'inherit' : theme.base08,
 });
 
-const jsxTagStyle = (theme: Base16Theme) => ({
-  color: theme.base08,
-});
-
-const tagTextStyle = (theme: Base16Theme) => ({
+const tagTextStyle = (inverted: boolean, theme: Base16Theme) => ({
   flex: 1,
   whiteSpace: 'nowrap',
-  color: theme.base0F,
+  color: inverted ? theme.base02 : theme.base0F,
 });
 
 const collapserStyle = (depth: number) => ({
@@ -457,10 +509,10 @@ const collapserStyle = (depth: number) => ({
 
 const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boolean, theme: Base16Theme) => {
   let borderColor = theme.base03;
-  if (hasState) {
+  if (isHeadInverted) {
+    borderColor = theme.base04;
+  } else if (hasState) {
     borderColor = theme.base08;
-  } else if (isHeadInverted) {
-    borderColor = theme.base05;
   }
 
   if (isCollapsed) {
@@ -488,13 +540,46 @@ const highlightStyle = (theme: Base16Theme) => ({
   backgroundColor: theme.base02,
 });
 
-const tailStyle = (depth: number, isTailHovered: boolean, isTailSelected: boolean, theme: Base16Theme) => ({
-  borderTop: '1px solid transparent',
-  cursor: 'default',
-  paddingLeft: calcPaddingLeft(depth),
-  paddingRight,
-  backgroundColor: isTailHovered ? theme.base01 : isTailSelected ? theme.base02 : 'transparent',
-});
+type tailStyleParams = {
+  depth: number,
+  isBottomTagHovered: boolean,
+  isBottomTagSelected: boolean,
+  isHovered: boolean,
+  isSelected: boolean,
+  isWindowFocused: boolean,
+  theme: Base16Theme
+};
+
+const tailStyle = ({
+  depth,
+  isBottomTagHovered,
+  isBottomTagSelected,
+  isHovered,
+  isSelected,
+  isWindowFocused,
+  theme,
+}: tailStyleParams) => {
+  let backgroundColor;
+  if (isSelected && isBottomTagSelected) {
+    backgroundColor = isWindowFocused
+      ? theme.base07
+      : theme.base01;
+  } else if (isHovered && isBottomTagHovered) {
+    backgroundColor = theme.base01;
+  }
+
+  const isInverted = isSelected && isWindowFocused && isBottomTagSelected;
+  const color = isInverted ? theme.base04 : undefined;
+
+  return {
+    borderTop: '1px solid transparent',
+    cursor: 'default',
+    paddingLeft: calcPaddingLeft(depth),
+    paddingRight,
+    backgroundColor,
+    color,
+  };
+};
 
 const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Base16Theme) => {
   let borderLeftColor = 'transparent';
@@ -531,12 +616,6 @@ const styles = {
   },
   falseyLiteral: {
     fontStyle: 'italic',
-  },
-  headHover: {
-    borderRadius: 20,
-  },
-  headSelect: {
-    borderRadius: 0,
   },
 };
 

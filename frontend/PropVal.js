@@ -53,7 +53,9 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
   var style;
 
   if (typeof val === 'number') {
-    style = {color: theme.base09};
+    style = {
+      color: inverted ? theme.base04 : theme.base09,
+    };
     return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
@@ -61,67 +63,93 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
       val = val.slice(0, 50) + '…';
     }
 
-    style = {color: theme.base0B};
+    style = {
+      color: inverted ? theme.base04 : theme.base0B,
+    };
     return (
       <span style={style}>"{val}"</span>
     );
   }
   if (typeof val === 'boolean') {
-    style = {color: theme.base09};
+    style = {
+      color: inverted ? theme.base04 : theme.base09,
+    };
     return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
     if (nested) {
-      style = {color: theme.base09};
+      style = {
+        color: inverted ? theme.base04 : theme.base09,
+      };
       return <span style={style}>[({val.length})]</span>;
     }
     return previewArray(val, inverted, theme);
   }
   if (!val) {
-    style = {color: theme.base03};
+    style = {
+      color: inverted ? theme.base04 : theme.base03,
+    };
     return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
-    style = {color: theme.base03};
+    style = {
+      color: inverted ? theme.base04 : theme.base03,
+    };
     return <span style={style}>…</span>;
   }
 
   switch (val[consts.type]) {
     case 'date': {
-      style = {color: theme.base05};
+      style = {
+        color: inverted ? theme.base04 : theme.base05,
+      };
       return <span style={style}>{val[consts.name]}</span>;
     }
     case 'function': {
-      style = {color: theme.base0D};
+      style = {
+        color: inverted ? theme.base04 : theme.base0D,
+      };
       return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
     case 'object': {
-      style = {color: theme.base09};
+      style = {
+        color: inverted ? theme.base04 : theme.base09,
+      };
       return <span style={style}>{val[consts.name] + '{…}'}</span>;
     }
     case 'array': {
-      style = {color: theme.base09};
+      style = {
+        color: inverted ? theme.base04 : theme.base09,
+      };
       return <span style={style}>Array[{val[consts.meta].length}]</span>;
     }
     case 'typed_array':
     case 'array_buffer':
     case 'data_view': {
-      style = {color: theme.base05};
+      style = {
+        color: inverted ? theme.base04 : theme.base05,
+      };
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
-      style = {color: theme.base05};
+      style = {
+        color: inverted ? theme.base04 : theme.base05,
+      };
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
-      style = {color: theme.base05};
+      style = {
+        color: inverted ? theme.base04 : theme.base05,
+      };
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
     }
   }
 
   if (nested) {
-    style = {color: theme.base05};
+    style = {
+      color: inverted ? theme.base04 : theme.base05,
+    };
     return <span style={style}>{'{…}'}</span>;
   }
 
@@ -140,7 +168,9 @@ function previewArray(val, inverted, theme) {
   } else {
     delete items['c' + (val.length - 1)];
   }
-  var style = {color: theme.base09};
+  var style = {
+    color: inverted ? theme.base04 : theme.base09,
+  };
   return (
     <span style={style}>
       [{createFragment(items)}]
@@ -152,7 +182,9 @@ function previewArray(val, inverted, theme) {
 function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
   var items = {};
-  var attrStyle = {color: theme.base0F};
+  var attrStyle = {
+    color: inverted ? theme.base02 : theme.base0F,
+  };
   names.slice(0, 3).forEach((name, i) => {
     items['k' + i] = <span style={attrStyle}>{name}</span>;
     items['c' + i] = ': ';
@@ -164,7 +196,9 @@ function previewObject(val, inverted, theme) {
   } else {
     delete items['m' + (names.length - 1)];
   }
-  var style = {color: theme.base09};
+  var style = {
+    color: inverted ? theme.base04 : theme.base09,
+  };
   return (
     <span style={style}>
       {'{'}{createFragment(items)}{'}'}
