@@ -11,8 +11,6 @@
 'use strict';
 
 var React = require('react');
-var assign = require('object-assign');
-var decorate = require('./decorate');
 var PropVal = require('./PropVal');
 
 import type {Base16Theme} from './Themes/Base16Theme';

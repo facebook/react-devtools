@@ -13,7 +13,6 @@
 var React = require('react');
 
 var assign = require('object-assign');
-var cn = require('classnames');
 var decorate = require('./decorate');
 var Props = require('./Props');
 
@@ -47,7 +46,7 @@ class Node extends React.Component {
   _ownerWindow: any;
 
   context: {
-    scrollTo: func,
+    scrollTo: (node: Node) => void,
     theme: Base16Theme,
   };
   props: PropsType;
@@ -248,7 +247,8 @@ class Node extends React.Component {
       );
     }
 
-    var isCustom = nodeType === 'Composite';
+    // TODO (bvaughn) Was this dropped? Is it important?
+    // var isCustom = nodeType === 'Composite';
 
     var name = node.get('name') + '';
     var searchRegExp = this.props.searchRegExp;

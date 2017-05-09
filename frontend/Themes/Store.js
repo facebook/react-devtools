@@ -10,8 +10,6 @@
  */
 'use strict';
 
-const Themes = require('./Themes');
-
 function get(): ?string {
   let themeName;
 
@@ -38,5 +36,5 @@ function set(themeName: string): boolean {
 
 module.exports = {
   get,
-  set
+  set,
 };

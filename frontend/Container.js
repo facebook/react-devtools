@@ -19,7 +19,6 @@ var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
 var assign = require('object-assign');
-var decorate = require('./decorate');
 
 import type MenuItem from './ContextMenu';
 import type {Base16Theme} from './Themes/Base16Theme';

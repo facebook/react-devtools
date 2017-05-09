@@ -11,11 +11,9 @@
 'use strict';
 
 const React = require('react');
-const ReactDOM = require('react-dom');
 
 const assign = require('object-assign');
 const decorate = require('./decorate');
-const Store = require('./Store');
 
 import type {Base16Theme} from './Themes/Base16Theme';
 
@@ -25,8 +23,8 @@ class PreferencesPanel extends React.Component {
     themes: { [string]: Base16Theme },
   };
   props: {
-    changeTheme: func,
-    hide: func,
+    changeTheme: (themeName: string) => void,
+    hide: () => void,
     open: bool,
   };
 

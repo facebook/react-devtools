@@ -18,7 +18,6 @@ var Simple = require('./Simple');
 
 var assign = require('object-assign');
 var consts = require('../../agent/consts');
-var decorate = require('../decorate');
 var previewComplex = require('./previewComplex');
 
 type Inspect = (path: Array<string>, cb: () => void) => void;

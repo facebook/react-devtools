@@ -89,7 +89,7 @@ class Panel extends React.Component {
     return {
       store: this._store,
       theme: this._store && this._store.theme || {},
-      themes: this._store && this._store.themes || {}
+      themes: this._store && this._store.themes || {},
     };
   }
 
@@ -218,7 +218,7 @@ class Panel extends React.Component {
       });
       this._store.on('theme', () => {
         this.setState({
-          themeName: this._store.theme.name
+          themeName: this._store.theme.name,
         });
       });
     });
@@ -280,7 +280,7 @@ class Panel extends React.Component {
         key={this.state.themeName /* Force deep re-render when theme changes */}
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
-          attr: (id, node, path) => {
+          attr: (id, node, val, path) => {
             if (!val || node.get('nodeType') !== 'Composite' || val[consts.type] !== 'function') {
               return undefined;
             }

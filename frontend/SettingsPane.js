@@ -177,8 +177,8 @@ const SettingsMenuIcon = ({ onClick, theme }) => {
 
   return (
     <div onClick={onClick} style={wrapperStyle}>
-      <svg style={styles.settingsMenuIcon} viewBox='0 0 24 24'>
-        <path d='
+      <svg style={styles.settingsMenuIcon} viewBox="0 0 24 24">
+        <path d="
           M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
           1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,
           11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,
@@ -190,11 +190,11 @@ const SettingsMenuIcon = ({ onClick, theme }) => {
           18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,
           18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,
           18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z
-        '></path>
+        "></path>
       </svg>
     </div>
   );
-}
+};
 
 function SearchIcon() {
   return (
@@ -289,7 +289,7 @@ var styles = {
     borderRightStyle: 'solid',
     borderRightWidth: '1px',
     paddingRight: '0.5rem',
-  }
+  },
 };
 
 module.exports = Wrapped;

@@ -14,7 +14,6 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var consts = require('../agent/consts');
-var decorate = require('./decorate');
 var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
 
@@ -51,8 +50,10 @@ PropVal.contextTypes = {
 
 // TODO (bvaughn) Handle :inverted case
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
+  var style;
+
   if (typeof val === 'number') {
-    var style = {color: theme.base09};
+    style = {color: theme.base09};
     return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
@@ -60,67 +61,67 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
       val = val.slice(0, 50) + '…';
     }
 
-    var style = {color: theme.base0B};
+    style = {color: theme.base0B};
     return (
       <span style={style}>"{val}"</span>
     );
   }
   if (typeof val === 'boolean') {
-    var style = {color: theme.base09};
+    style = {color: theme.base09};
     return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
     if (nested) {
-      var style = {color: theme.base09};
+      style = {color: theme.base09};
       return <span style={style}>[({val.length})]</span>;
     }
     return previewArray(val, inverted, theme);
   }
   if (!val) {
-    var style = {color: theme.base03};
+    style = {color: theme.base03};
     return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
-    var style = {color: theme.base03};
+    style = {color: theme.base03};
     return <span style={style}>…</span>;
   }
 
   switch (val[consts.type]) {
     case 'date': {
-      var style = {color: theme.base05};
+      style = {color: theme.base05};
       return <span style={style}>{val[consts.name]}</span>;
     }
     case 'function': {
-      var style = {color: theme.base0D};
+      style = {color: theme.base0D};
       return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
     case 'object': {
-      var style = {color: theme.base09};
+      style = {color: theme.base09};
       return <span style={style}>{val[consts.name] + '{…}'}</span>;
     }
     case 'array': {
-      var style = {color: theme.base09};
+      style = {color: theme.base09};
       return <span style={style}>Array[{val[consts.meta].length}]</span>;
     }
     case 'typed_array':
     case 'array_buffer':
     case 'data_view': {
-      var style = {color: theme.base05};
+      style = {color: theme.base05};
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
-      var style = {color: theme.base05};
+      style = {color: theme.base05};
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
-      var style = {color: theme.base05};
+      style = {color: theme.base05};
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
     }
   }
 
   if (nested) {
-    var style = {color: theme.base05};
+    style = {color: theme.base05};
     return <span style={style}>{'{…}'}</span>;
   }
 

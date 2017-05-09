@@ -25,7 +25,7 @@ import type {Base16Theme} from './Themes/Base16Theme';
 
 class PropState extends React.Component {
   context: {
-    onChange: func,
+    onChange: () => void,
     theme: Base16Theme,
   };
 

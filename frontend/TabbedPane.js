@@ -11,7 +11,6 @@
 'use strict';
 
 var React = require('react');
-var Store = require('./Store');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 

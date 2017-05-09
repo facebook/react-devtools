@@ -14,7 +14,6 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Base16Theme} from './Themes/Base16Theme';
 
-var cn = require('classnames');
 var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');

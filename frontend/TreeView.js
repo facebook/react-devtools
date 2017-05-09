@@ -124,7 +124,7 @@ TreeView.childContextTypes = {
 };
 
 TreeView.contextTypes = {
-  theme: React.PropTypes.object.isRequired
+  theme: React.PropTypes.object.isRequired,
 };
 
 var styles = {

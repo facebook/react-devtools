@@ -91,7 +91,7 @@ class ContextMenu extends React.Component {
     });
     var emptyStyle = assign({}, styles.empty, {
       color: theme.base03,
-    })
+    });
     var itemStyle = {
       color: theme.base04,
     };
