@@ -254,8 +254,7 @@ class Node extends React.Component {
       );
     }
 
-    // TODO (bvaughn) Was this dropped? Is it important?
-    // var isCustom = nodeType === 'Composite';
+    var isCustom = nodeType === 'Composite';
 
     let name = node.get('name') + '';
 
@@ -281,7 +280,7 @@ class Node extends React.Component {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle(inverted, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -318,7 +317,7 @@ class Node extends React.Component {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), theme);
+    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
     const closeTag = (
       <span>
         <span>&lt;/</span>
@@ -338,7 +337,7 @@ class Node extends React.Component {
         <span style={arrowStyle(collapsed, hasState, headInverted, theme)}/>
       </span>;
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, theme);
+    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
@@ -491,9 +490,20 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, theme: Base16Theme) => ({
-  color: inverted ? 'inherit' : theme.base08,
-});
+const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Base16Theme) => {
+  let color;
+  if (inverted) {
+    color = 'inherit';
+  } else if (isCustom) {
+    color = theme.base08;
+  } else {
+    color = theme.base03;
+  }
+
+  return {
+    color,
+  };
+};
 
 const tagTextStyle = (inverted: boolean, theme: Base16Theme) => ({
   flex: 1,
