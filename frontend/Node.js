@@ -500,9 +500,9 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
   let borderLeftColor = 'transparent';
   if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = theme.base03;
-  } else if (isSelected) {
     borderLeftColor = theme.base02;
+  } else if (isSelected) {
+    borderLeftColor = theme.base03;
   }
 
   return {
