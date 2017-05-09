@@ -21,7 +21,7 @@ var Themes = require('./Themes/Themes');
 var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;

@@ -15,7 +15,7 @@ const React = require('react');
 const assign = require('object-assign');
 const decorate = require('./decorate');
 
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 class PreferencesPanel extends React.Component {
   _selectRef: any;

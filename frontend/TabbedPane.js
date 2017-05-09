@@ -14,7 +14,7 @@ var React = require('react');
 var assign = require('object-assign');
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 class TabbedPane extends React.Component {
   context: {

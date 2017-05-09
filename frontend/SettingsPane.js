@@ -19,7 +19,7 @@ var {PropTypes} = React;
 
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 type EventLike = {
   keyCode: number,

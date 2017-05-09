@@ -12,7 +12,7 @@
 
 import type Store from './Store';
 import type {ElementID} from './types';
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 var React = require('react');
 var assign = require('object-assign');

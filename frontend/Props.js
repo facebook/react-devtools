@@ -13,7 +13,7 @@
 var React = require('react');
 var PropVal = require('./PropVal');
 
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 class Props extends React.Component {
   context: {

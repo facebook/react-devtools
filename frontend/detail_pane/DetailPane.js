@@ -13,7 +13,7 @@
 var assign = require('object-assign');
 var React = require('react');
 
-import type {Base16Theme} from '../Themes/Base16Theme';
+import type {Base16Theme} from '../Themes/Themes';
 
 class DetailPane extends React.Component {
   context: {

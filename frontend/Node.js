@@ -17,7 +17,7 @@ var decorate = require('./decorate');
 var Props = require('./Props');
 
 import type {Map} from 'immutable';
-import type {Base16Theme} from './Themes/Base16Theme';
+import type {Base16Theme} from './Themes/Themes';
 
 type PropsType = {
   hovered: boolean,
