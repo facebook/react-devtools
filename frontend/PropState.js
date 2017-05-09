@@ -20,7 +20,7 @@ var React = require('react');
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
-import type {Base16Theme} from './Themes/Themes';
+import type {Base16Theme} from './types';
 
 class PropState extends React.Component {
   context: {

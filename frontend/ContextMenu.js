@@ -16,7 +16,7 @@ var HighlightHover = require('./HighlightHover');
 
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './Themes/Themes';
+import type {Base16Theme} from './types';
 
 export type MenuItem = {
   key: string,

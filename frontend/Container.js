@@ -19,7 +19,7 @@ var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
 import type MenuItem from './ContextMenu';
-import type {Base16Theme} from './Themes/Themes';
+import type {Base16Theme} from './types';
 
 type Props = {};
 

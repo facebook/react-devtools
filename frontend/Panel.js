@@ -24,7 +24,7 @@ var Themes = require('./Themes/Themes');
 
 var consts = require('../agent/consts');
 
-import type {Base16Theme} from './Themes/Themes';
+import type {Base16Theme} from './types';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 

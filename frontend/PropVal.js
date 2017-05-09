@@ -17,7 +17,7 @@ var consts = require('../agent/consts');
 var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
 
-import type {Base16Theme} from './Themes/Themes';
+import type {Base16Theme} from './types';
 
 class PropVal extends React.Component {
   context: {

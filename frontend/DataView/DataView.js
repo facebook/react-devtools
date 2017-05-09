@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Base16Theme} from '../Themes/Themes';
+import type {Base16Theme} from '../types';
 import type {DOMEvent} from '../types';
 
 var React = require('react');
