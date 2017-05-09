@@ -31,10 +31,8 @@ var Box = (props: BoxProps) => {
   var {title, children, top, left, right, bottom, theme} = props;
   return (
     <div style={boxStyle(theme)}>
-      <div style={styles.row}>
-        <span style={labelStyle(theme)}>{title}</span>
-        <span style={styles.boxText}>{+top.toFixed(3)}</span>
-      </div>
+      <span style={labelStyle(theme)}>{title}</span>
+      <div style={styles.boxText}>{+top.toFixed(3)}</div>
       <div style={styles.row}>
         <span style={styles.boxText}>{+left.toFixed(3)}</span>
         {children}
@@ -65,10 +63,10 @@ class BoxInspector extends React.Component {
       <Box theme={theme} title="margin" {...margin}>
         <Box theme={theme} title="padding" {...padding}>
           <div style={styles.measureLayout}>
-            <span style={innerTextStyle(theme)}>
+            <span style={positionTextStyle(theme)}>
               ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
-            <span style={innerTextStyle(theme)}>
+            <span style={dimenTextStyle(theme)}>
               {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
@@ -87,17 +85,25 @@ const labelStyle = (theme: Base16Theme) => ({
   color: theme.base0C,
 });
 
-const innerTextStyle = (theme: Base16Theme) => ({
+const positionTextStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+  fontSize: 10,
+  textAlign: 'center',
+});
+
+const dimenTextStyle = (theme: Base16Theme) => ({
   color: theme.base0B,
   textAlign: 'center',
 });
 
 const boxStyle = (theme: Base16Theme) => ({
+  position: 'relative',
   padding: 8,
   margin: 8,
-  width: 208,
+  width: 184,
   border: `1px dashed ${theme.base05}`,
   alignItems: 'center',
+  alignSelf: 'center',
 });
 
 var styles = {

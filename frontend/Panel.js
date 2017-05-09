@@ -32,7 +32,6 @@ export type Props = {
   alreadyFoundReact: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
 
-
   // if alreadyFoundReact, then these don’t need to be passed
   checkForReact?: (cb: (isReact: boolean) => void) => void,
   reload?: () => void,
@@ -271,7 +270,7 @@ class Panel extends React.Component {
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure));
+      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure, theme));
     }
     return (
       <Container
@@ -324,19 +323,29 @@ Panel.childContextTypes = {
   themes: React.PropTypes.object.isRequired,
 };
 
-var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
+var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
-    return <strong key="rnstyle">No style</strong>;
+    return (
+      <div key="rnstyle" style={containerStyle(theme)}>
+        <strong>No style</strong>
+      </div>
+    );
   }
   return (
-    <div key="rnstyle">
-      <h3>React Native Style Editor</h3>
+    <div key="rnstyle" style={containerStyle(theme)}>
+      <strong>React Native Style Editor</strong>
       <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
     </div>
   );
 };
 
+const containerStyle = (theme: Base16Theme) => ({
+  borderTop: `1px solid ${theme.base01}`,
+  padding: 5,
+  marginBottom: 5,
+  flexShrink: 0,
+});
 const loadingStyle = (theme: Base16Theme) => ({
   textAlign: 'center',
   padding: 30,

@@ -11,8 +11,13 @@
 'use strict';
 
 var React = require('react');
-var BlurInput = require('./BlurInput');
+var AutoSizeInput = require('./AutoSizeInput');
 
+import type {Base16Theme} from '../../frontend/types';
+
+type Context = {
+  theme: Base16Theme,
+};
 
 type Props = {
   style: Object,
@@ -23,18 +28,20 @@ type Props = {
 type DefaultProps = {};
 
 type State = {
+  showNew: boolean,
   newAttr: string,
   newValue: string|number,
 };
 
 class StyleEdit extends React.Component {
+  context: Context;
   props: Props;
   defaultProps: DefaultProps;
   state: State;
 
   constructor(props: Props) {
     super(props);
-    this.state = {newAttr: '', newValue: ''};
+    this.state = {showNew: false, newAttr: '', newValue: ''};
   }
 
   onChange(name: string, val: string | number) {
@@ -42,69 +49,92 @@ class StyleEdit extends React.Component {
     this.props.onChange(name, num == val ? num : val);
   }
 
-  onNew(val: string | number) {
+  onNewSubmit(val: string | number) {
     this.onChange(this.state.newAttr, val);
-    this.setState({newAttr: '', newValue: ''});
+    this.setState({showNew: false, newAttr: '', newValue: ''});
+  }
+
+  onNewAttr(attr: string | number) {
+    if (attr === '') {
+      this.setState({showNew: false});
+    } else {
+      this.setState({newAttr: '' + attr});
+    }
+  }
+
+  onListClick(e: Event) {
+    if (e.target instanceof Element) {
+      if (e.target.tagName === 'INPUT') {
+        return;
+      }
+    }
+    this.setState({showNew: true});
   }
 
   render() {
     var attrs = Object.keys(this.props.style);
     return (
-      <ul style={styles.container}>
+      <ul style={styles.container} onClick={e => this.onListClick(e)}>
+        <span style={tagStyle(this.context.theme)}>style</span>
+        <span>{' {'}</span>
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.attr}>
-            <div style={styles.InputWrapper}>
-              <BlurInput
-                value={name}
-                onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
-              />
-            </div>
-            :
-            <div style={styles.InputWrapper}>
-              <BlurInput
-                value={this.props.style[name]}
-                onChange={val => this.onChange(name, val)}
-              />
-            </div>
+            <AutoSizeInput
+              type="attr"
+              value={name}
+              onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
+            />
+            <span style={styles.colon}>:</span>
+            <AutoSizeInput
+              value={this.props.style[name]}
+              onChange={val => this.onChange(name, val)}
+            />
+            <span style={styles.colon}>;</span>
           </li>
         ))}
-        <li style={styles.attr}>
-          <div style={styles.InputWrapper}>
-            <BlurInput
+        {this.state.showNew &&
+          <li style={styles.attr}>
+            <AutoSizeInput
+              isNew={true}
+              type="attr"
               value={this.state.newAttr}
-              onChange={newAttr => this.setState({newAttr: '' + newAttr})}
+              onChange={newAttr => this.onNewAttr(newAttr)}
             />
-          </div>
-          :
-          <div style={styles.InputWrapper}>
-            {this.state.newAttr && (
-              <BlurInput
-                value={''}
-                onChange={val => this.onNew(val)}
-              />
-            )}
-          </div>
-        </li>
+            <span style={styles.colon}>:</span>
+            <AutoSizeInput
+              value={''}
+              onChange={val => this.onNewSubmit(val)}
+            />
+            <span style={styles.colon}>;</span>
+          </li>}
+        <span>{'}'}</span>
       </ul>
     );
   }
 }
 
-var styles = {
+StyleEdit.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const tagStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+});
+
+const styles = {
   container: {
     listStyle: 'none',
     padding: 0,
-    margin: 0,
-    width: '100%',
+    margin: '5px 0px',
+    cursor: 'text',
+  },
+  colon: {
+    margin: '-3px',
   },
   attr: {
-    padding: 2,
     display: 'flex',
-    alignContent: 'center',
-  },
-  InputWrapper: {
-    flex: '1 1 100px',
-    display: 'flex',
+    alignItems: 'center',
+    margin: '1px 3px',
   },
 };
 
