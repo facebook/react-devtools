@@ -300,6 +300,7 @@ function alphanumericSort(a: string, b: string): number {
 const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
   cursor: isComplex ? 'pointer' : 'default',
   color: theme.base0C,
+  margin: '2px 3px',
 });
 
 var styles = {
