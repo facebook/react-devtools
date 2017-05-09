@@ -35,19 +35,19 @@ class ContextMenu extends React.Component {
     }
   };
 
-  backdropClickHandler: () => void;
+  handleBackdropClick: () => void;
 
   constructor(props) {
     super(props);
 
-    this.backdropClickHandler = this.backdropClickHandler.bind(this);
+    this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
 
   onClick(i, evt) {
     this.props.items[i].action();
   }
 
-  backdropClickHandler(evt) {
+  handleBackdropClick(evt) {
     evt.preventDefault();
     this.props.hideContextMenu();
   }
@@ -63,7 +63,7 @@ class ContextMenu extends React.Component {
     });
 
     return (
-      <div style={styles.backdrop} onClick={this.backdropClickHandler}>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick}>
         <ul style={containerStyle}>
             {!this.props.items.length && <li style={styles.empty}>No actions</li>}
             {this.props.items.map((item, i) => item && (
