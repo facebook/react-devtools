@@ -11,6 +11,7 @@
 
 var fs = require('fs');
 var path = require('path');
+var isAbsolutePath = require('absolute-path');
 var child_process = require('child_process');
 var shellQuote = require('shell-quote');
 
@@ -105,8 +106,18 @@ function guessEditor() {
 }
 
 var _childProcess = null;
-function launchEditor(filePath, lineNumber) {
-  if (!fs.existsSync(filePath)) {
+function launchEditor(maybeRelativePath, lineNumber, absoluteProjectRoots) {
+  // We use relative paths at Facebook we deterministic builds.
+  // This is why our internal tooling calls React DevTools with absoluteProjectRoots.
+  // If the filename is absolute then we don't need to care about this.
+  var filePath = [maybeRelativePath]
+    .concat(
+      absoluteProjectRoots.map(root => path.join(root, maybeRelativePath))
+    ).find(combinedPath =>
+      fs.existsSync(combinedPath)
+    );
+
+  if (!filePath) {
     return;
   }
 

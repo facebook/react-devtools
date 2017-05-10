@@ -24,6 +24,7 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "absolute-path": "0.0.0",
     "shell-quote": "^1.6.1",
     "ws": "^2.0.3"
   },
