@@ -101,6 +101,7 @@
                     '\n\nDid you run `npm run build` and `npm install` in packages/react-devtools-core?'
                 );
             }
+            window.devtools = devtools;
             window.server = devtools
                 .setContentDOMNode(document.getElementById('container'))
                 .setStatusListener(function(status) {
