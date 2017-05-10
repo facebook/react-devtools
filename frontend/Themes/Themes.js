@@ -141,7 +141,7 @@ const Dracula: Base16Theme = {
   base03: '#626483',
   base04: '#282a36',
   base05: '#e9e9f4',
-  base06: '#e5ee86',
+  base06: '#FFFF88',
   base07: '#00f769',
   base08: '#ff79c6',
   base09: '#bd93f9',
