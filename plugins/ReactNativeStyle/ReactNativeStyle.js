@@ -14,14 +14,6 @@ var React = require('react');
 var StyleEdit = require('./StyleEdit');
 var BoxInspector = require('./BoxInspector');
 
-function shallowClone(obj) {
-  var nobj = {};
-  for (var n in obj) {
-    nobj[n] = obj[n];
-  }
-  return nobj;
-}
-
 type Props = {
   // TODO: typecheck bridge interface
   bridge: any;
@@ -91,7 +83,7 @@ class NativeStyler extends React.Component {
     this.setState({style, measuredLayout});
   }
 
-  _handleStyleChange(attr: string, val: string | number) {
+  _handleStyleChange(attr: string, val: ?string | ?number) {
     if (this.state.style) {
       this.state.style[attr] = val;
     }
@@ -99,17 +91,10 @@ class NativeStyler extends React.Component {
     this.setState({style: this.state.style});
   }
 
-  _handleStyleRename(oldName: string, newName: string, val: string | number) {
-    if (/^\s*$/.test(newName)) { // empty string or just whitespace
-      val = undefined;
-      this._handleStyleChange(oldName, val);
-    } else {
-      var style = shallowClone(this.state.style);
-      delete style[oldName];
-      style[newName] = val;
-      console.log(this.props.id, oldName, newName, val);
-      this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
-      this.setState({style});
+  _handleStyleRename(oldName: string, newName: string, val: ?string | ?number) {
+    this._handleStyleChange(oldName, undefined);
+    if (/\S/.test(newName)) { // non empty string or no whitespace
+      this._handleStyleChange(newName, val);
     }
   }
 

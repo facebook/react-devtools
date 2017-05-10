@@ -15,7 +15,7 @@ var AutoSizeInput = require('./AutoSizeInput');
 
 type Props = {
   style: Object,
-  onChange: (attr: string, val: string | number) => void,
+  onChange: (attr: string, val: ?string | ?number) => void,
   onRename: (oldName: string, newName: string, val: string | number) => void,
 };
 
@@ -37,8 +37,8 @@ class StyleEdit extends React.Component {
     this.state = {showNew: false, newAttr: '', newValue: ''};
   }
 
-  onChange(name: string, val: string | number) {
-    if (/^\s*$/.test(val)) { // empty string or just whitespace
+  onChange(name: string, val: ?string | ?number) {
+    if (val === '') {
       val = undefined;
     }
     var num = Number(val);
