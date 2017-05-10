@@ -296,7 +296,7 @@ class Panel extends React.Component {
         extraPanes={extraPanes}
         extraTabs={extraTabs}
         onViewElementSource={
-          this.props.showElementSource && this.viewElementSource.bind(this)
+          this.props.showElementSource ? this.viewElementSource.bind(this) : null
         }
       />
     );
