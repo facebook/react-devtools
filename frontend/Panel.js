@@ -312,6 +312,9 @@ class Panel extends React.Component {
         extraPanes={extraPanes}
         extraTabs={extraTabs}
         theme={theme}
+        onViewElementSource={
+          this.props.showElementSource ? this.viewElementSource.bind(this) : null
+        }
       />
     );
   }

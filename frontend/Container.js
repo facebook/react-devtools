@@ -51,6 +51,7 @@ class Container extends React.Component {
     },
     extraTabs: {[key: string]: () => React$Element},
     theme: Base16Theme,
+    onViewElementSource: null | (id: string, node: ?Object) => void,
   };
   state: State;
   resizeTimeout: ?number;
@@ -100,7 +101,12 @@ class Container extends React.Component {
           initialWidth={10}
           initialHeight={10}
           left={() => <LeftPane reload={this.props.reload} />}
-          right={() => <PropState extraPanes={this.props.extraPanes} />}
+          right={() => (
+            <PropState
+              onViewElementSource={this.props.onViewElementSource}
+              extraPanes={this.props.extraPanes}
+            />
+          )}
           isVertical={this.state.isVertical}
         />
       ),

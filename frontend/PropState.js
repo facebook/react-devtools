@@ -38,12 +38,22 @@ class PropState extends React.Component {
 
   renderSource(): ?React.Element {
     const {theme} = this.context;
-    const source = this.props.node.get('source');
+    const {id, node, onViewElementSource} = this.props;
+    const source = node.get('source');
     if (!source) {
       return null;
     }
+
+    let onClick;
+    if (onViewElementSource) {
+      onClick = () => onViewElementSource(id, source);
+    }
+
     return (
-      <div style={sourceStyle(theme)}>
+      <div
+        style={sourceStyle(!!onViewElementSource, theme)}
+        onClick={onClick}
+      >
         {source.fileName}
         <span style={sourcePosStyle(theme)}>
           :{source.lineNumber}
@@ -209,11 +219,12 @@ const emptyStyle = (theme: Base16Theme) => ({
   color: theme.base03,
 });
 
-const sourceStyle = (theme: Base16Theme) => ({
+const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
   padding: '0.25rem 0.5rem',
   color: theme.base05,
   overflow: 'auto',
   overflowWrap: 'break-word',
+  cursor: hasViewElementSource ? 'pointer' : 'default',
 });
 
 const sourcePosStyle = (theme: Base16Theme) => ({
