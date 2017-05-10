@@ -89,6 +89,7 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
+  darkModeState: ?ControlState;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -479,6 +480,13 @@ class Store extends EventEmitter {
       }
       cb();
     });
+  }
+
+  toggleDarkMode(state: ControlState) {
+    this.darkModeState = state;
+    this.emit('darkmodechange');
+    invariant(state.toJS);
+    this._bridge.send('darkmodechange', state.toJS());
   }
 
   changeTraceUpdates(state: ControlState) {
