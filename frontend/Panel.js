@@ -309,17 +309,20 @@ Panel.childContextTypes = {
 
 var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
   var props = node.get('props');
-  if (!props || !props.style) {
-    return (
-      <div key="rnstyle" style={styles.container}>
-        <strong>No style</strong>
-      </div>
-    );
+  var readOnly = !node.get('canUpdate');
+  if (readOnly) {
+    return null;
   }
   return (
     <div key="rnstyle" style={styles.container}>
       <strong>React Native Style Editor</strong>
-      <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
+      {!props || !props.style
+        ? <div style={styles.tag}>No style</div>
+        : <NativeStyler
+            id={id}
+            bridge={bridge}
+            supportsMeasure={supportsMeasure}
+          />}
     </div>
   );
 };
@@ -330,6 +333,11 @@ var styles = {
   },
   stretch: {
     flex: 1,
+  },
+  tag: {
+    marginLeft: 10,
+    padding: '2px 5px',
+    color: '#bbb',
   },
   container: {
     borderTop: '1px solid #eee',
