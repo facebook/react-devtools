@@ -48,7 +48,7 @@ class Container extends React.Component {
       ) => ?Array<MenuItem>,
     },
     extraTabs: {[key: string]: () => React$Element},
-    onViewElementSource: (id: string, node: ?Object) => void | null,
+    onViewElementSource: null | (id: string, node: ?Object) => void,
   };
   state: State;
   resizeTimeout: ?number;
