@@ -37,15 +37,17 @@ class PropState extends React.Component {
       return null;
     }
 
-    var extraStyles: Object = {};
+    var style = styles.source;
+    var onClick;
     if (onViewElementSource) {
-      extraStyles.cursor = 'pointer';
+      onClick = () => onViewElementSource(id, source);
+      style = {...style, cursor: 'pointer'};
     }
 
     return (
       <div
-        style={{...styles.source, ...extraStyles}}
-        onClick={() => onViewElementSource && onViewElementSource(id, source)}
+        style={style}
+        onClick={onClick}
       >
         {source.fileName}
         <span style={styles.sourcePos}>
