@@ -61,9 +61,9 @@ const tabsStyle = (theme: Base16Theme) => ({
   flexShrink: 0,
   listStyle: 'none',
   margin: 0,
-  padding: '0',
-  marginBottom: '2px',
   backgroundColor: theme.base00,
+  borderBottom: `1px solid ${theme.base02}`,
+  padding: '0.25rem 0.25rem 0 0.25rem',
 });
 
 const tabStyle = (isSelected: boolean, theme: Base16Theme) => ({
@@ -72,8 +72,10 @@ const tabStyle = (isSelected: boolean, theme: Base16Theme) => ({
   fontSize: 12,
   fontFamily: "'Lucida Grande', sans-serif",
   cursor: 'pointer',
-  marginRight: '2px',
-  backgroundColor: isSelected ? theme.base02 : theme.base01,
+  backgroundColor: isSelected ? theme.base01 : 'transparent',
+  borderLeft: isSelected ? `1px solid ${theme.base02}` : 'none',
+  borderRight: isSelected ? `1px solid ${theme.base02}` : 'none',
+  borderTop: isSelected ? `1px solid ${theme.base02}` : 'none',
 });
 
 var styles = {

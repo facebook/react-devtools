@@ -38,8 +38,7 @@ DetailPaneSection.contextTypes = {
 
 const sectionStyle = (theme: Base16Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
-  padding: 5,
-  marginBottom: 5,
+  padding: '0.5rem',
   flexShrink: 0,
 });
 

@@ -154,7 +154,6 @@ var styles = {
   },
 
   scroll: {
-    paddingTop: 3,
     overflow: 'auto',
     minHeight: 0,
     flex: 1,

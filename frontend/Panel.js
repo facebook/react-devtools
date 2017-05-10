@@ -342,8 +342,8 @@ var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
 
 const containerStyle = (theme: Base16Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
-  padding: 5,
-  marginBottom: 5,
+  padding: '0.25rem',
+  marginBottom: '0.25rem',
   flexShrink: 0,
 });
 const loadingStyle = (theme: Base16Theme) => ({

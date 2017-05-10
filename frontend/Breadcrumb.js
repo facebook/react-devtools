@@ -78,6 +78,7 @@ const containerStyle = (theme: Base16Theme) => ({
   overflow: 'auto',
   marginTop: '2px',
   backgroundColor: theme.base01,
+  borderTop: `1px solid ${theme.base02}`,
 });
 
 const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base16Theme) => ({

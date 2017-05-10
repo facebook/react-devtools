@@ -60,7 +60,7 @@ var styles = {
     userSelect: 'none',
   },
   header: {
-    padding: 5,
+    padding: '0.5rem',
     maxHeight: 38,
     flexShrink: 0,
     display: 'flex',

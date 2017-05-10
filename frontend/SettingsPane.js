@@ -210,6 +210,7 @@ const settingsPaneStyle = (theme: Base16Theme) => ({
   alignItems: 'center',
   position: 'relative',
   backgroundColor: theme.base01,
+  borderBottom: `1px solid ${theme.base02}`,
 });
 
 const settingsMenuButtonStyle = (theme: Base16Theme) => ({
