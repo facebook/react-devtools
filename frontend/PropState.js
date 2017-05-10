@@ -31,12 +31,24 @@ class PropState extends React.Component {
   }
 
   renderSource(): ?React.Element {
-    var source = this.props.node.get('source');
+    const {id, node, onViewElementSource} = this.props;
+    var source = node.get('source');
     if (!source) {
       return null;
     }
+
+    var style = styles.source;
+    var onClick;
+    if (onViewElementSource) {
+      onClick = () => onViewElementSource(id, source);
+      style = {...style, cursor: 'pointer'};
+    }
+
     return (
-      <div style={styles.source}>
+      <div
+        style={style}
+        onClick={onClick}
+      >
         {source.fileName}
         <span style={styles.sourcePos}>
           :{source.lineNumber}
