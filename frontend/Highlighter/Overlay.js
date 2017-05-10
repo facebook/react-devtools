@@ -11,6 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
+var Fonts = require('../Themes/Fonts');
 
 import type {DOMNode, DOMRect, Window} from '../types';
 
@@ -53,7 +54,7 @@ class Overlay {
     assign(this.tip.style, {
       backgroundColor: '#333740',
       borderRadius: '2px',
-      fontFamily: 'monospace',
+      fontFamily: Fonts.monospace,
       fontWeight: 'bold',
       padding: '3px 5px',
       position: 'fixed',

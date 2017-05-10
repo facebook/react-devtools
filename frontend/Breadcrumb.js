@@ -14,6 +14,7 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Base16Theme} from './types';
 
+var Fonts = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
 
@@ -70,7 +71,7 @@ Breadcrumb.contextTypes = {
 };
 
 const containerStyle = (theme: Base16Theme) => ({
-  fontFamily: 'sans-serif',
+  fontFamily: Fonts.sansSerif,
   listStyle: 'none',
   padding: 0,
   margin: 0,

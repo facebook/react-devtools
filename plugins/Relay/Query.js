@@ -13,6 +13,7 @@
 import type {Base16Theme} from '../../frontend/types';
 import type {Map} from 'immutable';
 
+var Fonts = require('../../frontend/Themes/Fonts');
 var React = require('react');
 
 class Query extends React.Component {
@@ -67,7 +68,7 @@ const baseContainer = {
   fontSize: 11,
   height: 21,
   lineHeight: '21px',
-  fontFamily: "'Lucida Grande', sans-serif",
+  fontFamily: Fonts.sansSerif,
 };
 
 const baseTDStyle = (theme: Base16Theme) => ({

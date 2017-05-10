@@ -14,6 +14,8 @@
 const React = require('react');
 const immutable = require('immutable');
 
+const Fonts = require('./Themes/Fonts');
+
 import type {ControlState} from './types.js';
 
 type Props = {
@@ -86,7 +88,7 @@ var styles = {
     display: 'inline-block',
     fontSize: '12px',
     outline: 'none',
-    fontFamily: 'sans-serif',
+    fontFamily: Fonts.sansSerif,
     userSelect: 'none',
     marginRight: '10px',
   },

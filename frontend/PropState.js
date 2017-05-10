@@ -14,6 +14,7 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
+var Fonts = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
 
@@ -214,7 +215,7 @@ var WrappedPropState = decorate({
 }, PropState);
 
 const emptyStyle = (theme: Base16Theme) => ({
-  fontFamily: 'sans-serif',
+  fontFamily: Fonts.sansSerif,
   margin: 'auto',
   color: theme.base03,
 });

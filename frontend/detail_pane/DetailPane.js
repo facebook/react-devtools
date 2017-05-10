@@ -11,6 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
+var Fonts = require('../Themes/Fonts');
 var React = require('react');
 
 import type {Base16Theme} from '../types';
@@ -47,8 +48,7 @@ DetailPane.contextTypes = {
 var styles = {
   container: {
     fontSize: '11px',
-    // TODO figure out what font Chrome devtools uses on Windows
-    fontFamily: 'Menlo, Consolas, monospace',
+    fontFamily: Fonts.monospace,
     overflow: 'auto',
     flex: 1,
     display: 'flex',

@@ -13,6 +13,7 @@
 const React = require('react');
 
 const decorate = require('./decorate');
+const Fonts = require('./Themes/Fonts');
 
 import type {Base16Theme} from './types';
 
@@ -119,7 +120,7 @@ const panelStyle = (theme: Base16Theme) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
-  fontFamily: 'sans-serif',
+  fontFamily: Fonts.sansSerif,
   backgroundColor: theme.base01,
   color: theme.base05,
 });

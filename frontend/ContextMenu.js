@@ -12,6 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Fonts = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
 var decorate = require('./decorate');
@@ -149,7 +150,7 @@ const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
   fontSize: 14,
   borderRadius: '0.25rem',
   overflow: 'hidden',
-  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
+  fontFamily: Fonts.sansSerif,
   zIndex: 1,
   backgroundColor: theme.base01,
 });

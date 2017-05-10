@@ -16,6 +16,7 @@ var React = require('react');
 var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
+var Fonts = require('./Themes/Fonts');
 
 import type {Base16Theme} from './types';
 
@@ -133,14 +134,14 @@ TreeView.contextTypes = {
 
 const noSearchResultsStyle = (theme: Base16Theme) => ({
   color: theme.base03,
-  fontFamily: 'sans-serif',
+  fontFamily: Fonts.sansSerif,
   fontSize: '14px',
   padding: '0.5rem',
 });
 
 var styles = {
   container: {
-    fontFamily: 'Menlo, Consolas, monospace',
+    fontFamily: Fonts.monospace,
     fontSize: '11px',
     lineHeight: 1.3,
     flex: 1,
