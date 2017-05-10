@@ -11,7 +11,6 @@
 
 var fs = require('fs');
 var path = require('path');
-var isAbsolutePath = require('absolute-path');
 var child_process = require('child_process');
 var shellQuote = require('shell-quote');
 
