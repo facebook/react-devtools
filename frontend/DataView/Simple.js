@@ -13,7 +13,6 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var assign = require('object-assign');
 var flash = require('../flash');
 
 import type {Base16Theme, DOMEvent, DOMNode} from '../types';
@@ -106,44 +105,34 @@ class Simple extends React.Component {
   }
 
   render() {
-    if (this.state.editing) {
+    const {theme} = this.context;
+    const {readOnly} = this.props;
+    const {editing, text} = this.state;
+
+    if (editing) {
       return (
         <input
           autoFocus={true}
           ref={i => this.input = i}
-          style={inputStyle(this.context.theme)}
+          style={inputStyle(theme)}
           onChange={e => this.onChange(e)}
           onBlur={() => this.onSubmit(false)}
           onKeyDown={this.onKeyDown.bind(this)}
-          value={this.state.text}
+          value={text}
         />
       );
     }
 
-    var data = this.props.data;
-    var type = typeof data;
-    var style = styles.simple;
-    var typeClassName;
-    if (type === 'boolean') {
-      typeClassName = 'CodeBoolean';
-    } else if (type === 'string') {
-      typeClassName = 'CodeString';
-      if (data.length > 200) {
-        data = data.slice(0, 200) + '…';
-      }
-    } else if (type === 'number') {
-      typeClassName = 'CodeNumber';
-    } else if (!this.props.data) {
-      typeClassName = 'CodeEmpty';
+    let {data} = this.props;
+    if (typeof data === 'string' && data.length > 200) {
+      data = data.slice(0, 200) + '…';
     }
-    if (!this.props.readOnly) {
-      assign(style, styles.editable);
-    }
+
     return (
       <div
         onClick={this.startEditing.bind(this)}
-        className={typeClassName}
-        style={style}>
+        style={simpleStyle(readOnly, theme)}
+      >
         {valueToText(data)}
       </div>
     );
@@ -173,18 +162,14 @@ const inputStyle = (theme: Base16Theme) => ({
   fontSize: 'inherit',
 });
 
-var styles = {
-  simple: {
-    display: 'flex',
-    flex: 1,
-    whiteSpace: 'pre-wrap',
-  },
-  editable: {
-    cursor: 'pointer',
-  },
-};
+const simpleStyle = (readOnly: boolean, theme: Base16Theme) => ({
+  display: 'flex',
+  flex: 1,
+  whiteSpace: 'pre-wrap',
+  cursor: readOnly ? 'default' : 'pointer',
+});
 
-var BAD_INPUT = Symbol('bad input');
+const BAD_INPUT = Symbol('bad input');
 
 function textToValue(txt) {
   if (!txt.length) {
