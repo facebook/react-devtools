@@ -38,6 +38,9 @@ class StyleEdit extends React.Component {
   }
 
   onChange(name: string, val: string | number) {
+    if (/^\s*$/.test(val)) { // empty string or just whitespace
+      val = undefined;
+    }
     var num = Number(val);
     this.props.onChange(name, num == val ? num : val);
   }

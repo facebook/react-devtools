@@ -100,11 +100,17 @@ class NativeStyler extends React.Component {
   }
 
   _handleStyleRename(oldName: string, newName: string, val: string | number) {
-    var style = shallowClone(this.state.style);
-    delete style[oldName];
-    style[newName] = val;
-    this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
-    this.setState({style});
+    if (/^\s*$/.test(newName)) { // empty string or just whitespace
+      val = undefined;
+      this._handleStyleChange(oldName, val);
+    } else {
+      var style = shallowClone(this.state.style);
+      delete style[oldName];
+      style[newName] = val;
+      console.log(this.props.id, oldName, newName, val);
+      this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
+      this.setState({style});
+    }
   }
 
   render() {
