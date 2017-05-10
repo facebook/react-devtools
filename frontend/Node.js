@@ -547,7 +547,7 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
 };
 
 const highlightStyle = (theme: Base16Theme) => ({
-  backgroundColor: theme.base02,
+  backgroundColor: theme.base06,
 });
 
 type tailStyleParams = {

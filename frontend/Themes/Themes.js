@@ -121,7 +121,7 @@ const Default: Base16Theme = {
   base03: '#888888',
   base04: '#ffffff',
   base05: '#303942',
-  base06: '#881280',
+  base06: '#EEFF00',
   base07: '#0084ff',
   base08: '#881280',
   base09: '#212121',

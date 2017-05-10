@@ -84,7 +84,7 @@ export type Base16Theme = {
   base03: string; // Comments, Invisibles, Line Highlighting
   base04: string; // Dark Foreground (Used for status bars)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
-  base06: string; // Light Foreground (Not often used)
+  base06: string; // Light Foreground (Not often used); *also used for search/filter background highlights
   base07: string; // Light Background (Not often used); *also used for inverted selection in devtools
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
