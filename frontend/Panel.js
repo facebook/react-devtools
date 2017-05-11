@@ -31,6 +31,7 @@ import type {Wall} from '../agent/Bridge';
 export type Props = {
   alreadyFoundReact: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
+  preferencesPanelShown?: boolean,
 
   // if alreadyFoundReact, then these don’t need to be passed
   checkForReact?: (cb: (isReact: boolean) => void) => void,
@@ -56,6 +57,7 @@ type DefaultProps = {};
 type State = {
   loading: boolean,
   isReact: boolean,
+  preferencesPanelShown: boolean,
   themeName: ?string,
 };
 
@@ -79,6 +81,7 @@ class Panel extends React.Component {
     this.state = {
       loading: true,
       isReact: this.props.alreadyFoundReact,
+      preferencesPanelShown: false,
       themeName: null,
     };
     this._unMounted = false;
@@ -217,6 +220,11 @@ class Panel extends React.Component {
         this.setState({loading: false});
         this.getNewSelection();
       });
+      this._store.on('preferencesPanelShown', () => {
+        this.setState({
+          preferencesPanelShown: this._store.preferencesPanelShown,
+        });
+      });
       this._store.on('theme', () => {
         this.setState({
           themeName: this._store.theme.name,
@@ -311,6 +319,7 @@ class Panel extends React.Component {
         }}
         extraPanes={extraPanes}
         extraTabs={extraTabs}
+        preferencesPanelShown={this.state.preferencesPanelShown}
         theme={theme}
         onViewElementSource={
           this.props.showElementSource ? this.viewElementSource.bind(this) : null

@@ -120,6 +120,7 @@ const panelStyle = (theme: Base16Theme) => ({
   display: 'flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
+  zIndex: 1,
   fontFamily: Fonts.sansSerif,
   backgroundColor: theme.base01,
   color: theme.base05,
