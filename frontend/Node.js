@@ -615,6 +615,7 @@ const styles = {
   container: {
     flexShrink: 0,
     position: 'relative',
+    whiteSpace: 'nowrap',
   },
   falseyLiteral: {
     fontStyle: 'italic',
