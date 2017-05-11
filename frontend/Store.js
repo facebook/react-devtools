@@ -120,7 +120,11 @@ class Store extends EventEmitter {
   constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
 
-    this._defaultThemeName = defaultThemeName || 'ChromeDefault';
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
+      ? defaultThemeName
+      : 'ChromeDefault';
+
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
@@ -143,7 +147,13 @@ class Store extends EventEmitter {
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
-    const themeName = ThemeStore.get() || this._defaultThemeName;
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const restoredThemeName = ThemeStore.get();
+    const themeName = restoredThemeName && Themes.hasOwnProperty(restoredThemeName)
+      ? restoredThemeName
+      : this._defaultThemeName;
+
     this.theme = Themes[themeName];
     this.themes = Themes;
 
@@ -335,14 +345,16 @@ class Store extends EventEmitter {
   }
 
   changeTheme(themeName: ?string) {
-    const safeThemeName = themeName || this._defaultThemeName;
+    // Only apply a valid theme.
+    const safeThemeName = themeName && this.themes.hasOwnProperty(themeName)
+      ? themeName
+      : this._defaultThemeName;
 
-    if (this.themes.hasOwnProperty(safeThemeName)) {
-      this.theme = this.themes[safeThemeName];
-      this.emit('theme');
+    this.theme = this.themes[safeThemeName];
+    this.emit('theme');
 
-      ThemeStore.set(themeName || null);
-    }
+    // But allow users to restore "default" mode by selecting an empty theme.
+    ThemeStore.set(themeName || null);
   }
 
   showPreferencesPanel() {

@@ -10,10 +10,7 @@
  */
 'use strict';
 
-/**
- * Bump version number any time a non-backwards compatible change is made to theme-storage.
- */
-const LOCAL_STORAGE_VERSIONED_KEY = 'themeName.1';
+const LOCAL_STORAGE_VERSIONED_KEY = 'themeName';
 
 function get(): ?string {
   let themeName;
