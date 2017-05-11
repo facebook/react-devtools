@@ -92,6 +92,46 @@ const Chalk: Base16Theme = {
   base0F: '#deaf8f',
 };
 
+const ChromeDark: Base16Theme = {
+  name: 'Chrome (dark)',
+  base00: '#242424',
+  base01: '#363636',
+  base02: '#454545',
+  base03: '#898989',
+  base04: '#303942',
+  base05: '#ffffff',
+  base06: '#FFFF33',
+  base07: '#c78626',
+  base08: '#5dafd6',
+  base09: '#a1f7b5',
+  base0A: '#00ff00',
+  base0B: '#f29766',
+  base0C: '#d2c057',
+  base0D: '#34d1c5',
+  base0E: '#9a7fd5',
+  base0F: '#9bbbdc',
+};
+
+const ChromeDefault: Base16Theme = {
+  name: 'Chrome (default)',
+  base00: '#ffffff',
+  base01: '#efefef',
+  base02: '#cccccc',
+  base03: '#888888',
+  base04: '#ffffff',
+  base05: '#303942',
+  base06: '#EEFF00',
+  base07: '#0084ff',
+  base08: '#881280',
+  base09: '#212121',
+  base0A: '#00ff00',
+  base0B: '#242aa7',
+  base0C: '#c41a16',
+  base0D: '#236e25',
+  base0E: '#aa0d91',
+  base0F: '#a46832',
+};
+
 const Darktooth: Base16Theme = {
   name: 'Darktooth',
   base00: '#1D2021',
@@ -112,33 +152,12 @@ const Darktooth: Base16Theme = {
   base0F: '#A87322',
 };
 
-// Mimics the Chrome-like theme that devtools used previous
-const Default: Base16Theme = {
-  name: 'Default',
-  base00: '#ffffff',
-  base01: '#efefef',
-  base02: '#cccccc',
-  base03: '#888888',
-  base04: '#ffffff',
-  base05: '#303942',
-  base06: '#EEFF00',
-  base07: '#0084ff',
-  base08: '#881280',
-  base09: '#212121',
-  base0A: '#00ff00',
-  base0B: '#242aa7',
-  base0C: '#c41a16',
-  base0D: '#236e25',
-  base0E: '#aa0d91',
-  base0F: '#a46832',
-};
-
 const Dracula: Base16Theme = {
   name: 'Dracula',
   base00: '#282a36',
   base01: '#3a3c4e',
-  base02: '#4d4f68',
-  base03: '#626483',
+  base02: '#6d6f88',
+  base03: '#8284a3',
   base04: '#282a36',
   base05: '#e9e9f4',
   base06: '#FFFF88',
@@ -171,6 +190,26 @@ const Eighties: Base16Theme = {
   base0D: '#6699cc',
   base0E: '#cc99cc',
   base0F: '#d27b53',
+};
+
+const FirefoxDark: Base16Theme = {
+  name: 'Firefox (dark)',
+  base00: '#393f4c',
+  base01: '#475983',
+  base02: '#cccccc',
+  base03: '#8fa1b2',
+  base04: '#ffffff',
+  base05: '#ffffff',
+  base06: '#000000',
+  base07: '#5675b9',
+  base08: '#00ff7f',
+  base09: '#eb5368',
+  base0A: '#bcb8db',
+  base0B: '#e9f4fe',
+  base0C: '#bcb8db',
+  base0D: '#e9f4fe',
+  base0E: '#e9f4fe',
+  base0F: '#e9f4fe',
 };
 
 const Flat: Base16Theme = {
@@ -359,9 +398,11 @@ module.exports = {
   Bespin,
   Chalk,
   Darktooth,
-  Default,
+  ChromeDefault,
+  ChromeDark,
   Dracula,
   Eighties,
+  FirefoxDark,
   Flat,
   GitHub,
   GoogleLight,

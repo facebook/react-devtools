@@ -50,6 +50,9 @@ class PreferencesPanel extends React.Component {
       return null;
     }
 
+    const themeKeys = Object.keys(themes)
+      .filter(key => !key.includes('Chrome') && !key.includes('Firefox'));
+
     return (
       <div style={styles.backdrop} onClick={hide}>
         <div style={panelStyle(theme)} onClick={blockClick}>
@@ -60,8 +63,10 @@ class PreferencesPanel extends React.Component {
             ref={this._setSelectRef}
             value={theme.name}
           >
-            {Object.keys(themes).map(name => (
-              <option key={name} value={name}>{name}</option>
+            <option value="">default</option>
+            <option disabled="disabled">---</option>
+            {themeKeys.map(key => (
+              <option key={key} value={key}>{themes[key].name}</option>
             ))}
           </select>
           <button
@@ -141,6 +146,8 @@ const styles = {
   },
   closeButton: {
     marginTop: '0.5rem',
+    padding: '0.25rem',
+    borderRadius: '0.25rem',
   },
 };
 

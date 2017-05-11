@@ -280,7 +280,7 @@ class DataItem extends React.Component {
                 this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
-            style={styles.preview}
+            style={previewStyle(theme)}
           >
             {preview}
           </div>
@@ -310,6 +310,15 @@ const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
   cursor: isComplex ? 'pointer' : 'default',
   color: theme.base0C,
   margin: '2px 3px',
+});
+
+const previewStyle = (theme: Base16Theme) => ({
+  display: 'flex',
+  margin: '2px 3px',
+  whiteSpace: 'pre',
+  wordBreak: 'break-word',
+  flex: 1,
+  color: theme.base09,
 });
 
 const emptyStyle = (theme: Base16Theme) => ({
@@ -378,14 +387,6 @@ var styles = {
   head: {
     display: 'flex',
     position: 'relative',
-  },
-
-  preview: {
-    display: 'flex',
-    margin: '2px 3px',
-    whiteSpace: 'pre',
-    wordBreak: 'break-word',
-    flex: 1,
   },
 
   value: {

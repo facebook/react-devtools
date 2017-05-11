@@ -22,9 +22,9 @@ function get(): ?string {
   return themeName || null;
 }
 
-function set(themeName: string): boolean {
+function set(themeName: ?string): boolean {
   try {
-    localStorage.setItem('themeName', themeName);
+    localStorage.setItem('themeName', themeName || '');
 
     return true;
   } catch (error) {

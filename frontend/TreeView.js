@@ -142,7 +142,7 @@ const noSearchResultsStyle = (theme: Base16Theme) => ({
 var styles = {
   container: {
     fontFamily: Fonts.monospace,
-    fontSize: '11px',
+    fontSize: '10px',
     lineHeight: 1.3,
     flex: 1,
     display: 'flex',

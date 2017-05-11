@@ -210,7 +210,7 @@ const settingsPaneStyle = (theme: Base16Theme) => ({
   alignItems: 'center',
   position: 'relative',
   backgroundColor: theme.base01,
-  borderBottom: `1px solid ${theme.base02}`,
+  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
 });
 
 const settingsMenuButtonStyle = (theme: Base16Theme) => ({
@@ -252,7 +252,7 @@ const searchIconStyle = (theme: Base16Theme) => ({
 });
 
 const baseInputStyle = (theme: Base16Theme) => ({
-  fontSize: '12px',
+  fontSize: '11px',
   padding: '0.25rem',
   border: `1px solid ${theme.base02}`,
   outline: 'none',

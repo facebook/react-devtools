@@ -13,6 +13,7 @@
 var React = require('react');
 var decorate = require('./decorate');
 var Fonts = require('./Themes/Fonts');
+var {hexToRgba} = require('./Themes/utils');
 
 import type {Base16Theme} from './types';
 
@@ -63,7 +64,7 @@ const tabsStyle = (theme: Base16Theme) => ({
   listStyle: 'none',
   margin: 0,
   backgroundColor: theme.base00,
-  borderBottom: `1px solid ${theme.base02}`,
+  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
   padding: '0.25rem 0.25rem 0 0.25rem',
 });
 

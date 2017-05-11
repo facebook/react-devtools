@@ -34,7 +34,6 @@ type ContextMenu = {
 };
 
 const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
-const DEFAULT_THEME_NAME = 'Default';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -86,6 +85,7 @@ const DEFAULT_THEME_NAME = 'Default';
  */
 class Store extends EventEmitter {
   _bridge: Bridge;
+  _defaultThemeName: string;
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
@@ -117,8 +117,10 @@ class Store extends EventEmitter {
     rnStyleMeasure?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
+
+    this._defaultThemeName = defaultThemeName || 'ChromeDefault';
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
@@ -141,7 +143,7 @@ class Store extends EventEmitter {
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
-    const themeName = ThemeStore.get() || DEFAULT_THEME_NAME;
+    const themeName = ThemeStore.get() || this._defaultThemeName;
     this.theme = Themes[themeName];
     this.themes = Themes;
 
@@ -332,12 +334,14 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
-  changeTheme(themeName: string) {
-    if (this.themes.hasOwnProperty(themeName)) {
-      this.theme = this.themes[themeName];
+  changeTheme(themeName: ?string) {
+    const safeThemeName = themeName || this._defaultThemeName;
+
+    if (this.themes.hasOwnProperty(safeThemeName)) {
+      this.theme = this.themes[safeThemeName];
       this.emit('theme');
 
-      ThemeStore.set(themeName);
+      ThemeStore.set(themeName || null);
     }
   }
 

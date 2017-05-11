@@ -17,6 +17,7 @@ import type {Base16Theme} from './types';
 var Fonts = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
+var {hexToRgba} = require('./Themes/utils');
 
 class Breadcrumb extends React.Component {
   context: {theme: Base16Theme};
@@ -79,7 +80,7 @@ const containerStyle = (theme: Base16Theme) => ({
   overflow: 'auto',
   marginTop: '2px',
   backgroundColor: theme.base01,
-  borderTop: `1px solid ${theme.base02}`,
+  borderTop: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
 });
 
 const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base16Theme) => {

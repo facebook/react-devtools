@@ -30,6 +30,7 @@ import type {Wall} from '../agent/Bridge';
 
 export type Props = {
   alreadyFoundReact: boolean,
+  themeName?: string,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
   preferencesPanelShown?: boolean,
 
@@ -80,9 +81,9 @@ class Panel extends React.Component {
     super(props);
     this.state = {
       loading: true,
-      isReact: this.props.alreadyFoundReact,
       preferencesPanelShown: false,
-      themeName: null,
+      isReact: props.alreadyFoundReact,
+      themeName: props.themeName,
     };
     this._unMounted = false;
     window.panel = this;
@@ -92,7 +93,7 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
-      theme: this._store && this._store.theme || Themes.Default,
+      theme: this._store && this._store.theme || Themes.ChromeDefault,
       themes: this._store && this._store.themes || {},
     };
   }
@@ -206,7 +207,7 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge(wall);
 
-      this._store = new Store(this._bridge);
+      this._store = new Store(this._bridge, this.state.themeName);
       
       var refresh = () => this.forceUpdate();
       this.plugins = [
@@ -260,7 +261,7 @@ class Panel extends React.Component {
   }
 
   render() {
-    var theme = this._store ? this._store.theme : Themes.Default;
+    var theme = this._store ? this._store.theme : Themes.ChromeDefault;
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
