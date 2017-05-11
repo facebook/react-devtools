@@ -127,7 +127,7 @@ const panelStyle = (theme: Base16Theme) => ({
   flexDirection: 'column',
   alignItems: 'flex-start',
   zIndex: 1,
-  fontFamily: Fonts.sansSerif,
+  fontFamily: Fonts.sansSerif.family,
   backgroundColor: theme.base01,
   border: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
   color: theme.base05,

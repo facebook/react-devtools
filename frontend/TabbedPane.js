@@ -12,7 +12,7 @@
 
 var React = require('react');
 var decorate = require('./decorate');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var {hexToRgba} = require('./Themes/utils');
 
 import type {Base16Theme} from './types';
@@ -74,8 +74,8 @@ const tabStyle = (isSelected: boolean, theme: Base16Theme) => {
   return {
     padding: '0.25rem 0.5rem',
     lineHeight: '15px',
-    fontSize: 12,
-    fontFamily: Fonts.sansSerif,
+    fontSize: sansSerif.sizes.normal,
+    fontFamily: sansSerif.family,
     cursor: 'pointer',
     backgroundColor: isSelected ? theme.base01 : 'transparent',
     borderLeft: border,

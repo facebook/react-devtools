@@ -11,6 +11,17 @@
 'use strict';
 
 module.exports = {
-  monospace: 'Menlo, Consolas, monospace',
-  sansSerif: '-apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, "Helvetica Neue", "Lucida Grande", sans-serif',
+  monospace: {
+    family: 'Menlo, Consolas, monospace',
+    sizes: {
+      normal: 11,
+    },
+  },
+  sansSerif: {
+    family: '"Helvetica Neue", "Lucida Grande", -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif',
+    sizes: {
+      normal: 12,
+      large: 14,
+    },
+  },
 };

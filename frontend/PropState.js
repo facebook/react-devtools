@@ -212,7 +212,7 @@ var WrappedPropState = decorate({
 }, PropState);
 
 const emptyStyle = (theme: Base16Theme) => ({
-  fontFamily: Fonts.sansSerif,
+  fontFamily: Fonts.sansSerif.family,
   margin: 'auto',
   color: theme.base03,
 });

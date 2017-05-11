@@ -159,7 +159,7 @@ const inputStyle = (theme: Base16Theme) => ({
   padding: 0,
   outline: 'none',
   boxShadow: `0 0 3px ${theme.base02}`,
-  fontFamily: Fonts.monospace,
+  fontFamily: Fonts.monospace.family,
   fontSize: 'inherit',
 });
 

@@ -10,7 +10,7 @@
  */
 'use strict';
 
-var Fonts = require('../Themes/Fonts');
+var {monospace} = require('../Themes/Fonts');
 var React = require('react');
 
 class DetailPane extends React.Component {
@@ -25,8 +25,8 @@ class DetailPane extends React.Component {
 
 var styles = {
   container: {
-    fontSize: '10px',
-    fontFamily: Fonts.monospace,
+    fontSize: monospace.sizes.normal,
+    fontFamily: monospace.family,
     overflow: 'auto',
     flex: 1,
     display: 'flex',

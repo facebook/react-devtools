@@ -12,6 +12,7 @@
 
 import type {Base16Theme, DOMEvent} from '../types';
 
+var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
 var Simple = require('./Simple');
 
@@ -328,7 +329,7 @@ const emptyStyle = (theme: Base16Theme) => ({
 });
 
 const missingStyle = (theme: Base16Theme) => ({
-  fontSize: 12,
+  fontSize: sansSerif.sizes.normal,
   fontWeight: 'bold',
   marginLeft: 10,
   padding: '2px 5px',

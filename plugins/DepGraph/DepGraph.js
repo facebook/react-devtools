@@ -114,7 +114,7 @@ class SvgGraph extends React.Component {
                 y={node.y + node.height / 4}
                 textAnchor="middle"
                 fontSize="10"
-                fontFamily={Fonts.sansSerif}
+                fontFamily={Fonts.sansSerif.family}
               >{node.label + ' ' + node.count}</text>
             );
           })}
