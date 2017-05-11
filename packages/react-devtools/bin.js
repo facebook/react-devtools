@@ -6,6 +6,6 @@ var argv = process.argv.slice(2);
 var result = spawn.sync(
   electron,
   [require.resolve('./app')].concat(argv),
-  {stdio: 'inherit'}
+  {stdio: 'ignore'}
 );
 process.exit(result.status);
