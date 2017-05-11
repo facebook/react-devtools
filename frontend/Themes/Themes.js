@@ -196,7 +196,7 @@ const FirefoxDark: Base16Theme = {
   name: 'Firefox (dark)',
   base00: '#393f4c',
   base01: '#475983',
-  base02: '#cccccc',
+  base02: '#bbbbbb',
   base03: '#8fa1b2',
   base04: '#ffffff',
   base05: '#ffffff',

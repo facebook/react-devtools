@@ -21,7 +21,7 @@ var node = document.getElementById('container');
 ReactDOM.render(<h1 id="message">Looking for React...</h1>, node);
 var port = {};
 
-// TODO (bvaughn) Read default theme and parameterize <Panel>
+// TODO (bvaughn) Read default :themeName and parameterize <Panel>
 // Refer to 'shells/chrome/src/panel.js' for an example
 
 function reload() {
