@@ -82,17 +82,26 @@ const containerStyle = (theme: Base16Theme) => ({
   borderTop: `1px solid ${theme.base02}`,
 });
 
-const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base16Theme) => ({
-  backgroundColor: isSelected ? theme.base02 : 'transparent',
-  color: isComposite ? theme.base0E : 'inherit',
-  cursor: isSelected ? 'default' : 'pointer',
-  padding: '0.25rem 0.5rem',
-  WebkitUserSelect: 'none',
-  MozUserSelect: 'none',
-  userSelect: 'none',
-  display: 'inline-block',
-  marginRight: '2px',
-});
+const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base16Theme) => {
+  let color;
+  if (isSelected) {
+    color = theme.base04;
+  } else if (isComposite) {
+    color = theme.base0E;
+  }
+
+  return {
+    backgroundColor: isSelected ? theme.base07 : 'transparent',
+    color,
+    cursor: isSelected ? 'default' : 'pointer',
+    padding: '0.25rem 0.5rem',
+    WebkitUserSelect: 'none',
+    MozUserSelect: 'none',
+    userSelect: 'none',
+    display: 'inline-block',
+    marginRight: '2px',
+  };
+};
 
 function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
   var path = [];
