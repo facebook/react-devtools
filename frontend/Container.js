@@ -157,7 +157,6 @@ const containerStyle = (theme: Base16Theme) => ({
   flex: 1,
   display: 'flex',
   minWidth: 0,
-  position: 'relative',
 });
 
 module.exports = Container;
