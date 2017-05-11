@@ -14,6 +14,7 @@ const React = require('react');
 
 const decorate = require('./decorate');
 const Fonts = require('./Themes/Fonts');
+const {hexToRgba} = require('./Themes/utils');
 
 import type {Base16Theme} from './types';
 
@@ -128,6 +129,7 @@ const panelStyle = (theme: Base16Theme) => ({
   zIndex: 1,
   fontFamily: Fonts.sansSerif,
   backgroundColor: theme.base01,
+  border: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
   color: theme.base05,
 });
 

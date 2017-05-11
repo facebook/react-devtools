@@ -10,11 +10,16 @@
  */
 'use strict';
 
+/**
+ * Bump version number any time a non-backwards compatible change is made to theme-storage.
+ */
+const LOCAL_STORAGE_VERSIONED_KEY = 'themeName.1';
+
 function get(): ?string {
   let themeName;
 
   try {
-    themeName = localStorage.getItem('themeName');
+    themeName = localStorage.getItem(LOCAL_STORAGE_VERSIONED_KEY);
   } catch (error) {
     console.error('Could not read saved theme.', error);
   }
@@ -24,7 +29,7 @@ function get(): ?string {
 
 function set(themeName: ?string): boolean {
   try {
-    localStorage.setItem('themeName', themeName || '');
+    localStorage.setItem(LOCAL_STORAGE_VERSIONED_KEY, themeName || '');
 
     return true;
   } catch (error) {
