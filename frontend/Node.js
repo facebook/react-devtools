@@ -14,6 +14,7 @@ var React = require('react');
 
 var decorate = require('./decorate');
 var Props = require('./Props');
+var {hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
 import type {Base16Theme} from './types';
@@ -585,19 +586,17 @@ const tailStyle = ({
 
 const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Base16Theme) => {
   let borderLeftColor = 'transparent';
-  if (isHovered && !isBottomTagHovered) {
+  if (isSelected) {
+    borderLeftColor = hexToRgba(theme.base07, 0.25);
+  } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = theme.base02;
-  } else if (isSelected) {
-    borderLeftColor = theme.base03;
+    borderLeftColor = theme.base01;
   }
 
   return {
     position: 'absolute',
     width: '1px',
-    borderLeftStyle: 'dotted',
-    borderLeftWidth: '1px',
-    borderLeftColor,
+    borderLeft: `1px solid ${borderLeftColor}`,
     top: 16,
     bottom: 0,
     willChange: 'opacity',
