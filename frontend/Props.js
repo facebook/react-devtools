@@ -11,17 +11,21 @@
 'use strict';
 
 var React = require('react');
-var assign = require('object-assign');
 var PropVal = require('./PropVal');
 
+import type {Base16Theme} from './types';
+
 class Props extends React.Component {
-  props: Object;
+  context: {
+    theme: Base16Theme,
+  };
   shouldComponentUpdate(nextProps: Object): boolean {
     return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 
   render() {
-    var props = this.props.props;
+    var theme = this.context.theme;
+    var {inverted, props} = this.props;
     if (!props || typeof props !== 'object') {
       return <span/>;
     }
@@ -31,45 +35,39 @@ class Props extends React.Component {
     });
 
     var items = [];
-    var propNameStyle = assign(
-      {},
-      styles.propName,
-      this.props.inverted && styles.propNameInverted
-    );
 
     names.slice(0, 3).forEach(name => {
       items.push(
-        <span key={'prop-' + name} style={styles.prop}>
-          <span style={propNameStyle}>{name}</span>
+        <span key={'prop-' + name} style={propStype(inverted, theme)}>
+          <span style={attributeNameStyle(inverted, theme)}>{name}</span>
           =
-          <PropVal val={props[name]} inverted={this.props.inverted}/>
+          <PropVal val={props[name]} inverted={inverted}/>
         </span>
       );
     });
 
     if (names.length > 3) {
-      var ellipsisStyle = this.props.inverted ? styles.ellipsisInverted : null;
-      items.push(<span key="ellipsis" style={ellipsisStyle}>…</span>);
+      items.push(<span key="ellipsis" style={ellipsisStyle(inverted, theme)}>…</span>);
     }
     return <span>{items}</span>;
   }
 }
 
-var styles = {
-  ellipsisInverted: {
-    color: '#ccc',
-  },
-
-  prop: {
-    paddingLeft: 5,
-  },
-
-  propName: {
-    color: '#994500',
-  },
-  propNameInverted: {
-    color: '#ccc',
-  },
+Props.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
 };
+
+const attributeNameStyle = (isInverted: boolean, theme: Base16Theme) => ({
+  color: isInverted ? theme.base02 : theme.base0F,
+});
+
+const ellipsisStyle = (isInverted: boolean, theme: Base16Theme) => ({
+  color: isInverted ? theme.base02 : theme.base0F,
+});
+
+const propStype = (isInverted: boolean, theme: Base16Theme) => ({
+  paddingLeft: 5,
+  color: isInverted ? theme.base02 : theme.base0F,
+});
 
 module.exports = Props;

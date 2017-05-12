@@ -12,6 +12,8 @@
 
 var React = require('react');
 
+import type {Base16Theme} from '../../frontend/types';
+
 type BoxMeasurements = {
   top: number,
   left: number,
@@ -22,13 +24,14 @@ type BoxMeasurements = {
 type BoxProps = BoxMeasurements & {
   title: string,
   children: React$Element,
+  theme: Base16Theme,
 };
 
 var Box = (props: BoxProps) => {
-  var {title, children, top, left, right, bottom} = props;
+  var {title, children, top, left, right, bottom, theme} = props;
   return (
-    <div style={styles.box}>
-      <span style={styles.label}>{title}</span>
+    <div style={boxStyle(theme)}>
+      <span style={labelStyle(theme)}>{title}</span>
       <div style={styles.boxText}>{+top.toFixed(3)}</div>
       <div style={styles.row}>
         <span style={styles.boxText}>{+left.toFixed(3)}</span>
@@ -41,6 +44,9 @@ var Box = (props: BoxProps) => {
 };
 
 class BoxInspector extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
   props: {
     left: number,
     top: number,
@@ -51,15 +57,16 @@ class BoxInspector extends React.Component {
   };
 
   render() {
+    const {theme} = this.context;
     const {left, top, width, height, margin, padding} = this.props;
     return (
-      <Box title="margin" {...margin}>
-        <Box title="padding" {...padding}>
+      <Box theme={theme} title="margin" {...margin}>
+        <Box theme={theme} title="padding" {...padding}>
           <div style={styles.measureLayout}>
-            <span style={styles.positionText}>
+            <span style={positionTextStyle(theme)}>
               ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
-            <span style={styles.dimenText}>
+            <span style={dimenTextStyle(theme)}>
               {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
@@ -69,38 +76,46 @@ class BoxInspector extends React.Component {
   }
 }
 
+BoxInspector.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const labelStyle = (theme: Base16Theme) => ({
+  flex: 1,
+  color: theme.base0C,
+});
+
+const positionTextStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+  fontSize: 10,
+  textAlign: 'center',
+});
+
+const dimenTextStyle = (theme: Base16Theme) => ({
+  color: theme.base0B,
+  textAlign: 'center',
+});
+
+const boxStyle = (theme: Base16Theme) => ({
+  position: 'relative',
+  padding: 8,
+  margin: 8,
+  width: 184,
+  border: `1px dashed ${theme.base05}`,
+  alignItems: 'center',
+  alignSelf: 'center',
+});
+
 var styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  label: {
-    position: 'absolute',
-    color: '#c41a16',
-  },
   measureLayout: {
     display: 'flex',
     flexDirection: 'column',
     margin: 4,
-  },
-  dimenText: {
-    color: '#1c00cf',
-    textAlign: 'center',
-  },
-  positionText: {
-    color: '#bbb',
-    fontSize: 10,
-    textAlign: 'center',
-  },
-  box: {
-    position: 'relative',
-    padding: 8,
-    margin: 8,
-    width: 184,
-    border: '1px dashed grey',
-    alignItems: 'center',
-    alignSelf: 'center',
   },
   boxText: {
     textAlign: 'center',

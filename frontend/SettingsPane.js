@@ -17,6 +17,9 @@ var SearchUtils = require('./SearchUtils');
 var {PropTypes} = React;
 
 var decorate = require('./decorate');
+var {hexToRgba} = require('./Themes/utils');
+
+import type {Base16Theme} from './types';
 
 type EventLike = {
   keyCode: number,
@@ -26,6 +29,10 @@ type EventLike = {
 };
 
 class SettingsPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
+
   _key: (evt: EventLike) => void;
 
   constructor(props) {
@@ -81,22 +88,29 @@ class SettingsPane extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
     var searchText = this.props.searchText;
 
-    var inputStyle = styles.input;
-    if (searchText || this.state.focused) {
-      inputStyle = Object.assign({}, inputStyle, styles.highlightedInput);
-    }
+    var inputStyle;
     if (
       searchText &&
       SearchUtils.shouldSearchUseRegex(searchText) &&
       !SearchUtils.isValidRegex(searchText)
     ) {
-      inputStyle = Object.assign({}, inputStyle, styles.errorInput);
+      inputStyle = errorInputStyle(theme);
+    } else if (searchText || this.state.focused) {
+      inputStyle = highlightedInputStyle(theme);
+    } else {
+      inputStyle = baseInputStyle(theme);
     }
 
     return (
-      <div style={styles.container}>
+      <div style={settingsPaneStyle(theme)}>
+        <SettingsMenuButton
+          onClick={this.props.showPreferencesPanel}
+          theme={theme}
+        />
+
         <TraceUpdatesFrontendControl {...this.props} />
         
         <div style={styles.growToFill}>
@@ -114,9 +128,9 @@ class SettingsPane extends React.Component {
             placeholder={this.props.placeholderText}
             onChange={e => this.props.onChangeSearch(e.target.value)}
           />
-          <SearchIcon />
+          <SearchIcon theme={theme} />
           {!!searchText && (
-            <div onClick={this.cancel.bind(this)} style={styles.cancelButton}>
+            <div onClick={this.cancel.bind(this)} style={cancelButtonStyle(theme)}>
               &times;
             </div>
           )}
@@ -126,6 +140,9 @@ class SettingsPane extends React.Component {
   }
 }
 
+SettingsPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 SettingsPane.propTypes = {
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
@@ -143,14 +160,39 @@ var Wrapped = decorate({
       placeholderText: store.placeholderText,
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
+      showPreferencesPanel() {
+        store.showPreferencesPanel();
+      },
     };
   },
 }, SettingsPane);
 
-function SearchIcon() {
+const SettingsMenuButton = ({ onClick, theme }) => {
+  return (
+    <button onClick={onClick} style={settingsMenuButtonStyle(theme)}>
+      <svg style={styles.settingsMenuIcon} viewBox="0 0 24 24">
+        <path d="
+          M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
+          1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,
+          11L21.54,9.37C21.73,9.22 21.78,8.95 21.66,8.73L19.66,5.27C19.54,5.05 19.27,4.96 19.05,
+          5.05L16.56,6.05C16.04,5.66 15.5,5.32 14.87,5.07L14.5,2.42C14.46,2.18 14.25,2 14,
+          2H10C9.75,2 9.54,2.18 9.5,2.42L9.13,5.07C8.5,5.32 7.96,5.66 7.44,6.05L4.95,5.05C4.73,
+          4.96 4.46,5.05 4.34,5.27L2.34,8.73C2.21,8.95 2.27,9.22 2.46,9.37L4.57,11C4.53,11.34 4.5,
+          11.67 4.5,12C4.5,12.33 4.53,12.65 4.57,12.97L2.46,14.63C2.27,14.78 2.21,15.05 2.34,
+          15.27L4.34,18.73C4.46,18.95 4.73,19.03 4.95,18.95L7.44,17.94C7.96,18.34 8.5,18.68 9.13,
+          18.93L9.5,21.58C9.54,21.82 9.75,22 10,22H14C14.25,22 14.46,21.82 14.5,21.58L14.87,
+          18.93C15.5,18.67 16.04,18.34 16.56,17.94L19.05,18.95C19.27,19.03 19.54,18.95 19.66,
+          18.73L21.66,15.27C21.78,15.05 21.73,14.78 21.54,14.63L19.43,12.97Z
+        "></path>
+      </svg>
+    </button>
+  );
+};
+
+function SearchIcon({ theme }) {
   return (
     <svg
-      style={styles.searchIcon}
+      style={searchIconStyle(theme)}
       version="1.1"
       viewBox="0 0 32 32"
       xmlns="http://www.w3.org/2000/svg"
@@ -160,18 +202,79 @@ function SearchIcon() {
   );
 }
 
-var styles = {
-  container: {
-    backgroundColor: 'rgb(243, 243, 243)',
-    padding: '4px 4px',
-    borderBottom: '1px solid rgb(204, 204, 204)',
-    display: 'flex',
-    flexWrap: 'wrap',
-    flexShrink: 0,
-    alignItems: 'center',
-    position: 'relative',
-  },
+const settingsPaneStyle = (theme: Base16Theme) => ({
+  padding: '0.25rem',
+  display: 'flex',
+  flexWrap: 'wrap',
+  flexShrink: 0,
+  alignItems: 'center',
+  position: 'relative',
+  backgroundColor: theme.base01,
+  borderBottom: `1px solid ${theme.base02}`,
+});
 
+const settingsMenuButtonStyle = (theme: Base16Theme) => ({
+  display: 'flex',
+  cursor: 'pointer',
+  borderRightStyle: 'solid',
+  borderRightWidth: '1px',
+  paddingRight: '0.5rem',
+  background: 'none',
+  border: 'none',
+  color: 'inherit',
+  borderRightColor: theme.base02,
+});
+
+
+const cancelButtonStyle = (theme: Base16Theme) => ({
+  fontSize: '16px',
+  padding: '0 0.5rem',
+  position: 'absolute',
+  cursor: 'pointer',
+  right: 0,
+  lineHeight: '28px',
+  color: theme.base02,
+});
+
+const searchIconStyle = (theme: Base16Theme) => ({
+  position: 'absolute',
+  display: 'inline-block',
+  pointerEvents: 'none',
+  left: '0.25rem',
+  top: 0,
+  width: '1em',
+  height: '100%',
+  strokeWidth: 0,
+  stroke: theme.base02,
+  fill: theme.base02,
+  lineHeight: '28px',
+  fontSize: '12px',
+});
+
+const baseInputStyle = (theme: Base16Theme) => ({
+  fontSize: '12px',
+  padding: '0.25rem',
+  border: `1px solid ${theme.base02}`,
+  outline: 'none',
+  borderRadius: '0.25rem',
+  paddingLeft: '1.25rem',
+  width: '150px',
+});
+
+const highlightedInputStyle = (theme: Base16Theme) => ({
+  ...baseInputStyle(theme),
+  border: `1px solid ${theme.base07}`,
+  boxShadow: `0 0 1px 1px ${theme.base07}`,
+});
+
+const errorInputStyle = (theme: Base16Theme) => ({
+  ...baseInputStyle(theme),
+  backgroundColor: hexToRgba(theme.base0C, 0.1),
+  border: `1px solid ${theme.base0C}`,
+  boxShadow: `0 0 1px 1px ${theme.base0C}`,
+});
+
+var styles = {
   growToFill: {
     flexGrow: 1,
   },
@@ -183,49 +286,10 @@ var styles = {
     position: 'relative',
   },
 
-  cancelButton: {
-    fontSize: '16px',
-    padding: '0 0.5rem',
-    position: 'absolute',
-    cursor: 'pointer',
-    right: 0,
-    lineHeight: '28px',
-    color: '#bbb',
-  },
-
-  searchIcon: {
-    position: 'absolute',
-    display: 'inline-block',
-    pointerEvents: 'none',
-    left: '0.25rem',
-    top: 0,
-    width: '1em',
-    height: '100%',
-    strokeWidth: 0,
-    stroke: '#bbb',
-    fill: '#bbb',
-    lineHeight: '28px',
-    fontSize: '12px',
-  },
-
-  input: {
-    fontSize: '12px',
-    padding: '4px',
-    border: '1px solid #ccc',
-    outline: 'none',
-    borderRadius: '4px',
-    paddingLeft: '1.25rem',
-    width: '150px',
-  },
-
-  highlightedInput: {
-    border: '1px solid #99c6f4',
-    boxShadow: '0 0 1px 1px #81aedc',
-  },
-
-  errorInput: {
-    backgroundColor: '#fff0f0',
-    border: '1px solid red',
+  settingsMenuIcon: {
+    width: '16px',
+    height: '16px',
+    fill: 'currentColor',
   },
 };
 

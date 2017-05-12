@@ -20,16 +20,18 @@ var assign = require('object-assign');
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
+var Themes = require('./Themes/Themes');
 
 var consts = require('../agent/consts');
 
+import type {Base16Theme} from './types';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 
 export type Props = {
   alreadyFoundReact: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
-
+  preferencesPanelShown?: boolean,
 
   // if alreadyFoundReact, then these don’t need to be passed
   checkForReact?: (cb: (isReact: boolean) => void) => void,
@@ -55,6 +57,8 @@ type DefaultProps = {};
 type State = {
   loading: boolean,
   isReact: boolean,
+  preferencesPanelShown: boolean,
+  themeName: ?string,
 };
 
 class Panel extends React.Component {
@@ -74,7 +78,12 @@ class Panel extends React.Component {
 
   constructor(props: Props) {
     super(props);
-    this.state = {loading: true, isReact: this.props.alreadyFoundReact};
+    this.state = {
+      loading: true,
+      isReact: this.props.alreadyFoundReact,
+      preferencesPanelShown: false,
+      themeName: null,
+    };
     this._unMounted = false;
     window.panel = this;
     this.plugins = [];
@@ -83,6 +92,8 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       store: this._store,
+      theme: this._store && this._store.theme || Themes.Default,
+      themes: this._store && this._store.themes || {},
     };
   }
 
@@ -196,6 +207,7 @@ class Panel extends React.Component {
       this._bridge = new Bridge(wall);
 
       this._store = new Store(this._bridge);
+      
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -207,6 +219,16 @@ class Panel extends React.Component {
       this._store.on('connected', () => {
         this.setState({loading: false});
         this.getNewSelection();
+      });
+      this._store.on('preferencesPanelShown', () => {
+        this.setState({
+          preferencesPanelShown: this._store.preferencesPanelShown,
+        });
+      });
+      this._store.on('theme', () => {
+        this.setState({
+          themeName: this._store.theme.name,
+        });
       });
     });
   }
@@ -238,27 +260,29 @@ class Panel extends React.Component {
   }
 
   render() {
+    var theme = this._store ? this._store.theme : Themes.Default;
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
       // properly doing so probably requires refactoring how we load the panel
       // and communicate with the bridge.
       return (
-        <div style={styles.loading}>
+        <div style={loadingStyle(theme)}>
           <h2>Connecting to React…</h2>
         </div>
       );
     }
     if (!this.state.isReact) {
-      return <div style={styles.loading}><h2>Looking for React…</h2></div>;
+      return <div style={loadingStyle(theme)}><h2>Looking for React…</h2></div>;
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure));
+      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure, theme));
     }
     return (
       <Container
+        key={this.state.themeName /* Force deep re-render when theme changes */}
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path) => {
@@ -295,6 +319,8 @@ class Panel extends React.Component {
         }}
         extraPanes={extraPanes}
         extraTabs={extraTabs}
+        preferencesPanelShown={this.state.preferencesPanelShown}
+        theme={theme}
         onViewElementSource={
           this.props.showElementSource ? this.viewElementSource.bind(this) : null
         }
@@ -305,44 +331,38 @@ class Panel extends React.Component {
 
 Panel.childContextTypes = {
   store: React.PropTypes.object,
+  theme: React.PropTypes.object.isRequired,
+  themes: React.PropTypes.object.isRequired,
 };
 
-var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
+var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
     return (
-      <div key="rnstyle" style={styles.container}>
+      <div key="rnstyle" style={containerStyle(theme)}>
         <strong>No style</strong>
       </div>
     );
   }
   return (
-    <div key="rnstyle" style={styles.container}>
+    <div key="rnstyle" style={containerStyle(theme)}>
       <strong>React Native Style Editor</strong>
       <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
     </div>
   );
 };
 
-var styles = {
-  chromePane: {
-    display: 'flex',
-  },
-  stretch: {
-    flex: 1,
-  },
-  container: {
-    borderTop: '1px solid #eee',
-    padding: 5,
-    marginBottom: 5,
-    flexShrink: 0,
-  },
-  loading: {
-    textAlign: 'center',
-    color: '#888',
-    padding: 30,
-    flex: 1,
-  },
-};
+const containerStyle = (theme: Base16Theme) => ({
+  borderTop: `1px solid ${theme.base01}`,
+  padding: '0.25rem',
+  marginBottom: '0.25rem',
+  flexShrink: 0,
+});
+const loadingStyle = (theme: Base16Theme) => ({
+  textAlign: 'center',
+  padding: 30,
+  flex: 1,
+  color: theme.base05,
+});
 
 module.exports = Panel;

@@ -17,8 +17,11 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
+var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
+import type {Base16Theme} from './types';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -31,6 +34,7 @@ type ContextMenu = {
 };
 
 const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
+const DEFAULT_THEME_NAME = 'Default';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -96,12 +100,15 @@ class Store extends EventEmitter {
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
+  preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  theme: Base16Theme;
+  themes: { [key: string]: Base16Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -133,6 +140,10 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
+
+    const themeName = ThemeStore.get() || DEFAULT_THEME_NAME;
+    this.theme = Themes[themeName];
+    this.themes = Themes;
 
     // for debugging
     window.store = this;
@@ -319,6 +330,25 @@ class Store extends EventEmitter {
   hideContextMenu() {
     this.contextMenu = null;
     this.emit('contextMenu');
+  }
+
+  changeTheme(themeName: string) {
+    if (this.themes.hasOwnProperty(themeName)) {
+      this.theme = this.themes[themeName];
+      this.emit('theme');
+
+      ThemeStore.set(themeName);
+    }
+  }
+
+  showPreferencesPanel() {
+    this.preferencesPanelShown = true;
+    this.emit('preferencesPanelShown');
+  }
+
+  hidePreferencesPanel() {
+    this.preferencesPanelShown = false;
+    this.emit('preferencesPanelShown');
   }
 
   selectFirstSearchResult() {

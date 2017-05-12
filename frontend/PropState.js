@@ -14,14 +14,21 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
+var Fonts = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
+import type {Base16Theme} from './types';
 
 class PropState extends React.Component {
+  context: {
+    onChange: () => void,
+    theme: Base16Theme,
+  };
+
   getChildContext() {
     return {
       onChange: (path, val) => {
@@ -31,26 +38,25 @@ class PropState extends React.Component {
   }
 
   renderSource(): ?React.Element {
+    const {theme} = this.context;
     const {id, node, onViewElementSource} = this.props;
-    var source = node.get('source');
+    const source = node.get('source');
     if (!source) {
       return null;
     }
 
-    var style = styles.source;
-    var onClick;
+    let onClick;
     if (onViewElementSource) {
       onClick = () => onViewElementSource(id, source);
-      style = {...style, cursor: 'pointer'};
     }
 
     return (
       <div
-        style={style}
+        style={sourceStyle(!!onViewElementSource, theme)}
         onClick={onClick}
       >
         {source.fileName}
-        <span style={styles.sourcePos}>
+        <span style={sourcePosStyle(theme)}>
           :{source.lineNumber}
         </span>
       </div>
@@ -58,9 +64,10 @@ class PropState extends React.Component {
   }
 
   render(): React.Element {
+    var theme = this.context.theme;
+
     if (!this.props.node) {
-      // TODO(jared): style this
-      return <span style={styles.noSelection}>No selection</span>;
+      return <span style={emptyStyle(theme)}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -103,7 +110,8 @@ class PropState extends React.Component {
     return (
       <DetailPane
         header={'<' + this.props.node.get('name') + '>'}
-        hint={hasDollarR ? '($r in the console)' : null}>
+        hint={hasDollarR ? '($r in the console)' : null}
+        theme={theme}>
         {key &&
           <DetailPaneSection
             title="Key"
@@ -165,13 +173,17 @@ class PropState extends React.Component {
   }
 }
 
+PropState.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
 
 var WrappedPropState = decorate({
   listeners(props, store) {
-    return ['selected', store.selected];
+    return ['selected'];
   },
 
   props(store) {
@@ -202,28 +214,28 @@ var WrappedPropState = decorate({
   },
 }, PropState);
 
+const emptyStyle = (theme: Base16Theme) => ({
+  fontFamily: Fonts.sansSerif,
+  margin: 'auto',
+  color: theme.base03,
+});
+
+const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
+  padding: '0.25rem 0.5rem',
+  color: theme.base05,
+  overflow: 'auto',
+  overflowWrap: 'break-word',
+  cursor: hasViewElementSource ? 'pointer' : 'default',
+});
+
+const sourcePosStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+});
+
 var styles = {
-  source: {
-    padding: '5px 10px',
-    color: 'blue',
-    overflow: 'auto',
-    overflowWrap: 'break-word',
-  },
-
-  sourcePos: {
-    color: '#777',
-  },
-
-  noSelection: {
-    fontFamily: 'sans-serif',
-    margin: 'auto',
-    color: 'rgba(0,0,0,0.4)',
-  },
-
   noPropsState: {
     fontWeight: 'bold',
-    padding: '5px',
-    borderTop: '1px solid rgba(0,0,0,0.1)',
+    padding: '0.25rem',
   },
 };
 

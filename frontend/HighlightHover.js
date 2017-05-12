@@ -13,6 +13,12 @@
 var React = require('react');
 var assign = require('object-assign');
 
+import type {Base16Theme} from './types';
+
+type Context = {
+  theme: Base16Theme,
+};
+
 type Props = {
   style: ?Object,
   children?: any,
@@ -23,6 +29,7 @@ type State = {
 };
 
 class HighlightHover extends React.Component {
+  context: Context;
   props: Props;
   defaultProps: {};
   state: State;
@@ -33,17 +40,23 @@ class HighlightHover extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
+
     return (
       <div
         onMouseOver={() => !this.state.hover && this.setState({hover: true})}
         onMouseOut={() => this.state.hover && this.setState({hover: false})}
         style={assign({}, this.props.style, {
-          backgroundColor: this.state.hover ? '#eee' : 'transparent',
+          backgroundColor: this.state.hover ? theme.base02 : 'transparent',
         })}>
         {this.props.children}
       </div>
     );
   }
 }
+
+HighlightHover.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
 module.exports = HighlightHover;

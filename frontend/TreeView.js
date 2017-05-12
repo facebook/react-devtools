@@ -16,6 +16,9 @@ var React = require('react');
 var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
+var Fonts = require('./Themes/Fonts');
+
+import type {Base16Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
@@ -49,11 +52,13 @@ class TreeView extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
+
     if (!this.props.roots.count()) {
       if (this.props.searching) {
         return (
           <div style={styles.container}>
-            <span style={styles.noSearchResults}>No search results</span>
+            <span style={noSearchResultsStyle(theme)}>No search results</span>
           </div>
         );
       } else {
@@ -123,9 +128,20 @@ TreeView.childContextTypes = {
   scrollTo: React.PropTypes.func,
 };
 
+TreeView.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const noSearchResultsStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+  fontFamily: Fonts.sansSerif,
+  fontSize: '14px',
+  padding: '0.5rem',
+});
+
 var styles = {
   container: {
-    fontFamily: 'Menlo, Consolas, monospace',
+    fontFamily: Fonts.monospace,
     fontSize: '11px',
     lineHeight: 1.3,
     flex: 1,
@@ -139,7 +155,6 @@ var styles = {
   },
 
   scroll: {
-    paddingTop: 3,
     overflow: 'auto',
     minHeight: 0,
     flex: 1,
@@ -152,13 +167,6 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
-  },
-
-  noSearchResults: {
-    fontFamily: 'sans-serif',
-    fontSize: '14px',
-    padding: '10px',
-    color: 'rgba(0,0,0,0.4)',
   },
 };
 

@@ -13,12 +13,15 @@
 var React = require('react');
 
 var consts = require('../../agent/consts');
-var valueStyles = require('../value-styles');
 
-function previewComplex(data: Object) {
+import type {Base16Theme} from '../types';
+
+function previewComplex(data: Object, theme: Base16Theme) {
+  const style={ color: theme.base0D };
+
   if (Array.isArray(data)) {
     return (
-      <span style={valueStyles.array}>
+      <span style={style}>
         Array[{data.length}]
       </span>
     );
@@ -27,31 +30,31 @@ function previewComplex(data: Object) {
   switch (data[consts.type]) {
     case 'function':
       return (
-        <span style={valueStyles.func}>
+        <span style={style}>
           {data[consts.name] || 'fn'}()
         </span>
       );
     case 'object':
       return (
-        <span style={valueStyles.object}>
+        <span style={style}>
           {data[consts.name] + '{…}'}
         </span>
       );
     case 'date':
       return (
-        <span style={valueStyles.date}>
+        <span style={style}>
           {data[consts.name]}
         </span>
       );
     case 'symbol':
       return (
-        <span style={valueStyles.symbol}>
+        <span style={style}>
           {data[consts.name]}
         </span>
       );
     case 'iterator':
       return (
-        <span style={valueStyles.object}>
+        <span style={style}>
           {data[consts.name] + '(…)'}
         </span>
       );
@@ -61,7 +64,7 @@ function previewComplex(data: Object) {
     case 'array':
     case 'typed_array':
       return (
-        <span style={valueStyles.array}>
+        <span style={style}>
           {`${data[consts.name]}[${data[consts.meta].length}]`}
         </span>
       );

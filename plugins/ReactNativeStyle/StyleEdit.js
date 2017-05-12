@@ -13,6 +13,12 @@
 var React = require('react');
 var AutoSizeInput = require('./AutoSizeInput');
 
+import type {Base16Theme} from '../../frontend/types';
+
+type Context = {
+  theme: Base16Theme,
+};
+
 type Props = {
   style: Object,
   onChange: (attr: string, val: string | number) => void,
@@ -28,6 +34,7 @@ type State = {
 };
 
 class StyleEdit extends React.Component {
+  context: Context;
   props: Props;
   defaultProps: DefaultProps;
   state: State;
@@ -68,7 +75,7 @@ class StyleEdit extends React.Component {
     var attrs = Object.keys(this.props.style);
     return (
       <ul style={styles.container} onClick={e => this.onListClick(e)}>
-        <span style={styles.tag}>style</span>
+        <span style={tagStyle(this.context.theme)}>style</span>
         <span>{' {'}</span>
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.attr}>
@@ -106,15 +113,20 @@ class StyleEdit extends React.Component {
   }
 }
 
-var styles = {
+StyleEdit.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const tagStyle = (theme: Base16Theme) => ({
+  color: theme.base03,
+});
+
+const styles = {
   container: {
     listStyle: 'none',
     padding: 0,
     margin: '5px 0px',
     cursor: 'text',
-  },
-  tag: {
-    color: '#bbb',
   },
   colon: {
     margin: '-3px',

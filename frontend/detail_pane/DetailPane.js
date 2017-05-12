@@ -10,15 +10,27 @@
  */
 'use strict';
 
+var assign = require('object-assign');
+var Fonts = require('../Themes/Fonts');
 var React = require('react');
 
+import type {Base16Theme} from '../types';
+
 class DetailPane extends React.Component {
+  context: {
+    theme: Base16Theme,
+  };
 
   render(): React.Element {
+    const {theme} = this.context;
+    const headerNameStyle = assign({}, styles.headerName, {
+      color: theme.base08,
+    });
+
     return (
       <div style={styles.container}>
         <div style={styles.header}>
-          <span style={styles.headerName}>
+          <span style={headerNameStyle}>
             {this.props.header}
           </span>
           <span style={styles.consoleHint}>{this.props.hint}</span>
@@ -29,11 +41,14 @@ class DetailPane extends React.Component {
   }
 }
 
+DetailPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 var styles = {
   container: {
     fontSize: '11px',
-    // TODO figure out what font Chrome devtools uses on Windows
-    fontFamily: 'Menlo, Consolas, monospace',
+    fontFamily: Fonts.monospace,
     overflow: 'auto',
     flex: 1,
     display: 'flex',
@@ -45,7 +60,7 @@ var styles = {
     userSelect: 'none',
   },
   header: {
-    padding: 5,
+    padding: '0.5rem',
     maxHeight: 38,
     flexShrink: 0,
     display: 'flex',
@@ -54,7 +69,6 @@ var styles = {
   headerName: {
     flex: 1,
     fontSize: 16,
-    color: 'rgb(184, 0, 161)',
 
     cursor: 'text',
     WebkitUserSelect: 'text',

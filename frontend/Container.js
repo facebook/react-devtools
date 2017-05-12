@@ -14,12 +14,33 @@ var ContextMenu = require('./ContextMenu');
 var PropState = require('./PropState');
 var React = require('react');
 var LeftPane = require('./LeftPane');
+var PreferencesPanel = require('./PreferencesPanel');
 var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
 import type MenuItem from './ContextMenu';
+import type {Base16Theme} from './types';
 
-type Props = {};
+type Props = {
+  reload: () => void,
+  extraPanes: Array<(node: Object) => React$Element>,
+  extraTabs: ?{[key: string]: () => React$Element},
+  menuItems: {
+    tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
+    attr?: (
+      id: string,
+      node: Object,
+      val: any,
+      path: Array<string>,
+      name: string,
+      store: Object
+    ) => ?Array<MenuItem>,
+  },
+  extraTabs: {[key: string]: () => React$Element},
+  preferencesPanelShown: boolean,
+  theme: Base16Theme,
+  onViewElementSource: null | (id: string, node: ?Object) => void,
+};
 
 type State = {
   isVertical: boolean,
@@ -32,24 +53,7 @@ function shouldUseVerticalLayout(window) {
 }
 
 class Container extends React.Component {
-  props: {
-    reload: () => void,
-    extraPanes: Array<(node: Object) => React$Element>,
-    extraTabs: ?{[key: string]: () => React$Element},
-    menuItems: {
-      tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
-      attr?: (
-        id: string,
-        node: Object,
-        val: any,
-        path: Array<string>,
-        name: string,
-        store: Object
-      ) => ?Array<MenuItem>,
-    },
-    extraTabs: {[key: string]: () => React$Element},
-    onViewElementSource: null | (id: string, node: ?Object) => void,
-  };
+  props: Props;
   state: State;
   resizeTimeout: ?number;
 
@@ -90,6 +94,8 @@ class Container extends React.Component {
   };
 
   render() {
+    const {preferencesPanelShown, theme} = this.props;
+
     var tabs = {
       Elements: () => (
         <SplitPane
@@ -107,9 +113,11 @@ class Container extends React.Component {
       ),
       ...this.props.extraTabs,
     };
+
     return (
-      <div style={styles.container}>
+      <div style={containerStyle(preferencesPanelShown, theme)}>
         <TabbedPane tabs={tabs} />
+        <PreferencesPanel />
         <ContextMenu itemSources={[DEFAULT_MENU_ITEMS, this.props.menuItems]} />
       </div>
     );
@@ -144,14 +152,13 @@ var DEFAULT_MENU_ITEMS = {
   },
 };
 
-var styles = {
-  container: {
-    flex: 1,
-    display: 'flex',
-    minWidth: 0,
-    backgroundColor: 'white',
-    color: 'rgb(48, 57, 66)',
-  },
-};
+const containerStyle = (preferencesPanelShown: boolean, theme: Base16Theme) => ({
+  backgroundColor: theme.base00,
+  color: theme.base05,
+  flex: 1,
+  display: 'flex',
+  minWidth: 0,
+  position: preferencesPanelShown ? 'relative' : null,
+});
 
 module.exports = Container;
