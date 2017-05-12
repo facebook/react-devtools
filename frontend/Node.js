@@ -486,7 +486,7 @@ const headStyle = ({
 const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Base16Theme) => {
   let color;
   if (inverted) {
-    color = 'inherit';
+    color = theme.base01;
   } else if (isCustom) {
     color = theme.base08;
   } else {
