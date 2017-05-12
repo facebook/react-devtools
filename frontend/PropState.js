@@ -220,7 +220,6 @@ const emptyStyle = (theme: Base16Theme) => ({
 const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
   padding: '0.25rem 0.5rem',
   color: theme.base05,
-  overflow: 'auto',
   overflowWrap: 'break-word',
   cursor: hasViewElementSource ? 'pointer' : 'default',
 });
