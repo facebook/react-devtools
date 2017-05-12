@@ -18,6 +18,7 @@ var invariant = require('./invariant');
 var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
+var Fonts = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
@@ -274,7 +275,11 @@ class Panel extends React.Component {
       );
     }
     if (!this.state.isReact) {
-      return <div style={loadingStyle(theme)}><h2>Looking for React…</h2></div>;
+      return (
+        <div style={loadingStyle(theme)}>
+          <h2>Looking for React…</h2>
+        </div>
+      );
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
@@ -360,6 +365,8 @@ const containerStyle = (theme: Base16Theme) => ({
   flexShrink: 0,
 });
 const loadingStyle = (theme: Base16Theme) => ({
+  fontFamily: Fonts.sansSerif.family,
+  fontSize: Fonts.sansSerif.sizes.large,
   textAlign: 'center',
   padding: 30,
   flex: 1,
