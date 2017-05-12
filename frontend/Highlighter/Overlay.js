@@ -11,7 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
-var Fonts = require('../Themes/Fonts');
+var {monospace} = require('../Themes/Fonts');
 
 import type {DOMNode, DOMRect, Window} from '../types';
 
@@ -54,11 +54,11 @@ class Overlay {
     assign(this.tip.style, {
       backgroundColor: '#333740',
       borderRadius: '2px',
-      fontFamily: Fonts.monospace,
+      fontFamily: monospace.family,
       fontWeight: 'bold',
       padding: '3px 5px',
       position: 'fixed',
-      fontSize: '12px',
+      fontSize: monospace.sizes.normal,
     });
 
     this.nameSpan = doc.createElement('span');

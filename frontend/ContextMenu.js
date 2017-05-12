@@ -12,7 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
 var decorate = require('./decorate');
@@ -147,10 +147,10 @@ const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
   listStyle: 'none',
   margin: 0,
   padding: '0.25rem 0',
-  fontSize: 14,
+  fontSize: sansSerif.sizes.large,
+  fontFamily: sansSerif.family,
   borderRadius: '0.25rem',
   overflow: 'hidden',
-  fontFamily: Fonts.sansSerif,
   zIndex: 1,
   backgroundColor: theme.base01,
 });

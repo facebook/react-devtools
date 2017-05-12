@@ -10,45 +10,23 @@
  */
 'use strict';
 
-var assign = require('object-assign');
-var Fonts = require('../Themes/Fonts');
+var {monospace} = require('../Themes/Fonts');
 var React = require('react');
 
-import type {Base16Theme} from '../types';
-
 class DetailPane extends React.Component {
-  context: {
-    theme: Base16Theme,
-  };
-
   render(): React.Element {
-    const {theme} = this.context;
-    const headerNameStyle = assign({}, styles.headerName, {
-      color: theme.base08,
-    });
-
     return (
       <div style={styles.container}>
-        <div style={styles.header}>
-          <span style={headerNameStyle}>
-            {this.props.header}
-          </span>
-          <span style={styles.consoleHint}>{this.props.hint}</span>
-        </div>
         {this.props.children}
       </div>
     );
   }
 }
 
-DetailPane.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
-};
-
 var styles = {
   container: {
-    fontSize: '11px',
-    fontFamily: Fonts.monospace,
+    fontSize: monospace.sizes.normal,
+    fontFamily: monospace.family,
     overflow: 'auto',
     flex: 1,
     display: 'flex',
@@ -58,27 +36,6 @@ var styles = {
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
-  },
-  header: {
-    padding: '0.5rem',
-    maxHeight: 38,
-    flexShrink: 0,
-    display: 'flex',
-    alignItems: 'center',
-  },
-  headerName: {
-    flex: 1,
-    fontSize: 16,
-
-    cursor: 'text',
-    WebkitUserSelect: 'text',
-    MozUserSelect: 'text',
-    userSelect: 'text',
-  },
-  consoleHint: {
-    float: 'right',
-    fontSize: 11,
-    marginLeft: 10,
   },
 };
 

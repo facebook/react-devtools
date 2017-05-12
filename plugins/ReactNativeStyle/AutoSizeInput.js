@@ -11,7 +11,7 @@
 'use strict';
 
 var React = require('react');
-var Fonts = require('../../frontend/Themes/Fonts');
+var {monospace} = require('../../frontend/Themes/Fonts');
 
 type Props = {
   onChange: (text: string|number) => any,
@@ -158,7 +158,8 @@ var styles = {
     whiteSpace: 'pre',
   },
   input: {
-    fontFamily: Fonts.monospace,
+    fontFamily: monospace.family,
+    fontSize: monospace.sizes.normal,
     boxSizing: 'content-box',
     border: 'none',
     padding: '1px 2px',

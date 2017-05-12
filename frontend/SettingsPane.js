@@ -13,6 +13,7 @@ var TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesF
 var ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var {sansSerif} = require('./Themes/Fonts');
 var SearchUtils = require('./SearchUtils');
 var {PropTypes} = React;
 
@@ -210,7 +211,7 @@ const settingsPaneStyle = (theme: Base16Theme) => ({
   alignItems: 'center',
   position: 'relative',
   backgroundColor: theme.base01,
-  borderBottom: `1px solid ${theme.base02}`,
+  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
 });
 
 const settingsMenuButtonStyle = (theme: Base16Theme) => ({
@@ -227,7 +228,7 @@ const settingsMenuButtonStyle = (theme: Base16Theme) => ({
 
 
 const cancelButtonStyle = (theme: Base16Theme) => ({
-  fontSize: '16px',
+  fontSize: sansSerif.sizes.large,
   padding: '0 0.5rem',
   position: 'absolute',
   cursor: 'pointer',
@@ -248,11 +249,11 @@ const searchIconStyle = (theme: Base16Theme) => ({
   stroke: theme.base02,
   fill: theme.base02,
   lineHeight: '28px',
-  fontSize: '12px',
+  fontSize: sansSerif.sizes.normal,
 });
 
 const baseInputStyle = (theme: Base16Theme) => ({
-  fontSize: '12px',
+  fontSize: sansSerif.sizes.normal,
   padding: '0.25rem',
   border: `1px solid ${theme.base02}`,
   outline: 'none',

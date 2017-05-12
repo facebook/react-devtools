@@ -14,6 +14,7 @@ var React = require('react');
 
 var decorate = require('./decorate');
 var Props = require('./Props');
+var {hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
 import type {Base16Theme} from './types';
@@ -288,8 +289,7 @@ class Node extends React.Component {
           <div style={sharedHeadStyle} ref={h => this._head = h} {...headEvents}>
             <span>
               <span>
-                <span>&lt;</span>
-                <span style={jsxSingleLineTagStyle}>{name}</span>
+                <span style={jsxSingleLineTagStyle}>&lt;{name}</span>
                 {node.get('key') &&
                   <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
@@ -299,16 +299,14 @@ class Node extends React.Component {
                 {node.get('props') &&
                   <Props key="props" props={node.get('props')} inverted={inverted}/>
                 }
-                <span>{isCollapsed ? ' />' : '>'}</span>
+                <span style={jsxSingleLineTagStyle}>{isCollapsed ? ' />' : '>'}</span>
               </span>
               {!isCollapsed && [
                 <span key="content">
                   {content}
                 </span>,
                 <span key="close">
-                  <span>&lt;</span>
-                  <span style={jsxSingleLineTagStyle}>{name}</span>
-                  <span>&gt;</span>
+                  <span style={jsxSingleLineTagStyle}>&lt;{name}&gt;</span>
                 </span>,
               ]}
             </span>
@@ -319,11 +317,7 @@ class Node extends React.Component {
 
     const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
     const closeTag = (
-      <span>
-        <span>&lt;/</span>
-        <span style={jsxCloseTagStyle}>{name}</span>
-        <span>&gt;</span>
-      </span>
+      <span style={jsxCloseTagStyle}>&lt;/{name}&gt;</span>
     );
 
     const hasState = !!node.get('state') || !!node.get('context');
@@ -342,8 +336,7 @@ class Node extends React.Component {
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
         <span>
-          <span>&lt;</span>
-          <span style={jsxOpenTagStyle}>{name}</span>
+          <span style={jsxOpenTagStyle}>&lt;{name}</span>
           {node.get('key') &&
             <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
           }
@@ -353,7 +346,7 @@ class Node extends React.Component {
           {node.get('props') &&
             <Props key="props" props={node.get('props')} inverted={headInverted}/>
           }
-          <span>&gt;</span>
+          <span style={jsxOpenTagStyle}>&gt;</span>
         </span>
         {collapsed && <span>…</span>}
         {collapsed && closeTag}
@@ -593,19 +586,17 @@ const tailStyle = ({
 
 const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Base16Theme) => {
   let borderLeftColor = 'transparent';
-  if (isHovered && !isBottomTagHovered) {
+  if (isSelected) {
+    borderLeftColor = hexToRgba(theme.base07, 0.25);
+  } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = theme.base02;
-  } else if (isSelected) {
-    borderLeftColor = theme.base03;
+    borderLeftColor = theme.base01;
   }
 
   return {
     position: 'absolute',
     width: '1px',
-    borderLeftStyle: 'dotted',
-    borderLeftWidth: '1px',
-    borderLeftColor,
+    borderLeft: `1px solid ${borderLeftColor}`,
     top: 16,
     bottom: 0,
     willChange: 'opacity',
@@ -623,6 +614,7 @@ const styles = {
   container: {
     flexShrink: 0,
     position: 'relative',
+    whiteSpace: 'nowrap',
   },
   falseyLiteral: {
     fontStyle: 'italic',

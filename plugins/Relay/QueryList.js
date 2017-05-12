@@ -14,6 +14,7 @@ import type {OrderedMap} from 'immutable';
 
 var React = require('react');
 var decorate = require('../../frontend/decorate');
+var {sansSerif} = require('../../frontend/Themes/Fonts');
 var Query = require('./Query');
 
 class QueryList extends React.Component {
@@ -83,7 +84,7 @@ var styles = {
 
   grouper: {
     fontWeight: 'bold',
-    fontSize: 10,
+    fontSize: sansSerif.sizes.normal,
   },
 
   empty: {

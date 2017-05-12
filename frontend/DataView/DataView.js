@@ -12,6 +12,7 @@
 
 import type {Base16Theme, DOMEvent} from '../types';
 
+var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
 var Simple = require('./Simple');
 
@@ -280,7 +281,7 @@ class DataItem extends React.Component {
                 this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
-            style={styles.preview}
+            style={previewStyle(theme)}
           >
             {preview}
           </div>
@@ -312,6 +313,15 @@ const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
   margin: '2px 3px',
 });
 
+const previewStyle = (theme: Base16Theme) => ({
+  display: 'flex',
+  margin: '2px 3px',
+  whiteSpace: 'pre',
+  wordBreak: 'break-word',
+  flex: 1,
+  color: theme.base09,
+});
+
 const emptyStyle = (theme: Base16Theme) => ({
   marginLeft: 10,
   padding: '2px 5px',
@@ -319,7 +329,7 @@ const emptyStyle = (theme: Base16Theme) => ({
 });
 
 const missingStyle = (theme: Base16Theme) => ({
-  fontSize: 12,
+  fontSize: sansSerif.sizes.normal,
   fontWeight: 'bold',
   marginLeft: 10,
   padding: '2px 5px',
@@ -378,14 +388,6 @@ var styles = {
   head: {
     display: 'flex',
     position: 'relative',
-  },
-
-  preview: {
-    display: 'flex',
-    margin: '2px 3px',
-    whiteSpace: 'pre',
-    wordBreak: 'break-word',
-    flex: 1,
   },
 
   value: {

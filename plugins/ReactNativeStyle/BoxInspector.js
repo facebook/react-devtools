@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var {sansSerif} = require('../../frontend/Themes/Fonts');
 
 import type {Base16Theme} from '../../frontend/types';
 
@@ -87,7 +88,7 @@ const labelStyle = (theme: Base16Theme) => ({
 
 const positionTextStyle = (theme: Base16Theme) => ({
   color: theme.base03,
-  fontSize: 10,
+  fontSize: sansSerif.sizes.normal,
   textAlign: 'center',
 });
 

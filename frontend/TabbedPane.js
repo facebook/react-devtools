@@ -12,7 +12,8 @@
 
 var React = require('react');
 var decorate = require('./decorate');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
+var {hexToRgba} = require('./Themes/utils');
 
 import type {Base16Theme} from './types';
 
@@ -63,21 +64,25 @@ const tabsStyle = (theme: Base16Theme) => ({
   listStyle: 'none',
   margin: 0,
   backgroundColor: theme.base00,
-  borderBottom: `1px solid ${theme.base02}`,
+  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
   padding: '0.25rem 0.25rem 0 0.25rem',
 });
 
-const tabStyle = (isSelected: boolean, theme: Base16Theme) => ({
-  padding: '0.25rem 0.5rem',
-  lineHeight: '15px',
-  fontSize: 12,
-  fontFamily: Fonts.sansSerif,
-  cursor: 'pointer',
-  backgroundColor: isSelected ? theme.base01 : 'transparent',
-  borderLeft: isSelected ? `1px solid ${theme.base02}` : 'none',
-  borderRight: isSelected ? `1px solid ${theme.base02}` : 'none',
-  borderTop: isSelected ? `1px solid ${theme.base02}` : 'none',
-});
+const tabStyle = (isSelected: boolean, theme: Base16Theme) => {
+  const border = isSelected ? `1px solid ${hexToRgba(theme.base05, 0.1)}` : 'none';
+
+  return {
+    padding: '0.25rem 0.5rem',
+    lineHeight: '15px',
+    fontSize: sansSerif.sizes.normal,
+    fontFamily: sansSerif.family,
+    cursor: 'pointer',
+    backgroundColor: isSelected ? theme.base01 : 'transparent',
+    borderLeft: border,
+    borderRight: border,
+    borderTop: border,
+  };
+};
 
 var styles = {
   container:{

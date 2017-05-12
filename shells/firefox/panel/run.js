@@ -18,8 +18,11 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = document.getElementById('container');
-ReactDOM.render(<h1 id="message">Looking for React...</h1>, node);
+ReactDOM.render(<h2 id="message">Looking for React...</h2>, node);
 var port = {};
+
+// TODO (bvaughn) Read default :themeName and parameterize <Panel>
+// Refer to 'shells/chrome/src/panel.js' for an example
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);

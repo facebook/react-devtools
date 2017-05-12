@@ -16,7 +16,7 @@ import type {Base16Theme} from '../../frontend/types';
 var React = require('react');
 var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
-var Fonts = require('../../frontend/Themes/Fonts');
+var {sansSerif} = require('../../frontend/Themes/Fonts');
 
 class StoreTab extends React.Component {
   context: {
@@ -62,11 +62,11 @@ const loadingStyle = (theme: Base16Theme) => ({
 
 var styles = {
   container: {
-    fontFamily: Fonts.sansSerif,
+    fontFamily: sansSerif.family,
+    fontSize: sansSerif.sizes.normal,
     minHeight: 0,
     flex: 1,
     overflow: 'auto',
-    fontSize: 12,
     padding: 30,
   },
 };

@@ -81,7 +81,7 @@ export type Base16Theme = {
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
   base02: string; // Selection Background; *also used for inverted selection foreground in devtools
-  base03: string; // Comments, Invisibles, Line Highlighting
+  base03: string; // Comments, Invisibles, Line Highlighting; *also used for host components (eg <div>)
   base04: string; // Dark Foreground (Used for status bars)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
   base06: string; // Light Foreground (Not often used); *also used for search/filter background highlights

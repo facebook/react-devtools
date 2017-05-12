@@ -14,7 +14,7 @@
 const React = require('react');
 const immutable = require('immutable');
 
-const Fonts = require('./Themes/Fonts');
+const {sansSerif} = require('./Themes/Fonts');
 
 import type {ControlState} from './types.js';
 
@@ -86,9 +86,9 @@ var styles = {
     WebkitUserSelect: 'none',
     cursor: 'default',
     display: 'inline-block',
-    fontSize: '12px',
+    fontSize: sansSerif.sizes.normal,
     outline: 'none',
-    fontFamily: Fonts.sansSerif,
+    fontFamily: sansSerif.family,
     userSelect: 'none',
     marginRight: '10px',
   },

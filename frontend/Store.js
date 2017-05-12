@@ -34,7 +34,6 @@ type ContextMenu = {
 };
 
 const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
-const DEFAULT_THEME_NAME = 'Default';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -86,6 +85,7 @@ const DEFAULT_THEME_NAME = 'Default';
  */
 class Store extends EventEmitter {
   _bridge: Bridge;
+  _defaultThemeName: string;
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
@@ -117,8 +117,14 @@ class Store extends EventEmitter {
     rnStyleMeasure?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
+
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
+      ? defaultThemeName
+      : 'ChromeDefault';
+
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
@@ -141,7 +147,13 @@ class Store extends EventEmitter {
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
 
-    const themeName = ThemeStore.get() || DEFAULT_THEME_NAME;
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const restoredThemeName = ThemeStore.get();
+    const themeName = restoredThemeName && Themes.hasOwnProperty(restoredThemeName)
+      ? restoredThemeName
+      : this._defaultThemeName;
+
     this.theme = Themes[themeName];
     this.themes = Themes;
 
@@ -332,13 +344,17 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
-  changeTheme(themeName: string) {
-    if (this.themes.hasOwnProperty(themeName)) {
-      this.theme = this.themes[themeName];
-      this.emit('theme');
+  changeTheme(themeName: ?string) {
+    // Only apply a valid theme.
+    const safeThemeName = themeName && this.themes.hasOwnProperty(themeName)
+      ? themeName
+      : this._defaultThemeName;
 
-      ThemeStore.set(themeName);
-    }
+    this.theme = this.themes[safeThemeName];
+    this.emit('theme');
+
+    // But allow users to restore "default" mode by selecting an empty theme.
+    ThemeStore.set(themeName || null);
   }
 
   showPreferencesPanel() {
