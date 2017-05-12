@@ -25,7 +25,7 @@ var Themes = require('./Themes/Themes');
 
 var consts = require('../agent/consts');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 
@@ -358,13 +358,13 @@ var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
   );
 };
 
-const containerStyle = (theme: Base16Theme) => ({
+const containerStyle = (theme: Base18Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
   padding: '0.25rem',
   marginBottom: '0.25rem',
   flexShrink: 0,
 });
-const loadingStyle = (theme: Base16Theme) => ({
+const loadingStyle = (theme: Base18Theme) => ({
   fontFamily: Fonts.sansSerif.family,
   fontSize: Fonts.sansSerif.sizes.large,
   textAlign: 'center',

@@ -17,11 +17,11 @@ var consts = require('../agent/consts');
 var createFragment = require('react-addons-create-fragment');
 var flash = require('./flash');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 class PropVal extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   props: {
     val: any,
@@ -48,7 +48,7 @@ PropVal.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
+function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base18Theme) {
   var style;
 
   if (typeof val === 'number') {

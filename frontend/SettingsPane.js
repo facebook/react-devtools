@@ -20,7 +20,7 @@ var {PropTypes} = React;
 var decorate = require('./decorate');
 var {hexToRgba} = require('./Themes/utils');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 type EventLike = {
   keyCode: number,
@@ -31,7 +31,7 @@ type EventLike = {
 
 class SettingsPane extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
 
   _key: (evt: EventLike) => void;
@@ -203,7 +203,7 @@ function SearchIcon({ theme }) {
   );
 }
 
-const settingsPaneStyle = (theme: Base16Theme) => ({
+const settingsPaneStyle = (theme: Base18Theme) => ({
   padding: '0.25rem',
   display: 'flex',
   flexWrap: 'wrap',
@@ -214,7 +214,7 @@ const settingsPaneStyle = (theme: Base16Theme) => ({
   borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
 });
 
-const settingsMenuButtonStyle = (theme: Base16Theme) => ({
+const settingsMenuButtonStyle = (theme: Base18Theme) => ({
   display: 'flex',
   cursor: 'pointer',
   borderRightStyle: 'solid',
@@ -227,7 +227,7 @@ const settingsMenuButtonStyle = (theme: Base16Theme) => ({
 });
 
 
-const cancelButtonStyle = (theme: Base16Theme) => ({
+const cancelButtonStyle = (theme: Base18Theme) => ({
   fontSize: sansSerif.sizes.large,
   padding: '0 0.5rem',
   position: 'absolute',
@@ -237,7 +237,7 @@ const cancelButtonStyle = (theme: Base16Theme) => ({
   color: theme.base02,
 });
 
-const searchIconStyle = (theme: Base16Theme) => ({
+const searchIconStyle = (theme: Base18Theme) => ({
   position: 'absolute',
   display: 'inline-block',
   pointerEvents: 'none',
@@ -252,7 +252,7 @@ const searchIconStyle = (theme: Base16Theme) => ({
   fontSize: sansSerif.sizes.normal,
 });
 
-const baseInputStyle = (theme: Base16Theme) => ({
+const baseInputStyle = (theme: Base18Theme) => ({
   fontSize: sansSerif.sizes.normal,
   padding: '0.25rem',
   border: `1px solid ${theme.base02}`,
@@ -262,13 +262,13 @@ const baseInputStyle = (theme: Base16Theme) => ({
   width: '150px',
 });
 
-const highlightedInputStyle = (theme: Base16Theme) => ({
+const highlightedInputStyle = (theme: Base18Theme) => ({
   ...baseInputStyle(theme),
-  border: `1px solid ${theme.base07}`,
-  boxShadow: `0 0 1px 1px ${theme.base07}`,
+  border: `1px solid ${theme.base0H}`,
+  boxShadow: `0 0 1px 1px ${theme.base0H}`,
 });
 
-const errorInputStyle = (theme: Base16Theme) => ({
+const errorInputStyle = (theme: Base18Theme) => ({
   ...baseInputStyle(theme),
   backgroundColor: hexToRgba(theme.base0C, 0.1),
   border: `1px solid ${theme.base0C}`,

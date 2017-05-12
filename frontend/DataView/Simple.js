@@ -16,7 +16,7 @@ var ReactDOM = require('react-dom');
 var flash = require('../flash');
 var Fonts = require('../Themes/Fonts');
 
-import type {Base16Theme, DOMEvent, DOMNode} from '../types';
+import type {Base18Theme, DOMEvent, DOMNode} from '../types';
 
 type State = {
   editing: boolean,
@@ -26,7 +26,7 @@ type State = {
 class Simple extends React.Component {
   context: {
     onChange: (path: Array<any>, value: any) => void,
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   state: State;
   input: DOMNode;
@@ -151,7 +151,7 @@ Simple.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const inputStyle = (theme: Base16Theme) => ({
+const inputStyle = (theme: Base18Theme) => ({
   flex: 1,
   minWidth: 50,
   boxSizing: 'border-box',
@@ -163,7 +163,7 @@ const inputStyle = (theme: Base16Theme) => ({
   fontSize: 'inherit',
 });
 
-const simpleStyle = (readOnly: boolean, theme: Base16Theme) => ({
+const simpleStyle = (readOnly: boolean, theme: Base18Theme) => ({
   display: 'flex',
   flex: 1,
   whiteSpace: 'pre-wrap',

@@ -16,10 +16,10 @@ var Draggable = require('./Draggable');
 
 var {hexToRgba} = require('./Themes/utils');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 type Context = {
-  theme: Base16Theme,
+  theme: Base18Theme,
 };
 
 type Props = {
@@ -111,7 +111,7 @@ const containerStyle = (isVertical: boolean) => ({
   flexDirection: isVertical ? 'column' : 'row',
 });
 
-const draggerInnerStyle = (isVertical: boolean, theme: Base16Theme) => ({
+const draggerInnerStyle = (isVertical: boolean, theme: Base18Theme) => ({
   height: isVertical ? '1px' : '100%',
   width: isVertical ? '100%' : '1px',
   backgroundColor: hexToRgba(theme.base05, 0.25),

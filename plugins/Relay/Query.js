@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Base16Theme} from '../../frontend/types';
+import type {Base18Theme} from '../../frontend/types';
 import type {Map} from 'immutable';
 
 var {sansSerif} = require('../../frontend/Themes/Fonts');
@@ -18,7 +18,7 @@ var React = require('react');
 
 class Query extends React.Component {
   theme: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   props: {
     data: Map,
@@ -71,31 +71,31 @@ const baseContainer = {
   fontFamily: sansSerif.family,
 };
 
-const baseTDStyle = (theme: Base16Theme) => ({
+const baseTDStyle = (theme: Base18Theme) => ({
   whiteSpace: 'nowrap',
   'padding': '1px 4px',
   'lineHeight': '17px',
   'borderLeft': `1px solid ${theme.base01}`,
 });
 
-const tdFirstStyle = (theme: Base16Theme) => ({
+const tdFirstStyle = (theme: Base18Theme) => ({
   ...baseTDStyle(theme),
   borderLeft: '',
 });
 
-const tdNameStyle = (theme: Base16Theme) => ({
+const tdNameStyle = (theme: Base18Theme) => ({
   ...baseTDStyle(theme),
   width: '100%',
 });
 
-const containeroOddRowStyle = (theme: Base16Theme) => ({
+const containeroOddRowStyle = (theme: Base18Theme) => ({
   ...baseContainer,
   backgroundColor: theme.base01,
 });
 
-const containerSelectedStyle = (theme: Base16Theme) => ({
+const containerSelectedStyle = (theme: Base18Theme) => ({
   ...baseContainer,
-  backgroundColor: theme.base07,
+  backgroundColor: theme.base0H,
   color: theme.base04,
 });
 

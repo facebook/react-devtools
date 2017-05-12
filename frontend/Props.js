@@ -13,11 +13,11 @@
 var React = require('react');
 var PropVal = require('./PropVal');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 class Props extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   shouldComponentUpdate(nextProps: Object): boolean {
     return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
@@ -57,15 +57,15 @@ Props.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const attributeNameStyle = (isInverted: boolean, theme: Base16Theme) => ({
+const attributeNameStyle = (isInverted: boolean, theme: Base18Theme) => ({
   color: isInverted ? theme.base02 : theme.base0F,
 });
 
-const ellipsisStyle = (isInverted: boolean, theme: Base16Theme) => ({
+const ellipsisStyle = (isInverted: boolean, theme: Base18Theme) => ({
   color: isInverted ? theme.base02 : theme.base0F,
 });
 
-const propStype = (isInverted: boolean, theme: Base16Theme) => ({
+const propStype = (isInverted: boolean, theme: Base18Theme) => ({
   paddingLeft: 5,
   color: isInverted ? theme.base02 : theme.base0F,
 });

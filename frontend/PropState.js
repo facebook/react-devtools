@@ -21,12 +21,12 @@ var React = require('react');
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 class PropState extends React.Component {
   context: {
     onChange: () => void,
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
 
   getChildContext() {
@@ -211,13 +211,13 @@ var WrappedPropState = decorate({
   },
 }, PropState);
 
-const emptyStyle = (theme: Base16Theme) => ({
+const emptyStyle = (theme: Base18Theme) => ({
   fontFamily: Fonts.sansSerif.family,
   margin: 'auto',
   color: theme.base03,
 });
 
-const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
+const sourceStyle = (hasViewElementSource: boolean, theme: Base18Theme) => ({
   padding: '0.25rem 0.5rem',
   color: theme.base05,
   overflow: 'auto',
@@ -225,11 +225,11 @@ const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
   cursor: hasViewElementSource ? 'pointer' : 'default',
 });
 
-const sourcePosStyle = (theme: Base16Theme) => ({
+const sourcePosStyle = (theme: Base18Theme) => ({
   color: theme.base03,
 });
 
-const noPropsStateStyle = (theme: Base16Theme) => ({
+const noPropsStateStyle = (theme: Base18Theme) => ({
   fontFamily: Fonts.sansSerif.family,
   fontSize: Fonts.sansSerif.sizes.normal,
   color: theme.base03,

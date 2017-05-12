@@ -19,7 +19,7 @@ var SplitPane = require('./SplitPane');
 var TabbedPane = require('./TabbedPane');
 
 import type MenuItem from './ContextMenu';
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 type Props = {
   reload: () => void,
@@ -38,7 +38,7 @@ type Props = {
   },
   extraTabs: {[key: string]: () => React$Element},
   preferencesPanelShown: boolean,
-  theme: Base16Theme,
+  theme: Base18Theme,
   onViewElementSource: null | (id: string, node: ?Object) => void,
 };
 
@@ -152,7 +152,7 @@ var DEFAULT_MENU_ITEMS = {
   },
 };
 
-const containerStyle = (preferencesPanelShown: boolean, theme: Base16Theme) => ({
+const containerStyle = (preferencesPanelShown: boolean, theme: Base18Theme) => ({
   backgroundColor: theme.base00,
   color: theme.base05,
   flex: 1,

@@ -18,7 +18,7 @@ var SearchUtils = require('./SearchUtils');
 var decorate = require('./decorate');
 var {monospace, sansSerif} = require('./Themes/Fonts');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
@@ -132,7 +132,7 @@ TreeView.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const noSearchResultsStyle = (theme: Base16Theme) => ({
+const noSearchResultsStyle = (theme: Base18Theme) => ({
   color: theme.base03,
   fontFamily: sansSerif.family,
   fontSize: sansSerif.sizes.large,

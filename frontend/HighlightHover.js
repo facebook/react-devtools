@@ -13,10 +13,10 @@
 var React = require('react');
 var assign = require('object-assign');
 
-import type {Base16Theme} from './types';
+import type {Base18Theme} from './types';
 
 type Context = {
-  theme: Base16Theme,
+  theme: Base18Theme,
 };
 
 type Props = {

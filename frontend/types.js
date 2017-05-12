@@ -76,7 +76,7 @@ export type ControlState = {
   enabled: boolean,
 } & Record;
 
-export type Base16Theme = {
+export type Base18Theme = {
   name: string;
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
@@ -84,8 +84,8 @@ export type Base16Theme = {
   base03: string; // Comments, Invisibles, Line Highlighting; *also used for host components (eg <div>)
   base04: string; // Dark Foreground (Used for status bars)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
-  base06: string; // Light Foreground (Not often used); *also used for search/filter background highlights
-  base07: string; // Light Background (Not often used); *also used for inverted selection in devtools
+  base06: string; // Light Foreground (Not often used);
+  base07: string; // Light Background (Not often used);
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
   base0A: string; // Classes, Markup Bold, Search Text Background
@@ -94,4 +94,6 @@ export type Base16Theme = {
   base0D: string; // Functions, Methods, Attribute IDs, Headings
   base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
   base0F: string; // Deprecated, Opening/Closing Embedded Language Tags e.g.
+  base0H: string; // Highlight (background color) for selected nodes/tabs when devtools is focused
+  base0I: string; // Highlight (background color) for search/filter matches
 };

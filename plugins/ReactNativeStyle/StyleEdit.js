@@ -13,10 +13,10 @@
 var React = require('react');
 var AutoSizeInput = require('./AutoSizeInput');
 
-import type {Base16Theme} from '../../frontend/types';
+import type {Base18Theme} from '../../frontend/types';
 
 type Context = {
-  theme: Base16Theme,
+  theme: Base18Theme,
 };
 
 type Props = {
@@ -117,7 +117,7 @@ StyleEdit.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const tagStyle = (theme: Base16Theme) => ({
+const tagStyle = (theme: Base18Theme) => ({
   color: theme.base03,
 });
 

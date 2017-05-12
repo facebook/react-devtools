@@ -10,16 +10,36 @@
  */
 'use strict';
 
+type RGB = {
+	r: number,
+	g: number,
+	b: number,
+};
+
 function hexToRgba(hex: string, alpha: number): string {
+  const {r, g, b} = getRgb(hex);
+
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function getRgb(hex: string): RGB {
   hex = hex.replace('#', '');
 
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);
   const b = parseInt(hex.substring(4, 6), 16);
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  return {r, g, b};
+}
+
+function isBright(hex: string): boolean {
+  const {r, g, b} = getRgb(hex);
+
+  // http://www.w3.org/TR/AERT#color-contrast
+  return Math.round(((r * 299) + (g * 587) + (b * 114)) / 1000) > 125;
 }
 
 module.exports = {
   hexToRgba,
+  isBright,
 };

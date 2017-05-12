@@ -13,7 +13,7 @@
 var React = require('react');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 
-import type {Base16Theme} from '../../frontend/types';
+import type {Base18Theme} from '../../frontend/types';
 
 type BoxMeasurements = {
   top: number,
@@ -25,7 +25,7 @@ type BoxMeasurements = {
 type BoxProps = BoxMeasurements & {
   title: string,
   children: React$Element,
-  theme: Base16Theme,
+  theme: Base18Theme,
 };
 
 var Box = (props: BoxProps) => {
@@ -46,7 +46,7 @@ var Box = (props: BoxProps) => {
 
 class BoxInspector extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   props: {
     left: number,
@@ -81,23 +81,23 @@ BoxInspector.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const labelStyle = (theme: Base16Theme) => ({
+const labelStyle = (theme: Base18Theme) => ({
   flex: 1,
   color: theme.base0C,
 });
 
-const positionTextStyle = (theme: Base16Theme) => ({
+const positionTextStyle = (theme: Base18Theme) => ({
   color: theme.base03,
   fontSize: sansSerif.sizes.normal,
   textAlign: 'center',
 });
 
-const dimenTextStyle = (theme: Base16Theme) => ({
+const dimenTextStyle = (theme: Base18Theme) => ({
   color: theme.base0B,
   textAlign: 'center',
 });
 
-const boxStyle = (theme: Base16Theme) => ({
+const boxStyle = (theme: Base18Theme) => ({
   position: 'relative',
   padding: 8,
   margin: 8,

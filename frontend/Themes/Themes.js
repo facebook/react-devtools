@@ -10,9 +10,27 @@
  */
 'use strict';
 
-import type {Base16Theme} from '../types';
+import type {Base18Theme} from '../types';
 
-const Apathy: Base16Theme = {
+/**
+ * A theme is a color template used throughout devtools.
+ * All devtools coloring is declared by themes, with one minor exception: status colors.
+ * Themes are user-selectable (via the preferences panel) and peristed between sessions.
+ * New themes may be safely added without user-facing impact.
+ * Renaming or removing a theme may cause user preferences to be reset on next devtools launch however.
+ *
+ * A few of the themes below are special purpose (ChromeDefault and ChromeDark, FirefoxDark).
+ * These are not directly exposed to the user.
+ * Rather if the user chooses the "default" theme, these will be used to match the browser UI.
+ * 
+ * Before adding a new theme, refer to the Base18Theme docs in frontend/types.
+ * Each theme key has a specific purpose.
+ * Certain guidelines should also be followed for theme legibility,
+ * (eg colors 00...07 should progress from lightest to darkest or vice versa, depending on the theme).
+ * Themes were originally inspired by the base16 'spec' although additional colors were added as needed.
+ */
+
+const Apathy: Base18Theme = {
   name: 'Apathy',
   base00: '#031A16',
   base01: '#0B342D',
@@ -30,9 +48,11 @@ const Apathy: Base16Theme = {
   base0D: '#96883E',
   base0E: '#4C963E',
   base0F: '#3E965B',
+  base0H: '#D2E7E4',
+  base0I: '#A7CEC8',
 };
 
-const AtelierForest: Base16Theme = {
+const AtelierForest: Base18Theme = {
   name: 'AtelierForest',
   base00: '#1b1918',
   base01: '#2c2421',
@@ -50,9 +70,11 @@ const AtelierForest: Base16Theme = {
   base0D: '#407ee7',
   base0E: '#6666ea',
   base0F: '#c33ff3',
+  base0H: '#f1efee',
+  base0I: '#EEFF00',
 };
 
-const Bespin: Base16Theme = {
+const Bespin: Base18Theme = {
   name: 'Bespin',
   base00: '#28211c',
   base01: '#36312e',
@@ -70,9 +92,11 @@ const Bespin: Base16Theme = {
   base0D: '#5ea6ea',
   base0E: '#9b859d',
   base0F: '#937121',
+  base0H: '#baae9e',
+  base0I: '#EEFF00',
 };
 
-const Chalk: Base16Theme = {
+const Chalk: Base18Theme = {
   name: 'Chalk',
   base00: '#151515',
   base01: '#202020',
@@ -90,9 +114,11 @@ const Chalk: Base16Theme = {
   base0D: '#6fc2ef',
   base0E: '#e1a3ee',
   base0F: '#deaf8f',
+  base0H: '#f5f5f5',
+  base0I: '#EEFF00',
 };
 
-const ChromeDark: Base16Theme = {
+const ChromeDark: Base18Theme = {
   name: 'Chrome (dark)',
   base00: '#242424',
   base01: '#363636',
@@ -110,9 +136,11 @@ const ChromeDark: Base16Theme = {
   base0D: '#34d1c5',
   base0E: '#9a7fd5',
   base0F: '#9bbbdc',
+  base0H: '#c78626',
+  base0I: '#FFFF33',
 };
 
-const ChromeDefault: Base16Theme = {
+const ChromeDefault: Base18Theme = {
   name: 'Chrome (default)',
   base00: '#ffffff',
   base01: '#efefef',
@@ -130,9 +158,11 @@ const ChromeDefault: Base16Theme = {
   base0D: '#236e25',
   base0E: '#aa0d91',
   base0F: '#a46832',
+  base0H: '#0084ff',
+  base0I: '#EEFF00',
 };
 
-const Darktooth: Base16Theme = {
+const Darktooth: Base18Theme = {
   name: 'Darktooth',
   base00: '#1D2021',
   base01: '#32302F',
@@ -150,9 +180,11 @@ const Darktooth: Base16Theme = {
   base0D: '#0D6678',
   base0E: '#8F4673',
   base0F: '#A87322',
+  base0H: '#FDF4C1',
+  base0I: '#D5C4A1',
 };
 
-const Dracula: Base16Theme = {
+const Dracula: Base18Theme = {
   name: 'Dracula',
   base00: '#282a36',
   base01: '#3a3c4e',
@@ -170,9 +202,11 @@ const Dracula: Base16Theme = {
   base0D: '#62d6e8',
   base0E: '#b45bcf',
   base0F: '#00f769',
+  base0H: '#00f769',
+  base0I: '#FFFF88',
 };
 
-const Eighties: Base16Theme = {
+const Eighties: Base18Theme = {
   name: 'Eighties',
   base00: '#2d2d2d',
   base01: '#393939',
@@ -190,9 +224,11 @@ const Eighties: Base16Theme = {
   base0D: '#6699cc',
   base0E: '#cc99cc',
   base0F: '#d27b53',
+  base0H: '#f2f0ec',
+  base0I: '#EEFF00',
 };
 
-const FirefoxDark: Base16Theme = {
+const FirefoxDark: Base18Theme = {
   name: 'Firefox (dark)',
   base00: '#393f4c',
   base01: '#475983',
@@ -210,9 +246,11 @@ const FirefoxDark: Base16Theme = {
   base0D: '#e9f4fe',
   base0E: '#e9f4fe',
   base0F: '#e9f4fe',
+  base0H: '#5675b9',
+  base0I: '#000000',
 };
 
-const Flat: Base16Theme = {
+const Flat: Base18Theme = {
   name: 'Flat',
   base00: '#2C3E50',
   base01: '#34495E',
@@ -230,9 +268,11 @@ const Flat: Base16Theme = {
   base0D: '#3498DB',
   base0E: '#9B59B6',
   base0F: '#be643c',
+  base0H: '#ECF0F1',
+  base0I: '#EEFF00',
 };
 
-const GitHub: Base16Theme = {
+const GitHub: Base18Theme = {
   name: 'GitHub',
   base00: '#ffffff',
   base01: '#f5f5f5',
@@ -250,9 +290,11 @@ const GitHub: Base16Theme = {
   base0D: '#795da3',
   base0E: '#a71d5d',
   base0F: '#333333',
+  base0H: '#0084ff',
+  base0I: '#EEFF00',
 };
 
-const GoogleLight: Base16Theme = {
+const GoogleLight: Base18Theme = {
   name: 'GoogleLight',
   base00: '#ffffff',
   base01: '#e0e0e0',
@@ -270,49 +312,11 @@ const GoogleLight: Base16Theme = {
   base0D: '#3971ED',
   base0E: '#A36AC7',
   base0F: '#3971ED',
+  base0H: '#1d1f21',
+  base0I: '#EEFF00',
 };
 
-const Grayscale: Base16Theme = {
-  name: 'Grayscale',
-  base00: '#101010',
-  base01: '#252525',
-  base02: '#464646',
-  base03: '#525252',
-  base04: '#ababab',
-  base05: '#b9b9b9',
-  base06: '#e3e3e3',
-  base07: '#f7f7f7',
-  base08: '#7c7c7c',
-  base09: '#999999',
-  base0A: '#a0a0a0',
-  base0B: '#8e8e8e',
-  base0C: '#868686',
-  base0D: '#686868',
-  base0E: '#747474',
-  base0F: '#5e5e5e',
-};
-
-const GreenScreen: Base16Theme = {
-  name: 'GreenScreen',
-  base00: '#001100',
-  base01: '#003300',
-  base02: '#005500',
-  base03: '#007700',
-  base04: '#009900',
-  base05: '#00bb00',
-  base06: '#00dd00',
-  base07: '#00ff00',
-  base08: '#007700',
-  base09: '#009900',
-  base0A: '#007700',
-  base0B: '#00bb00',
-  base0C: '#005500',
-  base0D: '#009900',
-  base0E: '#00bb00',
-  base0F: '#005500',
-};
-
-const Materia: Base16Theme = {
+const Materia: Base18Theme = {
   name: 'Materia',
   base00: '#263238',
   base01: '#2C393F',
@@ -330,9 +334,11 @@ const Materia: Base16Theme = {
   base0D: '#89DDFF',
   base0E: '#82AAFF',
   base0F: '#EC5F67',
+  base0H: '#0084ff',
+  base0I: '#EEFF00',
 };
 
-const MexicoLight: Base16Theme = {
+const MexicoLight: Base18Theme = {
   name: 'MexicoLight',
   base00: '#f8f8f8',
   base01: '#e8e8e8',
@@ -350,9 +356,11 @@ const MexicoLight: Base16Theme = {
   base0D: '#7cafc2',
   base0E: '#96609e',
   base0F: '#a16946',
+  base0H: '#22A6ff',
+  base0I: '#EEFF00',
 };
 
-const Mocha: Base16Theme = {
+const Mocha: Base18Theme = {
   name: 'Mocha',
   base00: '#3B3228',
   base01: '#534636',
@@ -370,9 +378,11 @@ const Mocha: Base16Theme = {
   base0D: '#8ab3b5',
   base0E: '#a89bb9',
   base0F: '#bb9584',
+  base0H: '#f5eeeb',
+  base0I: '#EEFF00',
 };
 
-const Phd: Base16Theme = {
+const Phd: Base18Theme = {
   name: 'Phd',
   base00: '#061229',
   base01: '#2a3448',
@@ -390,6 +400,8 @@ const Phd: Base16Theme = {
   base0D: '#5299bf',
   base0E: '#9989cc',
   base0F: '#b08060',
+  base0H: '#ffffff',
+  base0I: '#EEFF00',
 };
 
 module.exports = {
@@ -406,8 +418,6 @@ module.exports = {
   Flat,
   GitHub,
   GoogleLight,
-  Grayscale,
-  GreenScreen,
   Materia,
   MexicoLight,
   Mocha,

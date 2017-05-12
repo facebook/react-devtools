@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Map} from 'immutable';
-import type {Base16Theme} from '../../frontend/types';
+import type {Base18Theme} from '../../frontend/types';
 
 var React = require('react');
 var DataView = require('../../frontend/DataView/DataView');
@@ -20,7 +20,7 @@ var {sansSerif} = require('../../frontend/Themes/Fonts');
 
 class StoreTab extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Base18Theme,
   };
   props: {
     data: Map,
@@ -55,7 +55,7 @@ StoreTab.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const loadingStyle = (theme: Base16Theme) => ({
+const loadingStyle = (theme: Base18Theme) => ({
   textAlign: 'center',
   color: theme.base03,
 });
