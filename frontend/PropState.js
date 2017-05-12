@@ -83,9 +83,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Text Node"><span style={noPropsStateStyle(theme)}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Empty Node"><span style={noPropsStateStyle(theme)}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;
@@ -229,11 +229,13 @@ const sourcePosStyle = (theme: Base16Theme) => ({
   color: theme.base03,
 });
 
-var styles = {
-  noPropsState: {
-    fontWeight: 'bold',
-    padding: '0.25rem',
-  },
-};
+const noPropsStateStyle = (theme: Base16Theme) => ({
+  fontFamily: Fonts.sansSerif.family,
+  fontSize: Fonts.sansSerif.sizes.normal,
+  color: theme.base03,
+  textAlign: 'center',
+  fontStyle: 'italic',
+  padding: '0.5rem',
+});
 
 module.exports = WrappedPropState;
