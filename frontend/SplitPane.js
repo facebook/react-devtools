@@ -112,7 +112,7 @@ const containerStyle = (isVertical: boolean) => ({
 const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
   height: isVertical ? '1px' : '100%',
   width: isVertical ? '100%' : '1px',
-  backgroundColor: theme.base05,
+  backgroundColor: theme.base04,
 });
 
 const draggerStyle = (isVertical: boolean) => ({

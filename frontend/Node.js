@@ -463,13 +463,13 @@ const headStyle = ({
   if (isSelected && (isCollapsed || !isBottomTagSelected)) {
     backgroundColor = isWindowFocused
       ? theme.base0H
-      : theme.base01;
+      : theme.base03;
   } else if (isHovered && (isCollapsed || !isBottomTagHovered)) {
-    backgroundColor = theme.base01;
+    backgroundColor = theme.base03;
   }
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
-  const color = isInverted ? theme.base04 : undefined;
+  const color = isInverted ? theme.base00 : undefined;
 
   return {
     cursor: 'default',
@@ -490,7 +490,7 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
   } else if (isCustom) {
     color = theme.base08;
   } else {
-    color = theme.base03;
+    color = theme.base04;
   }
 
   return {
@@ -511,9 +511,9 @@ const collapserStyle = (depth: number) => ({
 });
 
 const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boolean, theme: Theme) => {
-  let borderColor = theme.base03;
+  let borderColor = theme.base05;
   if (isHeadInverted) {
-    borderColor = theme.base04;
+    borderColor = theme.base00;
   } else if (hasState) {
     borderColor = theme.base08;
   }
@@ -541,6 +541,7 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
 
 const highlightStyle = (theme: Theme) => ({
   backgroundColor: theme.base0A,
+  color: theme.base07,
 });
 
 type tailStyleParams = {
@@ -590,7 +591,7 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     borderLeftColor = hexToRgba(theme.base0H, 0.25);
   } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = theme.base01;
+    borderLeftColor = theme.base03;
   }
 
   return {
@@ -601,11 +602,6 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     bottom: 0,
     willChange: 'opacity',
     left: calcPaddingLeft(depth) - 7,
-    // Bring it in front of the hovered children, but make sure
-    // hovering over parents doesn't draw on top of selected
-    // guideline even when we've selected the closing tag.
-    // When unsure, refer to how Chrome does it (it's subtle!)
-    zIndex: isSelected ? 1 : 0,
   };
 };
 

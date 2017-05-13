@@ -86,7 +86,7 @@ const containerStyle = (theme: Theme) => ({
 const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
   let color;
   if (isSelected) {
-    color = theme.base04;
+    color = theme.base00;
   } else if (isComposite) {
     color = theme.base0E;
   }

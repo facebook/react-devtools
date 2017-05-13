@@ -28,27 +28,6 @@ import type {Theme} from '../types';
  * Each theme key has a purpose and guidelines should be followed to ensure legibility.
  */
 
-const TODO: Theme = {
-  name: 'TODO',
-  base00: '#181818',
-  base01: '#282828',
-  base02: '#383838',
-  base03: '#585858',
-  base04: '#b8b8b8',
-  base05: '#d8d8d8',
-  base06: '#e8e8e8',
-  base07: '#f8f8f8',
-  base08: '#ab4642',
-  base09: '#dc9656',
-  base0A: '#EEFF00',
-  base0B: '#a1b56c',
-  base0C: '#86c1b9',
-  base0D: '#7cafc2',
-  base0E: '#ba8baf',
-  base0F: '#a16946',
-  base0H: '#0084ff',
-};
-
 const Apathy: Theme = {
   name: 'Apathy',
   base00: '#031A16',
@@ -161,7 +140,7 @@ const ChromeDefault: Theme = {
   base01: '#f3f3f3',
   base02: '#eeeeee',
   base03: '#dadada',
-  base04: '#cccccc',
+  base04: '#aaaaaa',
   base05: '#5a5a5a',
   base06: '#303942',
   base07: '#222222',
@@ -173,7 +152,7 @@ const ChromeDefault: Theme = {
   base0D: '#236e25',
   base0E: '#aa0d91',
   base0F: '#994500',
-  base0H: '#0084ff',
+  base0H: '#3879d9',
 };
 
 const Darktooth: Theme = {
@@ -425,5 +404,4 @@ module.exports = {
   MexicoLight,
   Mocha,
   Phd,
-  TODO,
 };
