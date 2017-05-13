@@ -130,7 +130,7 @@ const panelStyle = (theme: Theme) => ({
   fontFamily: sansSerif.family,
   fontSize: sansSerif.sizes.normal,
   backgroundColor: theme.base00,
-  border: `0.25rem solid ${theme.base03}`,
+  border: `1px solid ${theme.base03}`,
   color: theme.base05,
 });
 

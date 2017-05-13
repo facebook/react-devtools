@@ -147,7 +147,7 @@ const ChromeDefault: Theme = {
   base08: '#881280',
   base09: '#222222',
   base0A: '#EEFF00',
-  base0B: '#1155cc',
+  base0B: '#1a1aa6',
   base0C: '#c80000',
   base0D: '#236e25',
   base0E: '#aa0d91',

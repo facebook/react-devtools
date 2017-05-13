@@ -14,7 +14,7 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Theme} from './types';
 
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
 var {hexToRgba} = require('./Themes/utils');
@@ -72,7 +72,7 @@ Breadcrumb.contextTypes = {
 };
 
 const containerStyle = (theme: Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
+  fontFamily: sansSerif.family,
   listStyle: 'none',
   padding: 0,
   margin: 0,

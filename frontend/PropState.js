@@ -14,7 +14,7 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
 
@@ -212,9 +212,11 @@ var WrappedPropState = decorate({
 }, PropState);
 
 const emptyStyle = (theme: Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
+  fontStyle: 'italic',
   margin: 'auto',
-  color: theme.base03,
+  color: theme.base04,
 });
 
 const sourceStyle = (hasViewElementSource: boolean, theme: Theme) => ({
@@ -230,8 +232,8 @@ const sourcePosStyle = (theme: Theme) => ({
 });
 
 const noPropsStateStyle = (theme: Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
-  fontSize: Fonts.sansSerif.sizes.normal,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
   color: theme.base03,
   textAlign: 'center',
   fontStyle: 'italic',

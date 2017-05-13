@@ -324,8 +324,11 @@ const previewStyle = (theme: Theme) => ({
 
 const emptyStyle = (theme: Theme) => ({
   marginLeft: 10,
-  padding: '2px 5px',
-  color: theme.base02,
+  padding: '0 5px',
+  color: theme.base04,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
+  fontStyle: 'italic',
 });
 
 const missingStyle = (theme: Theme) => ({

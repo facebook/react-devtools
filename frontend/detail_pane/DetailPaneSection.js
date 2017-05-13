@@ -44,7 +44,9 @@ const sectionStyle = (theme: Theme) => ({
 
 var styles = {
   title: {
-    marginRight: 7,
+    display: 'inline-block',
+    marginBottom: '0.5rem',
+    marginRight: '0.25rem',
   },
 };
 
