@@ -22,6 +22,7 @@ class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
+    showHiddenThemes: boolean,
     theme: Theme,
     themes: { [key: string]: Theme },
   };
@@ -55,7 +56,7 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {theme, themes} = this.context;
+    const {showHiddenThemes, theme, themes} = this.context;
     const {changeTheme, hide, open} = this.props;
     const {previewMode} = this.state;
 
@@ -69,8 +70,10 @@ class PreferencesPanel extends React.Component {
         <Preview theme={theme} />
       );
     } else {
-      const themeKeys = Object.keys(themes)
-        .filter(key => !key.includes('Chrome') && !key.includes('Firefox'));
+      let themeKeys = Object.keys(themes);
+      if (!showHiddenThemes) {
+        themeKeys = themeKeys.filter(key => !themes[key].hidden);
+      }
 
       content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
@@ -143,6 +146,7 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
+  showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
   themes: React.PropTypes.object.isRequired,
 };

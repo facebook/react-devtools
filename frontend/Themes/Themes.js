@@ -113,18 +113,19 @@ const Chalk: Theme = {
 };
 
 const ChromeDark: Theme = {
+  hidden: true,
   name: 'Chrome (dark)',
   base00: '#242424',
-  base01: '#363636',
-  base02: '#454545',
-  base03: '#666666',
-  base04: '#aaaaaa',
-  base05: '#dddddd',
-  base06: '#eeeeee',
-  base07: '#ffffff',
-  base08: '#5dafd6',
+  base01: '#2a2a2a',
+  base02: '#363636',
+  base03: '#404040',
+  base04: '#777777',
+  base05: '#a5a5a5',
+  base06: '#d5d5d5',
+  base07: '#d9d9d9',
+  base08: '#5db0d7',
   base09: '#a1f7b5',
-  base0A: '#FFFF33',
+  base0A: '#009921',
   base0B: '#f29766',
   base0C: '#d2c057',
   base0D: '#34d1c5',
@@ -135,6 +136,7 @@ const ChromeDark: Theme = {
 
 // Chrome defaults obtained by inspecting Chrome devtools with another devtools instance
 const ChromeDefault: Theme = {
+  hidden: true,
   name: 'Chrome (default)',
   base00: '#ffffff',
   base01: '#f3f3f3',
@@ -219,6 +221,7 @@ const Eighties: Theme = {
 };
 
 const FirefoxDark: Theme = {
+  hidden: true,
   name: 'Firefox (dark)',
   base00: '#393f4c',
   base01: '#475983',

@@ -85,7 +85,8 @@ export type ControlState = {
  * Colors 08...0H are special use, highlight colors.
  */
 export type Theme = {
-  name: string;
+  hidden?: boolean; // Special theme (eg Chrome or Firefox default) hidden from user in prefs panel
+  name: string; // Display name (shown in PreferencesPanel)
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
   base02: string; // Selection Background; inverted prop-name Foreground in devtools
