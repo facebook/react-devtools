@@ -12,6 +12,7 @@
 
 var React = require('react');
 var PropVal = require('./PropVal');
+var {getInvertedMid} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
@@ -58,16 +59,16 @@ Props.contextTypes = {
 };
 
 const attributeNameStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? theme.base02 : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.base0I) : theme.base0F,
 });
 
 const ellipsisStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? theme.base02 : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.base0I) : theme.base0F,
 });
 
 const propStype = (isInverted: boolean, theme: Theme) => ({
   paddingLeft: 5,
-  color: isInverted ? theme.base02 : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.base0I) : theme.base0F,
 });
 
 module.exports = Props;

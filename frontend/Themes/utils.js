@@ -16,10 +16,19 @@ type RGB = {
 	b: number,
 };
 
-function hexToRgba(hex: string, alpha: number): string {
+function getBrightness(hex: string): number {
   const {r, g, b} = getRgb(hex);
 
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  // http://www.w3.org/TR/AERT#color-contrast
+  return Math.round(((r * 299) + (g * 587) + (b * 114)) / 1000);
+}
+
+function getInvertedMid(hex: string): string {
+  return hexToRgba(hex, 0.8);
+}
+
+function getInvertedWeak(hex: string): string {
+  return hexToRgba(hex, 0.65);
 }
 
 function getRgb(hex: string): RGB {
@@ -32,14 +41,22 @@ function getRgb(hex: string): RGB {
   return {r, g, b};
 }
 
-function isBright(hex: string): boolean {
+function hexToRgba(hex: string, alpha: number): string {
   const {r, g, b} = getRgb(hex);
 
+  return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+}
+
+function isBright(hex: string): boolean {
   // http://www.w3.org/TR/AERT#color-contrast
-  return Math.round(((r * 299) + (g * 587) + (b * 114)) / 1000) > 125;
+  return getBrightness(hex) > 125;
 }
 
 module.exports = {
+  getBrightness,
+  getInvertedMid,
+  getInvertedWeak,
+  getRgb,
   hexToRgba,
   isBright,
 };

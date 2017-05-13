@@ -13,7 +13,6 @@
 var React = require('react');
 var decorate = require('./decorate');
 var {sansSerif} = require('./Themes/Fonts');
-var {hexToRgba} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
@@ -64,12 +63,12 @@ const tabsStyle = (theme: Theme) => ({
   listStyle: 'none',
   margin: 0,
   backgroundColor: theme.base00,
-  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
+  borderBottom: `1px solid ${theme.base03}`,
   padding: '0.25rem 0.25rem 0 0.25rem',
 });
 
 const tabStyle = (isSelected: boolean, theme: Theme) => {
-  const border = isSelected ? `1px solid ${hexToRgba(theme.base05, 0.1)}` : 'none';
+  const border = isSelected ? `1px solid ${theme.base03}` : 'none';
 
   return {
     padding: '0.25rem 0.5rem',

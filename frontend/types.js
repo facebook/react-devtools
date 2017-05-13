@@ -89,7 +89,7 @@ export type Theme = {
   name: string; // Display name (shown in PreferencesPanel)
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
-  base02: string; // Selection Background; inverted prop-name Foreground in devtools
+  base02: string; // Selection Background
   base03: string; // Comments, Invisibles, Line Highlighting
   base04: string; // Dark Foreground (Used for status bars), Host Components (eg <div>)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
@@ -103,5 +103,6 @@ export type Theme = {
   base0D: string; // Functions, Methods, Attribute IDs, Headings
   base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
   base0F: string; // Deprecated, Opening/Closing Embedded Language Tags e.g.
-  base0H: string; // Selected background for nodes/tabs when devtools is focused
+  base0H: string; // Selected Background for nodes/tabs when devtools is focused
+  base0I: string; // Selected Foreground for nodes/tabs when devtools is focused
 };

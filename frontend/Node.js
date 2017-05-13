@@ -14,7 +14,7 @@ var React = require('react');
 
 var decorate = require('./decorate');
 var Props = require('./Props');
-var {hexToRgba} = require('./Themes/utils');
+var {getInvertedWeak, hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
 import type {Theme} from './types';
@@ -469,7 +469,7 @@ const headStyle = ({
   }
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
-  const color = isInverted ? theme.base00 : undefined;
+  const color = isInverted ? theme.base0I : undefined;
 
   return {
     cursor: 'default',
@@ -486,7 +486,7 @@ const headStyle = ({
 const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
   let color;
   if (inverted) {
-    color = 'inherit';
+    color = theme.base0I;
   } else if (isCustom) {
     color = theme.base08;
   } else {
@@ -501,7 +501,7 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
 const tagTextStyle = (inverted: boolean, theme: Theme) => ({
   flex: 1,
   whiteSpace: 'nowrap',
-  color: inverted ? theme.base02 : theme.base0F,
+  color: inverted ? getInvertedWeak(theme.base0I) : theme.base0F,
 });
 
 const collapserStyle = (depth: number) => ({
