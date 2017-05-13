@@ -118,7 +118,7 @@ class PreferencesPanel extends React.Component {
 
     if (previewMode) {
       this.setState({
-        previewMode: false
+        previewMode: false,
       });
     } else {
       hide();

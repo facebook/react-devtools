@@ -17,7 +17,7 @@ const consts = require('../../agent/consts');
 const Node = require('../Node');
 const {sansSerif} = require('./Fonts');
 
-import type {Theme} from './types';
+import type {Theme} from '../types';
 
 type Props = {
   theme: Theme,
@@ -98,14 +98,14 @@ const nodes = {
   child: childNode,
   grandparent: grandparentNode,
   parent: parentNode,
-}
+};
 
 const noop = () => {};
 
 const fauxStore = {
   hovered: 'parent',
   selected: 'grandparent',
-  get: id => nodes[id],
+  get: (id: any) => nodes[id],
   off: noop,
   on: noop,
   onContextMenu: noop,
@@ -133,11 +133,5 @@ const panelStyle = (theme: Theme) => ({
   border: `1px solid ${theme.base03}`,
   color: theme.base05,
 });
-
-const styles = {
-  header: {
-    margin: '0 0 0.25rem',
-  },
-};
 
 module.exports = Preview;
