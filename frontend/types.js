@@ -76,13 +76,21 @@ export type ControlState = {
   enabled: boolean,
 } & Record;
 
+/**
+ * A theme is a color template used throughout devtools.
+ * All devtools coloring is declared by themes, with one minor exception: status colors.
+ *
+ * Colors 00...07 should increase in light-to-dark (or dark-to-light) order.
+ * This is important for legibility/contrast because of how the colors are used.
+ * Colors 08...0H are special use, highlight colors.
+ */
 export type Theme = {
   name: string;
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
-  base02: string; // Selection Background; *also used for inverted selection foreground in devtools
-  base03: string; // Comments, Invisibles, Line Highlighting; *also used for host components (eg <div>)
-  base04: string; // Dark Foreground (Used for status bars)
+  base02: string; // Selection Background; inverted prop-name Foreground in devtools
+  base03: string; // Comments, Invisibles, Line Highlighting
+  base04: string; // Dark Foreground (Used for status bars), Host Components (eg <div>)
   base05: string; // Default Foreground, Caret, Delimiters, Operators
   base06: string; // Light Foreground (Not often used);
   base07: string; // Light Background (Not often used);

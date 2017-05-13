@@ -211,7 +211,6 @@ const styles = {
   closeButton: {
     marginTop: '0.5rem',
     padding: '0.25rem',
-    borderRadius: '0.25rem',
   },
   selectAndPreviewRow: {
     display: 'flex',
