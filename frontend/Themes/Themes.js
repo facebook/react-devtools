@@ -21,8 +21,9 @@ import type {Theme} from '../types';
  * Renaming or removing a theme may cause user preferences to be reset on next devtools launch however.
  *
  * A few of the themes below are special purpose (ChromeDefault and ChromeDark, FirefoxDark).
- * These are not directly exposed to the user.
- * Rather if the user chooses the "default" theme, these will be used to match the browser UI.
+ * These are flagged as "hidden", meaning that they are not directly exposed to the user.
+ * Rather if the user chooses the "default" theme- they will be used to match the browser UI.
+ * These themes can be exposed to the UI directly by passing a "showHiddenThemes" flag to <Panel>.
  * 
  * Before adding a new theme, refer to the Theme docs in frontend/types.
  * Each theme key has a purpose and guidelines should be followed to ensure legibility.
@@ -224,13 +225,13 @@ const FirefoxDark: Theme = {
   hidden: true,
   name: 'Firefox (dark)',
   base00: '#393f4c',
-  base01: '#475983',
-  base02: '#bbbbbb',
-  base03: '#8fa1b2',
-  base04: '#ffffff',
-  base05: '#ffffff',
-  base06: '#000000',
-  base07: '#5675b9',
+  base01: '#393f4c',
+  base02: '#454d5d',
+  base03: '#475983',
+  base04: '#8fa1b2',
+  base05: '#a9bacb',
+  base06: '#e9f4fe',
+  base07: '#ffffff',
   base08: '#00ff7f',
   base09: '#eb5368',
   base0A: '#000000',
@@ -240,6 +241,7 @@ const FirefoxDark: Theme = {
   base0E: '#e9f4fe',
   base0F: '#e9f4fe',
   base0H: '#5675b9',
+  base0I: '#ffffff',
 };
 
 const Flat: Theme = {
