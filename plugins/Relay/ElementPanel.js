@@ -13,11 +13,11 @@
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 
-import type {Base18Theme} from '../../frontend/types';
+import type {Theme} from '../../frontend/types';
 
 class ElementPanel extends React.Component {
   context: {
-    theme: Base18Theme,
+    theme: Theme,
   };
   props: {
     dataIDs: Array<{id: string, queries: Array<Map>}>,
@@ -64,18 +64,18 @@ ElementPanel.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const dataNodeStyle = (theme: Base18Theme) => ({
+const dataNodeStyle = (theme: Theme) => ({
   marginBottom: 5,
   border: `1px solid ${theme.base02}`,
 });
 
-const dataIDStyle = (theme: Base18Theme) => ({
+const dataIDStyle = (theme: Theme) => ({
   cursor: 'pointer',
   padding: '2px 4px',
   backgroundColor: theme.base02,
 });
 
-const noQueriesStyle = (theme: Base18Theme) => ({
+const noQueriesStyle = (theme: Theme) => ({
   color: theme.base03,
   padding: '2px 4px',
 });

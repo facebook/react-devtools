@@ -17,7 +17,7 @@ var Props = require('./Props');
 var {hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
-import type {Base18Theme} from './types';
+import type {Theme} from './types';
 
 type PropsType = {
   hovered: boolean,
@@ -47,7 +47,7 @@ class Node extends React.Component {
 
   context: {
     scrollTo: (node: HTMLElement) => void,
-    theme: Base18Theme,
+    theme: Theme,
   };
   props: PropsType;
   state: StateType = {
@@ -446,7 +446,7 @@ type headStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
-  theme: Base18Theme
+  theme: Theme
 };
 
 const headStyle = ({
@@ -483,7 +483,7 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Base18Theme) => {
+const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
   let color;
   if (inverted) {
     color = 'inherit';
@@ -498,7 +498,7 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Base18Theme) =
   };
 };
 
-const tagTextStyle = (inverted: boolean, theme: Base18Theme) => ({
+const tagTextStyle = (inverted: boolean, theme: Theme) => ({
   flex: 1,
   whiteSpace: 'nowrap',
   color: inverted ? theme.base02 : theme.base0F,
@@ -510,7 +510,7 @@ const collapserStyle = (depth: number) => ({
   left: calcPaddingLeft(depth) - 12,
 });
 
-const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boolean, theme: Base18Theme) => {
+const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boolean, theme: Theme) => {
   let borderColor = theme.base03;
   if (isHeadInverted) {
     borderColor = theme.base04;
@@ -539,8 +539,8 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
   }
 };
 
-const highlightStyle = (theme: Base18Theme) => ({
-  backgroundColor: theme.base0I,
+const highlightStyle = (theme: Theme) => ({
+  backgroundColor: theme.base0A,
 });
 
 type tailStyleParams = {
@@ -550,7 +550,7 @@ type tailStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
-  theme: Base18Theme
+  theme: Theme
 };
 
 const tailStyle = ({
@@ -584,7 +584,7 @@ const tailStyle = ({
   };
 };
 
-const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Base18Theme) => {
+const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Theme) => {
   let borderLeftColor = 'transparent';
   if (isSelected) {
     borderLeftColor = hexToRgba(theme.base0H, 0.25);

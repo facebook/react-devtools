@@ -21,7 +21,7 @@ var Themes = require('./Themes/Themes');
 var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
-import type {Base18Theme} from './types';
+import type {Theme} from './types';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -107,8 +107,8 @@ class Store extends EventEmitter {
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
-  theme: Base18Theme;
-  themes: { [key: string]: Base18Theme };
+  theme: Theme;
+  themes: { [key: string]: Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {

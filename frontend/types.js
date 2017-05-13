@@ -76,7 +76,7 @@ export type ControlState = {
   enabled: boolean,
 } & Record;
 
-export type Base18Theme = {
+export type Theme = {
   name: string;
   base00: string; // Default Background
   base01: string; // Lighter Background (Used for status bars)
@@ -88,12 +88,11 @@ export type Base18Theme = {
   base07: string; // Light Background (Not often used);
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
-  base0A: string; // Classes, Markup Bold, Search Text Background
+  base0A: string; // Highlight (background color) for search/filter matches
   base0B: string; // Strings, Inherited Class, Markup Code, Diff Inserted
   base0C: string; // Support, Regular Expressions, Escape Characters, Markup Quotes
   base0D: string; // Functions, Methods, Attribute IDs, Headings
   base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
   base0F: string; // Deprecated, Opening/Closing Embedded Language Tags e.g.
-  base0H: string; // Highlight (background color) for selected nodes/tabs when devtools is focused
-  base0I: string; // Highlight (background color) for search/filter matches
+  base0H: string; // Selected background for nodes/tabs when devtools is focused
 };

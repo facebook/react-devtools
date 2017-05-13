@@ -10,12 +10,13 @@
  */
 'use strict';
 
-import type {Base18Theme} from '../types';
+import type {Theme} from '../types';
 
 /**
  * A theme is a color template used throughout devtools.
  * All devtools coloring is declared by themes, with one minor exception: status colors.
  * Themes are user-selectable (via the preferences panel) and peristed between sessions.
+ *
  * New themes may be safely added without user-facing impact.
  * Renaming or removing a theme may cause user preferences to be reset on next devtools launch however.
  *
@@ -23,14 +24,32 @@ import type {Base18Theme} from '../types';
  * These are not directly exposed to the user.
  * Rather if the user chooses the "default" theme, these will be used to match the browser UI.
  * 
- * Before adding a new theme, refer to the Base18Theme docs in frontend/types.
- * Each theme key has a specific purpose.
- * Certain guidelines should also be followed for theme legibility,
- * (eg colors 00...07 should progress from lightest to darkest or vice versa, depending on the theme).
- * Themes were originally inspired by the base16 'spec' although additional colors were added as needed.
+ * Before adding a new theme, refer to the Theme docs in frontend/types.
+ * Each theme key has a purpose and guidelines should be followed to ensure legibility.
  */
 
-const Apathy: Base18Theme = {
+const TODO: Theme = {
+  name: 'TODO',
+  base00: '#181818',
+  base01: '#282828',
+  base02: '#383838',
+  base03: '#585858',
+  base04: '#b8b8b8',
+  base05: '#d8d8d8',
+  base06: '#e8e8e8',
+  base07: '#f8f8f8',
+  base08: '#ab4642',
+  base09: '#dc9656',
+  base0A: '#EEFF00',
+  base0B: '#a1b56c',
+  base0C: '#86c1b9',
+  base0D: '#7cafc2',
+  base0E: '#ba8baf',
+  base0F: '#a16946',
+  base0H: '#0084ff',
+};
+
+const Apathy: Theme = {
   name: 'Apathy',
   base00: '#031A16',
   base01: '#0B342D',
@@ -42,17 +61,16 @@ const Apathy: Base18Theme = {
   base07: '#D2E7E4',
   base08: '#3E9688',
   base09: '#3E7996',
-  base0A: '#3E4C96',
+  base0A: '#A7CEC8',
   base0B: '#883E96',
   base0C: '#963E4C',
   base0D: '#96883E',
   base0E: '#4C963E',
   base0F: '#3E965B',
   base0H: '#D2E7E4',
-  base0I: '#A7CEC8',
 };
 
-const AtelierForest: Base18Theme = {
+const AtelierForest: Theme = {
   name: 'AtelierForest',
   base00: '#1b1918',
   base01: '#2c2421',
@@ -64,17 +82,16 @@ const AtelierForest: Base18Theme = {
   base07: '#f1efee',
   base08: '#f22c40',
   base09: '#df5320',
-  base0A: '#c38418',
+  base0A: '#EEFF00',
   base0B: '#7b9726',
   base0C: '#3d97b8',
   base0D: '#407ee7',
   base0E: '#6666ea',
   base0F: '#c33ff3',
   base0H: '#f1efee',
-  base0I: '#EEFF00',
 };
 
-const Bespin: Base18Theme = {
+const Bespin: Theme = {
   name: 'Bespin',
   base00: '#28211c',
   base01: '#36312e',
@@ -86,17 +103,16 @@ const Bespin: Base18Theme = {
   base07: '#baae9e',
   base08: '#cf6a4c',
   base09: '#cf7d34',
-  base0A: '#f9ee98',
+  base0A: '#EEFF00',
   base0B: '#54be0d',
   base0C: '#afc4db',
   base0D: '#5ea6ea',
   base0E: '#9b859d',
   base0F: '#937121',
   base0H: '#baae9e',
-  base0I: '#EEFF00',
 };
 
-const Chalk: Base18Theme = {
+const Chalk: Theme = {
   name: 'Chalk',
   base00: '#151515',
   base01: '#202020',
@@ -108,61 +124,59 @@ const Chalk: Base18Theme = {
   base07: '#f5f5f5',
   base08: '#fb9fb1',
   base09: '#eda987',
-  base0A: '#ddb26f',
+  base0A: '#EEFF00',
   base0B: '#acc267',
   base0C: '#12cfc0',
   base0D: '#6fc2ef',
   base0E: '#e1a3ee',
   base0F: '#deaf8f',
   base0H: '#f5f5f5',
-  base0I: '#EEFF00',
 };
 
-const ChromeDark: Base18Theme = {
+const ChromeDark: Theme = {
   name: 'Chrome (dark)',
   base00: '#242424',
   base01: '#363636',
   base02: '#454545',
-  base03: '#898989',
-  base04: '#303942',
-  base05: '#ffffff',
-  base06: '#FFFF33',
-  base07: '#c78626',
+  base03: '#666666',
+  base04: '#aaaaaa',
+  base05: '#dddddd',
+  base06: '#eeeeee',
+  base07: '#ffffff',
   base08: '#5dafd6',
   base09: '#a1f7b5',
-  base0A: '#00ff00',
+  base0A: '#FFFF33',
   base0B: '#f29766',
   base0C: '#d2c057',
   base0D: '#34d1c5',
   base0E: '#9a7fd5',
   base0F: '#9bbbdc',
   base0H: '#c78626',
-  base0I: '#FFFF33',
 };
 
-const ChromeDefault: Base18Theme = {
+// Chrome defaults obtained by inspecting Chrome devtools with another devtools instance
+const ChromeDefault: Theme = {
   name: 'Chrome (default)',
   base00: '#ffffff',
-  base01: '#efefef',
-  base02: '#cccccc',
-  base03: '#888888',
-  base04: '#ffffff',
-  base05: '#303942',
-  base06: '#EEFF00',
-  base07: '#0084ff',
+  base01: '#f3f3f3',
+  base02: '#eeeeee',
+  base03: '#dadada',
+  base04: '#cccccc',
+  base05: '#5a5a5a',
+  base06: '#303942',
+  base07: '#222222',
   base08: '#881280',
-  base09: '#212121',
-  base0A: '#00ff00',
-  base0B: '#242aa7',
-  base0C: '#c41a16',
+  base09: '#222222',
+  base0A: '#EEFF00',
+  base0B: '#1155cc',
+  base0C: '#c80000',
   base0D: '#236e25',
   base0E: '#aa0d91',
-  base0F: '#a46832',
+  base0F: '#994500',
   base0H: '#0084ff',
-  base0I: '#EEFF00',
 };
 
-const Darktooth: Base18Theme = {
+const Darktooth: Theme = {
   name: 'Darktooth',
   base00: '#1D2021',
   base01: '#32302F',
@@ -174,17 +188,16 @@ const Darktooth: Base18Theme = {
   base07: '#FDF4C1',
   base08: '#FB543F',
   base09: '#FE8625',
-  base0A: '#FAC03B',
+  base0A: '#D5C4A1',
   base0B: '#95C085',
   base0C: '#8BA59B',
   base0D: '#0D6678',
   base0E: '#8F4673',
   base0F: '#A87322',
   base0H: '#FDF4C1',
-  base0I: '#D5C4A1',
 };
 
-const Dracula: Base18Theme = {
+const Dracula: Theme = {
   name: 'Dracula',
   base00: '#282a36',
   base01: '#3a3c4e',
@@ -196,17 +209,16 @@ const Dracula: Base18Theme = {
   base07: '#00f769',
   base08: '#ff79c6',
   base09: '#bd93f9',
-  base0A: '#00f769',
+  base0A: '#FFFF88',
   base0B: '#e5ee86',
   base0C: '#a1efe4',
   base0D: '#62d6e8',
   base0E: '#b45bcf',
   base0F: '#00f769',
   base0H: '#00f769',
-  base0I: '#FFFF88',
 };
 
-const Eighties: Base18Theme = {
+const Eighties: Theme = {
   name: 'Eighties',
   base00: '#2d2d2d',
   base01: '#393939',
@@ -218,17 +230,16 @@ const Eighties: Base18Theme = {
   base07: '#f2f0ec',
   base08: '#f2777a',
   base09: '#f99157',
-  base0A: '#ffcc66',
+  base0A: '#EEFF00',
   base0B: '#99cc99',
   base0C: '#66cccc',
   base0D: '#6699cc',
   base0E: '#cc99cc',
   base0F: '#d27b53',
   base0H: '#f2f0ec',
-  base0I: '#EEFF00',
 };
 
-const FirefoxDark: Base18Theme = {
+const FirefoxDark: Theme = {
   name: 'Firefox (dark)',
   base00: '#393f4c',
   base01: '#475983',
@@ -240,17 +251,16 @@ const FirefoxDark: Base18Theme = {
   base07: '#5675b9',
   base08: '#00ff7f',
   base09: '#eb5368',
-  base0A: '#bcb8db',
+  base0A: '#000000',
   base0B: '#e9f4fe',
   base0C: '#bcb8db',
   base0D: '#e9f4fe',
   base0E: '#e9f4fe',
   base0F: '#e9f4fe',
   base0H: '#5675b9',
-  base0I: '#000000',
 };
 
-const Flat: Base18Theme = {
+const Flat: Theme = {
   name: 'Flat',
   base00: '#2C3E50',
   base01: '#34495E',
@@ -262,17 +272,16 @@ const Flat: Base18Theme = {
   base07: '#ECF0F1',
   base08: '#E74C3C',
   base09: '#E67E22',
-  base0A: '#F1C40F',
+  base0A: '#EEFF00',
   base0B: '#2ECC71',
   base0C: '#1ABC9C',
   base0D: '#3498DB',
   base0E: '#9B59B6',
   base0F: '#be643c',
   base0H: '#ECF0F1',
-  base0I: '#EEFF00',
 };
 
-const GitHub: Base18Theme = {
+const GitHub: Theme = {
   name: 'GitHub',
   base00: '#ffffff',
   base01: '#f5f5f5',
@@ -284,17 +293,16 @@ const GitHub: Base18Theme = {
   base07: '#0084ff',
   base08: '#ed6a43',
   base09: '#0086b3',
-  base0A: '#795da3',
+  base0A: '#EEFF00',
   base0B: '#183691',
   base0C: '#183691',
   base0D: '#795da3',
   base0E: '#a71d5d',
   base0F: '#333333',
   base0H: '#0084ff',
-  base0I: '#EEFF00',
 };
 
-const GoogleLight: Base18Theme = {
+const GoogleLight: Theme = {
   name: 'GoogleLight',
   base00: '#ffffff',
   base01: '#e0e0e0',
@@ -306,17 +314,16 @@ const GoogleLight: Base18Theme = {
   base07: '#1d1f21',
   base08: '#CC342B',
   base09: '#F96A38',
-  base0A: '#FBA922',
+  base0A: '#EEFF00',
   base0B: '#198844',
   base0C: '#3971ED',
   base0D: '#3971ED',
   base0E: '#A36AC7',
   base0F: '#3971ED',
   base0H: '#1d1f21',
-  base0I: '#EEFF00',
 };
 
-const Materia: Base18Theme = {
+const Materia: Theme = {
   name: 'Materia',
   base00: '#263238',
   base01: '#2C393F',
@@ -328,17 +335,16 @@ const Materia: Base18Theme = {
   base07: '#0084ff',
   base08: '#EC5F67',
   base09: '#EA9560',
-  base0A: '#FFCC00',
+  base0A: '#EEFF00',
   base0B: '#8BD649',
   base0C: '#80CBC4',
   base0D: '#89DDFF',
   base0E: '#82AAFF',
   base0F: '#EC5F67',
   base0H: '#0084ff',
-  base0I: '#EEFF00',
 };
 
-const MexicoLight: Base18Theme = {
+const MexicoLight: Theme = {
   name: 'MexicoLight',
   base00: '#f8f8f8',
   base01: '#e8e8e8',
@@ -350,17 +356,16 @@ const MexicoLight: Base18Theme = {
   base07: '#22A6ff',
   base08: '#ab4642',
   base09: '#dc9656',
-  base0A: '#f79a0e',
+  base0A: '#EEFF00',
   base0B: '#538947',
   base0C: '#4b8093',
   base0D: '#7cafc2',
   base0E: '#96609e',
   base0F: '#a16946',
   base0H: '#22A6ff',
-  base0I: '#EEFF00',
 };
 
-const Mocha: Base18Theme = {
+const Mocha: Theme = {
   name: 'Mocha',
   base00: '#3B3228',
   base01: '#534636',
@@ -372,17 +377,16 @@ const Mocha: Base18Theme = {
   base07: '#f5eeeb',
   base08: '#cb6077',
   base09: '#d28b71',
-  base0A: '#f4bc87',
+  base0A: '#EEFF00',
   base0B: '#beb55b',
   base0C: '#7bbda4',
   base0D: '#8ab3b5',
   base0E: '#a89bb9',
   base0F: '#bb9584',
   base0H: '#f5eeeb',
-  base0I: '#EEFF00',
 };
 
-const Phd: Base18Theme = {
+const Phd: Theme = {
   name: 'Phd',
   base00: '#061229',
   base01: '#2a3448',
@@ -394,14 +398,13 @@ const Phd: Base18Theme = {
   base07: '#ffffff',
   base08: '#d07346',
   base09: '#f0a000',
-  base0A: '#fbd461',
+  base0A: '#EEFF00',
   base0B: '#99bf52',
   base0C: '#72b9bf',
   base0D: '#5299bf',
   base0E: '#9989cc',
   base0F: '#b08060',
   base0H: '#ffffff',
-  base0I: '#EEFF00',
 };
 
 module.exports = {
@@ -422,4 +425,5 @@ module.exports = {
   MexicoLight,
   Mocha,
   Phd,
+  TODO,
 };

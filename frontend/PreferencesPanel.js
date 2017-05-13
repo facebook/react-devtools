@@ -14,16 +14,15 @@ const React = require('react');
 
 const decorate = require('./decorate');
 const {sansSerif} = require('./Themes/Fonts');
-const {hexToRgba, isBright} = require('./Themes/utils');
 
-import type {Base18Theme} from './types';
+import type {Theme} from './types';
 
 class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
-    theme: Base18Theme,
-    themes: { [key: string]: Base18Theme },
+    theme: Theme,
+    themes: { [key: string]: Theme },
   };
   props: {
     changeTheme: (themeName: string) => void,
@@ -70,7 +69,6 @@ class PreferencesPanel extends React.Component {
               <option key={key} value={key}>{themes[key].name}</option>
             ))}
           </select>
-          <ThemePreview theme={theme} />
           <button
             onClick={hide}
             style={styles.closeButton}
@@ -103,22 +101,6 @@ PreferencesPanel.propTypes = {
   open: React.PropTypes.bool,
 };
 
-const ThemePreview = ({ theme }: { theme: Base18Theme }) => (
-  <div style={styles.themePreview}>
-    {Object.keys(theme)
-      .filter(key => key !== 'name')
-      .map(key => (
-        <div
-          key={key}
-          style={themeSwatch(theme[key], theme)}
-        >
-          <div style={styles.themeSwatchLabel}>{key.replace('base', '')}</div>
-          <div>{theme[key].replace('#', '')}</div>
-        </div>
-      ))}
-  </div>
-);
-
 const blockClick = event => event.stopPropagation();
 
 const WrappedPreferencesPanel = decorate({
@@ -134,22 +116,7 @@ const WrappedPreferencesPanel = decorate({
   },
 }, PreferencesPanel);
 
-const themeSwatch = (color: string, theme: Base18Theme) => ({
-  display: 'inline-flex',
-  flexDirection: 'column',
-  alignItems: 'center',
-  justifyContent: 'center',
-  width: '2.5rem',
-  height: '2.5rem',
-  borderRadius: '0.25rem',
-  marginRight: '0.25rem',
-  marginTop: '0.25rem',
-  backgroundColor: color,
-  color: isBright(color) ? '#000000' : '#ffffff',
-  fontSize: sansSerif.sizes.small,
-});
-
-const panelStyle = (theme: Base18Theme) => ({
+const panelStyle = (theme: Theme) => ({
   maxWidth: '100%',
   margin: '0.5rem',
   padding: '0.5rem',
@@ -160,7 +127,7 @@ const panelStyle = (theme: Base18Theme) => ({
   zIndex: 1,
   fontFamily: sansSerif.family,
   backgroundColor: theme.base01,
-  border: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
+  border: `1px solid ${theme.base06}`,
   color: theme.base05,
 });
 
@@ -181,16 +148,6 @@ const styles = {
     marginTop: '0.5rem',
     padding: '0.25rem',
     borderRadius: '0.25rem',
-  },
-  themePreview: {
-    display: 'inline-flex',
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    width: '22rem',
-  },
-  themeSwatchLabel: {
-    fontSize: sansSerif.sizes.normal,
-    marginBottom: '0.25rem',
   },
 };
 

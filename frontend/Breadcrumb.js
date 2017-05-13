@@ -12,7 +12,7 @@
 
 import type Store from './Store';
 import type {ElementID} from './types';
-import type {Base18Theme} from './types';
+import type {Theme} from './types';
 
 var Fonts = require('./Themes/Fonts');
 var React = require('react');
@@ -20,7 +20,7 @@ var decorate = require('./decorate');
 var {hexToRgba} = require('./Themes/utils');
 
 class Breadcrumb extends React.Component {
-  context: {theme: Base18Theme};
+  context: {theme: Theme};
   state: {hovered: ?string};
 
   constructor(props) {
@@ -71,7 +71,7 @@ Breadcrumb.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const containerStyle = (theme: Base18Theme) => ({
+const containerStyle = (theme: Theme) => ({
   fontFamily: Fonts.sansSerif.family,
   listStyle: 'none',
   padding: 0,
@@ -83,7 +83,7 @@ const containerStyle = (theme: Base18Theme) => ({
   borderTop: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
 });
 
-const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Base18Theme) => {
+const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
   let color;
   if (isSelected) {
     color = theme.base04;

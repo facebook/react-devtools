@@ -16,7 +16,7 @@ var {monospace} = require('../Themes/Fonts');
 import type {DOMNode, DOMRect, Window} from '../types';
 
 /**
- * Note that this component is not affected by the active Base18Theme,
+ * Note that this component is not affected by the active Theme,
  * Because it highlights elements in the main Chrome window (outside of devtools).
  * The colors below were chosen to roughly match those used by Chrome devtools.
  */

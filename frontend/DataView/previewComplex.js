@@ -14,9 +14,9 @@ var React = require('react');
 
 var consts = require('../../agent/consts');
 
-import type {Base18Theme} from '../types';
+import type {Theme} from '../types';
 
-function previewComplex(data: Object, theme: Base18Theme) {
+function previewComplex(data: Object, theme: Theme) {
   const style={ color: theme.base0D };
 
   if (Array.isArray(data)) {
