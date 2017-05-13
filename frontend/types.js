@@ -104,5 +104,7 @@ export type Theme = {
   base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
   base0F: string; // Deprecated, Opening/Closing Embedded Language Tags e.g.
   base0H: string; // Selected Background for nodes/tabs when devtools is focused
-  base0I: string; // Selected Foreground for nodes/tabs when devtools is focused
+  base0I: string; // Selected Background for nodes/tabs when devtools is not focused
+  base0J: string; // Hover Background for nodes/tabs
+  base0K: string; // Selected Foreground for nodes/tabs when devtools is focused
 };

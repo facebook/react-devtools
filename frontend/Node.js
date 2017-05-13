@@ -201,6 +201,9 @@ class Node extends React.Component {
     const collapsed = node.get('collapsed');
     const inverted = selected && isWindowFocused;
 
+    const sharedHeadBracketStyle = bracketStyle(inverted && !isBottomTagSelected, theme);
+    const sharedTailBracketStyle = bracketStyle(inverted && isBottomTagSelected, theme);
+
     const sharedHeadStyle = headStyle({
       depth,
       isBottomTagHovered,
@@ -289,7 +292,8 @@ class Node extends React.Component {
           <div style={sharedHeadStyle} ref={h => this._head = h} {...headEvents}>
             <span>
               <span>
-                <span style={jsxSingleLineTagStyle}>&lt;{name}</span>
+                <span style={sharedHeadBracketStyle}>&lt;</span>
+                <span style={jsxSingleLineTagStyle}>{name}</span>
                 {node.get('key') &&
                   <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
                 }
@@ -299,14 +303,16 @@ class Node extends React.Component {
                 {node.get('props') &&
                   <Props key="props" props={node.get('props')} inverted={inverted}/>
                 }
-                <span style={jsxSingleLineTagStyle}>{isCollapsed ? ' />' : '>'}</span>
+                <span style={sharedHeadBracketStyle}>{isCollapsed ? ' />' : '>'}</span>
               </span>
               {!isCollapsed && [
                 <span key="content">
                   {content}
                 </span>,
                 <span key="close">
-                  <span style={jsxSingleLineTagStyle}>&lt;{name}&gt;</span>
+                  <span style={sharedHeadBracketStyle}>&lt;</span>
+                  <span style={jsxSingleLineTagStyle}>{name}</span>
+                  <span style={sharedHeadBracketStyle}>&gt;</span>
                 </span>,
               ]}
             </span>
@@ -317,7 +323,11 @@ class Node extends React.Component {
 
     const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
     const closeTag = (
-      <span style={jsxCloseTagStyle}>&lt;/{name}&gt;</span>
+      <span>
+        <span style={sharedTailBracketStyle}>&lt;</span>
+        <span style={jsxCloseTagStyle}>/{name}</span>
+        <span style={sharedTailBracketStyle}>&gt;</span>
+      </span>
     );
 
     const hasState = !!node.get('state') || !!node.get('context');
@@ -336,7 +346,8 @@ class Node extends React.Component {
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
         <span>
-          <span style={jsxOpenTagStyle}>&lt;{name}</span>
+          <span style={sharedHeadBracketStyle}>&lt;</span>
+          <span style={jsxOpenTagStyle}>{name}</span>
           {node.get('key') &&
             <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
           }
@@ -346,7 +357,7 @@ class Node extends React.Component {
           {node.get('props') &&
             <Props key="props" props={node.get('props')} inverted={headInverted}/>
           }
-          <span style={jsxOpenTagStyle}>&gt;</span>
+          <span style={sharedHeadBracketStyle}>&gt;</span>
         </span>
         {collapsed && <span>…</span>}
         {collapsed && closeTag}
@@ -463,13 +474,13 @@ const headStyle = ({
   if (isSelected && (isCollapsed || !isBottomTagSelected)) {
     backgroundColor = isWindowFocused
       ? theme.base0H
-      : theme.base03;
+      : theme.base0I;
   } else if (isHovered && (isCollapsed || !isBottomTagHovered)) {
-    backgroundColor = theme.base03;
+    backgroundColor = theme.base0J;
   }
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
-  const color = isInverted ? theme.base0I : undefined;
+  const color = isInverted ? theme.base0K : undefined;
 
   return {
     cursor: 'default',
@@ -486,7 +497,7 @@ const headStyle = ({
 const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
   let color;
   if (inverted) {
-    color = theme.base0I;
+    color = theme.base0K;
   } else if (isCustom) {
     color = theme.base08;
   } else {
@@ -501,7 +512,7 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
 const tagTextStyle = (inverted: boolean, theme: Theme) => ({
   flex: 1,
   whiteSpace: 'nowrap',
-  color: inverted ? getInvertedWeak(theme.base0I) : theme.base0F,
+  color: inverted ? getInvertedWeak(theme.base0K) : theme.base0F,
 });
 
 const collapserStyle = (depth: number) => ({
@@ -539,6 +550,10 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
   }
 };
 
+const bracketStyle = (inverted: boolean, theme: Theme) => ({
+  color: inverted ? getInvertedWeak(theme.base0K) : theme.base04,
+});
+
 const highlightStyle = (theme: Theme) => ({
   backgroundColor: theme.base0A,
   color: theme.base07,
@@ -567,9 +582,9 @@ const tailStyle = ({
   if (isSelected && isBottomTagSelected) {
     backgroundColor = isWindowFocused
       ? theme.base0H
-      : theme.base01;
+      : theme.base0I;
   } else if (isHovered && isBottomTagHovered) {
-    backgroundColor = theme.base01;
+    backgroundColor = theme.base0J;
   }
 
   const isInverted = isSelected && isWindowFocused && isBottomTagSelected;

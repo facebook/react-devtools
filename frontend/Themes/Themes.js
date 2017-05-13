@@ -48,7 +48,9 @@ const Apathy: Theme = {
   base0E: '#4C963E',
   base0F: '#3E965B',
   base0H: '#D2E7E4',
-  base0I: '#031A16',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#031A16',
 };
 
 const AtelierForest: Theme = {
@@ -70,7 +72,9 @@ const AtelierForest: Theme = {
   base0E: '#6666ea',
   base0F: '#c33ff3',
   base0H: '#f1efee',
-  base0I: '#1b1918',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#1b1918',
 };
 
 const Bespin: Theme = {
@@ -92,7 +96,9 @@ const Bespin: Theme = {
   base0E: '#9b859d',
   base0F: '#937121',
   base0H: '#baae9e',
-  base0I: '#28211c',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#28211c',
 };
 
 const Chalk: Theme = {
@@ -114,7 +120,9 @@ const Chalk: Theme = {
   base0E: '#e1a3ee',
   base0F: '#deaf8f',
   base0H: '#f5f5f5',
-  base0I: '#151515',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#151515',
 };
 
 const ChromeDark: Theme = {
@@ -137,7 +145,9 @@ const ChromeDark: Theme = {
   base0E: '#9a7fd5',
   base0F: '#9bbbdc',
   base0H: '#c78626',
-  base0I: '#242424',
+  base0I: '#363636',
+  base0J: '#342e24',
+  base0K: '#242424',
 };
 
 // Chrome defaults obtained by inspecting Chrome devtools with another devtools instance
@@ -161,7 +171,9 @@ const ChromeDefault: Theme = {
   base0E: '#aa0d91',
   base0F: '#994500',
   base0H: '#3879d9',
-  base0I: '#ffffff',
+  base0I: '#dadada',
+  base0J: '#ebf1fb',
+  base0K: '#ffffff',
 };
 
 const Darktooth: Theme = {
@@ -183,7 +195,9 @@ const Darktooth: Theme = {
   base0E: '#8F4673',
   base0F: '#A87322',
   base0H: '#FDF4C1',
-  base0I: '#1D2021',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#1D2021',
 };
 
 const Dracula: Theme = {
@@ -205,7 +219,9 @@ const Dracula: Theme = {
   base0E: '#b45bcf',
   base0F: '#00f769',
   base0H: '#00f769',
-  base0I: '#282a36',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#282a36',
 };
 
 const Eighties: Theme = {
@@ -227,7 +243,9 @@ const Eighties: Theme = {
   base0E: '#cc99cc',
   base0F: '#d27b53',
   base0H: '#f2f0ec',
-  base0I: '#2d2d2d',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#2d2d2d',
 };
 
 const FirefoxDark: Theme = {
@@ -250,7 +268,9 @@ const FirefoxDark: Theme = {
   base0E: '#e9f4fe',
   base0F: '#e9f4fe',
   base0H: '#5675b9',
-  base0I: '#ffffff',
+  base0I: '#475983',
+  base0J: '#475983',
+  base0K: '#ffffff',
 };
 
 const Flat: Theme = {
@@ -272,7 +292,9 @@ const Flat: Theme = {
   base0E: '#9B59B6',
   base0F: '#be643c',
   base0H: '#ECF0F1',
-  base0I: '#2C3E50',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#2C3E50',
 };
 
 const GitHub: Theme = {
@@ -294,7 +316,9 @@ const GitHub: Theme = {
   base0E: '#a71d5d',
   base0F: '#333333',
   base0H: '#0084ff',
-  base0I: '#ffffff',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#ffffff',
 };
 
 const GoogleLight: Theme = {
@@ -316,7 +340,9 @@ const GoogleLight: Theme = {
   base0E: '#A36AC7',
   base0F: '#3971ED',
   base0H: '#1d1f21',
-  base0I: '#ffffff',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#ffffff',
 };
 
 const Materia: Theme = {
@@ -338,7 +364,9 @@ const Materia: Theme = {
   base0E: '#82AAFF',
   base0F: '#EC5F67',
   base0H: '#0084ff',
-  base0I: '#263238',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#263238',
 };
 
 const MexicoLight: Theme = {
@@ -360,7 +388,9 @@ const MexicoLight: Theme = {
   base0E: '#96609e',
   base0F: '#a16946',
   base0H: '#22A6ff',
-  base0I: '#f8f8f8',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#f8f8f8',
 };
 
 const Mocha: Theme = {
@@ -382,7 +412,9 @@ const Mocha: Theme = {
   base0E: '#a89bb9',
   base0F: '#bb9584',
   base0H: '#f5eeeb',
-  base0I: '#3B3228',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#3B3228',
 };
 
 const Phd: Theme = {
@@ -404,7 +436,9 @@ const Phd: Theme = {
   base0E: '#9989cc',
   base0F: '#b08060',
   base0H: '#ffffff',
-  base0I: '#061229',
+  base0I: '#TODO',
+  base0J: '#TODO',
+  base0K: '#061229',
 };
 
 module.exports = {

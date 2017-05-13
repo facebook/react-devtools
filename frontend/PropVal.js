@@ -51,7 +51,7 @@ PropVal.contextTypes = {
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
   const style = {
-    color: inverted ? getInvertedWeak(theme.base0I) : theme.base09,
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
   };
 
   if (typeof val === 'number') {
@@ -141,7 +141,7 @@ function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
   var items = {};
   var attrStyle = {
-    color: inverted ? getInvertedWeak(theme.base0I) : theme.base0F,
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base0F,
   };
   names.slice(0, 3).forEach((name, i) => {
     items['k' + i] = <span style={attrStyle}>{name}</span>;
@@ -155,7 +155,7 @@ function previewObject(val, inverted, theme) {
     delete items['m' + (names.length - 1)];
   }
   var style = {
-    color: inverted ? getInvertedWeak(theme.base0I) : theme.base09,
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
   };
   return (
     <span style={style}>
