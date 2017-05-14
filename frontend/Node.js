@@ -607,7 +607,7 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     borderLeftColor = hexToRgba(theme.base0H, 0.45);
   } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = hexToRgba(theme.base04, 0.45);
+    borderLeftColor = hexToRgba(theme.base04, 0.2);
   }
 
   return {
@@ -618,8 +618,12 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     bottom: 0,
     willChange: 'opacity',
     left: calcPaddingLeft(depth) - 7,
-    zIndex: 1,
-  };
+    // Bring it in front of the hovered children, but make sure
+    // hovering over parents doesn't draw on top of selected
+    // guideline even when we've selected the closing tag.
+    // When unsure, refer to how Chrome does it (it's subtle!)
+    zIndex: isSelected ? 1 : 0,
+   };
 };
 
 // Static styles
