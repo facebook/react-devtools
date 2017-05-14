@@ -376,7 +376,10 @@ const loadingStyle = (theme: Theme) => ({
   textAlign: 'center',
   padding: 30,
   flex: 1,
-  color: theme.base05,
+
+  // This color is hard-coded to match app.html and standalone.js
+  // Without it, the loading headers change colors and look weird
+  color: '#aaa',
 });
 
 module.exports = Panel;

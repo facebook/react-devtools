@@ -325,8 +325,8 @@ class Node extends React.Component {
     const closeTagBracketStyle = collapsed ? sharedHeadBracketStyle : sharedTailBracketStyle;
     const closeTag = (
       <span>
-        <span style={closeTagBracketStyle}>&lt;</span>
-        <span style={jsxCloseTagStyle}>/{name}</span>
+        <span style={closeTagBracketStyle}>&lt;/</span>
+        <span style={jsxCloseTagStyle}>{name}</span>
         <span style={closeTagBracketStyle}>&gt;</span>
       </span>
     );
@@ -604,10 +604,10 @@ const tailStyle = ({
 const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Theme) => {
   let borderLeftColor = 'transparent';
   if (isSelected) {
-    borderLeftColor = hexToRgba(theme.base0H, 0.25);
+    borderLeftColor = hexToRgba(theme.base0H, 0.45);
   } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
-    borderLeftColor = theme.base03;
+    borderLeftColor = hexToRgba(theme.base04, 0.45);
   }
 
   return {
@@ -618,6 +618,7 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     bottom: 0,
     willChange: 'opacity',
     left: calcPaddingLeft(depth) - 7,
+    zIndex: 1,
   };
 };
 

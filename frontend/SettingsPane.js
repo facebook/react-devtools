@@ -264,15 +264,13 @@ const baseInputStyle = (theme: Theme) => ({
 
 const highlightedInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
-  border: `1px solid ${theme.base0H}`,
-  boxShadow: `0 0 1px 1px ${theme.base0H}`,
+  border: `1px solid ${hexToRgba(theme.base0H, 0.75)}`,
 });
 
 const errorInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
   backgroundColor: hexToRgba(theme.base0C, 0.1),
   border: `1px solid ${theme.base0C}`,
-  boxShadow: `0 0 1px 1px ${theme.base0C}`,
 });
 
 var styles = {

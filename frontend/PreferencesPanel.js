@@ -86,7 +86,7 @@ class PreferencesPanel extends React.Component {
               ref={this._setSelectRef}
               value={themeName}
             >
-              {!showHiddenThemes && (<option value="">default</option>)}
+              {!showHiddenThemes && (<option value="">Match browser</option>)}
               {!showHiddenThemes && (<option disabled="disabled">---</option>)}
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
