@@ -623,7 +623,7 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     // guideline even when we've selected the closing tag.
     // When unsure, refer to how Chrome does it (it's subtle!)
     zIndex: isSelected ? 1 : 0,
-   };
+  };
 };
 
 // Static styles
