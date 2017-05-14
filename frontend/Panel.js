@@ -18,20 +18,21 @@ var invariant = require('./invariant');
 var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
 
 var consts = require('../agent/consts');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 
 export type Props = {
   alreadyFoundReact: boolean,
   themeName?: string,
+  showHiddenThemes?: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
   preferencesPanelShown?: boolean,
 
@@ -93,8 +94,10 @@ class Panel extends React.Component {
 
   getChildContext(): Object {
     return {
+      showHiddenThemes: !!this.props.showHiddenThemes,
       store: this._store,
       theme: this._store && this._store.theme || Themes.ChromeDefault,
+      themeName: this._store && this._store.themeName || '',
       themes: this._store && this._store.themes || {},
     };
   }
@@ -228,8 +231,9 @@ class Panel extends React.Component {
         });
       });
       this._store.on('theme', () => {
+        // Force a deep re-render when theme changes
         this.setState({
-          themeName: this._store.theme.name,
+          themeName: this._store.theme.displayName,
         });
       });
     });
@@ -336,8 +340,10 @@ class Panel extends React.Component {
 }
 
 Panel.childContextTypes = {
+  showHiddenThemes: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,
   theme: React.PropTypes.object.isRequired,
+  themeName: React.PropTypes.string.isRequired,
   themes: React.PropTypes.object.isRequired,
 };
 
@@ -358,19 +364,22 @@ var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
   );
 };
 
-const containerStyle = (theme: Base16Theme) => ({
+const containerStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
   padding: '0.25rem',
   marginBottom: '0.25rem',
   flexShrink: 0,
 });
-const loadingStyle = (theme: Base16Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
-  fontSize: Fonts.sansSerif.sizes.large,
+const loadingStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
   textAlign: 'center',
   padding: 30,
   flex: 1,
-  color: theme.base05,
+
+  // This color is hard-coded to match app.html and standalone.js
+  // Without it, the loading headers change colors and look weird
+  color: '#aaa',
 });
 
 module.exports = Panel;

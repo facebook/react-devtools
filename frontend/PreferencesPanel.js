@@ -13,23 +13,36 @@
 const React = require('react');
 
 const decorate = require('./decorate');
-const Fonts = require('./Themes/Fonts');
-const {hexToRgba} = require('./Themes/utils');
+const {sansSerif} = require('./Themes/Fonts');
+const Preview = require('./Themes/Preview');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 
 class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
-    theme: Base16Theme,
-    themes: { [key: string]: Base16Theme },
+    showHiddenThemes: boolean,
+    theme: Theme,
+    themeName: string,
+    themes: { [key: string]: Theme },
   };
   props: {
     changeTheme: (themeName: string) => void,
     hide: () => void,
     open: bool,
   };
+  state: {
+    previewMode: bool,
+  };
+
+  constructor(props, context) {
+    super(props, context);
+
+    this.state = {
+      previewMode: false,
+    };
+  }
 
   componentDidMount(prevProps, prevState) {
     if (this.props.open) {
@@ -44,32 +57,48 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {theme, themes} = this.context;
-    const {changeTheme, hide, open} = this.props;
+    const {showHiddenThemes, theme, themeName, themes} = this.context;
+    const {hide, open} = this.props;
+    const {previewMode} = this.state;
 
     if (!open) {
       return null;
     }
 
-    const themeKeys = Object.keys(themes)
-      .filter(key => !key.includes('Chrome') && !key.includes('Firefox'));
+    let content;
+    if (previewMode) {
+      content = (
+        <Preview theme={theme} />
+      );
+    } else {
+      let themeNames = Object.keys(themes);
+      if (!showHiddenThemes) {
+        themeNames = themeNames.filter(key => !themes[key].hidden);
+      }
 
-    return (
-      <div style={styles.backdrop} onClick={hide}>
+      content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
           <h4 style={styles.header}>Theme</h4>
-          <select
-            onChange={changeTheme}
-            onKeyUp={this._onKeyUp}
-            ref={this._setSelectRef}
-            value={theme.name}
-          >
-            <option value="">default</option>
-            <option disabled="disabled">---</option>
-            {themeKeys.map(key => (
-              <option key={key} value={key}>{themes[key].name}</option>
-            ))}
-          </select>
+          <div style={styles.selectAndPreviewRow}>
+            <select
+              onChange={this._changeTheme}
+              onKeyUp={this._onKeyUp}
+              ref={this._setSelectRef}
+              value={themeName}
+            >
+              {!showHiddenThemes && (<option value="">Match browser</option>)}
+              {!showHiddenThemes && (<option disabled="disabled">---</option>)}
+              {themeNames.map(key => (
+                <option key={key} value={key}>{themes[key].displayName}</option>
+              ))}
+            </select>
+            <button
+              onClick={this._onPreviewClick}
+              style={styles.previewButton}
+            >
+              <PreviewIcon />
+            </button>
+          </div>
           <button
             onClick={hide}
             style={styles.closeButton}
@@ -77,14 +106,53 @@ class PreferencesPanel extends React.Component {
             Close
           </button>
         </div>
+      );
+    }
+
+    return (
+      <div style={styles.backdrop} onClick={this._hide}>
+        {content}
       </div>
     );
   }
+
+  _changeTheme = (event) => {
+    const {showHiddenThemes, themes} = this.context;
+    const {changeTheme} = this.props;
+
+    const themeName = event.target.value;
+    const theme = themes[themeName];
+
+    if (!themeName || !theme || (theme.hidden && !showHiddenThemes)) {
+      changeTheme('');
+    } else {
+      changeTheme(themeName);
+    }
+  };
+
+  _hide = () => {
+    const {hide} = this.props;
+    const {previewMode} = this.state;
+
+    if (previewMode) {
+      this.setState({
+        previewMode: false,
+      });
+    } else {
+      hide();
+    }
+  };
 
   _onKeyUp = ({ key }) => {
     if (key === 'Escape') {
       this.props.hide();
     }
+  };
+
+  _onPreviewClick = () => {
+    this.setState(state => ({
+      previewMode: !state.previewMode,
+    }));
   };
 
   _setSelectRef = (ref) => {
@@ -93,7 +161,9 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
+  showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
+  themeName: React.PropTypes.string.isRequired,
   themes: React.PropTypes.object.isRequired,
 };
 PreferencesPanel.propTypes = {
@@ -101,6 +171,19 @@ PreferencesPanel.propTypes = {
   hide: React.PropTypes.func,
   open: React.PropTypes.bool,
 };
+
+const PreviewIcon = () => (
+  <svg
+    style={styles.previewIcon}
+    viewBox="0 0 24 24"
+  >
+    <path d="
+      M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,
+      1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,
+      12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z
+    " />
+  </svg>
+);
 
 const blockClick = event => event.stopPropagation();
 
@@ -110,15 +193,14 @@ const WrappedPreferencesPanel = decorate({
   },
   props(store, props) {
     return {
-      changeTheme: event => store.changeTheme(event.target.value),
+      changeTheme: themeName => store.changeTheme(themeName),
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
     };
   },
 }, PreferencesPanel);
 
-const panelStyle = (theme: Base16Theme) => ({
-  width: '150px',
+const panelStyle = (theme: Theme) => ({
   maxWidth: '100%',
   margin: '0.5rem',
   padding: '0.5rem',
@@ -127,9 +209,9 @@ const panelStyle = (theme: Base16Theme) => ({
   flexDirection: 'column',
   alignItems: 'flex-start',
   zIndex: 1,
-  fontFamily: Fonts.sansSerif.family,
+  fontFamily: sansSerif.family,
   backgroundColor: theme.base01,
-  border: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
+  border: `1px solid ${theme.base03}`,
   color: theme.base05,
 });
 
@@ -149,7 +231,23 @@ const styles = {
   closeButton: {
     marginTop: '0.5rem',
     padding: '0.25rem',
-    borderRadius: '0.25rem',
+  },
+  selectAndPreviewRow: {
+    display: 'flex',
+    direction: 'row',
+    alignItems: 'center',
+  },
+  previewButton: {
+    marginLeft: '0.25rem',
+    background: 'none',
+    border: 'none',
+    color: 'inherit',
+    cursor: 'pointer',
+  },
+  previewIcon: {
+    fill: 'currentColor',
+    width: '1rem',
+    height: '1rem',
   },
 };
 

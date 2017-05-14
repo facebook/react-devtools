@@ -15,13 +15,14 @@ var ReactDOM = require('react-dom');
 
 var consts = require('../agent/consts');
 var createFragment = require('react-addons-create-fragment');
+var {getInvertedWeak} = require('./Themes/utils');
 var flash = require('./flash');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 
 class PropVal extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Theme,
   };
   props: {
     val: any,
@@ -48,77 +49,67 @@ PropVal.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16Theme) {
-  var style;
+function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
+  let style = {
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
+  };
 
   if (typeof val === 'number') {
-    style = {
-      color: inverted ? theme.base04 : theme.base09,
-    };
     return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
 
-    style = {
-      color: inverted ? theme.base04 : theme.base0B,
-    };
     return (
       <span style={style}>"{val}"</span>
     );
   }
   if (typeof val === 'boolean') {
-    style = {
-      color: inverted ? theme.base04 : theme.base09,
-    };
     return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (nested) {
-      style = {
-        color: inverted ? theme.base04 : theme.base09,
-      };
       return <span style={style}>[({val.length})]</span>;
     }
     return previewArray(val, inverted, theme);
   }
   if (!val) {
     style = {
-      color: inverted ? theme.base04 : theme.base03,
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base03,
     };
     return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
     style = {
-      color: inverted ? theme.base04 : theme.base03,
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
     };
     return <span style={style}>…</span>;
   }
 
   switch (val[consts.type]) {
     case 'date': {
-      style = {
-        color: inverted ? theme.base04 : theme.base05,
-      };
       return <span style={style}>{val[consts.name]}</span>;
     }
     case 'function': {
       style = {
-        color: inverted ? theme.base04 : theme.base0D,
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
       };
       return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
     case 'object': {
-      style = {
-        color: inverted ? theme.base04 : theme.base09,
-      };
       return <span style={style}>{val[consts.name] + '{…}'}</span>;
     }
     case 'array': {
       style = {
-        color: inverted ? theme.base04 : theme.base09,
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
       };
       return <span style={style}>Array[{val[consts.meta].length}]</span>;
     }
@@ -126,19 +117,19 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
     case 'array_buffer':
     case 'data_view': {
       style = {
-        color: inverted ? theme.base04 : theme.base05,
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
       };
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
-      style = {
-        color: inverted ? theme.base04 : theme.base05,
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
       };
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
-      style = {
-        color: inverted ? theme.base04 : theme.base05,
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
       };
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
@@ -146,8 +137,8 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Base16
   }
 
   if (nested) {
-    style = {
-      color: inverted ? theme.base04 : theme.base05,
+    style = {    
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
     };
     return <span style={style}>{'{…}'}</span>;
   }
@@ -167,7 +158,7 @@ function previewArray(val, inverted, theme) {
     delete items['c' + (val.length - 1)];
   }
   var style = {
-    color: inverted ? theme.base04 : theme.base09,
+    color: inverted ? theme.base03 : theme.base09,
   };
   return (
     <span style={style}>
@@ -180,7 +171,7 @@ function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
   var items = {};
   var attrStyle = {
-    color: inverted ? theme.base02 : theme.base0F,
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base0F,
   };
   names.slice(0, 3).forEach((name, i) => {
     items['k' + i] = <span style={attrStyle}>{name}</span>;
@@ -194,7 +185,7 @@ function previewObject(val, inverted, theme) {
     delete items['m' + (names.length - 1)];
   }
   var style = {
-    color: inverted ? theme.base04 : theme.base09,
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
   };
   return (
     <span style={style}>

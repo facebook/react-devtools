@@ -17,7 +17,7 @@ var HighlightHover = require('./HighlightHover');
 
 var decorate = require('./decorate');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 
 export type MenuItem = {
   key: string,
@@ -29,7 +29,7 @@ class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
   context: {
-    theme: Base16Theme,
+    theme: Theme,
   };
 
   props: {
@@ -140,7 +140,7 @@ var Wrapped = decorate({
 }, ContextMenu);
 
 
-const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
+const containerStyle = (xPos: number, yPos: number, theme: Theme) => ({
   top: `${yPos}px`,
   left: `${xPos}px`,
   position: 'fixed',
@@ -155,12 +155,12 @@ const containerStyle = (xPos: number, yPos: number, theme: Base16Theme) => ({
   backgroundColor: theme.base01,
 });
 
-const emptyStyle = (theme: Base16Theme) => ({
+const emptyStyle = (theme: Theme) => ({
   padding: '0.25rem 0.5rem',
   color: theme.base03,
 });
 
-const listItemStyle = (theme: Base16Theme) => ({
+const listItemStyle = (theme: Theme) => ({
   color: theme.base05,
 });
 

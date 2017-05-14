@@ -13,13 +13,12 @@
 var React = require('react');
 var decorate = require('./decorate');
 var {sansSerif} = require('./Themes/Fonts');
-var {hexToRgba} = require('./Themes/utils');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 
 class TabbedPane extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Theme,
   };
   props: {
     tabs: {[key: string]: () => React$Element},
@@ -58,18 +57,18 @@ TabbedPane.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const tabsStyle = (theme: Base16Theme) => ({
+const tabsStyle = (theme: Theme) => ({
   display: 'flex',
   flexShrink: 0,
   listStyle: 'none',
   margin: 0,
   backgroundColor: theme.base00,
-  borderBottom: `1px solid ${hexToRgba(theme.base05, 0.1)}`,
+  borderBottom: `1px solid ${theme.base03}`,
   padding: '0.25rem 0.25rem 0 0.25rem',
 });
 
-const tabStyle = (isSelected: boolean, theme: Base16Theme) => {
-  const border = isSelected ? `1px solid ${hexToRgba(theme.base05, 0.1)}` : 'none';
+const tabStyle = (isSelected: boolean, theme: Theme) => {
+  const border = isSelected ? `1px solid ${theme.base03}` : 'none';
 
   return {
     padding: '0.25rem 0.5rem',

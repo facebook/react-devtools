@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Base16Theme, DOMEvent} from '../types';
+import type {Theme, DOMEvent} from '../types';
 
 var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
@@ -34,7 +34,7 @@ type DataViewProps = {
 
 class DataView extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Theme,
   };
   props: DataViewProps;
 
@@ -142,7 +142,7 @@ DataView.contextTypes = {
 class DataItem extends React.Component {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
-    theme: Base16Theme,
+    theme: Theme,
   };
   props: {
     path: Array<string>,
@@ -307,13 +307,13 @@ function alphanumericSort(a: string, b: string): number {
   return (a < b) ? -1 : 1;
 }
 
-const nameStyle = (isComplex: boolean, theme: Base16Theme) => ({
+const nameStyle = (isComplex: boolean, theme: Theme) => ({
   cursor: isComplex ? 'pointer' : 'default',
   color: theme.base0C,
   margin: '2px 3px',
 });
 
-const previewStyle = (theme: Base16Theme) => ({
+const previewStyle = (theme: Theme) => ({
   display: 'flex',
   margin: '2px 3px',
   whiteSpace: 'pre',
@@ -322,13 +322,16 @@ const previewStyle = (theme: Base16Theme) => ({
   color: theme.base09,
 });
 
-const emptyStyle = (theme: Base16Theme) => ({
+const emptyStyle = (theme: Theme) => ({
   marginLeft: 10,
-  padding: '2px 5px',
-  color: theme.base02,
+  padding: '0 5px',
+  color: theme.base04,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
+  fontStyle: 'italic',
 });
 
-const missingStyle = (theme: Base16Theme) => ({
+const missingStyle = (theme: Theme) => ({
   fontSize: sansSerif.sizes.normal,
   fontWeight: 'bold',
   marginLeft: 10,
@@ -336,7 +339,7 @@ const missingStyle = (theme: Base16Theme) => ({
   color: theme.base03,
 });
 
-const collapsedArrowStyle = (theme: Base16Theme) => ({
+const collapsedArrowStyle = (theme: Theme) => ({
   borderColor: `transparent transparent transparent ${theme.base03}`,
   borderStyle: 'solid',
   borderWidth: '4px 0 4px 7px',
@@ -345,7 +348,7 @@ const collapsedArrowStyle = (theme: Base16Theme) => ({
   verticalAlign: 'top',
 });
 
-const expandedArrowStyle = (theme: Base16Theme) => ({
+const expandedArrowStyle = (theme: Theme) => ({
   borderColor: `${theme.base03} transparent transparent transparent`,
   borderStyle: 'solid',
   borderWidth: '7px 4px 0 4px',
@@ -354,7 +357,7 @@ const expandedArrowStyle = (theme: Base16Theme) => ({
   verticalAlign: 'top',
 });
 
-const sparseArrayHoleStyle = (theme: Base16Theme) => ({
+const sparseArrayHoleStyle = (theme: Theme) => ({
   fontStyle: 'italic',
   color: theme.base03,
   margin: '2px 3px',

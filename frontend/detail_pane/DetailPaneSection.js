@@ -12,11 +12,11 @@
 
 var React = require('react');
 
-import type {Base16Theme} from '../types';
+import type {Theme} from '../types';
 
 class DetailPaneSection extends React.Component {
   context: {
-    theme: Base16Theme,
+    theme: Theme,
   };
 
   render(): React.Element {
@@ -36,7 +36,7 @@ DetailPaneSection.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const sectionStyle = (theme: Base16Theme) => ({
+const sectionStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
   padding: '0.5rem',
   flexShrink: 0,
@@ -44,7 +44,9 @@ const sectionStyle = (theme: Base16Theme) => ({
 
 var styles = {
   title: {
-    marginRight: 7,
+    display: 'inline-block',
+    marginBottom: '0.5rem',
+    marginRight: '0.25rem',
   },
 };
 

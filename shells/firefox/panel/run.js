@@ -21,12 +21,13 @@ var node = document.getElementById('container');
 ReactDOM.render(<h2 id="message">Looking for React...</h2>, node);
 var port = {};
 
-// TODO (bvaughn) Read default :themeName and parameterize <Panel>
+// TODO (bvaughn) Read default :themeName and switch between 'FirefoxDefault' and 'FirefoxDark'
 // Refer to 'shells/chrome/src/panel.js' for an example
+const themeName = 'FirefoxDefault';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);
-  ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
+  ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);
 }
 
 window.addEventListener('message', function(event) {

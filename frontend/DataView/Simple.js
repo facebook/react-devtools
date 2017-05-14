@@ -14,9 +14,9 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var flash = require('../flash');
-var Fonts = require('../Themes/Fonts');
+var {monospace} = require('../Themes/Fonts');
 
-import type {Base16Theme, DOMEvent, DOMNode} from '../types';
+import type {Theme, DOMEvent, DOMNode} from '../types';
 
 type State = {
   editing: boolean,
@@ -26,7 +26,7 @@ type State = {
 class Simple extends React.Component {
   context: {
     onChange: (path: Array<any>, value: any) => void,
-    theme: Base16Theme,
+    theme: Theme,
   };
   state: State;
   input: DOMNode;
@@ -151,7 +151,7 @@ Simple.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-const inputStyle = (theme: Base16Theme) => ({
+const inputStyle = (theme: Theme) => ({
   flex: 1,
   minWidth: 50,
   boxSizing: 'border-box',
@@ -159,11 +159,11 @@ const inputStyle = (theme: Base16Theme) => ({
   padding: 0,
   outline: 'none',
   boxShadow: `0 0 3px ${theme.base02}`,
-  fontFamily: Fonts.monospace.family,
+  fontFamily: monospace.family,
   fontSize: 'inherit',
 });
 
-const simpleStyle = (readOnly: boolean, theme: Base16Theme) => ({
+const simpleStyle = (readOnly: boolean, theme: Theme) => ({
   display: 'flex',
   flex: 1,
   whiteSpace: 'pre-wrap',

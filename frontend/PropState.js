@@ -14,19 +14,19 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
-import type {Base16Theme} from './types';
+import type {Theme} from './types';
 
 class PropState extends React.Component {
   context: {
     onChange: () => void,
-    theme: Base16Theme,
+    theme: Theme,
   };
 
   getChildContext() {
@@ -211,13 +211,15 @@ var WrappedPropState = decorate({
   },
 }, PropState);
 
-const emptyStyle = (theme: Base16Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
+const emptyStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
+  fontStyle: 'italic',
   margin: 'auto',
-  color: theme.base03,
+  color: theme.base04,
 });
 
-const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
+const sourceStyle = (hasViewElementSource: boolean, theme: Theme) => ({
   padding: '0.25rem 0.5rem',
   color: theme.base05,
   overflow: 'auto',
@@ -225,13 +227,13 @@ const sourceStyle = (hasViewElementSource: boolean, theme: Base16Theme) => ({
   cursor: hasViewElementSource ? 'pointer' : 'default',
 });
 
-const sourcePosStyle = (theme: Base16Theme) => ({
+const sourcePosStyle = (theme: Theme) => ({
   color: theme.base03,
 });
 
-const noPropsStateStyle = (theme: Base16Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
-  fontSize: Fonts.sansSerif.sizes.normal,
+const noPropsStateStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
   color: theme.base03,
   textAlign: 'center',
   fontStyle: 'italic',
