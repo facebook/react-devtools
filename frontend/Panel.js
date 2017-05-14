@@ -18,7 +18,7 @@ var invariant = require('./invariant');
 var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
-var Fonts = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
@@ -371,8 +371,8 @@ const containerStyle = (theme: Theme) => ({
   flexShrink: 0,
 });
 const loadingStyle = (theme: Theme) => ({
-  fontFamily: Fonts.sansSerif.family,
-  fontSize: Fonts.sansSerif.sizes.large,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
   textAlign: 'center',
   padding: 30,
   flex: 1,

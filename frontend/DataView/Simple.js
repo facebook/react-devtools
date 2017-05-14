@@ -14,7 +14,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var flash = require('../flash');
-var Fonts = require('../Themes/Fonts');
+var {monospace} = require('../Themes/Fonts');
 
 import type {Theme, DOMEvent, DOMNode} from '../types';
 
@@ -159,7 +159,7 @@ const inputStyle = (theme: Theme) => ({
   padding: 0,
   outline: 'none',
   boxShadow: `0 0 3px ${theme.base02}`,
-  fontFamily: Fonts.monospace.family,
+  fontFamily: monospace.family,
   fontSize: 'inherit',
 });
 
