@@ -122,15 +122,24 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+      };
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+      };
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
     }
   }
 
   if (nested) {
+    style = {    
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+    };
     return <span style={style}>{'{…}'}</span>;
   }
 
