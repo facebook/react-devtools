@@ -322,11 +322,12 @@ class Node extends React.Component {
     }
 
     const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
+    const closeTagBracketStyle = collapsed ? sharedHeadBracketStyle : sharedTailBracketStyle;
     const closeTag = (
       <span>
-        <span style={sharedTailBracketStyle}>&lt;</span>
+        <span style={closeTagBracketStyle}>&lt;</span>
         <span style={jsxCloseTagStyle}>/{name}</span>
-        <span style={sharedTailBracketStyle}>&gt;</span>
+        <span style={closeTagBracketStyle}>&gt;</span>
       </span>
     );
 

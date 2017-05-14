@@ -115,6 +115,7 @@ const fauxStore = {
   onSelectBottom: noop,
   onToggleCollapse: noop,
   setHover: noop,
+  selectBottom: noop,
   selectTop: noop,
 };
 

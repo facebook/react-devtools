@@ -50,7 +50,7 @@ PropVal.contextTypes = {
 };
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
-  const style = {
+  let style = {
     color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
   };
 
@@ -58,6 +58,9 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
     return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
@@ -70,15 +73,24 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
     return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (nested) {
       return <span style={style}>[({val.length})]</span>;
     }
     return previewArray(val, inverted, theme);
   }
   if (!val) {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base03,
+    };
     return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
+    };
     return <span style={style}>…</span>;
   }
 
@@ -87,17 +99,26 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
       return <span style={style}>{val[consts.name]}</span>;
     }
     case 'function': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
+      };
       return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
     case 'object': {
       return <span style={style}>{val[consts.name] + '{…}'}</span>;
     }
     case 'array': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+      };
       return <span style={style}>Array[{val[consts.meta].length}]</span>;
     }
     case 'typed_array':
     case 'array_buffer':
     case 'data_view': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+      };
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
