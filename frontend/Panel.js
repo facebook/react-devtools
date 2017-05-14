@@ -97,6 +97,7 @@ class Panel extends React.Component {
       showHiddenThemes: !!this.props.showHiddenThemes,
       store: this._store,
       theme: this._store && this._store.theme || Themes.ChromeDefault,
+      themeName: this._store && this._store.themeName || '',
       themes: this._store && this._store.themes || {},
     };
   }
@@ -230,8 +231,9 @@ class Panel extends React.Component {
         });
       });
       this._store.on('theme', () => {
+        // Force a deep re-render when theme changes
         this.setState({
-          themeName: this._store.theme.name,
+          themeName: this._store.theme.displayName,
         });
       });
     });
@@ -341,6 +343,7 @@ Panel.childContextTypes = {
   showHiddenThemes: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,
   theme: React.PropTypes.object.isRequired,
+  themeName: React.PropTypes.string.isRequired,
   themes: React.PropTypes.object.isRequired,
 };
 

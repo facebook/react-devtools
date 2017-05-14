@@ -23,7 +23,7 @@ var port = {};
 
 // TODO (bvaughn) Read default :themeName and switch between 'FirefoxDefault' and 'FirefoxDark'
 // Refer to 'shells/chrome/src/panel.js' for an example
-const themeName = 'FirefoxDefault'
+const themeName = 'FirefoxDefault';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);

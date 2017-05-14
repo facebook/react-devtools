@@ -108,6 +108,7 @@ class Store extends EventEmitter {
   selectedTab: string;
   selected: ?ElementID;
   theme: Theme;
+  themeName: string;
   themes: { [key: string]: Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
@@ -149,12 +150,13 @@ class Store extends EventEmitter {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const restoredThemeName = ThemeStore.get();
-    const themeName = restoredThemeName && Themes.hasOwnProperty(restoredThemeName)
-      ? restoredThemeName
+    const restoredThemeKey = ThemeStore.get();
+    const themeName = restoredThemeKey && Themes.hasOwnProperty(restoredThemeKey)
+      ? restoredThemeKey
       : this._defaultThemeName;
 
     this.theme = Themes[themeName];
+    this.themeName = themeName;
     this.themes = Themes;
 
     // for debugging
@@ -346,11 +348,12 @@ class Store extends EventEmitter {
 
   changeTheme(themeName: ?string) {
     // Only apply a valid theme.
-    const safeThemeName = themeName && this.themes.hasOwnProperty(themeName)
+    const safeThemeKey = themeName && this.themes.hasOwnProperty(themeName)
       ? themeName
       : this._defaultThemeName;
 
-    this.theme = this.themes[safeThemeName];
+    this.theme = this.themes[safeThemeKey];
+    this.themeName = safeThemeKey;
     this.emit('theme');
 
     // But allow users to restore "default" mode by selecting an empty theme.

@@ -24,6 +24,7 @@ class PreferencesPanel extends React.Component {
   context: {
     showHiddenThemes: boolean,
     theme: Theme,
+    themeName: string,
     themes: { [key: string]: Theme },
   };
   props: {
@@ -56,8 +57,8 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {showHiddenThemes, theme, themes} = this.context;
-    const {changeTheme, hide, open} = this.props;
+    const {showHiddenThemes, theme, themeName, themes} = this.context;
+    const {hide, open} = this.props;
     const {previewMode} = this.state;
 
     if (!open) {
@@ -70,9 +71,9 @@ class PreferencesPanel extends React.Component {
         <Preview theme={theme} />
       );
     } else {
-      let themeKeys = Object.keys(themes);
+      let themeNames = Object.keys(themes);
       if (!showHiddenThemes) {
-        themeKeys = themeKeys.filter(key => !themes[key].hidden);
+        themeNames = themeNames.filter(key => !themes[key].hidden);
       }
 
       content = (
@@ -80,15 +81,15 @@ class PreferencesPanel extends React.Component {
           <h4 style={styles.header}>Theme</h4>
           <div style={styles.selectAndPreviewRow}>
             <select
-              onChange={changeTheme}
+              onChange={this._changeTheme}
               onKeyUp={this._onKeyUp}
               ref={this._setSelectRef}
-              value={theme.name}
+              value={themeName}
             >
-              <option value="">default</option>
-              <option disabled="disabled">---</option>
-              {themeKeys.map(key => (
-                <option key={key} value={key}>{themes[key].name}</option>
+              {!showHiddenThemes && (<option value="">default</option>)}
+              {!showHiddenThemes && (<option disabled="disabled">---</option>)}
+              {themeNames.map(key => (
+                <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
             </select>
             <button
@@ -114,6 +115,20 @@ class PreferencesPanel extends React.Component {
       </div>
     );
   }
+
+  _changeTheme = (event) => {
+    const {showHiddenThemes, themes} = this.context;
+    const {changeTheme} = this.props;
+
+    const themeName = event.target.value;
+    const theme = themes[themeName];
+
+    if (!themeName || !theme || (theme.hidden && !showHiddenThemes)) {
+      changeTheme('');
+    } else {
+      changeTheme(themeName);
+    }
+  };
 
   _hide = () => {
     const {hide} = this.props;
@@ -148,6 +163,7 @@ class PreferencesPanel extends React.Component {
 PreferencesPanel.contextTypes = {
   showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
+  themeName: React.PropTypes.string.isRequired,
   themes: React.PropTypes.object.isRequired,
 };
 PreferencesPanel.propTypes = {
@@ -177,7 +193,7 @@ const WrappedPreferencesPanel = decorate({
   },
   props(store, props) {
     return {
-      changeTheme: event => store.changeTheme(event.target.value),
+      changeTheme: themeName => store.changeTheme(themeName),
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
     };

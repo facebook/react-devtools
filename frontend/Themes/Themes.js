@@ -30,8 +30,8 @@ import type {Theme} from '../types';
  */
 
 const ChromeDark: Theme = {
+  displayName: 'Chrome (dark)',
   hidden: true,
-  name: 'Chrome (dark)',
   base00: '#242424',
   base01: '#2a2a2a',
   base02: '#363636',
@@ -55,8 +55,8 @@ const ChromeDark: Theme = {
 };
 
 const ChromeDefault: Theme = {
+  displayName: 'Chrome (default)',
   hidden: true,
-  name: 'Chrome (default)',
   base00: '#ffffff',
   base01: '#f3f3f3',
   base02: '#eeeeee',
@@ -80,7 +80,7 @@ const ChromeDefault: Theme = {
 };
 
 const Dracula: Theme = {
-  name: 'Dracula',
+  displayName: 'Dracula',
   base00: '#282936',
   base01: '#3a3c4e',
   base02: '#4d4f68',
@@ -104,7 +104,7 @@ const Dracula: Theme = {
 };
 
 const Eighties: Theme = {
-  name: 'Eighties',
+  displayName: 'Eighties',
   base00: '#2d2d2d',
   base01: '#393939',
   base02: '#515151',
@@ -128,8 +128,8 @@ const Eighties: Theme = {
 };
 
 const FirefoxDark: Theme = {
+  displayName: 'Firefox (dark)',
   hidden: true,
-  name: 'Firefox (dark)',
   base00: '#393f4c',
   base01: '#393f4c',
   base02: '#454d5d',
@@ -153,8 +153,8 @@ const FirefoxDark: Theme = {
 };
 
 const FirefoxDefault: Theme = {
+  displayName: 'Firefox (default)',
   hidden: true,
-  name: 'Firefox (default)',
   base00: '#ffffff',
   base01: '#fcfcfc',
   base02: '#dde1e4',
@@ -178,7 +178,7 @@ const FirefoxDefault: Theme = {
 };
 
 const Flat: Theme = {
-  name: 'Flat',
+  displayName: 'Flat',
   base00: '#2C3E50',
   base01: '#34495E',
   base02: '#7F8C8D',
@@ -202,7 +202,7 @@ const Flat: Theme = {
 };
 
 const Materia: Theme = {
-  name: 'Materia',
+  displayName: 'Materia',
   base00: '#263238',
   base01: '#2C393F',
   base02: '#37474F',
@@ -226,7 +226,7 @@ const Materia: Theme = {
 };
 
 const Phd: Theme = {
-  name: 'Phd',
+  displayName: 'Phd',
   base00: '#061229',
   base01: '#2a3448',
   base02: '#4d5666',
@@ -250,8 +250,8 @@ const Phd: Theme = {
 };
 
 module.exports = {
-  ChromeDefault,
   ChromeDark,
+  ChromeDefault,
   Dracula,
   Eighties,
   FirefoxDark,

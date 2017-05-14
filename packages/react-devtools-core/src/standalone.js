@@ -44,7 +44,7 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    ReactDOM.render(<Panel {...config} />, node);
+    ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
   }, 100);
 }
 
