@@ -152,6 +152,31 @@ const FirefoxDark: Theme = {
   base0K: '#ffffff',
 };
 
+const FirefoxDefault: Theme = {
+  hidden: true,
+  name: 'Firefox (default)',
+  base00: '#ffffff',
+  base01: '#fcfcfc',
+  base02: '#dde1e4',
+  base03: '#c1c1c1',
+  base04: '#9a9a9a',
+  base05: '#767676',
+  base06: '#585959',
+  base07: '#585959',
+  base08: '#2e9dd5',
+  base09: '#676bff',
+  base0A: '#EEFF00',
+  base0B: '#5b5fff',
+  base0C: '#393f4c',
+  base0D: '#ed2655',
+  base0E: '#4f88cc',
+  base0F: '#393f4c',
+  base0H: '#4c9ed9',
+  base0I: '#e4f1fa',
+  base0J: '#e4f1fa',
+  base0K: '#f4f7fa',
+};
+
 const Flat: Theme = {
   name: 'Flat',
   base00: '#2C3E50',
@@ -230,6 +255,7 @@ module.exports = {
   Dracula,
   Eighties,
   FirefoxDark,
+  FirefoxDefault,
   Flat,
   Materia,
   Phd,
