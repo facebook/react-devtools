@@ -11,14 +11,10 @@ NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js
 
 mkdir "$PACKAGE_TMP/react-devtools-chrome/"
 rsync -R \
-  build/backend.js \
-  build/background.js \
-  build/contentScript.js \
-  build/inject.js \
-  build/main.js \
-  build/panel.js \
-  icons/icon48.png \
-  icons/icon128.png \
+  build/*.js \
+  icons/*.png \
+  popups/*.html \
+  popups/*.js \
   main.html \
   manifest.json \
   panel.html \

@@ -12,6 +12,7 @@
 
 var React = require('react');
 var decorate = require('../../frontend/decorate');
+var {sansSerif} = require('../../frontend/Themes/Fonts');
 var QueryList = require('./QueryList');
 var QueryViewer = require('./QueryViewer');
 var SplitPane = require('../../frontend/SplitPane');
@@ -28,8 +29,10 @@ class QueriesTab extends React.Component {
       contents = (
         <SplitPane
           initialWidth={500}
+          initialHeight={500}
           left={() => <QueryList />}
           right={() => <QueryViewer />}
+          isVertical={false}
         />
       );
     }
@@ -44,8 +47,8 @@ class QueriesTab extends React.Component {
 
 var styles = {
   container: {
-    fontFamily: 'Menlo, sans-serif',
-    fontSize: 12,
+    fontFamily: sansSerif.family,
+    fontSize: sansSerif.sizes.normal,
     flex: 1,
     display: 'flex',
   },

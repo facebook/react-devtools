@@ -11,22 +11,16 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
-var BananaSlugBackendManager = require('../../../plugins/BananaSlug/BananaSlugBackendManager');
+var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
-var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+var setupHighlighter = require('../../../frontend/Highlighter/setup');
 var setupRelay = require('../../../plugins/Relay/backend');
-
-// TODO: check to see if we're in RN before doing this?
-setInterval(function() {
-  // this is needed to force refresh on react native
-}, 100);
-
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
-  if (evt.data.source !== 'react-devtools-content-script') {
+  if (evt.source !== window || evt.data.source !== 'react-devtools-content-script') {
     return;
   }
 
@@ -40,7 +34,7 @@ function setup(hook) {
   var wall = {
     listen(fn) {
       var listener = evt => {
-        if (evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
+        if (evt.source !== window || !evt.data || evt.data.source !== 'react-devtools-content-script' || !evt.data.payload) {
           return;
         }
         fn(evt.data.payload);
@@ -56,11 +50,13 @@ function setup(hook) {
     },
   };
 
-  var isReactNative = !!hook.resolveRNStyle;
+  // Note: this is only useful for react-native-web (and equivalents).
+  // They would have to set this field directly on the hook.
+  var isRNStyleEnabled = !!hook.resolveRNStyle;
 
   var bridge = new Bridge(wall);
   var agent = new Agent(window, {
-    rnStyle: isReactNative,
+    rnStyle: isRNStyleEnabled,
   });
   agent.addBridge(bridge);
 
@@ -68,7 +64,7 @@ function setup(hook) {
     inject(hook, agent);
   });
 
-  if (isReactNative) {
+  if (isRNStyleEnabled) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
 
@@ -82,9 +78,6 @@ function setup(hook) {
     listeners = [];
   });
 
-  if (!isReactNative) {
-    setupHighlighter(agent);
-  }
-
-  BananaSlugBackendManager.init(agent);
+  setupHighlighter(agent);
+  TraceUpdatesBackendManager.init(agent);
 }

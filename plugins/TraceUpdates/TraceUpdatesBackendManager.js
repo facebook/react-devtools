@@ -11,23 +11,23 @@
 
 'use strict';
 
-const BananaSlugAbstractNodeMeasurer = require('./BananaSlugAbstractNodeMeasurer');
-const BananaSlugAbstractNodePresenter = require('./BananaSlugAbstractNodePresenter');
-const BananaSlugWebNodeMeasurer = require('./BananaSlugWebNodeMeasurer');
-const BananaSlugWebNodePresenter = require('./BananaSlugWebNodePresenter');
+const TraceUpdatesAbstractNodeMeasurer = require('./TraceUpdatesAbstractNodeMeasurer');
+const TraceUpdatesAbstractNodePresenter = require('./TraceUpdatesAbstractNodePresenter');
+const TraceUpdatesWebNodeMeasurer = require('./TraceUpdatesWebNodeMeasurer');
+const TraceUpdatesWebNodePresenter = require('./TraceUpdatesWebNodePresenter');
 
 import type {
   Agent,
   Measurement,
   Measurer,
   Presenter,
-} from './BananaSlugTypes';
+} from './TraceUpdatesTypes';
 
 import type {ControlState} from '../../frontend/types.js';
 
 const NODE_TYPE_COMPOSITE = 'Composite';
 
-class BananaSlugBackendManager {
+class TraceUpdatesBackendManager {
   _onMeasureNode: () => void;
   _measurer: Measurer;
   _presenter: Presenter;
@@ -39,15 +39,15 @@ class BananaSlugBackendManager {
     var useDOM = agent.capabilities.dom;
 
     this._measurer = useDOM ?
-      new BananaSlugWebNodeMeasurer() :
-      new BananaSlugAbstractNodeMeasurer();
+      new TraceUpdatesWebNodeMeasurer() :
+      new TraceUpdatesAbstractNodeMeasurer();
 
     this._presenter = useDOM ?
-      new BananaSlugWebNodePresenter() :
-      new BananaSlugAbstractNodePresenter();
+      new TraceUpdatesWebNodePresenter() :
+      new TraceUpdatesAbstractNodePresenter();
 
     this._isActive = false;
-    agent.on('bananaslugchange', this._onBananaSlugChange.bind(this));
+    agent.on('traceupdatesstatechange', this._onTraceUpdatesStateChange.bind(this));
     agent.on('update', this._onUpdate.bind(this, agent));
     agent.on('shutdown', this._shutdown.bind(this));
   }
@@ -74,7 +74,7 @@ class BananaSlugBackendManager {
     this._presenter.present(measurement);
   }
 
-  _onBananaSlugChange(state: ControlState): void {
+  _onTraceUpdatesStateChange(state: ControlState): void {
     this._isActive = state.enabled;
     this._presenter.setEnabled(state.enabled);
   }
@@ -85,8 +85,8 @@ class BananaSlugBackendManager {
   }
 }
 
-function init(agent: Agent): BananaSlugBackendManager {
-  return new BananaSlugBackendManager(agent);
+function init(agent: Agent): TraceUpdatesBackendManager {
+  return new TraceUpdatesBackendManager(agent);
 }
 
 module.exports = {

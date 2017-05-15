@@ -11,19 +11,31 @@
 var app = require('electron').app;  // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 var path = require('path');
+var updateNotifier = require('update-notifier');
+var pkg = require('./package.json');
 
 var mainWindow = null;
+var argv = process.argv.slice(2);
 
 app.on('window-all-closed', function() {
   app.quit();
 });
 
 app.on('ready', function() {
+  // notify if there's an update
+  updateNotifier({pkg}).notify({defer: false});
+
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600, icon: path.join(__dirname, 'icons/icon128.png')});
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app.html'); // eslint-disable-line no-path-concat
+  mainWindow.webContents.executeJavaScript(
+    // We use this so that RN can keep relative JSX __source filenames
+    // but "click to open in editor" still works. js1 passes project roots
+    // as the argument to DevTools.
+    'window.devtools.setProjectRoots(' + JSON.stringify(argv) + ')'
+  );
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

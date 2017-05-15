@@ -1,6 +1,6 @@
 {
   "name": "react-devtools-core",
-  "version": "2.0.12",
+  "version": "2.1.9",
   "description": "Use react-devtools outside of the browser",
   "main": "./build/backend.js",
   "repository": {
@@ -24,7 +24,10 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
-    "cross-env": "^3.1.4",
+    "shell-quote": "^1.6.1",
     "ws": "^2.0.3"
+  },
+  "devDependencies": {
+    "cross-env": "^3.1.4"
   }
 }

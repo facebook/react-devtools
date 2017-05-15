@@ -10,12 +10,12 @@
  */
 'use strict';
 
-import type {DOMEvent} from '../types';
+import type {Theme, DOMEvent} from '../types';
 
+var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
 var Simple = require('./Simple');
 
-var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
@@ -33,22 +33,84 @@ type DataViewProps = {
 };
 
 class DataView extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: DataViewProps;
 
+  renderSparseArrayHole(count: number, key: string) {
+    const {theme} = this.context;
+
+    return (
+      <li key={key}>
+        <div style={styles.head}>
+          <div style={sparseArrayHoleStyle(theme)}>
+            undefined × {count}
+          </div>
+        </div>
+      </li>
+    );
+  }
+
+  renderItem(name: string, key: string) {
+    return (
+      <DataItem
+        key={key}
+        name={name}
+        path={this.props.path.concat([name])}
+        startOpen={this.props.startOpen}
+        inspect={this.props.inspect}
+        showMenu={this.props.showMenu}
+        readOnly={this.props.readOnly}
+        value={this.props.data[name]} />
+    );
+  }
+
   render() {
+    const {theme} = this.context;
     var data = this.props.data;
     if (!data) {
-      return <div style={styles.missing}>null</div>;
+      return <div style={missingStyle(theme)}>null</div>;
     }
-    var names = Object.keys(data);
-    if (!this.props.noSort) {
-      names.sort(alphanumericSort);
+
+    var isArray = Array.isArray(data);
+    var elements = [];
+    if (isArray) {
+      // Iterate over array, filling holes with special items
+      var lastIndex = -1;
+      data.forEach((item, i) => {
+        if (lastIndex < i - 1) {
+          // Have we skipped over a hole?
+          var holeCount = (i - 1) - lastIndex;
+          elements.push(
+            this.renderSparseArrayHole(holeCount, i + '-hole')
+          );
+        }
+        elements.push(this.renderItem(i, i));
+        lastIndex = i;
+      });
+      if (lastIndex < data.length - 1) {
+        // Is there a hole at the end?
+        var holeCount = (data.length - 1) - lastIndex;
+        elements.push(
+          this.renderSparseArrayHole(holeCount, lastIndex + '-hole')
+        );
+      }
+    } else {
+      // Iterate over a regular object
+      var names = Object.keys(data);
+      if (!this.props.noSort) {
+        names.sort(alphanumericSort);
+      }
+      names.forEach((name, i) => {
+        elements.push(this.renderItem(name, name));
+      });
     }
-    var path = this.props.path;
-    if (!names.length) {
+
+    if (!elements.length) {
       return (
-        <div style={styles.empty}>
-          {Array.isArray(data) ? 'Empty array' : 'Empty object'}
+        <div style={emptyStyle(theme)}>
+          {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
     }
@@ -57,9 +119,9 @@ class DataView extends React.Component {
       <ul style={styles.container}>
         {data[consts.proto] &&
           <DataItem
-            name={'__proto__'}
-            path={path.concat(['__proto__'])}
             key={'__proto__'}
+            name={'__proto__'}
+            path={this.props.path.concat(['__proto__'])}
             startOpen={this.props.startOpen}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
@@ -67,24 +129,21 @@ class DataView extends React.Component {
             value={this.props.data[consts.proto]}
           />}
 
-        {names.map((name, i) => (
-          <DataItem
-            name={name}
-            path={path.concat([name])}
-            key={name}
-            startOpen={this.props.startOpen}
-            inspect={this.props.inspect}
-            showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
-            value={this.props.data[name]}
-          />
-        ))}
+        {elements}
       </ul>
     );
   }
 }
 
+DataView.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 class DataItem extends React.Component {
+  context: {
+    onChange: (path: Array<string>, checked: boolean) => void,
+    theme: Theme,
+  };
   props: {
     path: Array<string>,
     inspect: Inspect,
@@ -136,10 +195,14 @@ class DataItem extends React.Component {
     });
   }
 
+  toggleBooleanValue(e) {
+    this.context.onChange(this.props.path, e.target.checked);
+  }
+
   render() {
+    const {theme} = this.context;
     var data = this.props.value;
     var otype = typeof data;
-
     var complex = true;
     var preview;
     if (otype === 'number' || otype === 'string' || data == null /* null or undefined */ || otype === 'boolean') {
@@ -152,35 +215,46 @@ class DataItem extends React.Component {
       );
       complex = false;
     } else {
-      preview = previewComplex(data);
+      preview = previewComplex(data, theme);
     }
 
-    var open = this.state.open && (!data || data[consts.inspected] !== false);
-
+    var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
+    var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
-    if (complex) {
+
+    if (complex && inspectable) {
       opener = (
         <div
           onClick={this.toggleOpen.bind(this)}
           style={styles.opener}>
           {open ?
-            <span style={styles.expandedArrow} /> :
-            <span style={styles.collapsedArrow} />}
+            <span style={expandedArrowStyle(theme)} /> :
+            <span style={collapsedArrowStyle(theme)} />}
         </div>
+      );
+    } else if (otype === 'boolean' && !this.props.readOnly) {
+      opener = (
+        <input
+          checked={data}
+          onChange={this.toggleBooleanValue.bind(this)}
+          style={styles.toggler}
+          type="checkbox"
+        />
       );
     }
 
     var children = null;
     if (complex && open) {
+      var readOnly = this.props.readOnly || (data[consts.meta] && data[consts.meta].readOnly);
       // TODO path
       children = (
         <div style={styles.children}>
           <DataView
-            data={this.props.value}
+            data={data}
             path={this.props.path}
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
-            readOnly={this.props.readOnly}
+            readOnly={readOnly}
           />
         </div>
       );
@@ -196,18 +270,18 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={assign({}, styles.name, complex && styles.complexName)}
-            onClick={this.toggleOpen.bind(this)}
+            style={nameStyle(complex, theme)}
+            onClick={inspectable && this.toggleOpen.bind(this)}
           >
-            {this.props.name}:
+            {name}:
           </div>
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
-                this.props.showMenu(e, this.props.value, this.props.path, this.props.name);
+                this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
-            style={styles.preview}
+            style={previewStyle(theme)}
           >
             {preview}
           </div>
@@ -218,6 +292,11 @@ class DataItem extends React.Component {
   }
 }
 
+DataItem.contextTypes = {
+  onChange: React.PropTypes.func,
+  theme: React.PropTypes.object.isRequired,
+};
+
 function alphanumericSort(a: string, b: string): number {
   if ('' + (+a) === a) {
     if ('' + (+b) !== b) {
@@ -227,6 +306,62 @@ function alphanumericSort(a: string, b: string): number {
   }
   return (a < b) ? -1 : 1;
 }
+
+const nameStyle = (isComplex: boolean, theme: Theme) => ({
+  cursor: isComplex ? 'pointer' : 'default',
+  color: theme.base0C,
+  margin: '2px 3px',
+});
+
+const previewStyle = (theme: Theme) => ({
+  display: 'flex',
+  margin: '2px 3px',
+  whiteSpace: 'pre',
+  wordBreak: 'break-word',
+  flex: 1,
+  color: theme.base09,
+});
+
+const emptyStyle = (theme: Theme) => ({
+  marginLeft: 10,
+  padding: '0 5px',
+  color: theme.base04,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
+  fontStyle: 'italic',
+});
+
+const missingStyle = (theme: Theme) => ({
+  fontSize: sansSerif.sizes.normal,
+  fontWeight: 'bold',
+  marginLeft: 10,
+  padding: '2px 5px',
+  color: theme.base03,
+});
+
+const collapsedArrowStyle = (theme: Theme) => ({
+  borderColor: `transparent transparent transparent ${theme.base03}`,
+  borderStyle: 'solid',
+  borderWidth: '4px 0 4px 7px',
+  display: 'inline-block',
+  marginLeft: 1,
+  verticalAlign: 'top',
+});
+
+const expandedArrowStyle = (theme: Theme) => ({
+  borderColor: `${theme.base03} transparent transparent transparent`,
+  borderStyle: 'solid',
+  borderWidth: '7px 4px 0 4px',
+  display: 'inline-block',
+  marginTop: 1,
+  verticalAlign: 'top',
+});
+
+const sparseArrayHoleStyle = (theme: Theme) => ({
+  fontStyle: 'italic',
+  color: theme.base03,
+  margin: '2px 3px',
+});
 
 var styles = {
   container: {
@@ -239,20 +374,6 @@ var styles = {
   children: {
   },
 
-  empty: {
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#aaa',
-  },
-
-  missing: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#888',
-  },
-
   opener: {
     cursor: 'pointer',
     marginLeft: -8,
@@ -261,44 +382,15 @@ var styles = {
     top: 4,
   },
 
-  collapsedArrow: {
-    borderColor: 'transparent transparent transparent #555',
-    borderStyle: 'solid',
-    borderWidth: '4px 0 4px 7px',
-    display: 'inline-block',
-    marginLeft: 1,
-    verticalAlign: 'top',
-  },
-
-  expandedArrow: {
-    borderColor: '#555 transparent transparent transparent',
-    borderStyle: 'solid',
-    borderWidth: '7px 4px 0 4px',
-    display: 'inline-block',
-    marginTop: 1,
-    verticalAlign: 'top',
+  toggler: {
+    left: -15,
+    position: 'absolute',
+    top: -1,
   },
 
   head: {
     display: 'flex',
     position: 'relative',
-  },
-
-  name: {
-    color: '#666',
-    margin: '2px 3px',
-  },
-
-  complexName: {
-    cursor: 'pointer',
-  },
-
-  preview: {
-    display: 'flex',
-    margin: '2px 3px',
-    whiteSpace: 'pre',
-    wordBreak: 'break-word',
-    flex: 1,
   },
 
   value: {

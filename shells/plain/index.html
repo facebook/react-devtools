@@ -7,15 +7,12 @@
             #target {
                 flex: 1;
                 border: none;
-                border-bottom: 1px solid #ccc;
             }
             #container {
                 display: flex;
-                height: 400px;
             }
             body {
                 display: flex;
-                flex-direction: column;
                 position: absolute;
                 top: 0;
                 left: 0;
@@ -24,9 +21,34 @@
                 margin: 0;
                 padding: 0;
             }
+
+            body.devtools-bottom {
+                flex-direction: column;                
+            }
+
+            body.devtools-bottom #container {
+                height:  400px;
+                max-height: 50%;
+            }
+
+            body.devtools-bottom #target {
+                border-bottom: 1px solid #ccc;
+            }
+
+            body.devtools-right {
+                flex-direction: row;                
+            }
+
+            body.devtools-right #container {
+                max-width: 40%;
+            }
+
+            body.devtools-right #target {
+                border-right: 1px solid #ccc;
+            }
         </style>
     </head>
-    <body>
+    <body class="devtools-bottom">
         <iframe id="target"></iframe>
         <div id="container"></div>
         <script src="build/container.js"></script>

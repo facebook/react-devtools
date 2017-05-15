@@ -14,6 +14,8 @@
 const React = require('react');
 const immutable = require('immutable');
 
+const {sansSerif} = require('./Themes/Fonts');
+
 import type {ControlState} from './types.js';
 
 type Props = {
@@ -78,16 +80,17 @@ class SettingsCheckbox extends React.Component {
 var styles = {
   checkbox: {
     pointerEvents: 'none',
+    marginRight: '5px',
   },
   container: {
     WebkitUserSelect: 'none',
-    cursor: 'pointer',
+    cursor: 'default',
     display: 'inline-block',
-    fontFamily: 'arial',
-    fontSize: '12px',
+    fontSize: sansSerif.sizes.normal,
     outline: 'none',
+    fontFamily: sansSerif.family,
     userSelect: 'none',
-    margin: '0px 4px',
+    marginRight: '10px',
   },
 };
 

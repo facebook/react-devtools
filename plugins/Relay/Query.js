@@ -10,46 +10,48 @@
  */
 'use strict';
 
+import type {Theme} from '../../frontend/types';
 import type {Map} from 'immutable';
 
+var {sansSerif} = require('../../frontend/Themes/Fonts');
 var React = require('react');
 
 class Query extends React.Component {
+  theme: {
+    theme: Theme,
+  };
   props: {
     data: Map,
     oddRow: boolean,
     onSelect: () => void,
   };
   render() {
+    var theme = this.context.theme;
     var data = this.props.data;
-    var containerStyle = styles.container;
+    var containerStyle = baseContainer;
     if (this.props.isSelected) {
-      containerStyle = styles.containerSelected;
+      containerStyle = containerSelectedStyle(theme);
     } else if (this.props.oddRow) {
-      containerStyle = styles.containeroOddRow;
+      containerStyle = containeroOddRowStyle(theme);
     }
 
     var status = data.get('status');
-    var statusStyle = {
-      ...styles.status,
-      backgroundColor: statusColors[status] || statusColors.error,
-    };
 
     const start = data.get('start');
     const end = data.get('end');
 
     return (
       <tr onClick={this.props.onSelect} style={containerStyle}>
-        <td style={styles.tdFirst}>
-          <span style={statusStyle} title={status} />
+        <td style={tdFirstStyle(theme)}>
+          <span style={statusStyle(status, theme)} title={status} />
         </td>
-        <td style={styles.tdName}>
+        <td style={tdNameStyle(theme)}>
           {data.get('name')}
         </td>
-        <td style={styles.td}>
+        <td style={baseTDStyle(theme)}>
           {Math.round(start) / 1000}s
         </td>
-        <td style={styles.td}>
+        <td style={baseTDStyle(theme)}>
           {Math.round(end - start)}ms
         </td>
       </tr>
@@ -57,61 +59,60 @@ class Query extends React.Component {
   }
 }
 
-var statusColors = {
+Query.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const baseContainer = {
+  cursor: 'pointer',
+  fontSize: sansSerif.sizes.normal,
+  height: 21,
+  lineHeight: '21px',
+  fontFamily: sansSerif.family,
+};
+
+const baseTDStyle = (theme: Theme) => ({
+  whiteSpace: 'nowrap',
+  'padding': '1px 4px',
+  'lineHeight': '17px',
+  'borderLeft': `1px solid ${theme.base01}`,
+});
+
+const tdFirstStyle = (theme: Theme) => ({
+  ...baseTDStyle(theme),
+  borderLeft: '',
+});
+
+const tdNameStyle = (theme: Theme) => ({
+  ...baseTDStyle(theme),
+  width: '100%',
+});
+
+const containeroOddRowStyle = (theme: Theme) => ({
+  ...baseContainer,
+  backgroundColor: theme.base01,
+});
+
+const containerSelectedStyle = (theme: Theme) => ({
+  ...baseContainer,
+  backgroundColor: theme.base0H,
+  color: theme.base04,
+});
+
+// Status colors not themed b'c the color choice is significant
+const statusColors = {
   pending: 'orange',
   success: 'green',
   failure: 'red',
   error: '#aaa',
 };
 
-var baseContainer = {
-  cursor: 'pointer',
-  fontSize: 11,
-  height: 21,
-  lineHeight: '21px',
-  fontFamily: "'Lucida Grande', sans-serif",
-};
-
-var baseTD = {
-  whiteSpace: 'nowrap',
-  'padding': '1px 4px',
-  'lineHeight': '17px',
-  'borderLeft': '1px solid #e1e1e1',
-};
-
-var styles = {
-  container: baseContainer,
-
-  containerSelected: {
-    ...baseContainer,
-    backgroundColor: '#3879d9',
-    color: 'white',
-  },
-
-  containeroOddRow: {
-    ...baseContainer,
-    backgroundColor: '#f5f5f5',
-  },
-
-  td: baseTD,
-
-  tdFirst: {
-    ...baseTD,
-    borderLeft: '',
-  },
-
-  tdName: {
-    ...baseTD,
-    width: '100%',
-  },
-
-  status: {
-    display: 'inline-block',
-    width: 11,
-    height: 11,
-    borderRadius: 6,
-    backgroundColor: '#aaa',
-  },
-};
+const statusStyle = (status: string) => ({
+  display: 'inline-block',
+  width: 11,
+  height: 11,
+  borderRadius: 6,
+  backgroundColor: statusColors[status] || statusColors.error,
+});
 
 module.exports = Query;

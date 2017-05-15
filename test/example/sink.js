@@ -136,6 +136,61 @@ class LotsOfMounts extends React.Component {
   }
 }
 
+class IframeWrapper extends React.Component {
+  componentDidMount() {
+    this.root = document.createElement('div');
+    this.frame.contentDocument.body.appendChild(this.root);
+    ReactDOM.render(this.props.children, this.root);
+  }
+
+  componentWillUnmount() {
+    ReactDOM.unmountComponentAtNode(this.root);
+  }
+
+  render() {
+    var { children, ...props } = this.props; // eslint-disable-line no-unused-vars
+
+    return (
+      <div>
+        <div>Iframe below</div>
+        <iframe ref={frame => this.frame = frame} {...props} />
+      </div>
+    );
+  }
+}
+
+class InnerContent extends React.Component {
+  render() {
+    return (
+      <div>
+        Inner content (highlight should overlap properly)
+      </div>
+    );
+  }
+}
+
+class IframeWithMountedChild extends React.Component {
+  render() {
+    return (
+      <IframeWrapper>
+        <InnerContent />
+      </IframeWrapper>
+    );
+  }
+}
+
+class NestedMountedIframesWithVaryingBorder extends React.Component {
+  render() {
+    return (
+      <IframeWrapper>
+        <IframeWrapper frameBorder="0">
+          <InnerContent />
+        </IframeWrapper>
+      </IframeWrapper>
+    );
+  }
+}
+
 // Render the list of tests
 
 class Sink extends React.Component {
@@ -147,6 +202,8 @@ class Sink extends React.Component {
       BadUnmount,
       Nester,
       LotsOfMounts,
+      IframeWithMountedChild,
+      NestedMountedIframesWithVaryingBorder,
     };
 
     var view = Comp => run(View, {Comp});

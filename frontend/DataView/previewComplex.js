@@ -13,40 +13,65 @@
 var React = require('react');
 
 var consts = require('../../agent/consts');
-var valueStyles = require('../value-styles');
 
-function previewComplex(data: Object) {
+import type {Theme} from '../types';
+
+function previewComplex(data: Object, theme: Theme) {
+  const style={ color: theme.base0D };
+
   if (Array.isArray(data)) {
     return (
-      <span style={valueStyles.array}>
+      <span style={style}>
         Array[{data.length}]
       </span>
     );
   }
 
-  if (!data[consts.type]) {
-    return '{…}';
-  }
+  switch (data[consts.type]) {
+    case 'function':
+      return (
+        <span style={style}>
+          {data[consts.name] || 'fn'}()
+        </span>
+      );
+    case 'object':
+      return (
+        <span style={style}>
+          {data[consts.name] + '{…}'}
+        </span>
+      );
+    case 'date':
+      return (
+        <span style={style}>
+          {data[consts.name]}
+        </span>
+      );
+    case 'symbol':
+      return (
+        <span style={style}>
+          {data[consts.name]}
+        </span>
+      );
+    case 'iterator':
+      return (
+        <span style={style}>
+          {data[consts.name] + '(…)'}
+        </span>
+      );
 
-  var type = data[consts.type];
-  if (type === 'function') {
-    return (
-      <span style={valueStyles.func}>
-        {data[consts.name] || 'fn'}()
-      </span>
-    );
-  } else if (type === 'object') {
-    return (
-      <span style={valueStyles.object}>
-        {data[consts.name] + '{…}'}
-      </span>
-    );
-  } else if (type === 'symbol') {
-    return (
-      <span style={valueStyles.symbol}>
-        {data[consts.name]}
-      </span>
-    );
+    case 'array_buffer':
+    case 'data_view':
+    case 'array':
+    case 'typed_array':
+      return (
+        <span style={style}>
+          {`${data[consts.name]}[${data[consts.meta].length}]`}
+        </span>
+      );
+
+    case undefined:
+    case null:
+      return '{…}';
   }
   return null;
 }
