@@ -180,7 +180,7 @@ PropState.childContextTypes = {
 
 var WrappedPropState = decorate({
   listeners(props, store) {
-    return ['selected'];
+    return ['selected', store.selected];
   },
 
   props(store) {
