@@ -21,9 +21,9 @@ var node = document.getElementById('container');
 ReactDOM.render(<h2 id="message">Looking for React...</h2>, node);
 var port = {};
 
-// TODO (bvaughn) Read default :themeName and switch between 'FirefoxDefault' and 'FirefoxDark'
+// TODO (bvaughn) Read default :themeName and switch between 'FirefoxLight' and 'FirefoxDark'
 // Refer to 'shells/chrome/src/panel.js' for an example
-const themeName = 'FirefoxDefault';
+const themeName = 'FirefoxLight';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);
