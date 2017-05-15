@@ -46,6 +46,7 @@ class Preview extends React.Component {
               name: 'div',
             })
           }
+          searchRegExp={/iv/}
         />
       </div>
     );

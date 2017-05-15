@@ -42,7 +42,7 @@ const ChromeDark: Theme = {
   base07: '#d9d9d9',
   base08: '#5db0d7',
   base09: '#a1f7b5',
-  base0A: '#009921',
+  base0A: '#66ff88',
   base0B: '#f29766',
   base0C: '#d2c057',
   base0D: '#34d1c5',
@@ -52,6 +52,7 @@ const ChromeDark: Theme = {
   base0I: '#363636',
   base0J: '#342e24',
   base0K: '#242424',
+  base0L: '#242424',
 };
 
 const ChromeDefault: Theme = {
@@ -77,6 +78,7 @@ const ChromeDefault: Theme = {
   base0I: '#dadada',
   base0J: '#ebf1fb',
   base0K: '#ffffff',
+  base0L: '#222222',
 };
 
 const Dracula: Theme = {
@@ -91,7 +93,7 @@ const Dracula: Theme = {
   base07: '#f7f7fb',
   base08: '#ff79c6',
   base09: '#bd93f9',
-  base0A: '#121218',
+  base0A: '#fafa8c',
   base0B: '#f1fa8c',
   base0C: '#a1efe4',
   base0D: '#4afa7b',
@@ -101,6 +103,7 @@ const Dracula: Theme = {
   base0I: '#323547',
   base0J: '#323547',
   base0K: '#f7f7fb',
+  base0L: '#000000',
 };
 
 const Eighties: Theme = {
@@ -115,7 +118,7 @@ const Eighties: Theme = {
   base07: '#f2f0ec',
   base08: '#f2777a',
   base09: '#f99157',
-  base0A: '#121212',
+  base0A: '#4afa7b',
   base0B: '#99cc99',
   base0C: '#66cccc',
   base0D: '#4afa7b',
@@ -125,6 +128,7 @@ const Eighties: Theme = {
   base0I: '#3f3e3e',
   base0J: '#3f3e3e',
   base0K: '#2d2d2d',
+  base0L: '#121212',
 };
 
 const FirefoxDark: Theme = {
@@ -140,7 +144,7 @@ const FirefoxDark: Theme = {
   base07: '#ffffff',
   base08: '#00ff7f',
   base09: '#eb5368',
-  base0A: '#181d20',
+  base0A: '#00ff7f',
   base0B: '#e9f4fe',
   base0C: '#bcb8db',
   base0D: '#e9f4fe',
@@ -150,6 +154,7 @@ const FirefoxDark: Theme = {
   base0I: '#475983',
   base0J: '#475983',
   base0K: '#ffffff',
+  base0L: '#181d20',
 };
 
 const FirefoxLight: Theme = {
@@ -175,6 +180,7 @@ const FirefoxLight: Theme = {
   base0I: '#e4f1fa',
   base0J: '#e4f1fa',
   base0K: '#f4f7fa',
+  base0L: '#585959',
 };
 
 const Flat: Theme = {
@@ -189,7 +195,7 @@ const Flat: Theme = {
   base07: '#ECF0F1',
   base08: '#E74C3C',
   base09: '#E67E22',
-  base0A: '#131a22',
+  base0A: '#64fa82',
   base0B: '#2ECC71',
   base0C: '#1ABC9C',
   base0D: '#3498DB',
@@ -199,6 +205,7 @@ const Flat: Theme = {
   base0I: '#364c62',
   base0J: '#364c62',
   base0K: '#2C3E50',
+  base0L: '#2C3E50',
 };
 
 const Materia: Theme = {
@@ -213,7 +220,7 @@ const Materia: Theme = {
   base07: '#FFFFFF',
   base08: '#EC5F67',
   base09: '#EA9560',
-  base0A: '#12171a',
+  base0A: '#00ff84',
   base0B: '#8BD649',
   base0C: '#80CBC4',
   base0D: '#89DDFF',
@@ -223,6 +230,7 @@ const Materia: Theme = {
   base0I: '#314048',
   base0J: '#314048',
   base0K: '#263238',
+  base0L: '#263238',
 };
 
 const Phd: Theme = {
@@ -237,7 +245,7 @@ const Phd: Theme = {
   base07: '#ffffff',
   base08: '#d07346',
   base09: '#f0a000',
-  base0A: '#000000',
+  base0A: '#00c8fa',
   base0B: '#99bf52',
   base0C: '#72b9bf',
   base0D: '#5299bf',
@@ -247,6 +255,7 @@ const Phd: Theme = {
   base0I: '#112243',
   base0J: '#112243',
   base0K: '#061229',
+  base0L: '#061229',
 };
 
 module.exports = {
