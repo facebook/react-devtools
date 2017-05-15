@@ -557,7 +557,7 @@ const bracketStyle = (inverted: boolean, theme: Theme) => ({
 
 const highlightStyle = (theme: Theme) => ({
   backgroundColor: theme.base0A,
-  color: theme.base07,
+  color: theme.base0L,
 });
 
 type tailStyleParams = {

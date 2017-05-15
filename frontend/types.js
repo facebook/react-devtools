@@ -97,7 +97,7 @@ export type Theme = {
   base07: string; // Light Background (Not often used);
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
   base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
-  base0A: string; // Highlight (background color) for search/filter matches
+  base0A: string; // Highlight Background Color for search/filter matches
   base0B: string; // Strings, Inherited Class, Markup Code, Diff Inserted
   base0C: string; // Support, Regular Expressions, Escape Characters, Markup Quotes
   base0D: string; // Functions, Methods, Attribute IDs, Headings
@@ -107,4 +107,5 @@ export type Theme = {
   base0I: string; // Selected Background for nodes/tabs when devtools is not focused
   base0J: string; // Hover Background for nodes/tabs
   base0K: string; // Selected Foreground for nodes/tabs when devtools is focused
+  base0L: string; // Highlight Foreground Color for search/filter matches
 };
