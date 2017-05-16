@@ -37,7 +37,7 @@ class PropState extends React.Component {
     };
   }
 
-  renderSource(): ?React.Element {
+  renderSource(): ?React.Element<any> {
     const {theme} = this.context;
     const {id, node, onViewElementSource} = this.props;
     const source = node.get('source');
@@ -63,7 +63,7 @@ class PropState extends React.Component {
     );
   }
 
-  render(): React.Element {
+  render(): React.Element<any> {
     var theme = this.context.theme;
 
     if (!this.props.node) {

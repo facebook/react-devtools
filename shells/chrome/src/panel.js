@@ -109,7 +109,9 @@ var node = document.getElementById('container');
 function reload() {
   setTimeout(() => {
     ReactDOM.unmountComponentAtNode(node);
-    node.innerHTML = '';
+    if (node) {
+      node.innerHTML = '';
+    }
     ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }

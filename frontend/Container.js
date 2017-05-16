@@ -23,8 +23,8 @@ import type {Theme} from './types';
 
 type Props = {
   reload: () => void,
-  extraPanes: Array<(node: Object) => React$Element>,
-  extraTabs: ?{[key: string]: () => React$Element},
+  extraPanes: Array<(node: Object) => React.Element<any>>,
+  extraTabs: ?{[key: string]: () => React.Element<any>},
   menuItems: {
     tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
     attr?: (
@@ -36,7 +36,7 @@ type Props = {
       store: Object
     ) => ?Array<MenuItem>,
   },
-  extraTabs: {[key: string]: () => React$Element},
+  extraTabs: {[key: string]: () => React.Element<any>},
   preferencesPanelShown: boolean,
   theme: Theme,
   onViewElementSource: null | (id: string, node: ?Object) => void,
@@ -77,14 +77,12 @@ class Container extends React.Component {
     clearTimeout(this.resizeTimeout);
   }
 
-  // $FlowFixMe future versions of Flow can infer this
   handleResize = (e: Event): void => {
     if (!this.resizeTimeout) {
       this.resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
     }
   };
 
-  // $FlowFixMe future versions of Flow can infer this
   handleResizeTimeout = (): void => {
     this.resizeTimeout = null;
 

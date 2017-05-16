@@ -332,7 +332,7 @@ class Panel extends React.Component {
         preferencesPanelShown={this.state.preferencesPanelShown}
         theme={theme}
         onViewElementSource={
-          this.props.showElementSource ? this.viewElementSource.bind(this) : null
+          this.props.showElementSource ? (this.viewElementSource.bind(this): Function) : null
         }
       />
     );

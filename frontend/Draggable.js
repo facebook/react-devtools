@@ -32,7 +32,7 @@ class Draggable extends React.Component {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
-    var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    var doc = ((ReactDOM.findDOMNode(this): any): Node).ownerDocument;
     doc.addEventListener('mousemove', this._onMove);
     doc.addEventListener('mouseup', this._onUp);
     this.props.onStart();
@@ -45,7 +45,7 @@ class Draggable extends React.Component {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
-    var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    var doc = ((ReactDOM.findDOMNode(this): any): Node).ownerDocument;
     doc.removeEventListener('mousemove', this._onMove);
     doc.removeEventListener('mouseup', this._onUp);
     this.props.onStop();

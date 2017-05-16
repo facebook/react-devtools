@@ -345,13 +345,14 @@ class Agent extends EventEmitter {
       return internalInstance;
     }
     if (!this.idsByInternalInstances.has(internalInstance)) {
-      this.idsByInternalInstances.set(internalInstance, guid());
+      const newInternalInstanceId = guid();
+      this.idsByInternalInstances.set(internalInstance, newInternalInstanceId);
       this.internalInstancesById.set(
-        this.idsByInternalInstances.get(internalInstance),
+        newInternalInstanceId,
         internalInstance
       );
     }
-    return this.idsByInternalInstances.get(internalInstance);
+    return ((this.idsByInternalInstances.get(internalInstance): any): ElementID);
   }
 
   addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {

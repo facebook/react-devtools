@@ -101,7 +101,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
-      flash(ReactDOM.findDOMNode(this), this.context.theme.base0A, 'transparent', 1);
+      flash((ReactDOM.findDOMNode(this): any), this.context.theme.base0A, 'transparent', 1);
     }
   }
 

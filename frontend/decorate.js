@@ -21,6 +21,7 @@ type Options = {
   /** This is how you get data and action handlers from the store. The
    * returned object will be spread in as props on the wrapped component. **/
   props: (store: Object, props: Object) => Object,
+  store?: string
 };
 
 type State = {};
@@ -53,7 +54,7 @@ type State = {};
  * }, MyComp);
  */
 module.exports = function(options: Options, Component: any): any {
-  var storeKey = options.store || 'store';
+  var storeKey: string = options.store || 'store';
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;

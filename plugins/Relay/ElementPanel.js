@@ -20,7 +20,7 @@ class ElementPanel extends React.Component {
     theme: Theme,
   };
   props: {
-    dataIDs: Array<{id: string, queries: Array<Map>}>,
+    dataIDs: Array<{id: string, queries: Array<Map<string, any>>}>,
     jumpToData: (id: string) => void,
     jumpToQuery: (queryID: string) => void,
   };

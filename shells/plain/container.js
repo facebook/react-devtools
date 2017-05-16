@@ -20,7 +20,7 @@ window.React = React;
 
 var Panel = require('../../frontend/Panel');
 
-var target: Object = document.getElementById('target');
+var target: Object = ((document.getElementById('target'): any): Object);
 
 var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
 var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
@@ -35,7 +35,7 @@ if (iframeSrc) {
 }
 
 window.addEventListener('keydown', function(e) {
-  if (e.altKey && e.keyCode === 68) { // Alt + D
+  if (e.altKey && e.keyCode === 68 && document.body) { // Alt + D
     if (document.body.className === 'devtools-bottom') {
       document.body.className = 'devtools-right';
     } else {
