@@ -45,9 +45,6 @@ export type Props = {
     globalPathToInst: string,
     globalPathToType: string,
   ) => void,
-  showElementSource?: (
-    source: Object
-  ) => void,
 
   reloadSubscribe?: (reloadFn: () => void) => () => void,
   showAttrSource?: (path: Array<string>) => void,
@@ -74,6 +71,7 @@ class Panel extends React.Component {
   _unsub: ?() => void;
   // TODO: typecheck plugin interface
   plugins: Array<any>;
+  hasLaunchEditor: boolean = false;
 
   props: Props;
   defaultProps: DefaultProps;
@@ -184,8 +182,12 @@ class Panel extends React.Component {
     }
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
-      invariant(this.props.showElementSource, 'cannot view source if props.showElementSource is not supplied');
-      this.props.showElementSource(source);
+      invariant(
+        typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
+          typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function',
+        'cannot view source if __REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor is not supplied'
+      );
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor(source.fileName, source.lineNumber);
     }, 100);
   }
 
@@ -212,7 +214,7 @@ class Panel extends React.Component {
       this._bridge = new Bridge(wall);
 
       this._store = new Store(this._bridge, this.state.themeName);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -237,6 +239,12 @@ class Panel extends React.Component {
         });
       });
     });
+  }
+
+  componentWillUpdate() {
+    this.hasLaunchEditor =
+      typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
+      typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function';
   }
 
   componentDidUpdate() {
@@ -320,7 +328,7 @@ class Panel extends React.Component {
               key: 'showComponentSource',
               title: 'Show ' + node.get('name') + ' source',
               action: () => this.viewComponentSource(id),
-            }, this.props.showElementSource && node.get('source') && {
+            }, this.hasLaunchEditor && node.get('source') && {
               key: 'showElementSource',
               title: 'Show <' + node.get('name') + ' /> in source',
               action: () => this.viewElementSource(id, node.get('source')),
@@ -331,9 +339,7 @@ class Panel extends React.Component {
         extraTabs={extraTabs}
         preferencesPanelShown={this.state.preferencesPanelShown}
         theme={theme}
-        onViewElementSource={
-          this.props.showElementSource ? this.viewElementSource.bind(this) : null
-        }
+        onViewElementSource={this.hasLaunchEditor ? this.viewElementSource.bind(this) : null}
       />
     );
   }

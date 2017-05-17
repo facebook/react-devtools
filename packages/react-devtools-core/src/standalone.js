@@ -31,9 +31,6 @@ var config = {
   inject(done) {
     done(wall);
   },
-  showElementSource(source) {
-    launchEditor(source.fileName, source.lineNumber, projectRoots);
-  },
 };
 
 var log = (...args) => console.log('[React DevTools]', ...args);
@@ -44,6 +41,12 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
+    if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
+      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {};
+    }
+    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor = (fileName, lineNumber) => {
+      launchEditor(fileName, lineNumber, projectRoots);
+    };
     ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
   }, 100);
 }
