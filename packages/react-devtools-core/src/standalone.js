@@ -22,6 +22,7 @@ var ReactDOM = require('react-dom');
 
 var node = null;
 var onStatusChange = function noop() {};
+var projectRoots = [];
 var wall = null;
 
 var config = {
@@ -31,7 +32,7 @@ var config = {
     done(wall);
   },
   showElementSource(source) {
-    launchEditor(source.fileName, source.lineNumber);
+    launchEditor(source.fileName, source.lineNumber, projectRoots);
   },
 };
 
@@ -43,7 +44,7 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    ReactDOM.render(<Panel {...config} />, node);
+    ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
   }, 100);
 }
 
@@ -168,6 +169,10 @@ var DevtoolsUI = {
   setContentDOMNode(_node) {
     node = _node;
     return DevtoolsUI;
+  },
+
+  setProjectRoots(_projectRoots) {
+    projectRoots = _projectRoots;
   },
 
   setStatusListener(_listener) {

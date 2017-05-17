@@ -14,6 +14,7 @@ var React = require('react');
 var decorate = require('../../frontend/decorate');
 var crawlChildren = require('./crawlChildren');
 var dagre = require('dagre');
+var {sansSerif} = require('../../Themes/Fonts');
 
 class DepGraph extends React.Component {
   constructor(props: Object) {
@@ -113,7 +114,7 @@ class SvgGraph extends React.Component {
                 y={node.y + node.height / 4}
                 textAnchor="middle"
                 fontSize="10"
-                fontFamily="sans-serif"
+                fontFamily={sansSerif.family}
               >{node.label + ' ' + node.count}</text>
             );
           })}

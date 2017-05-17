@@ -17,8 +17,11 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
+var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
+import type {Theme} from './types';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -82,6 +85,7 @@ const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
  */
 class Store extends EventEmitter {
   _bridge: Bridge;
+  _defaultThemeName: string;
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
@@ -96,12 +100,16 @@ class Store extends EventEmitter {
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
+  preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  theme: Theme;
+  themeName: string;
+  themes: { [key: string]: Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -110,8 +118,14 @@ class Store extends EventEmitter {
     rnStyleMeasure?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
+
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
+      ? defaultThemeName
+      : 'ChromeDefault';
+
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
@@ -133,6 +147,17 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
+
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const restoredThemeKey = ThemeStore.get();
+    const themeName = restoredThemeKey && Themes.hasOwnProperty(restoredThemeKey)
+      ? restoredThemeKey
+      : this._defaultThemeName;
+
+    this.theme = Themes[themeName];
+    this.themeName = themeName;
+    this.themes = Themes;
 
     // for debugging
     window.store = this;
@@ -319,6 +344,30 @@ class Store extends EventEmitter {
   hideContextMenu() {
     this.contextMenu = null;
     this.emit('contextMenu');
+  }
+
+  changeTheme(themeName: ?string) {
+    // Only apply a valid theme.
+    const safeThemeKey = themeName && this.themes.hasOwnProperty(themeName)
+      ? themeName
+      : this._defaultThemeName;
+
+    this.theme = this.themes[safeThemeKey];
+    this.themeName = safeThemeKey;
+    this.emit('theme');
+
+    // But allow users to restore "default" mode by selecting an empty theme.
+    ThemeStore.set(themeName || null);
+  }
+
+  showPreferencesPanel() {
+    this.preferencesPanelShown = true;
+    this.emit('preferencesPanelShown');
+  }
+
+  hidePreferencesPanel() {
+    this.preferencesPanelShown = false;
+    this.emit('preferencesPanelShown');
   }
 
   selectFirstSearchResult() {

@@ -114,4 +114,10 @@ function reload() {
   }, 100);
 }
 
-ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
+// chrome.devtools.panels added in Chrome 18.
+// chrome.devtools.panels.themeName added in Chrome 54.
+const themeName = (chrome.devtools.panels : any).themeName === 'dark'
+  ? 'ChromeDark'
+  : 'ChromeDefault';
+
+ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);

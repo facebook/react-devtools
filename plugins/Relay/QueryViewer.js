@@ -15,6 +15,7 @@ import type {Map} from 'immutable';
 import DataView from '../../frontend/DataView/DataView';
 import DetailPane from '../../frontend/detail_pane/DetailPane';
 import DetailPaneSection from '../../frontend/detail_pane/DetailPaneSection';
+import {monospace} from '../../frontend/Themes/Fonts';
 import React from 'react';
 
 import decorate from '../../frontend/decorate';
@@ -97,7 +98,8 @@ class QueryViewer extends React.Component {
 var styles = {
   query: {
     cursor: 'text',
-    fontFamily: 'monospace',
+    fontFamily: monospace.family,
+    fontSize: monospace.sizes.normal,
     userSelect: 'text',
     MozUserSelect: 'text',
     WebkitUserSelect: 'text',

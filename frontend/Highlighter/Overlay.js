@@ -11,8 +11,15 @@
 'use strict';
 
 var assign = require('object-assign');
+var {monospace} = require('../Themes/Fonts');
+
 import type {DOMNode, DOMRect, Window} from '../types';
 
+/**
+ * Note that this component is not affected by the active Theme,
+ * Because it highlights elements in the main Chrome window (outside of devtools).
+ * The colors below were chosen to roughly match those used by Chrome devtools.
+ */
 class Overlay {
   win: Object;
   container: DOMNode;
@@ -45,25 +52,27 @@ class Overlay {
 
     this.tip = doc.createElement('div');
     assign(this.tip.style, {
-      border: '1px solid #aaa',
-      backgroundColor: 'rgb(255, 255, 178)',
-      fontFamily: 'sans-serif',
-      color: 'orange',
+      backgroundColor: '#333740',
+      borderRadius: '2px',
+      fontFamily: monospace.family,
+      fontWeight: 'bold',
       padding: '3px 5px',
       position: 'fixed',
-      fontSize: '10px',
+      fontSize: monospace.sizes.normal,
     });
 
     this.nameSpan = doc.createElement('span');
     this.tip.appendChild(this.nameSpan);
     assign(this.nameSpan.style, {
-      color:   'rgb(136, 18, 128)',
-      marginRight: '5px',
+      color:   '#ee78e6',
+      borderRight: '1px solid #aaaaaa',
+      paddingRight: '0.5rem',
+      marginRight: '0.5rem',
     });
     this.dimSpan = doc.createElement('span');
     this.tip.appendChild(this.dimSpan);
     assign(this.dimSpan.style, {
-      color: '#888',
+      color: '#d7d7d7',
     });
 
     this.container.style.zIndex = 10000000;
