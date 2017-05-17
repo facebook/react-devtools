@@ -23,8 +23,8 @@ import type {Theme} from './types';
 
 type Props = {
   reload: () => void,
-  extraPanes: Array<(node: Object) => React.Element<any>>,
-  extraTabs: ?{[key: string]: () => React.Element<any>},
+  extraPanes: Array<(node: Object) => React.Element<*>>,
+  extraTabs: ?{[key: string]: () => React.Element<*>},
   menuItems: {
     tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
     attr?: (
@@ -36,7 +36,7 @@ type Props = {
       store: Object
     ) => ?Array<MenuItem>,
   },
-  extraTabs: {[key: string]: () => React.Element<any>},
+  extraTabs: {[key: string]: () => React.Element<*>},
   preferencesPanelShown: boolean,
   theme: Theme,
   onViewElementSource: null | (id: string, node: ?Object) => void,

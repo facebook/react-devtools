@@ -22,8 +22,8 @@ type Context = {
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React.Element<any>,
-  right: () => React.Element<any>,
+  left: () => React.Element<*>,
+  right: () => React.Element<*>,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,

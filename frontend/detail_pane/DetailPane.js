@@ -14,7 +14,7 @@ var {monospace} = require('../Themes/Fonts');
 var React = require('react');
 
 class DetailPane extends React.Component {
-  render(): React.Element<any> {
+  render(): React.Element<*> {
     return (
       <div style={styles.container}>
         {this.props.children}

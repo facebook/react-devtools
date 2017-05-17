@@ -352,7 +352,8 @@ class Agent extends EventEmitter {
         internalInstance
       );
     }
-    return ((this.idsByInternalInstances.get(internalInstance): any): ElementID);
+    // $FlowFixMe we know that there is an ID for this internalInstance
+    return this.idsByInternalInstances.get(internalInstance);
   }
 
   addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {

@@ -147,16 +147,17 @@ function setStyle(agent, id, attr, val) {
   var style = data.props && data.props.style;
   if (Array.isArray(style)) {
     if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-      // $FlowFixMe we know that updater is not null here
-      data.updater.setInProps(['style', style.length - 1, attr], val);
+      // $FlowFixMe we know that setNativeProps can be called here
+      data.updater.setInProps(['style', String(style.length - 1), attr], val);
     } else {
       style = style.concat([newStyle]);
-      // $FlowFixMe we know that updater is not null here
+      // $FlowFixMe we know that setNativeProps can be called here
       data.updater.setInProps(['style'], style);
     }
   } else {
     style = [style, newStyle];
     data.updater.setInProps(['style'], style);
   }
+  
   agent.emit('hideHighlight');
 }

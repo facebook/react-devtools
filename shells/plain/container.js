@@ -20,11 +20,12 @@ window.React = React;
 
 var Panel = require('../../frontend/Panel');
 
-var target: Object = ((document.getElementById('target'): any): Object);
+var target: ?HTMLElement = document.getElementById('target');
 
-var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
-var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
+var appSrc = (target && target.getAttribute('data-app-src')) || '../../test/example/build/target.js';
+var devtoolsSrc = (target && target.getAttribute('data-devtools-src')) || './build/backend.js';
 
+// $FlowFixMe we know that target will have contentWindow
 var win = target.contentWindow;
 installGlobalHook(win);
 installRelayHook(win);
@@ -70,10 +71,14 @@ function inject(src, done) {
     done();
     return;
   }
-  var script = target.contentDocument.createElement('script');
-  script.src = src;
-  script.onload = done;
-  target.contentDocument.body.appendChild(script);
+  if (target && target.contentDocument) {
+    // $FlowFixMe we know that contentDocument has createElement    
+    var script = target.contentDocument.createElement('script');
+    script.src = src;
+    script.onload = done;
+    // $FlowFixMe we know that contentDocument has a body    
+    target.contentDocument.body.appendChild(script);
+  }
 }
 
 function injectMany(sources, done) {

@@ -14,8 +14,9 @@ const FB_MODULE_RE = /^(.*) \[from (.*)\]$/;
 const cachedDisplayNames = new WeakMap();
 
 function getDisplayName(type: Function): string {
-  if (cachedDisplayNames.has(type)) {
-    return ((cachedDisplayNames.get(type): any): string);
+  const cachedDisplayName = cachedDisplayNames.get(type);
+  if (cachedDisplayName) {
+    return cachedDisplayName;
   }
 
   let displayName = type.displayName || type.name || 'Unknown';

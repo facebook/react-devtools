@@ -24,7 +24,7 @@ type BoxMeasurements = {
 
 type BoxProps = BoxMeasurements & {
   title: string,
-  children?: React.Element<any>,
+  children?: React.Element<*>,
   theme: Theme,
 };
 
