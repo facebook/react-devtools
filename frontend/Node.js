@@ -261,7 +261,6 @@ class Node extends React.Component {
     var isCustom = nodeType === 'Composite';
 
     let name = node.get('name') + '';
-      // var nodeIndexStyle = isWindowFocused ? styles.selectedNodeIndex : styles.selectedNodeIndexInverted;
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
@@ -316,7 +315,7 @@ class Node extends React.Component {
                   <span style={sharedHeadBracketStyle}>&gt;</span>
                 </span>,
               ]}
-              {selected && <span style={nodeIndexStyle}> == $r</span>}
+              {selected && <span style={jsxSingleLineTagStyle}> == $r</span>}
             </span>
           </div>
         </div>
@@ -331,7 +330,7 @@ class Node extends React.Component {
         <span style={jsxCloseTagStyle}>{name}</span>
         <span style={closeTagBracketStyle}>&gt;</span>
         {selected && ((collapsed && !this.props.isBottomTagSelected) || this.props.isBottomTagSelected) &&
-          <span style={nodeIndexStyle}> == $r</span>
+          <span style={jsxCloseTagStyle}> == $r</span>
         }
       </span>
     );
@@ -365,7 +364,7 @@ class Node extends React.Component {
             }
             <span style={sharedHeadBracketStyle}>&gt;</span>
           {selected && !collapsed && !this.props.isBottomTagSelected &&
-              <span style={nodeIndexStyle}> == $r</span>
+              <span style={jsxOpenTagStyle}> == $r</span>
             }</span>
           {collapsed && <span >…</span>}
           {collapsed && closeTag}
@@ -644,14 +643,6 @@ const styles = {
   falseyLiteral: {
     fontStyle: 'italic',
   },
-
-    // selectedNodeIndex: {
-    //     color: '#aec8f2',
-    // },
-    // selectedNodeIndexInverted: {
-    //     color: '#575757',
-    // },
-
 };
 
 module.exports = WrappedNode;
