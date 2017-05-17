@@ -350,25 +350,25 @@ class Node extends React.Component {
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
-        <span >
+        <span>
           <span style={sharedHeadBracketStyle}>&lt;</span>
-            <span style={jsxOpenTagStyle}>{name}</span>
-            {node.get('key') &&
-              <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
-            }
-            {node.get('ref') &&
-              <Props key="ref" props={{'ref': node.get('ref')}} inverted={headInverted}/>
-            }
-            {node.get('props') &&
-              <Props key="props" props={node.get('props')} inverted={headInverted}/>
-            }
-            <span style={sharedHeadBracketStyle}>&gt;</span>
+          <span style={jsxOpenTagStyle}>{name}</span>
+          {node.get('key') &&
+            <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
+          }
+          {node.get('ref') &&
+            <Props key="ref" props={{'ref': node.get('ref')}} inverted={headInverted}/>
+          }
+          {node.get('props') &&
+            <Props key="props" props={node.get('props')} inverted={headInverted}/>
+          }
+          <span style={sharedHeadBracketStyle}>&gt;</span>
           {selected && !collapsed && !this.props.isBottomTagSelected &&
               <span style={jsxOpenTagStyle}> == $r</span>
-            }</span>
-          {collapsed && <span >…</span>}
-          {collapsed && closeTag}
-
+          }
+        </span>
+        {collapsed && <span>…</span>}
+        {collapsed && closeTag}
       </div>
     );
 
