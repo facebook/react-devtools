@@ -25,15 +25,14 @@ var onStatusChange = function noop() {};
 var projectRoots = [];
 var wall = null;
 
-window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor = (fileName, lineNumber) => {
-  launchEditor(fileName, lineNumber, projectRoots);
-};
-
 var config = {
   reload,
   alreadyFoundReact: true,
   inject(done) {
     done(wall);
+  },
+  showElementSource(source) {
+    launchEditor(source.fileName, source.lineNumber, projectRoots);
   },
 };
 

@@ -55,6 +55,15 @@ var config: Props = {
       }
     });
   },
+  showElementSource(source) {
+    chrome.devtools.inspectedWindow.eval(
+      'window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor(' +
+        JSON.stringify(source.fileName) +
+        ',' +
+        JSON.stringify(source.lineNumber) +
+        ')'
+    );
+  },
   showAttrSource(path) {
     var attrs = '[' + path.map(m => JSON.stringify(m)).join('][') + ']';
     var code = 'inspect(window.$r' + attrs + ')';
