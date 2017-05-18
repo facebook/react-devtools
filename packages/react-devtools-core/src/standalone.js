@@ -25,6 +25,10 @@ var onStatusChange = function noop() {};
 var projectRoots = [];
 var wall = null;
 
+window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor = (fileName, lineNumber) => {
+  launchEditor(fileName, lineNumber, projectRoots);
+};
+
 var config = {
   reload,
   alreadyFoundReact: true,
@@ -41,12 +45,6 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    if (typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ === 'undefined') {
-      window.__REACT_DEVTOOLS_GLOBAL_HOOK__ = {};
-    }
-    window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor = (fileName, lineNumber) => {
-      launchEditor(fileName, lineNumber, projectRoots);
-    };
     ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
   }, 100);
 }

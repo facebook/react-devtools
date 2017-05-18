@@ -183,8 +183,7 @@ class Panel extends React.Component {
     this._bridge.send('putSelectedInstance', id);
     setTimeout(() => {
       invariant(
-        typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
-          typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function',
+        typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function',
         'cannot view source if __REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor is not supplied'
       );
       window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor(source.fileName, source.lineNumber);
@@ -243,7 +242,6 @@ class Panel extends React.Component {
 
   componentWillUpdate() {
     this.hasLaunchEditor =
-      typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__ !== 'undefined' &&
       typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function';
   }
 
