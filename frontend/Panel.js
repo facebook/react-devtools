@@ -110,6 +110,9 @@ class Panel extends React.Component {
     if (this.props.reloadSubscribe) {
       this._unsub = this.props.reloadSubscribe(() => this.reload());
     }
+
+    this.hasLaunchEditor =
+      typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function';
   }
 
   componentWillUnmount() {
@@ -238,11 +241,6 @@ class Panel extends React.Component {
         });
       });
     });
-  }
-
-  componentWillUpdate() {
-    this.hasLaunchEditor =
-      typeof window.__REACT_DEVTOOLS_GLOBAL_HOOK__.launchEditor === 'function';
   }
 
   componentDidUpdate() {
