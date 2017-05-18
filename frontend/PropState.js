@@ -51,15 +51,23 @@ class PropState extends React.Component {
     }
 
     return (
-      <div
-        style={sourceStyle(!!onViewElementSource, theme)}
-        onClick={onClick}
+      <span
+        title={
+          onViewElementSource
+            ? 'Clicking this URL opens this file in your text editor within supported environments.'
+            : null
+        }
       >
-        {source.fileName}
-        <span style={sourcePosStyle(theme)}>
-          :{source.lineNumber}
-        </span>
-      </div>
+        <div
+          style={sourceStyle(!!onViewElementSource, theme)}
+          onClick={onClick}
+        >
+          {source.fileName}
+          <span style={sourcePosStyle(theme)}>
+            :{source.lineNumber}
+          </span>
+        </div>
+      </span>
     );
   }
 
