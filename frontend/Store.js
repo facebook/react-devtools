@@ -121,10 +121,7 @@ class Store extends EventEmitter {
   constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
 
-    // Don't accept an invalid themeName as a default.
-    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
-      ? defaultThemeName
-      : 'ChromeDefault';
+    this.setDefaultThemeName(defaultThemeName);
 
     this._nodes = new Map();
     this._parents = new Map();
@@ -358,6 +355,13 @@ class Store extends EventEmitter {
 
     // But allow users to restore "default" mode by selecting an empty theme.
     ThemeStore.set(themeName || null);
+  }
+
+  setDefaultThemeName(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
+      ? defaultThemeName
+      : 'ChromeDefault';
   }
 
   showPreferencesPanel() {
