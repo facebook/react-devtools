@@ -224,7 +224,10 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {
-        this.setState({loading: false});
+        this.setState({
+          loading: false,
+          themeName: this._store.themeName,
+        });
         this.getNewSelection();
       });
       this._store.on('preferencesPanelShown', () => {
