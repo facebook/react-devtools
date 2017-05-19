@@ -14,6 +14,8 @@ var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 
 var Panel = require('../../../frontend/Panel');
+var Loading = require('../../../frontend/Loading');
+var ReactNotDetected = require('../../../frontend/ReactNotDetected');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -37,18 +39,13 @@ window.addEventListener('message', function(event) {
     if (evt.data === 'show') {
       reload();
     } else if (evt.data === 'unload') {
-      ReactDOM.render(<h1 id="message">Looking for React...</h1>, node);
+      ReactDOM.render(<Loading />, node);
     } else if (evt.data.type === 'hasReact') {
-      if (evt.data.val) {
-        ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
+      var reactDetected = evt.data.val;
+      if (!reactDetected) {
+        ReactDOM.render(<ReactNotDetected />, node);
       } else {
-        // TODO: Does this actually show up? It seems like either the "Looking
-        // for React..." at the top of this file shows, or (when navigating
-        // from a React page to a non-React one) Panel renders the same text.
-        ReactDOM.render(
-          <h1 id="message">Unable to find React on the page.</h1>,
-          node
-        );
+        ReactDOM.render(<Panel {...config} alreadyFoundReact={true} />, node);
       }
     }
   };

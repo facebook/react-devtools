@@ -16,9 +16,10 @@ var Store = require('./Store');
 var keyboardNav = require('./keyboardNav');
 var invariant = require('./invariant');
 var assign = require('object-assign');
+var Loading = require('./Loading');
+var ReactNotDetected = require('./ReactNotDetected');
 
 var Bridge = require('../agent/Bridge');
-var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
@@ -68,6 +69,7 @@ type State = {
 class Panel extends React.Component {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
+  _loadingTimeout: ?number;
   _checkTimeout: ?number;
   _unMounted: boolean;
   _bridge: Bridge;
@@ -108,6 +110,12 @@ class Panel extends React.Component {
     if (this.props.alreadyFoundReact) {
       this.inject();
     } else {
+      // Show loading message until:
+      // a) React is found
+      // b) After a few seconds, for page load, before showing React not detected message
+      this._loadingTimeout = setTimeout(() => {
+        this._loadingTimeout = null;
+      }, 3500);
       this.lookForReact();
     }
 
@@ -257,53 +265,23 @@ class Panel extends React.Component {
       return;
     }
     this.props.checkForReact(isReact => {
+      this.setState({
+        isReact: !!isReact,
+        loading: !!isReact || !!this._loadingTimeout,
+      });
       if (isReact) {
-        this.setState({isReact: true, loading: true});
         this.inject();
-      } else {
-        console.log('still looking...');
-        this.setState({isReact: false, loading: false});
       }
     });
   }
 
   render() {
+    var theme = this._store ? this._store.theme : Themes.ChromeDefault;
     if (this.state.loading) {
       return <Loading />;
     }
     if (!this.state.isReact) {
       return <ReactNotDetected />;
-    }
-    var theme = this._store ? this._store.theme : Themes.ChromeDefault;
-    
-    if (this.state.loading) {
-      // TODO: This currently shows in the Firefox shell when navigating from a
-      // React page to a non-React page. We should show a better message but
-      // properly doing so probably requires refactoring how we load the panel
-      // and communicate with the bridge.
-      return (
-        <div style={loadingStyle(theme)}>
-          <h2>Connecting to React…</h2>
-        </div>
-      );
-    }
-    if (!this.state.isReact) {
-      return (
-        <div style={styles.loading}>
-          <h2>React was not detected on this page.</h2>
-          <p>
-            If this seems wrong, follow the
-            {' '}
-            <a
-              href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up"
-              target="_blank"
-            >
-              troubleshooting instructions
-            </a>
-            .
-          </p>
-        </div>
-      );
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
@@ -390,17 +368,6 @@ const containerStyle = (theme: Theme) => ({
   padding: '0.25rem',
   marginBottom: '0.25rem',
   flexShrink: 0,
-});
-const loadingStyle = (theme: Theme) => ({
-  fontFamily: sansSerif.family,
-  fontSize: sansSerif.sizes.large,
-  textAlign: 'center',
-  padding: 30,
-  flex: 1,
-
-  // This color is hard-coded to match app.html and standalone.js
-  // Without it, the loading headers change colors and look weird
-  color: '#aaa',
 });
 
 module.exports = Panel;
