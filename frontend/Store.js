@@ -149,10 +149,7 @@ class Store extends EventEmitter {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const restoredThemeKey = ThemeStore.get();
-    const themeName = restoredThemeKey && Themes.hasOwnProperty(restoredThemeKey)
-      ? restoredThemeKey
-      : this._defaultThemeName;
+    const themeName = this._safeThemeName(ThemeStore.get(), this._defaultThemeName);
 
     this.theme = Themes[themeName];
     this.themeName = themeName;
@@ -345,11 +342,15 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
+  _safeThemeName(maybeThemeName: string, safeThemeName: string): string {
+    return maybeThemeName && Themes.hasOwnProperty(maybeThemeName)
+      ? maybeThemeName
+      : safeThemeName;
+  }
+
   changeTheme(themeName: ?string) {
     // Only apply a valid theme.
-    const safeThemeKey = themeName && this.themes.hasOwnProperty(themeName)
-      ? themeName
-      : this._defaultThemeName;
+    const safeThemeKey = this._safeThemeName(themeName, this._defaultThemeName);
 
     this.theme = this.themes[safeThemeKey];
     this.themeName = safeThemeKey;
@@ -361,9 +362,7 @@ class Store extends EventEmitter {
 
   setDefaultThemeName(defaultThemeName: ?string) {
     // Don't accept an invalid themeName as a default.
-    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
-      ? defaultThemeName
-      : 'ChromeDefault';
+    this._defaultThemeName = this._safeThemeName(defaultThemeName, 'ChromeDefault');
   }
 
   showPreferencesPanel() {
