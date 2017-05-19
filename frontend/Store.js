@@ -93,6 +93,7 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
+  isInspectEnabled: boolean;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -132,6 +133,7 @@ class Store extends EventEmitter {
     this._bridge = bridge;
 
     // Public state
+    this.isInspectEnabled = false;
     this.roots = new List();
     this.contextMenu = null;
     this.searchRoots = null;
@@ -547,6 +549,12 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
+  }
+
+  setInspectEnabled(isInspectEnabled: boolean) {
+    this.isInspectEnabled = isInspectEnabled;
+    this.emit('isInspectEnabled');
+    this._bridge.send('setInspectEnabled', isInspectEnabled);
   }
 
   // Private stuff

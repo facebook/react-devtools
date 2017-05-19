@@ -94,6 +94,7 @@ class Agent extends EventEmitter {
   _scrollUpdate: boolean;
   capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
+  _inspectEnabled: boolean;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -124,6 +125,7 @@ class Agent extends EventEmitter {
     if (isReactDOM) {
       this._updateScroll = this._updateScroll.bind(this);
       window.addEventListener('scroll', this._onScroll.bind(this), true);
+      window.addEventListener('click', this._onClick.bind(this), true);
     }
   }
 
@@ -156,6 +158,9 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('setInspectEnabled', enabled => {
+      this._inspectEnabled = enabled;
+    });
     bridge.on('shutdown', () => this.emit('shutdown'));
     bridge.on('changeTextContent', ({id, text}) => {
       var node = this.getNodeForID(id);
@@ -410,6 +415,22 @@ class Agent extends EventEmitter {
   _updateScroll() {
     this.emit('refreshMultiOverlay');
     this._scrollUpdate = false;
+  }
+
+  _onClick(event: Event) {
+    if (!this._inspectEnabled) {
+      return;
+    }
+
+    var id = this.getIDForNode(event.target);
+    if (!id) {
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.emit('setSelection', {id});
   }
 }
 
