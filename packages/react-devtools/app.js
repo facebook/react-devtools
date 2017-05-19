@@ -15,7 +15,9 @@ var updateNotifier = require('update-notifier');
 var pkg = require('./package.json');
 
 var mainWindow = null;
-var argv = process.argv.slice(2);
+var argv = require('minimist')(process.argv.slice(2));
+var projectRoots = argv._;
+var defaultThemeName = argv.theme;
 
 app.on('window-all-closed', function() {
   app.quit();
@@ -34,7 +36,10 @@ app.on('ready', function() {
     // We use this so that RN can keep relative JSX __source filenames
     // but "click to open in editor" still works. js1 passes project roots
     // as the argument to DevTools.
-    'window.devtools.setProjectRoots(' + JSON.stringify(argv) + ')'
+    'window.devtools.setProjectRoots(' + JSON.stringify(projectRoots) + ')'
+  );
+  mainWindow.webContents.executeJavaScript(
+    'window.devtools.setDefaultThemeName(' + JSON.stringify(defaultThemeName) + ')'
   );
 
   // Emitted when the window is closed.
