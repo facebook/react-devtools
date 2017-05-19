@@ -342,10 +342,10 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
-  _safeThemeName(maybeThemeName: string, safeThemeName: string): string {
+  _safeThemeName(maybeThemeName: ?string, safeThemeName: ?string): string {
     return maybeThemeName && Themes.hasOwnProperty(maybeThemeName)
       ? maybeThemeName
-      : safeThemeName;
+      : typeof safeThemeName === 'string' ? safeThemeName : 'ChromeDefault';
   }
 
   changeTheme(themeName: ?string) {
@@ -362,7 +362,7 @@ class Store extends EventEmitter {
 
   setDefaultThemeName(defaultThemeName: ?string) {
     // Don't accept an invalid themeName as a default.
-    this._defaultThemeName = this._safeThemeName(defaultThemeName, 'ChromeDefault');
+    this._defaultThemeName = this._safeThemeName(defaultThemeName);
   }
 
   showPreferencesPanel() {
