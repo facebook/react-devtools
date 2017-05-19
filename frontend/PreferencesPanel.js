@@ -86,8 +86,8 @@ class PreferencesPanel extends React.Component {
               ref={this._setSelectRef}
               value={themeName}
             >
-              <option value="">{showHiddenThemes ? 'Reset' : 'Match browser'}</option>
-              <option disabled="disabled">---</option>
+              {!showHiddenThemes && (<option value="">Match browser</option>)}
+              {!showHiddenThemes && (<option disabled="disabled">---</option>)}
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
@@ -99,12 +99,20 @@ class PreferencesPanel extends React.Component {
               <PreviewIcon />
             </button>
           </div>
-          <button
-            onClick={hide}
-            style={styles.closeButton}
-          >
-            Close
-          </button>
+          <div style={styles.buttonBar}>
+            <button
+              onClick={this._reset}
+              style={styles.button}
+            >
+              Reset
+            </button>
+            <button
+              onClick={hide}
+              style={styles.button}
+            >
+              Close
+            </button>
+          </div>
         </div>
       );
     }
@@ -141,6 +149,11 @@ class PreferencesPanel extends React.Component {
     } else {
       hide();
     }
+  };
+
+  _reset = () => {
+    const {changeTheme} = this.props;
+    changeTheme('');
   };
 
   _onKeyUp = ({ key }) => {
@@ -230,8 +243,12 @@ const styles = {
   header: {
     margin: '0 0 0.25rem',
   },
-  closeButton: {
+  buttonBar: {
+    flexDirection: 'row',
+  },
+  button: {
     marginTop: '0.5rem',
+    marginRight: '0.25rem',
     padding: '0.25rem',
   },
   selectAndPreviewRow: {
