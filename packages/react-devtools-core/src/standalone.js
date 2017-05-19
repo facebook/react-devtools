@@ -192,8 +192,9 @@ var DevtoolsUI = {
       var {store} = panel.getChildContext();
       // Change default themeName if panel mounted
       store.setDefaultThemeName(themeName);
-      // Change theme with user selected theme,
-      // it always wins than default theme
+      // Render devtools with the current theme.
+      // If user has selected a theme then ThemeStore will return it.
+      // If not the new default we set above will be used.
       store.changeTheme(ThemeStore.get());
     }
     return DevtoolsUI;
