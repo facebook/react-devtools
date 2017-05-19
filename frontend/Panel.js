@@ -32,6 +32,7 @@ import type {Wall} from '../agent/Bridge';
 export type Props = {
   alreadyFoundReact: boolean,
   themeName?: string,
+  showInspectButton?: boolean,
   showHiddenThemes?: boolean,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
   preferencesPanelShown?: boolean,
@@ -95,6 +96,7 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       showHiddenThemes: !!this.props.showHiddenThemes,
+      showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
       theme: this._store && this._store.theme || Themes.ChromeDefault,
       themeName: this._store && this._store.themeName || '',
@@ -341,6 +343,7 @@ class Panel extends React.Component {
 
 Panel.childContextTypes = {
   showHiddenThemes: React.PropTypes.bool.isRequired,
+  showInspectButton: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,
   theme: React.PropTypes.object.isRequired,
   themeName: React.PropTypes.string.isRequired,

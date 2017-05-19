@@ -30,6 +30,8 @@ var panel = null;
 var config = {
   reload,
   alreadyFoundReact: true,
+  showInspectButton: false,
+  showHiddenThemes: true,
   inject(done) {
     done(wall);
   },
@@ -46,7 +48,7 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    panel = ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
+    panel = ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
