@@ -10,41 +10,32 @@
  */
 'use strict';
 
-var React = require('react');
-var { sansSerif } = require('./Themes/Fonts');
+const React = require('react');
 
-import type { Theme } from './types';
+const {sansSerif} = require('../Themes/Fonts');
 
 type Props = {
-  children?: any,
-};
-type Context = {
-  theme: Theme,
+  children: string,
 };
 
-function Message(props: Props, context: Context) {
-  const { theme } = context;
+function Message({ children }: Props) {
   return (
-    <div style={messageStyle(theme)}>
-      {props.children}
+    <div style={loadingStyle}>
+      <h2>{children}</h2>
     </div>
   );
 }
 
-Message.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
-};
-
-const messageStyle = (theme: Theme) => ({
+const loadingStyle = {
   fontFamily: sansSerif.family,
   fontSize: sansSerif.sizes.large,
   textAlign: 'center',
   padding: 30,
   flex: 1,
 
-  // This color is hard-coded to match app.html and standalone.js
+  // This color is hard-coded to match packages/react-devtools/app.html and standalone.js
   // Without it, the loading headers change colors and look weird
   color: '#aaa',
-});
+};
 
 module.exports = Message;

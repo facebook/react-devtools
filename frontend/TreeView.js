@@ -13,9 +13,9 @@
 var React = require('react');
 var { List } = require('immutable');
 var Breadcrumb = require('./Breadcrumb');
+var Message = require('./Messages/Message');
 var Node = require('./Node');
 var SearchUtils = require('./SearchUtils');
-var Message = require('./Message');
 var decorate = require('./decorate');
 var {monospace, sansSerif} = require('./Themes/Fonts');
 

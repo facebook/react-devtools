@@ -15,6 +15,7 @@ var path = require('path');
 
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
+var Message = require('../../../frontend/Messages/Message');
 var Panel = require('../../../frontend/Panel');
 var ThemeStore = require('../../../frontend/Themes/Store');
 var launchEditor = require('./launchEditor');
@@ -55,7 +56,7 @@ function reload() {
 function onDisconnected() {
   panel = null;
   ReactDOM.unmountComponentAtNode(node);
-  node.innerHTML = '<div id="waiting"><h2>Waiting for React to connect…</h2></div>';
+  ReactDOM.render(<Message>Waiting for React to connect…</Message>, node);
 }
 
 function onError(e) {

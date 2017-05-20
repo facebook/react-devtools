@@ -14,13 +14,12 @@ var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 
 var Panel = require('../../../frontend/Panel');
-var Loading = require('../../../frontend/Loading');
-var ReactNotDetected = require('../../../frontend/ReactNotDetected');
+var Message = require('../../../frontend/Messages/Message');
+var ReactNotDetected = require('../../../frontend/Messages/ReactNotDetected');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = document.getElementById('container');
-ReactDOM.render(<LoadingText>Looking for React…</LoadingText>, node);
 var port = {};
 
 // TODO (bvaughn) Read default :themeName and switch between 'FirefoxLight' and 'FirefoxDark'
@@ -39,7 +38,7 @@ window.addEventListener('message', function(event) {
     if (evt.data === 'show') {
       reload();
     } else if (evt.data === 'unload') {
-      ReactDOM.render(<Loading />, node);
+      ReactDOM.render(<Message>Looking for React…</Message>, node);
     } else if (evt.data.type === 'hasReact') {
       var reactDetected = evt.data.val;
       if (!reactDetected) {

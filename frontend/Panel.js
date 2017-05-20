@@ -16,8 +16,8 @@ var Store = require('./Store');
 var keyboardNav = require('./keyboardNav');
 var invariant = require('./invariant');
 var assign = require('object-assign');
-var Loading = require('./Loading');
-var ReactNotDetected = require('./ReactNotDetected');
+var Message = require('./Messages/Message');
+var ReactNotDetected = require('./Messages/ReactNotDetected');
 
 var Bridge = require('../agent/Bridge');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
@@ -283,7 +283,7 @@ class Panel extends React.Component {
     var theme = this._store ? this._store.theme : Themes.ChromeDefault;
 
     if (this.state.loading) {
-      return <Loading />;
+      return <Message>Looking for React…</Message>;
     }
     if (!this.state.isReact) {
       return <ReactNotDetected />;
