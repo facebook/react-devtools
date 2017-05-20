@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const Themes = require('./Themes');
+
 type RGB = {
 	r: number,
 	g: number,
@@ -21,6 +23,20 @@ function getBrightness(hex: string): number {
 
   // http://www.w3.org/TR/AERT#color-contrast
   return Math.round(((r * 299) + (g * 587) + (b * 114)) / 1000);
+}
+
+function getDefaultThemeName(): string {
+  return 'ChromeDefault';
+}
+
+function getSafeThemeName(themeName: ?string, defaultThemeName: ?string): string {
+  if (themeName && Themes.hasOwnProperty(themeName)) {
+    return themeName;
+  } else if (defaultThemeName === 'string') {
+    return defaultThemeName;
+  } else {
+    return getDefaultThemeName();
+  }
 }
 
 function getInvertedMid(hex: string): string {
@@ -54,6 +70,8 @@ function isBright(hex: string): boolean {
 
 module.exports = {
   getBrightness,
+  getDefaultThemeName,
+  getSafeThemeName,
   getInvertedMid,
   getInvertedWeak,
   getRgb,

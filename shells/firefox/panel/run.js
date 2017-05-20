@@ -20,7 +20,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = document.getElementById('container');
-ReactDOM.render(<h2 id="message">Looking for React...</h2>, node);
+ReactDOM.render(<LoadingText>Looking for React…</LoadingText>, node);
 var port = {};
 
 // TODO (bvaughn) Read default :themeName and switch between 'FirefoxLight' and 'FirefoxDark'
@@ -29,7 +29,7 @@ const themeName = 'FirefoxLight';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);
-  ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);
+  ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
 window.addEventListener('message', function(event) {
@@ -53,6 +53,7 @@ window.addEventListener('message', function(event) {
 
 var config = {
   reload,
+  themeName,
   // checkForReact,
   inject(done) {
     var disconnected = false;

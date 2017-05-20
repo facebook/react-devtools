@@ -16,6 +16,7 @@ var path = require('path');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
+var ThemeStore = require('../../../frontend/Themes/Store');
 var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -24,6 +25,7 @@ var node = null;
 var onStatusChange = function noop() {};
 var projectRoots = [];
 var wall = null;
+var panel = null;
 
 var config = {
   reload,
@@ -46,16 +48,18 @@ function reload() {
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '';
   setTimeout(() => {
-    ReactDOM.render(<Panel {...config} />, node);
+    panel = ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
 function onDisconnected() {
+  panel = null;
   ReactDOM.unmountComponentAtNode(node);
   node.innerHTML = '<div id="waiting"><h2>Waiting for React to connect…</h2></div>';
 }
 
 function onError(e) {
+  panel = null;
   ReactDOM.unmountComponentAtNode(node);
   var message;
   if (e.code === 'EADDRINUSE') {
@@ -179,6 +183,20 @@ var DevtoolsUI = {
 
   setStatusListener(_listener) {
     onStatusChange = _listener;
+    return DevtoolsUI;
+  },
+
+  setDefaultThemeName(themeName) {
+    config.themeName = themeName;
+    if (panel) {
+      var {store} = panel.getChildContext();
+      // Change default themeName if panel mounted
+      store.setDefaultThemeName(themeName);
+      // Render devtools with the current theme.
+      // If user has selected a theme then ThemeStore will return it.
+      // If not the new default we set above will be used.
+      store.changeTheme(ThemeStore.get());
+    }
     return DevtoolsUI;
   },
 

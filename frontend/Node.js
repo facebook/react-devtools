@@ -162,7 +162,7 @@ class Node extends React.Component {
     const {theme} = this.context;
     const {
       depth,
-      hovered, 
+      hovered,
       isBottomTagHovered,
       isBottomTagSelected,
       node,
@@ -315,6 +315,7 @@ class Node extends React.Component {
                   <span style={sharedHeadBracketStyle}>&gt;</span>
                 </span>,
               ]}
+              {selected && <span style={jsxSingleLineTagStyle}> == $r</span>}
             </span>
           </div>
         </div>
@@ -328,6 +329,9 @@ class Node extends React.Component {
         <span style={closeTagBracketStyle}>&lt;/</span>
         <span style={jsxCloseTagStyle}>{name}</span>
         <span style={closeTagBracketStyle}>&gt;</span>
+        {selected && ((collapsed && !this.props.isBottomTagSelected) || this.props.isBottomTagSelected) &&
+          <span style={jsxCloseTagStyle}> == $r</span>
+        }
       </span>
     );
 
@@ -359,6 +363,9 @@ class Node extends React.Component {
             <Props key="props" props={node.get('props')} inverted={headInverted}/>
           }
           <span style={sharedHeadBracketStyle}>&gt;</span>
+          {selected && !collapsed && !this.props.isBottomTagSelected &&
+              <span style={jsxOpenTagStyle}> == $r</span>
+          }
         </span>
         {collapsed && <span>…</span>}
         {collapsed && closeTag}

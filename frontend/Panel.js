@@ -97,6 +97,7 @@ class Panel extends React.Component {
 
   getChildContext(): Object {
     return {
+      defaultThemeName: this._store && this._store.getDefaultThemeName() || '',
       showHiddenThemes: !!this.props.showHiddenThemes,
       showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
@@ -232,7 +233,10 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {
-        this.setState({loading: false});
+        this.setState({
+          loading: false,
+          themeName: this._store.themeName,
+        });
         this.getNewSelection();
       });
       this._store.on('preferencesPanelShown', () => {
@@ -277,12 +281,14 @@ class Panel extends React.Component {
 
   render() {
     var theme = this._store ? this._store.theme : Themes.ChromeDefault;
+
     if (this.state.loading) {
       return <Loading />;
     }
     if (!this.state.isReact) {
       return <ReactNotDetected />;
     }
+
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
@@ -338,6 +344,7 @@ class Panel extends React.Component {
 }
 
 Panel.childContextTypes = {
+  defaultThemeName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   showInspectButton: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,

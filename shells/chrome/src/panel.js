@@ -17,8 +17,15 @@ var inject = require('./inject');
 
 import type {Props} from '../../../frontend/Panel';
 
+// chrome.devtools.panels added in Chrome 18.
+// chrome.devtools.panels.themeName added in Chrome 54.
+const themeName = (chrome.devtools.panels : any).themeName === 'dark'
+  ? 'ChromeDark'
+  : 'ChromeDefault';
+
 var config: Props = {
   reload,
+  themeName,
   checkForReact,
   alreadyFoundReact: false,
   reloadSubscribe(reloadFn) {
@@ -114,10 +121,4 @@ function reload() {
   }, 100);
 }
 
-// chrome.devtools.panels added in Chrome 18.
-// chrome.devtools.panels.themeName added in Chrome 54.
-const themeName = (chrome.devtools.panels : any).themeName === 'dark'
-  ? 'ChromeDark'
-  : 'ChromeDefault';
-
-ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);
+ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);

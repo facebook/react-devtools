@@ -22,6 +22,7 @@ class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
+    defaultThemeName: string,
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
@@ -57,7 +58,7 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {showHiddenThemes, theme, themeName, themes} = this.context;
+    const {defaultThemeName, showHiddenThemes, theme, themeName, themes} = this.context;
     const {hide, open} = this.props;
     const {previewMode} = this.state;
 
@@ -99,12 +100,21 @@ class PreferencesPanel extends React.Component {
               <PreviewIcon />
             </button>
           </div>
-          <button
-            onClick={hide}
-            style={styles.closeButton}
-          >
-            Close
-          </button>
+          <div style={styles.buttonBar}>
+            <button
+              disabled={themeName === defaultThemeName}
+              onClick={this._reset}
+              style={styles.button}
+            >
+              Reset
+            </button>
+            <button
+              onClick={hide}
+              style={styles.button}
+            >
+              Close
+            </button>
+          </div>
         </div>
       );
     }
@@ -143,6 +153,11 @@ class PreferencesPanel extends React.Component {
     }
   };
 
+  _reset = () => {
+    const {changeTheme} = this.props;
+    changeTheme('');
+  };
+
   _onKeyUp = ({ key }) => {
     if (key === 'Escape') {
       this.props.hide();
@@ -161,6 +176,7 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
+  defaultThemeName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
   themeName: React.PropTypes.string.isRequired,
@@ -230,8 +246,12 @@ const styles = {
   header: {
     margin: '0 0 0.25rem',
   },
-  closeButton: {
+  buttonBar: {
+    flexDirection: 'row',
+  },
+  button: {
     marginTop: '0.5rem',
+    marginRight: '0.25rem',
     padding: '0.25rem',
   },
   selectAndPreviewRow: {

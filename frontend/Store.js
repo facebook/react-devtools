@@ -19,6 +19,7 @@ var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var Themes = require('./Themes/Themes');
 var ThemeStore = require('./Themes/Store');
+var {getSafeThemeName} = require('./Themes/utils');
 
 import type Bridge from '../agent/Bridge';
 import type {Theme} from './types';
@@ -122,10 +123,7 @@ class Store extends EventEmitter {
   constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
 
-    // Don't accept an invalid themeName as a default.
-    this._defaultThemeName = defaultThemeName && Themes.hasOwnProperty(defaultThemeName)
-      ? defaultThemeName
-      : 'ChromeDefault';
+    this.setDefaultThemeName(defaultThemeName);
 
     this._nodes = new Map();
     this._parents = new Map();
@@ -152,10 +150,7 @@ class Store extends EventEmitter {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const restoredThemeKey = ThemeStore.get();
-    const themeName = restoredThemeKey && Themes.hasOwnProperty(restoredThemeKey)
-      ? restoredThemeKey
-      : this._defaultThemeName;
+    const themeName = getSafeThemeName(ThemeStore.get(), this._defaultThemeName);
 
     this.theme = Themes[themeName];
     this.themeName = themeName;
@@ -350,9 +345,7 @@ class Store extends EventEmitter {
 
   changeTheme(themeName: ?string) {
     // Only apply a valid theme.
-    const safeThemeKey = themeName && this.themes.hasOwnProperty(themeName)
-      ? themeName
-      : this._defaultThemeName;
+    const safeThemeKey = getSafeThemeName(themeName, this._defaultThemeName);
 
     this.theme = this.themes[safeThemeKey];
     this.themeName = safeThemeKey;
@@ -360,6 +353,15 @@ class Store extends EventEmitter {
 
     // But allow users to restore "default" mode by selecting an empty theme.
     ThemeStore.set(themeName || null);
+  }
+
+  getDefaultThemeName(): string {
+    return this._defaultThemeName;
+  }
+
+  setDefaultThemeName(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = getSafeThemeName(defaultThemeName);
   }
 
   showPreferencesPanel() {
