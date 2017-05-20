@@ -13,12 +13,13 @@
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 
+var LoadingText = require('../../../frontend/LoadingText');
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
 var node = document.getElementById('container');
-ReactDOM.render(<h2 id="message">Looking for React...</h2>, node);
+ReactDOM.render(<LoadingText>Looking for React…</LoadingText>, node);
 var port = {};
 
 // TODO (bvaughn) Read default :themeName and switch between 'FirefoxLight' and 'FirefoxDark'
@@ -27,7 +28,7 @@ const themeName = 'FirefoxLight';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);
-  ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);
+  ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
 window.addEventListener('message', function(event) {
@@ -37,18 +38,12 @@ window.addEventListener('message', function(event) {
     if (evt.data === 'show') {
       reload();
     } else if (evt.data === 'unload') {
-      ReactDOM.render(<h1 id="message">Looking for React...</h1>, node);
+      ReactDOM.render(<LoadingText>Looking for React…</LoadingText>, node);
     } else if (evt.data.type === 'hasReact') {
       if (evt.data.val) {
         ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
       } else {
-        // TODO: Does this actually show up? It seems like either the "Looking
-        // for React..." at the top of this file shows, or (when navigating
-        // from a React page to a non-React one) Panel renders the same text.
-        ReactDOM.render(
-          <h1 id="message">Unable to find React on the page.</h1>,
-          node
-        );
+        ReactDOM.render(<LoadingText>Unable to find React on the page</LoadingText>, node);
       }
     }
   };
@@ -56,6 +51,7 @@ window.addEventListener('message', function(event) {
 
 var config = {
   reload,
+  themeName,
   // checkForReact,
   inject(done) {
     var disconnected = false;

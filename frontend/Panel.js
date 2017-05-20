@@ -18,7 +18,7 @@ var invariant = require('./invariant');
 var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
-var {sansSerif} = require('./Themes/Fonts');
+var LoadingText = require('./LoadingText');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
@@ -273,24 +273,17 @@ class Panel extends React.Component {
 
   render() {
     var theme = this._store ? this._store.theme : Themes.ChromeDefault;
+
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
       // properly doing so probably requires refactoring how we load the panel
       // and communicate with the bridge.
-      return (
-        <div style={loadingStyle(theme)}>
-          <h2>Connecting to React…</h2>
-        </div>
-      );
+      return <LoadingText>Conneting to React…</LoadingText>;
+    } else if (!this.state.isReact) {
+      return <LoadingText>Looking for React…</LoadingText>;
     }
-    if (!this.state.isReact) {
-      return (
-        <div style={loadingStyle(theme)}>
-          <h2>Looking for React…</h2>
-        </div>
-      );
-    }
+
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
@@ -377,17 +370,6 @@ const containerStyle = (theme: Theme) => ({
   padding: '0.25rem',
   marginBottom: '0.25rem',
   flexShrink: 0,
-});
-const loadingStyle = (theme: Theme) => ({
-  fontFamily: sansSerif.family,
-  fontSize: sansSerif.sizes.large,
-  textAlign: 'center',
-  padding: 30,
-  flex: 1,
-
-  // This color is hard-coded to match app.html and standalone.js
-  // Without it, the loading headers change colors and look weird
-  color: '#aaa',
 });
 
 module.exports = Panel;

@@ -19,6 +19,7 @@ var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var Themes = require('./Themes/Themes');
 var ThemeStore = require('./Themes/Store');
+var {getSafeThemeName} = require('./Themes/utils');
 
 import type Bridge from '../agent/Bridge';
 import type {Theme} from './types';
@@ -149,7 +150,7 @@ class Store extends EventEmitter {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const themeName = this._safeThemeName(ThemeStore.get(), this._defaultThemeName);
+    const themeName = getSafeThemeName(ThemeStore.get(), this._defaultThemeName);
 
     this.theme = Themes[themeName];
     this.themeName = themeName;
@@ -342,15 +343,9 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
-  _safeThemeName(maybeThemeName: ?string, safeThemeName: ?string): string {
-    return maybeThemeName && Themes.hasOwnProperty(maybeThemeName)
-      ? maybeThemeName
-      : typeof safeThemeName === 'string' ? safeThemeName : 'ChromeDefault';
-  }
-
   changeTheme(themeName: ?string) {
     // Only apply a valid theme.
-    const safeThemeKey = this._safeThemeName(themeName, this._defaultThemeName);
+    const safeThemeKey = getSafeThemeName(themeName, this._defaultThemeName);
 
     this.theme = this.themes[safeThemeKey];
     this.themeName = safeThemeKey;
@@ -366,7 +361,7 @@ class Store extends EventEmitter {
 
   setDefaultThemeName(defaultThemeName: ?string) {
     // Don't accept an invalid themeName as a default.
-    this._defaultThemeName = this._safeThemeName(defaultThemeName);
+    this._defaultThemeName = getSafeThemeName(defaultThemeName);
   }
 
   showPreferencesPanel() {
