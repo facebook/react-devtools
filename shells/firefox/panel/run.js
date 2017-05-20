@@ -13,8 +13,9 @@
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 
-var LoadingText = require('../../../frontend/LoadingText');
 var Panel = require('../../../frontend/Panel');
+var Loading = require('../../../frontend/Loading');
+var ReactNotDetected = require('../../../frontend/ReactNotDetected');
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -38,12 +39,13 @@ window.addEventListener('message', function(event) {
     if (evt.data === 'show') {
       reload();
     } else if (evt.data === 'unload') {
-      ReactDOM.render(<LoadingText>Looking for React…</LoadingText>, node);
+      ReactDOM.render(<Loading />, node);
     } else if (evt.data.type === 'hasReact') {
-      if (evt.data.val) {
-        ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
+      var reactDetected = evt.data.val;
+      if (!reactDetected) {
+        ReactDOM.render(<ReactNotDetected />, node);
       } else {
-        ReactDOM.render(<LoadingText>Unable to find React on the page</LoadingText>, node);
+        ReactDOM.render(<Panel {...config} alreadyFoundReact={true} />, node);
       }
     }
   };

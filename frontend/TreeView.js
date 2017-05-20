@@ -10,11 +10,12 @@
  */
 'use strict';
 
+var React = require('react');
+var { List } = require('immutable');
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
-var React = require('react');
 var SearchUtils = require('./SearchUtils');
-
+var Message = require('./Message');
 var decorate = require('./decorate');
 var {monospace, sansSerif} = require('./Themes/Fonts');
 
@@ -22,8 +23,16 @@ import type {Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
+type Props = {
+  reload?: () => void,
+  roots: List,
+  searching: boolean,
+  searchText: string,
+};
+
 class TreeView extends React.Component {
   node: ?HTMLElement;
+  props: Props;
 
   getChildContext() {
     return {
@@ -63,17 +72,13 @@ class TreeView extends React.Component {
         );
       } else {
         return (
-          <div style={styles.container}>
-            <div ref={n => this.node = n} style={styles.scroll}>
-              <div style={styles.scrollContents}>
-              Waiting for roots to load...
-              {this.props.reload &&
-                <span>
-                  to reload the inspector <button onClick={this.props.reload}> click here</button>
-                </span>}
-              </div>
-            </div>
-          </div>
+          <Message>
+            <h3>React was detected, but no components are mounted.</h3>
+            <p>If this seems wrong, try reloading the inspector.</p>
+            {this.props.reload &&
+              <button onClick={this.props.reload}>Reload inspector</button>
+            }
+          </Message>
         );
       }
     }
