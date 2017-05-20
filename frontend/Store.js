@@ -502,7 +502,18 @@ class Store extends EventEmitter {
 
   // pin component
   pinComponent(componentId: string): void {
-    this.pinnedComponents.push(componentId);
+    const currentNode = this.get(componentId);
+    const key = currentNode.get('key') === null ? '' : currentNode.get('key');
+    let path = `${currentNode.get('name')}${key}`;
+    let temp = this.getParent(componentId);
+    while (this.getParent(temp)) {
+      const parentNode = this.get(this.getParent(temp));
+      const k = parentNode.get('key') === null ? '' : parentNode.get('key');
+      path = `${parentNode.get('name')}${k}/${path}`;
+      temp = this.getParent(temp);
+    }
+
+    this.pinnedComponents.push(path);
     this.emit('pinComponent');
   }
 

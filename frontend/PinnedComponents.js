@@ -100,14 +100,33 @@ var styles = {
   },
 };
 
+
+const findPath = store => componentId => {
+  const currentNode = store.get(componentId);
+  const key = currentNode.get('key') === null ? '' : currentNode.get('key');
+  let path = `${currentNode.get('name')}${key}`;
+  let temp = store.getParent(componentId);
+  while (store.getParent(temp)) {
+    const parentNode = store.get(store.getParent(temp));
+    const k = parentNode.get('key') === null ? '' : parentNode.get('key');
+    path = `${parentNode.get('name')}${k}/${path}`;
+    temp = store.getParent(temp);
+  }
+  return path;
+}
+
+
 var WrapPinnedComponents = decorate({
   listeners(props) {
     return ['pinComponent', 'unpinComponent'];
   },
   props(store, props) {
+    const findPathWithStore = findPath(store);
     const pinnedComponentIDs = store.pinnedComponents;
     const pinnedComponents = store._nodes.entrySeq()
-      .filter(([key, val]) => pinnedComponentIDs.findIndex(id => id === key) > -1)
+      .filter(([key, val]) => {
+        return pinnedComponentIDs.includes(findPathWithStore(key));
+      })
       .map(([key, val]) => key)
       .toList();
     return {
