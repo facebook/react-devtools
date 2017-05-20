@@ -115,7 +115,7 @@ class Store extends EventEmitter {
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
-    this.pinnedComponents = [];
+    this.pinnedComponents = JSON.parse(localStorage.getItem('foo', JSON.stringify(this.pinnedComponents))) || [];
 
     // Public state
     this.roots = new List();
@@ -502,7 +502,31 @@ class Store extends EventEmitter {
 
   // pin component
   pinComponent(componentId: string): void {
+    const path = this.getPath(componentId);
+    this.pinnedComponents.push(path);
+    localStorage.setItem('foo', JSON.stringify(this.pinnedComponents));
+    this.emit('pinComponent');
+  }
+
+  // remove pinned component
+  unpinComponent(componentId: string): void {
+    const foundIndex = this.pinnedComponents.findIndex(id => id === this.getPath(componentId));
+    if (foundIndex === -1) {
+      return;
+    }
+
+    this.pinnedComponents = [
+      ...this.pinnedComponents.slice(0, foundIndex),
+      ...this.pinnedComponents.slice(foundIndex + 1, this.pinnedComponents.length),
+    ];
+    localStorage.setItem('foo', JSON.stringify(this.pinnedComponents));
+    this.emit('unpinComponent');
+  }
+
+
+  getPath(componentId: string): string {
     const currentNode = this.get(componentId);
+    if (!currentNode) return null;
     const key = currentNode.get('key') === null ? '' : currentNode.get('key');
     let path = `${currentNode.get('name')}${key}`;
     let temp = this.getParent(componentId);
@@ -512,29 +536,12 @@ class Store extends EventEmitter {
       path = `${parentNode.get('name')}${k}/${path}`;
       temp = this.getParent(temp);
     }
-
-    this.pinnedComponents.push(path);
-    this.emit('pinComponent');
-  }
-
-  // remove pinned component
-  unpinComponent(componentId: string): void {
-    const foundIndex = this.pinnedComponents.findIndex(id => id === componentId);
-    if (foundIndex === -1) {
-      return;
-    }
-
-    this.pinnedComponents = [
-      ...this.pinnedComponents.slice(0, foundIndex),
-      ...this.pinnedComponents.slice(foundIndex + 1, this.pinnedComponents.length),
-    ];
-    this.emit('unpinComponent');
+    return path;
   }
 
   // is pinned component
   checkPinnedComponent(componentId: string): boolean {
-    const foundIndex = this.pinnedComponents.findIndex(id => id === componentId);
-    return foundIndex !== -1;
+    return this.pinnedComponents.includes(this.getPath(componentId));
   }
 
   // Private stuff
@@ -576,6 +583,10 @@ class Store extends EventEmitter {
     }
   }
 
+  _updatePinnedComponentIfNeeded(componentID: string) {
+    this.emit('updatePinnedComponents');
+  }
+
   _mountComponent(data: DataType) {
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Composite') {
@@ -593,6 +604,7 @@ class Store extends EventEmitter {
   }
 
   _updateComponent(data: DataType) {
+    this._updatePinnedComponentIfNeeded(data.id);
     var node = this.get(data.id);
     if (!node) {
       return;

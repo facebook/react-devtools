@@ -40,7 +40,7 @@ class PinnedComponents extends React.Component {
   }
 
   render() {
-    if (!this.props.nodes.length) {
+    if (!this.props.nodes.count()) {
       return null;
     }
     return (
@@ -100,32 +100,15 @@ var styles = {
   },
 };
 
-
-const findPath = store => componentId => {
-  const currentNode = store.get(componentId);
-  const key = currentNode.get('key') === null ? '' : currentNode.get('key');
-  let path = `${currentNode.get('name')}${key}`;
-  let temp = store.getParent(componentId);
-  while (store.getParent(temp)) {
-    const parentNode = store.get(store.getParent(temp));
-    const k = parentNode.get('key') === null ? '' : parentNode.get('key');
-    path = `${parentNode.get('name')}${k}/${path}`;
-    temp = store.getParent(temp);
-  }
-  return path;
-}
-
-
 var WrapPinnedComponents = decorate({
   listeners(props) {
-    return ['pinComponent', 'unpinComponent'];
+    return ['updatePinnedComponents', 'pinComponent', 'unpinComponent'];
   },
   props(store, props) {
-    const findPathWithStore = findPath(store);
-    const pinnedComponentIDs = store.pinnedComponents;
+    const pinnedComponentPaths = store.pinnedComponents;
     const pinnedComponents = store._nodes.entrySeq()
       .filter(([key, val]) => {
-        return pinnedComponentIDs.includes(findPathWithStore(key));
+        return pinnedComponentPaths.includes(store.getPath(key));
       })
       .map(([key, val]) => key)
       .toList();
