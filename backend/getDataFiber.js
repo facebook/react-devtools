@@ -81,6 +81,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     case HostComponent:
       nodeType = 'Native';
       name = fiber.type;
+      publicInstance = fiber.stateNode;
       props = fiber.memoizedProps;
       if (
         typeof props.children === 'string' ||

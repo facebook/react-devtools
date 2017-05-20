@@ -14,25 +14,30 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var Draggable = require('./Draggable');
 
-var assign = require('object-assign');
+import type {Theme} from './types';
+
+type Context = {
+  theme: Theme,
+};
 
 type Props = {
   style?: {[key: string]: any},
   left: () => React$Element,
   right: () => React$Element,
   initialWidth: number,
+  initialHeight: number,
+  isVertical: bool,
 };
-
-type DefaultProps = {};
 
 type State = {
   moving: boolean,
   width: number,
+  height: number,
 };
 
 class SplitPane extends React.Component {
+  context: Context;
   props: Props;
-  defaultProps: DefaultProps;
   state: State;
 
   constructor(props: Props) {
@@ -40,69 +45,102 @@ class SplitPane extends React.Component {
     this.state = {
       moving: false,
       width: props.initialWidth,
+      height: props.initialHeight,
     };
   }
 
-  onMove(x: number) {
+  componentDidMount() {
     var node = ReactDOM.findDOMNode(this);
+
     this.setState({
-      width: (node.offsetLeft + node.offsetWidth) - x,
+      width: Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3)),
+      height: Math.floor(node.offsetHeight * 0.3),
     });
   }
 
+  onMove(x: number, y: number) {
+    var node = ReactDOM.findDOMNode(this);
+
+    this.setState(prevState => ({
+      width: this.props.isVertical ?
+        prevState.width :
+        Math.floor(node.offsetLeft + node.offsetWidth - x),
+      height: !this.props.isVertical ?
+        prevState.height :
+        Math.floor(node.offsetTop + node.offsetHeight - y),
+    }));
+  }
+
   render() {
-    var rightStyle = assign({}, styles.rightPane, {
-      width: this.state.width,
-    });
+    const {theme} = this.context;
+    const {isVertical} = this.props;
+    const {height, width} = this.state;
+
     return (
-      <div style={styles.container}>
+      <div style={containerStyle(isVertical)}>
         <div style={styles.leftPane}>
           {this.props.left()}
         </div>
-        <Draggable
-          style={styles.dragger}
-          onStart={() => this.setState({moving: true})}
-          onMove={x => this.onMove(x)}
-          onStop={() => this.setState({moving: false})}>
-          <div style={styles.draggerInner} />
-        </Draggable>
-        <div style={rightStyle}>
-          {this.props.right()}
+        <div style={rightStyle(isVertical, width, height)}>
+          <Draggable
+            style={draggerStyle(isVertical)}
+            onStart={() => this.setState({moving: true})}
+            onMove={(x, y) => this.onMove(x, y)}
+            onStop={() => this.setState({moving: false})}>
+            <div style={draggerInnerStyle(isVertical, theme)} />
+          </Draggable>
+          <div style={styles.rightPane}>
+            {this.props.right()}
+          </div>
         </div>
       </div>
     );
   }
 }
 
-var styles = {
-  container: {
-    display: 'flex',
-    minWidth: 0,
-    flex: 1,
-  },
+SplitPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
-  dragger: {
-    padding: '0 3px',
-    cursor: 'ew-resize',
-    position: 'relative',
-    zIndex: 1,
-  },
+const containerStyle = (isVertical: boolean) => ({
+  display: 'flex',
+  minWidth: 0,
+  flex: 1,
+  flexDirection: isVertical ? 'column' : 'row',
+});
 
-  draggerInner: {
-    backgroundColor: '#ccc',
-    height: '100%',
-    width: 1,
-  },
+const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
+  height: isVertical ? '1px' : '100%',
+  width: isVertical ? '100%' : '1px',
+  backgroundColor: theme.base04,
+});
 
+const draggerStyle = (isVertical: boolean) => ({
+  position: 'relative',
+  zIndex: 1,
+  padding: isVertical ? '0.25rem 0' : '0 0.25rem',
+  margin: isVertical ? '-0.25rem 0' : '0 -0.25rem',
+  cursor: isVertical ? 'ns-resize' : 'ew-resize',
+});
+
+const rightStyle = (isVertical: boolean, width: number, height: number) => ({
+  ...containerStyle(isVertical),
+  width: isVertical ? '100%' : width,
+  height: isVertical ? height : '100%',
+  flex: 'initial',
+  minHeight: 120,
+  minWidth: 150,
+});
+
+const styles = {
   rightPane: {
     display: 'flex',
-    marginLeft: -3,
+    width: '100%',
   },
-
   leftPane: {
     display: 'flex',
-    marginRight: -3,
-    minWidth: '255px',
+    minWidth: '50%',
+    minHeight: '50%',
     flex: 1,
   },
 };

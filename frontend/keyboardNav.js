@@ -34,7 +34,7 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
     if (win.document.activeElement !== win.document.body) {
       return;
     }
-    if (e.shiftKey || e.ctrlKey || e.metaKey || e.altKey) {
+    if (e.shiftKey || e.metaKey) {
       return;
     }
 
@@ -43,6 +43,17 @@ module.exports = function keyboardNav(store: Store, win: Object): (e: DOMEvent) 
       return;
     }
     e.preventDefault();
+    if (e.altKey && direction === 'right') {
+      store.toggleAllChildrenNodes(false);
+      return;
+    }
+    if (e.altKey && direction === 'left') {
+      store.toggleAllChildrenNodes(true);
+      return;
+    }
+    if (e.ctrlKey || e.altKey) {
+      return;
+    }
     var dest = getDest(direction, store);
     if (!dest) {
       return;

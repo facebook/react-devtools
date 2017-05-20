@@ -11,10 +11,15 @@
 'use strict';
 
 var React = require('react');
-var assign = require('object-assign');
 var decorate = require('./decorate');
+var {sansSerif} = require('./Themes/Fonts');
+
+import type {Theme} from './types';
 
 class TabbedPane extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: {
     tabs: {[key: string]: () => React$Element},
     selected: string,
@@ -22,27 +27,23 @@ class TabbedPane extends React.Component {
   };
 
   render() {
+    var {theme} = this.context;
     var tabs = Object.keys(this.props.tabs);
     if (tabs.length === 1) {
       return this.props.tabs[tabs[0]]();
     }
     return (
       <div style={styles.container}>
-        <ul style={styles.tabs}>
-          {tabs.map((name, i) => {
-            var style = styles.tab;
-            if (name === this.props.selected) {
-              style = assign({}, style, styles.selectedTab);
-            }
-            if (i === tabs.length - 1) {
-              style = assign({}, style, styles.lastTab);
-            }
-            return (
-              <li key={name + i} style={style} onClick={() => this.props.setSelectedTab(name)}>
-                {name}
-              </li>
-            );
-          })}
+        <ul style={tabsStyle(theme)}>
+          {tabs.map((name, i) => (
+            <li
+              key={name + i}
+              onClick={() => this.props.setSelectedTab(name)}
+              style={tabStyle(name === this.props.selected, theme)}
+            >
+              {name}
+            </li>
+          ))}
         </ul>
         <div style={styles.body}>
           {this.props.tabs[this.props.selected]()}
@@ -52,35 +53,42 @@ class TabbedPane extends React.Component {
   }
 }
 
+TabbedPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const tabsStyle = (theme: Theme) => ({
+  display: 'flex',
+  flexShrink: 0,
+  listStyle: 'none',
+  margin: 0,
+  backgroundColor: theme.base00,
+  borderBottom: `1px solid ${theme.base03}`,
+  padding: '0.25rem 0.25rem 0 0.25rem',
+});
+
+const tabStyle = (isSelected: boolean, theme: Theme) => {
+  const border = isSelected ? `1px solid ${theme.base03}` : 'none';
+
+  return {
+    padding: '0.25rem 0.5rem',
+    lineHeight: '15px',
+    fontSize: sansSerif.sizes.normal,
+    fontFamily: sansSerif.family,
+    cursor: 'pointer',
+    backgroundColor: isSelected ? theme.base01 : 'transparent',
+    borderLeft: border,
+    borderRight: border,
+    borderTop: border,
+  };
+};
+
 var styles = {
   container:{
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     width: '100%',
-  },
-  tabs: {
-    display: 'flex',
-    flexShrink: 0,
-    listStyle: 'none',
-    backgroundColor: '#eee',
-    borderBottom: '1px solid rgb(163, 163, 163)',
-    margin: 0,
-    padding: '0 2px',
-  },
-  tab: {
-    padding: '2px 4px',
-    lineHeight: '15px',
-    fontSize: 12,
-    fontFamily: "'Lucida Grande', sans-serif",
-    cursor: 'pointer',
-    borderLeft: '1px solid rgb(163, 163, 163)',
-  },
-  lastTab: {
-    borderRight: '1px solid rgb(163, 163, 163)',
-  },
-  selectedTab: {
-    backgroundColor: 'white',
   },
   body: {
     flex: 1,

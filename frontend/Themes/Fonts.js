@@ -11,40 +11,18 @@
 'use strict';
 
 module.exports = {
-  func: {
-    color: '#170',
+  monospace: {
+    family: 'Menlo, Consolas, monospace',
+    sizes: {
+      normal: 11,
+    },
   },
-
-  attr: {
-    color: '#666',
-  },
-
-  object: {
-    color: '#666',
-  },
-
-  array: {
-    color: '#666',
-  },
-
-  symbol: {
-    color: '#22a',
-  },
-
-  number: {
-    color: '#a11',
-  },
-
-  string: {
-    color: '#22a',
-    wordBreak: 'break-word',
-  },
-
-  bool: {
-    color: '#a11',
-  },
-
-  empty: {
-    color: '#777',
+  sansSerif: {
+    family: '"Helvetica Neue", "Lucida Grande", -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif',
+    sizes: {
+      small: 10,
+      normal: 12,
+      large: 14,
+    },
   },
 };

@@ -12,12 +12,14 @@
 
 import type Store from './Store';
 import type {ElementID} from './types';
+import type {Theme} from './types';
 
+var {sansSerif} = require('./Themes/Fonts');
 var React = require('react');
-var assign = require('object-assign');
 var decorate = require('./decorate');
 
 class Breadcrumb extends React.Component {
+  context: {theme: Theme};
   state: {hovered: ?string};
 
   constructor(props) {
@@ -36,18 +38,17 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
+    var theme = this.context.theme;
     return (
-      <ul style={styles.container}>
+      <ul style={containerStyle(theme)}>
         {this.props.path.map(({ id, node }) => {
-          var isSelected = id === this.props.selected;
-          var isHovered = id === this.state.hovered;
-          var style = assign(
-            {},
-            styles.item,
-            node.get('nodeType') === 'Composite' && styles.composite,
-            isHovered && styles.hovered,
-            isSelected && styles.selected,
+          const isSelected = id === this.props.selected;
+          const style = itemStyle(
+            isSelected,
+            node.get('nodeType') === 'Composite',
+            theme,
           );
+
           return (
             <li
               style={style}
@@ -65,40 +66,41 @@ class Breadcrumb extends React.Component {
   }
 }
 
-var styles = {
-  container: {
-    borderTop: '1px solid #ccc',
-    backgroundColor: 'white',
-    fontFamily: 'sans-serif',
-    listStyle: 'none',
-    padding: 0,
-    margin: 0,
-    maxHeight: '80px',
-    overflow: 'scroll',
-  },
+Breadcrumb.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
-  selected: {
-    cursor: 'default',
-    backgroundColor: 'rgb(56, 121, 217)',
-    color: 'white',
-  },
+const containerStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  listStyle: 'none',
+  padding: 0,
+  margin: 0,
+  maxHeight: '80px',
+  overflow: 'auto',
+  marginTop: '2px',
+  backgroundColor: theme.base01,
+  borderTop: `1px solid ${theme.base03}`,
+});
 
-  hovered: {
-    backgroundColor: '#d8d8d8',
-  },
+const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
+  let color;
+  if (isSelected) {
+    color = theme.base0K;
+  } else if (isComposite) {
+    color = theme.base0E;
+  }
 
-  composite: {
-    color: 'rgb(136, 18, 128)',
-  },
-
-  item: {
-    padding: '3px 7px',
+  return {
+    backgroundColor: isSelected ? theme.base0H : 'transparent',
+    color,
+    cursor: isSelected ? 'default' : 'pointer',
+    padding: '0.25rem 0.5rem',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
-    cursor: 'default',
     display: 'inline-block',
-  },
+    marginRight: '2px',
+  };
 };
 
 function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
@@ -119,7 +121,7 @@ module.exports = decorate({
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
-      hover: (id, isHovered) => store.setHover(id, isHovered),
+      hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),
     };

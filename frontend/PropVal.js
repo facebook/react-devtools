@@ -15,13 +15,19 @@ var ReactDOM = require('react-dom');
 
 var consts = require('../agent/consts');
 var createFragment = require('react-addons-create-fragment');
+var {getInvertedWeak} = require('./Themes/utils');
 var flash = require('./flash');
-var valueStyles = require('./value-styles');
+
+import type {Theme} from './types';
 
 class PropVal extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: {
     val: any,
     nested?: boolean,
+    inverted?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -31,69 +37,119 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
-    flash(node, 'rgba(0,255,0,1)', 'transparent', 1);
+    flash(node, this.context.theme.base0A, 'transparent', 1);
   }
 
   render() {
-    return previewProp(this.props.val, !!this.props.nested);
+    return previewProp(this.props.val, !!this.props.nested, !!this.props.inverted, this.context.theme);
   }
 }
 
-function previewProp(val: any, nested: boolean) {
+PropVal.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
+  let style = {
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
+  };
+
   if (typeof val === 'number') {
-    return <span style={valueStyles.number}>{val}</span>;
+    return <span style={style}>{val}</span>;
   }
   if (typeof val === 'string') {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (val.length > 50) {
       val = val.slice(0, 50) + '…';
     }
-    return <span style={valueStyles.string}>"{val}"</span>;
+
+    return (
+      <span style={style}>"{val}"</span>
+    );
   }
   if (typeof val === 'boolean') {
-    return <span style={valueStyles.bool}>{'' + val}</span>;
+    return <span style={style}>{'' + val}</span>;
   }
   if (Array.isArray(val)) {
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+    };
     if (nested) {
-      return <span style={valueStyles.array}>[({val.length})]</span>;
+      return <span style={style}>[({val.length})]</span>;
     }
-    return previewArray(val);
+    return previewArray(val, inverted, theme);
   }
   if (!val) {
-    return <span style={valueStyles.empty}>{'' + val}</span>;
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base03,
+    };
+    return <span style={style}>{'' + val}</span>;
   }
   if (typeof val !== 'object') {
-    return <span>…</span>;
+    style = {
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
+    };
+    return <span style={style}>…</span>;
   }
-  if (val[consts.type]) {
-    var type = val[consts.type];
-    if (type === 'function') {
-      return (
-        <span style={valueStyles.func}>
-          {val[consts.name] || 'fn'}()
-        </span>
-      );
+
+  switch (val[consts.type]) {
+    case 'date': {
+      return <span style={style}>{val[consts.name]}</span>;
     }
-    if (type === 'object') {
-      return <span style={valueStyles.object}>{val[consts.name] + '{…}'}</span>;
+    case 'function': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0D,
+      };
+      return <span style={style}>{val[consts.name] || 'fn'}()</span>;
     }
-    if (type === 'array') {
-      return <span>Array[{val[consts.meta].length}]</span>;
+    case 'object': {
+      return <span style={style}>{val[consts.name] + '{…}'}</span>;
     }
-    if (type === 'symbol') {
+    case 'array': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+      };
+      return <span style={style}>Array[{val[consts.meta].length}]</span>;
+    }
+    case 'typed_array':
+    case 'array_buffer':
+    case 'data_view': {
+      style = {
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base0B,
+      };
+      return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
+    }
+    case 'iterator': {
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+      };
+      return <span style={style}>{val[consts.name] + '(…)'}</span>;
+    }
+    case 'symbol': {
+      style = {    
+        color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+      };
       // the name is "Symbol(something)"
-      return <span style={valueStyles.symbol}>{val[consts.name]}</span>;
+      return <span style={style}>{val[consts.name]}</span>;
     }
   }
+
   if (nested) {
-    return <span>{'{…}'}</span>;
+    style = {    
+      color: inverted ? getInvertedWeak(theme.base0K) : theme.base05,    
+    };
+    return <span style={style}>{'{…}'}</span>;
   }
-  return previewObject(val);
+
+  return previewObject(val, inverted, theme);
 }
 
-function previewArray(val) {
+function previewArray(val, inverted, theme) {
   var items = {};
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} />;
+    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} theme={theme} />;
     items['c' + i] = ', ';
   });
   if (val.length > 3) {
@@ -101,20 +157,26 @@ function previewArray(val) {
   } else {
     delete items['c' + (val.length - 1)];
   }
+  var style = {
+    color: inverted ? theme.base03 : theme.base09,
+  };
   return (
-    <span style={valueStyles.array}>
+    <span style={style}>
       [{createFragment(items)}]
     </span>
   );
 }
 
-function previewObject(val) {
+function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
   var items = {};
+  var attrStyle = {
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base0F,
+  };
   names.slice(0, 3).forEach((name, i) => {
-    items['k' + i] = <span style={valueStyles.attr}>{name}</span>;
+    items['k' + i] = <span style={attrStyle}>{name}</span>;
     items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} />;
+    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />;
     items['m' + i] = ', ';
   });
   if (names.length > 3) {
@@ -122,8 +184,11 @@ function previewObject(val) {
   } else {
     delete items['m' + (names.length - 1)];
   }
+  var style = {
+    color: inverted ? getInvertedWeak(theme.base0K) : theme.base09,
+  };
   return (
-    <span style={valueStyles.object}>
+    <span style={style}>
       {'{'}{createFragment(items)}{'}'}
     </span>
   );
