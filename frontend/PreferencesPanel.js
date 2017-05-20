@@ -22,6 +22,7 @@ class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
+    defaultThemeName: string,
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
@@ -57,7 +58,7 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {showHiddenThemes, theme, themeName, themes} = this.context;
+    const {defaultThemeName, showHiddenThemes, theme, themeName, themes} = this.context;
     const {hide, open} = this.props;
     const {previewMode} = this.state;
 
@@ -101,6 +102,7 @@ class PreferencesPanel extends React.Component {
           </div>
           <div style={styles.buttonBar}>
             <button
+              disabled={themeName === defaultThemeName}
               onClick={this._reset}
               style={styles.button}
             >
@@ -174,6 +176,7 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
+  defaultThemeName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
   themeName: React.PropTypes.string.isRequired,

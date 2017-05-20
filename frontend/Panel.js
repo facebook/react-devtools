@@ -95,6 +95,7 @@ class Panel extends React.Component {
 
   getChildContext(): Object {
     return {
+      defaultThemeName: this._store && this._store.getDefaultThemeName() || '',
       showHiddenThemes: !!this.props.showHiddenThemes,
       showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
@@ -345,6 +346,7 @@ class Panel extends React.Component {
 }
 
 Panel.childContextTypes = {
+  defaultThemeName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   showInspectButton: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,

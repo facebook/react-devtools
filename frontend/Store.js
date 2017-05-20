@@ -360,6 +360,10 @@ class Store extends EventEmitter {
     ThemeStore.set(themeName || null);
   }
 
+  getDefaultThemeName(): string {
+    return this._defaultThemeName;
+  }
+
   setDefaultThemeName(defaultThemeName: ?string) {
     // Don't accept an invalid themeName as a default.
     this._defaultThemeName = this._safeThemeName(defaultThemeName);
