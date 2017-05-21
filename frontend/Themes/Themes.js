@@ -233,6 +233,31 @@ const Materia: Theme = {
   base0L: '#263238',
 };
 
+const MaterialDark: Theme = {
+  displayName: 'Material Dark',
+  base00: '#263239',
+  base01: '#373b41',
+  base02: '#3e4a51',
+  base03: '#445052',
+  base04: '#718184',
+  base05: '#B2CCD6',
+  base06: '#ebfcfc',
+  base07: '#EEFFFF',
+  base08: '#f95479',
+  base09: '#F78C6A',
+  base0A: '#4a55b9',
+  base0B: '#C3E88D',
+  base0C: '#89DDF3',
+  base0D: '#82AAFF',
+  base0E: '#C792EA',
+  base0F: '#FFCB6B',
+  base0H: '#4a55b9',
+  base0I: '#3e4a50',
+  base0J: '#212b30',
+  base0K: '#ffffff',
+  base0L: '#ffffff',
+};
+
 const Phd: Theme = {
   displayName: 'Phd',
   base00: '#061229',
@@ -267,5 +292,6 @@ module.exports = {
   FirefoxLight,
   Flat,
   Materia,
+  MaterialDark,
   Phd,
 };
