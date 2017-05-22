@@ -208,6 +208,31 @@ const Flat: Theme = {
   base0L: '#2C3E50',
 };
 
+const GruvboxDark: Theme = {
+  displayName: 'Gruvbox (dark)',
+  base00: '#282828',
+  base01: '#3c3836',
+  base02: '#504945',
+  base03: '#928374',
+  base04: '#bdae93',
+  base05: '#ebdbb2',
+  base06: '#fbf1c7',
+  base07: '#665c54',
+  base08: '#83a598',
+  base09: '#d3869b',
+  base0A: '#7c6f64',
+  base0B: '#b8bb26',
+  base0C: '#689d6a',
+  base0D: '#fabd2f',
+  base0E: '#fe8019',
+  base0F: '#fe8019',
+  base0H: '#504945',
+  base0I: '#3c3836',
+  base0J: '#3c3836',
+  base0K: '#fbf1c7',
+  base0L: '#fbf1c7',
+};
+
 const Materia: Theme = {
   displayName: 'Materia',
   base00: '#263238',
@@ -341,6 +366,7 @@ module.exports = {
   FirefoxDark,
   FirefoxLight,
   Flat,
+  GruvboxDark,
   Materia,
   MaterialDark,
   Phd,
