@@ -72,7 +72,7 @@ class TreeView extends React.Component {
         );
       } else {
         return (
-          <Message>
+          <Message theme={theme}>
             <h3>React was detected, but no components are mounted.</h3>
             <p>If this seems wrong, try reloading the inspector.</p>
             {this.props.reload &&
