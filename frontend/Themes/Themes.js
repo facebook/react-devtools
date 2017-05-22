@@ -283,6 +283,56 @@ const Phd: Theme = {
   base0L: '#061229',
 };
 
+const Tomorrow: Theme = {
+  displayName: 'Tomorrow',
+  base00: '#ffffff',
+  base01: '#e0e0e0',
+  base02: '#d6d6d6',
+  base03: '#8e908c',
+  base04: '#969896',
+  base05: '#4d4d4c',
+  base06: '#282a2e',
+  base07: '#1d1f21',
+  base08: '#c82829',
+  base09: '#f5871f',
+  base0A: '#eab700',
+  base0B: '#718c00',
+  base0C: '#3e999f',
+  base0D: '#4271ae',
+  base0E: '#8959a8',
+  base0F: '#a3685a',
+  base0H: '#4271ae',
+  base0I: '#e0e0e0',
+  base0J: '#e0e0e0',
+  base0K: '#ffffff',
+  base0L: '#ffffff',
+};
+
+const TomorrowNight: Theme = {
+  displayName: 'Tomorrow Night',
+  base00: '#1d1f21',
+  base01: '#282a2e',
+  base02: '#373b41',
+  base03: '#969896',
+  base04: '#b4b7b4',
+  base05: '#c5c8c6',
+  base06: '#e0e0e0',
+  base07: '#ffffff',
+  base08: '#cc6666',
+  base09: '#de935f',
+  base0A: '#f0c674',
+  base0B: '#b5bd68',
+  base0C: '#8abeb7',
+  base0D: '#81a2be',
+  base0E: '#b294bb',
+  base0F: '#a3685a',
+  base0H: '#e0e0e0',
+  base0I: '#373b41',
+  base0J: '#373b41',
+  base0K: '#282a2e',
+  base0L: '#1d1f21',
+};
+
 module.exports = {
   ChromeDark,
   ChromeDefault,
@@ -294,4 +344,6 @@ module.exports = {
   Materia,
   MaterialDark,
   Phd,
+  Tomorrow,
+  TomorrowNight,
 };
