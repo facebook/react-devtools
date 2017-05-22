@@ -32,7 +32,7 @@ function getDefaultThemeName(): string {
 function getSafeThemeName(themeName: ?string, defaultThemeName: ?string): string {
   if (themeName && Themes.hasOwnProperty(themeName)) {
     return themeName;
-  } else if (defaultThemeName === 'string') {
+  } else if (typeof defaultThemeName === 'string') {
     return defaultThemeName;
   } else {
     return getDefaultThemeName();
