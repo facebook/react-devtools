@@ -121,4 +121,4 @@ function reload() {
   }, 100);
 }
 
-ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
+ReactDOM.render(<Panel {...config} />, node);
