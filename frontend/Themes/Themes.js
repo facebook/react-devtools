@@ -305,7 +305,7 @@ const Tomorrow: Theme = {
   base0I: '#e0e0e0',
   base0J: '#e0e0e0',
   base0K: '#ffffff',
-  base0L: '#ffffff',
+  base0L: '#1d1f21',
 };
 
 const TomorrowNight: Theme = {
@@ -326,8 +326,8 @@ const TomorrowNight: Theme = {
   base0D: '#81a2be',
   base0E: '#b294bb',
   base0F: '#a3685a',
-  base0H: '#e0e0e0',
-  base0I: '#373b41',
+  base0H: '#0084ff',
+  base0I: '#e0e0e0',
   base0J: '#373b41',
   base0K: '#282a2e',
   base0L: '#1d1f21',
