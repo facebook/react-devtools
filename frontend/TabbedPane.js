@@ -21,7 +21,7 @@ class TabbedPane extends React.Component {
     theme: Theme,
   };
   props: {
-    tabs: {[key: string]: () => React$Element},
+    tabs: {[key: string]: () => React.Element<*>},
     selected: string,
     setSelectedTab: (name: string) => void,
   };

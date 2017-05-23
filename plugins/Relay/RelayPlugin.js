@@ -45,7 +45,7 @@ class RelayPlugin {
     }, 1000);
   }
 
-  panes(): Array<(node: Object, id: string) => React$Element> {
+  panes(): Array<(node: Object, id: string) => React.Element<*>> {
     if (!this.hasRelay) {
       return [];
     }
@@ -61,7 +61,7 @@ class RelayPlugin {
   teardown() {
   }
 
-  tabs(): ?{[key: string]: () => React$Element} {
+  tabs(): ?{[key: string]: () => React.Element<*>} {
     if (!this.hasRelay) {
       return null;
     }

@@ -46,7 +46,7 @@ class StyleEdit extends React.Component {
 
   onChange(name: string, val: string | number) {
     var num = Number(val);
-    this.props.onChange(name, num == val ? num : val);
+    this.props.onChange(name, isFinite(num) ? num : val);
   }
 
   onNewSubmit(val: string | number) {

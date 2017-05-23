@@ -19,7 +19,7 @@ class DetailPaneSection extends React.Component {
     theme: Theme,
   };
 
-  render(): React.Element {
+  render(): React.Element<*> {
     const {theme} = this.context;
     const {children, hint} = this.props;
     return (

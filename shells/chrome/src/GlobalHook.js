@@ -59,5 +59,10 @@ var js = (
 // to <html> instead.
 var script = document.createElement('script');
 script.textContent = js;
-document.documentElement.appendChild(script);
-script.parentNode.removeChild(script);
+if (document.documentElement !== null) {
+  document.documentElement.appendChild(script);
+  if (script.parentNode) {
+    script.parentNode.removeChild(script);
+  }
+}
+

@@ -13,7 +13,7 @@
 var sep = '\x1f'; // separator
 // var MAX_DEPTH = 100;
 
-function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map>, depth: number, graph: Object) {
+function crawlChildren(ptype: string, children: Array<string>, nodes: Map<string, Map<string, *>>, depth: number, graph: Object) {
   var descendents = [];
   var keepCrawling = true; // depth < MAX_DEPTH;
   children.forEach(cid => {

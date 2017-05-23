@@ -133,22 +133,22 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   };
 }
 
-function setInProps(fiber, path: Array<string | number>, value: any) {
+function setInProps(fiber, path: Array<string>, value: any) {
   fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
   fiber.stateNode.forceUpdate();
 }
 
-function setInState(inst, path: Array<string | number>, value: any) {
+function setInState(inst, path: Array<string>, value: any) {
   setIn(inst.state, path, value);
   inst.forceUpdate();
 }
 
-function setInContext(inst, path: Array<string | number>, value: any) {
+function setInContext(inst, path: Array<string>, value: any) {
   setIn(inst.context, path, value);
   inst.forceUpdate();
 }
 
-function setIn(obj: Object, path: Array<string | number>, value: any) {
+function setIn(obj: Object, path: Array<string>, value: any) {
   var last = path.pop();
   var parent = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
   if (parent) {

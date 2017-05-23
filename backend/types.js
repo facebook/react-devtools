@@ -87,7 +87,7 @@ export type ReactRenderer = {
 
 export type Helpers = {
   getNativeFromReactElement?: ?(component: OpaqueNodeHandle) => ?NativeType,
-  getReactElementFromNative?: ?(component: NativeType) => ?OpaqueNodeHandle,
+  getReactElementFromNative?: ?(component: Node) => ?OpaqueNodeHandle,
   walkTree: (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) => void,
   cleanup: () => void,
 };
