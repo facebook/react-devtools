@@ -59,15 +59,15 @@ class SplitPane extends React.Component {
   }
 
   onMove(x: number, y: number) {
-    var node = ReactDOM.findDOMNode(this);
+    var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
     this.setState(prevState => ({
       width: this.props.isVertical ?
         prevState.width :
-        Math.floor(node.offsetLeft + node.offsetWidth - x),
+        Math.floor(rect.left + rect.width - x),
       height: !this.props.isVertical ?
         prevState.height :
-        Math.floor(node.offsetTop + node.offsetHeight - y),
+        Math.floor(rect.top + rect.height - y),
     }));
   }
 
