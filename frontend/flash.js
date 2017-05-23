@@ -14,17 +14,19 @@
 'use strict';
 
 type DOMElement = {
-  style: Object,
-  offsetTop: number;
+  style?: Object,
+  offsetTop?: number;
 };
 
 function flash(node: DOMElement, flashColor: string, baseColor: string, duration: number) {
-  node.style.transition = 'none';
-  node.style.backgroundColor = flashColor;
-  // force recalc
-  void node.offsetTop;
-  node.style.transition = `background-color ${duration}s ease`;
-  node.style.backgroundColor = baseColor;
+  if (node.style) {
+    node.style.transition = 'none';
+    node.style.backgroundColor = flashColor;
+    // force recalc
+    void node.offsetTop;
+    node.style.transition = `background-color ${duration}s ease`;
+    node.style.backgroundColor = baseColor;
+  }
 }
 
 module.exports = flash;

@@ -22,8 +22,8 @@ type Context = {
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React$Element,
-  right: () => React$Element,
+  left: () => React.Element<*>,
+  right: () => React.Element<*>,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,
@@ -34,6 +34,14 @@ type State = {
   width: number,
   height: number,
 };
+
+type DOMOffsetElement = {
+  offsetWidth: number,
+  offsetHeight: number,
+  offsetLeft: number,
+  offsetRight: number,
+  offsetTop: number
+}
 
 class SplitPane extends React.Component {
   context: Context;
@@ -50,25 +58,29 @@ class SplitPane extends React.Component {
   }
 
   componentDidMount() {
-    var node = ReactDOM.findDOMNode(this);
+    var node: DOMOffsetElement = (ReactDOM.findDOMNode(this): any);
 
-    this.setState({
-      width: Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3)),
-      height: Math.floor(node.offsetHeight * 0.3),
-    });
+    if (node) {
+      this.setState({
+        width: Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3)),
+        height: Math.floor(node.offsetHeight * 0.3),
+      });
+    }
   }
 
   onMove(x: number, y: number) {
-    var node = ReactDOM.findDOMNode(this);
+    var node: DOMOffsetElement = (ReactDOM.findDOMNode(this): any);
 
-    this.setState(prevState => ({
-      width: this.props.isVertical ?
-        prevState.width :
-        Math.floor(node.offsetLeft + node.offsetWidth - x),
-      height: !this.props.isVertical ?
-        prevState.height :
-        Math.floor(node.offsetTop + node.offsetHeight - y),
-    }));
+    if (node && node.offsetWidth && node.offsetHeight && node.offsetLeft && node.offsetRight) {
+      this.setState(prevState => ({
+        width: this.props.isVertical ?
+          prevState.width :
+          Math.floor(node.offsetLeft + node.offsetWidth - x),
+        height: !this.props.isVertical ?
+          prevState.height :
+          Math.floor(node.offsetTop + node.offsetHeight - y),
+      }));
+    }
   }
 
   render() {

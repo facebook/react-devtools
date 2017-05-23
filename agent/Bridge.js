@@ -140,9 +140,9 @@ type PayloadType = {
  */
 class Bridge {
   _buffer: Array<{evt: string, data: any}>;
-  _cbs: Map;
+  _cbs: Map<number, Function>;
   _cid: number;
-  _inspectables: Map;
+  _inspectables: Map<string, Object>;
   _listeners: {[key: string]: Array<(data: any) => void>};
   _flushHandle: ?number;
   _wall: Wall;

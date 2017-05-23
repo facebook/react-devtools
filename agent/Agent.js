@@ -350,12 +350,14 @@ class Agent extends EventEmitter {
       return internalInstance;
     }
     if (!this.idsByInternalInstances.has(internalInstance)) {
-      this.idsByInternalInstances.set(internalInstance, guid());
+      const newInternalInstanceId = guid();
+      this.idsByInternalInstances.set(internalInstance, newInternalInstanceId);
       this.internalInstancesById.set(
-        this.idsByInternalInstances.get(internalInstance),
+        newInternalInstanceId,
         internalInstance
       );
     }
+    // $FlowFixMe we know that there is an ID for this internalInstance
     return this.idsByInternalInstances.get(internalInstance);
   }
 

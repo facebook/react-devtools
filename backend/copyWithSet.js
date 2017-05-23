@@ -21,7 +21,7 @@ function copyWithSetImpl(obj, path, idx, value) {
   return updated;
 }
 
-function copyWithSet(obj: Object | Array<any>, path: Array<string | number>, value: any): Object | Array<any> {
+function copyWithSet(obj: Object | Array<any>, path: Array<string>, value: any): Object | Array<any> {
   return copyWithSetImpl(obj, path, 0, value);
 }
 

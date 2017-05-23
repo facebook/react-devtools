@@ -29,8 +29,8 @@ const NODE_TYPE_COMPOSITE = 'Composite';
 
 class TraceUpdatesBackendManager {
   _onMeasureNode: () => void;
-  _measurer: Measurer;
-  _presenter: Presenter;
+  _measurer: Measurer | TraceUpdatesWebNodeMeasurer | TraceUpdatesAbstractNodeMeasurer;
+  _presenter: Presenter | TraceUpdatesWebNodePresenter | TraceUpdatesAbstractNodePresenter;
   _isActive: boolean;
 
   constructor(agent: Agent) {
