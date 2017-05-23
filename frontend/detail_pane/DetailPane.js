@@ -31,11 +31,6 @@ var styles = {
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
-
-    cursor: 'default',
-    WebkitUserSelect: 'none',
-    MozUserSelect: 'none',
-    userSelect: 'none',
   },
 };
 
