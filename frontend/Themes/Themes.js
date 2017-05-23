@@ -326,7 +326,7 @@ const OceanDark: Theme = {
   base0D: '#eccd88',
   base0E: '#d06a77',
   base0F: '#757a85',
-  base0H: '#0084ff',
+  base0H: '#a0a4ae',
   base0I: '#314048',
   base0J: '#314048',
   base0K: '#263238',
