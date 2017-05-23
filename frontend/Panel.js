@@ -262,9 +262,14 @@ class Panel extends React.Component {
       return;
     }
     this.props.checkForReact(isReact => {
-      const reactDetected = !!isReact;
-      this.setState({ isReact: reactDetected, loading: reactDetected });
-      if (reactDetected) {
+      isReact = !!isReact;
+
+      this.setState({
+        isReact: isReact,
+        loading: isReact,
+      });
+
+      if (isReact) {
         this.inject();
       }
     });

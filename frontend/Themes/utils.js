@@ -25,17 +25,19 @@ function getBrightness(hex: string): number {
   return Math.round(((r * 299) + (g * 587) + (b * 114)) / 1000);
 }
 
-function getDefaultThemeName(): string {
-  return 'ChromeDefault';
-}
-
-function getSafeThemeName(themeName: ?string, defaultThemeName: ?string): string {
-  if (themeName && Themes.hasOwnProperty(themeName)) {
+function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
+  if (
+    themeName &&
+    Themes.hasOwnProperty(themeName)
+  ) {
     return themeName;
-  } else if (typeof defaultThemeName === 'string') {
-    return defaultThemeName;
+  } else if (
+    fallbackThemeName &&
+    Themes.hasOwnProperty(fallbackThemeName)
+  ) {
+    return fallbackThemeName;
   } else {
-    return getDefaultThemeName();
+    return 'ChromeDefault';
   }
 }
 
@@ -70,7 +72,6 @@ function isBright(hex: string): boolean {
 
 module.exports = {
   getBrightness,
-  getDefaultThemeName,
   getSafeThemeName,
   getInvertedMid,
   getInvertedWeak,
