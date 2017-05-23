@@ -69,7 +69,6 @@ type State = {
 class Panel extends React.Component {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
-  _loadingTimeout: ?number;
   _checkTimeout: ?number;
   _unMounted: boolean;
   _bridge: Bridge;
@@ -111,12 +110,6 @@ class Panel extends React.Component {
     if (this.props.alreadyFoundReact) {
       this.inject();
     } else {
-      // Show loading message until:
-      // a) React is found
-      // b) After a few seconds, for page load, before showing React not detected message
-      this._loadingTimeout = setTimeout(() => {
-        this._loadingTimeout = null;
-      }, 3500);
       this.lookForReact();
     }
 
@@ -269,11 +262,9 @@ class Panel extends React.Component {
       return;
     }
     this.props.checkForReact(isReact => {
-      this.setState({
-        isReact: !!isReact,
-        loading: !!isReact || !!this._loadingTimeout,
-      });
-      if (isReact) {
+      const reactDetected = !!isReact;
+      this.setState({ isReact: reactDetected, loading: reactDetected });
+      if (reactDetected) {
         this.inject();
       }
     });
