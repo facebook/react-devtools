@@ -96,13 +96,13 @@ export type Theme = {
   base06: string; // Light Foreground (Not often used);
   base07: string; // Light Background (Not often used);
   base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-  base09: string; // Integers, Boolean, Constants, XML Attributes, Markup Link Url
+  base09: string; // Integers, Boolean, Constants, Markup Link Url
   base0A: string; // Highlight Background Color for search/filter matches
   base0B: string; // Strings, Inherited Class, Markup Code, Diff Inserted
   base0C: string; // Support, Regular Expressions, Escape Characters, Markup Quotes
   base0D: string; // Functions, Methods, Attribute IDs, Headings
   base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
-  base0F: string; // Deprecated, Opening/Closing Embedded Language Tags e.g.
+  base0F: string; // XML Attributes, Deprecated, Opening/Closing Embedded Language Tags e.g.
   base0H: string; // Selected Background for nodes/tabs when devtools is focused
   base0I: string; // Selected Background for nodes/tabs when devtools is not focused
   base0J: string; // Hover Background for nodes/tabs
