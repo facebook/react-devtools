@@ -126,6 +126,8 @@ class Agent extends EventEmitter {
       this._updateScroll = this._updateScroll.bind(this);
       window.addEventListener('scroll', this._onScroll.bind(this), true);
       window.addEventListener('click', this._onClick.bind(this), true);
+      window.addEventListener('mouseover', this._onMouseOver.bind(this), true);
+      window.addEventListener('resize', this._onResize.bind(this), true);
     }
   }
 
@@ -213,6 +215,7 @@ class Agent extends EventEmitter {
       bridge.forget(id);
     });
     this.on('setSelection', data => bridge.send('select', data));
+    this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
   }
 
   scrollToNode(id: ElementID): void {
@@ -431,6 +434,22 @@ class Agent extends EventEmitter {
     event.preventDefault();
 
     this.emit('setSelection', {id});
+    this.emit('setInspectEnabled', false);
+  }
+
+  _onMouseOver(event: Event) {
+    if (this._inspectEnabled) {
+      const id = this.getIDForNode(event.target);
+      if (!id) {
+        return;
+      }
+      
+      this.highlight(id);
+    }
+  }
+
+  _onResize(event: Event) {
+    this.emit('stopInspecting');
   }
 }
 
