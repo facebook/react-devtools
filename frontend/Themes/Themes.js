@@ -76,7 +76,7 @@ const ApathyLight: Theme = {
   base0I: '#f5fcfb',
   base0J: '#f5fcfb',
   base0K: '#2b2d2d',
-  base0L: '#2b2d2d',
+  base0L: '#f5fcfb',
 };
 
 const ChromeDark: Theme = {
