@@ -85,13 +85,13 @@ const containerStyle = (theme: Theme) => ({
 const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
   let color;
   if (isSelected) {
-    color = theme.base0K;
+    color = theme.state02;
   } else if (isComposite) {
-    color = theme.base0E;
+    color = theme.special05;
   }
 
   return {
-    backgroundColor: isSelected ? theme.base0H : 'transparent',
+    backgroundColor: isSelected ? theme.state00 : 'transparent',
     color,
     cursor: isSelected ? 'default' : 'pointer',
     padding: '0.25rem 0.5rem',

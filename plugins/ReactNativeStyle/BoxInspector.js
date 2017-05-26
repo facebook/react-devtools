@@ -83,7 +83,7 @@ BoxInspector.contextTypes = {
 
 const labelStyle = (theme: Theme) => ({
   flex: 1,
-  color: theme.base0C,
+  color: theme.special03,
 });
 
 const positionTextStyle = (theme: Theme) => ({
@@ -93,7 +93,7 @@ const positionTextStyle = (theme: Theme) => ({
 });
 
 const dimenTextStyle = (theme: Theme) => ({
-  color: theme.base0B,
+  color: theme.special02,
   textAlign: 'center',
 });
 

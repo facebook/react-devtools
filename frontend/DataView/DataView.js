@@ -309,7 +309,7 @@ function alphanumericSort(a: string, b: string): number {
 
 const nameStyle = (isComplex: boolean, theme: Theme) => ({
   cursor: isComplex ? 'pointer' : 'default',
-  color: theme.base0C,
+  color: theme.special03,
   margin: '2px 3px',
 });
 
@@ -319,7 +319,7 @@ const previewStyle = (theme: Theme) => ({
   whiteSpace: 'pre',
   wordBreak: 'break-word',
   flex: 1,
-  color: theme.base09,
+  color: theme.special01,
 });
 
 const emptyStyle = (theme: Theme) => ({

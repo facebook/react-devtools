@@ -79,33 +79,44 @@ export type ControlState = {
 /**
  * A theme is a color template used throughout devtools.
  * All devtools coloring is declared by themes, with one minor exception: status colors.
- *
- * Colors 00...07 should increase in light-to-dark (or dark-to-light) order.
- * This is important for legibility/contrast because of how the colors are used.
- * Colors 08...0H are special use, highlight colors.
  */
 export type Theme = {
   displayName: string; // Display name (shown in PreferencesPanel)
+
   hidden?: boolean; // Special theme (eg Chrome or Firefox default) hidden from user in prefs panel
+
+  /**
+   * Base colors should increase in light-to-dark (or dark-to-light) order.
+   * This is important for legibility/contrast because of how the colors are used.
+   */
   base00: string; // Default Background
-  base01: string; // Lighter Background (Used for status bars)
-  base02: string; // Selection Background
-  base03: string; // Comments, Invisibles, Line Highlighting
-  base04: string; // Dark Foreground (Used for status bars), Host Components (eg <div>)
-  base05: string; // Default Foreground, Caret, Delimiters, Operators
-  base06: string; // Light Foreground (Not often used);
-  base07: string; // Light Background (Not often used);
-  base08: string; // Variables, XML Tags, Markup Link Text, Markup Lists, Diff Deleted
-  base09: string; // Integers, Boolean, Constants, Markup Link Url
-  base0A: string; // Highlight Background Color for search/filter matches
-  base0B: string; // Strings, Inherited Class, Markup Code, Diff Inserted
-  base0C: string; // Support, Regular Expressions, Escape Characters, Markup Quotes
-  base0D: string; // Functions, Methods, Attribute IDs, Headings
-  base0E: string; // Keywords, Storage, Selector, Markup Italic, Diff Changed
-  base0F: string; // XML Attributes, Deprecated, Opening/Closing Embedded Language Tags e.g.
-  base0H: string; // Selected Background for nodes/tabs when devtools is focused
-  base0I: string; // Selected Background for nodes/tabs when devtools is not focused
-  base0J: string; // Hover Background for nodes/tabs
-  base0K: string; // Selected Foreground for nodes/tabs when devtools is focused
-  base0L: string; // Highlight Foreground Color for search/filter matches
+  base01: string; // Lighter Background (eg status bars)
+  base02: string; // Borders, Context Menu, etc.
+  base03: string; // Borders, Comments, etc.
+  base04: string; // Lighter Foreground
+  base05: string; // Default Foreground
+
+  /**
+   * These colors are used to highlight specific parts of the UI.
+   * Typically they are used for syntax highlighting.
+   * Some have special one-off usage (eg invalid regex input highlight).
+   */
+  special00: string; // Custom Coponents
+  special01: string; // Integers, Booleans, etc.
+  special02: string; // Strings, Arrays, etc.
+  special03: string; // Details Pane Text
+  special04: string; // Functions, Objects, etc.
+  special05: string; // Special Text (eg breadcrumbs)
+  special06: string; // XML Attributes
+  special07: string; // Host Components
+
+  /**
+   * These colors are used for selection, hover, and filtering state.
+   */
+  state00: string; // Focused Background
+  state01: string; // Blurred Background
+  state03: string; // Hovered Background
+  state02: string; // Focused Foreground
+  state04: string; // Search Background
+  state05: string; // Search Foreground
 };

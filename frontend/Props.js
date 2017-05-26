@@ -59,16 +59,16 @@ Props.contextTypes = {
 };
 
 const attributeNameStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? getInvertedMid(theme.base0K) : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
 });
 
 const ellipsisStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? getInvertedMid(theme.base0K) : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
 });
 
 const propStype = (isInverted: boolean, theme: Theme) => ({
   paddingLeft: 5,
-  color: isInverted ? getInvertedMid(theme.base0K) : theme.base0F,
+  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
 });
 
 module.exports = Props;
