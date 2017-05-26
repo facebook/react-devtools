@@ -29,6 +29,56 @@ import type {Theme} from '../types';
  * Each theme key has a purpose and guidelines should be followed to ensure legibility.
  */
 
+const ApathyDark: Theme = {
+  displayName: 'Apathy (dark)',
+  base00: '#1b322e',
+  base01: '#30695f',
+  base02: '#184E45',
+  base03: '#2B685E',
+  base04: '#5F9C92',
+  base05: '#f5fcfb',
+  base06: '#A7CEC8',
+  base07: '#D2E7E4',
+  base08: '#3E9688',
+  base09: '#3E7996',
+  base0A: '#3E4C96',
+  base0B: '#883E96',
+  base0C: '#963E4C',
+  base0D: '#96883E',
+  base0E: '#4C963E',
+  base0F: '#3E965B',
+  base0H: '#28423d',
+  base0I: '#28423d',
+  base0J: '#28423d',
+  base0K: '#f5fcfb',
+  base0L: '#f5fcfb',
+};
+
+const ApathyLight: Theme = {
+  displayName: 'Apathy (light)',
+  base00: '#D2E7E4',
+  base01: '#fff',
+  base02: '#184E45',
+  base03: '#2B685E',
+  base04: '#5F9C92',
+  base05: 'rgba(0, 0, 0, .7)',
+  base06: '#A7CEC8',
+  base07: '#D2E7E4',
+  base08: '#3E9688',
+  base09: '#3E7996',
+  base0A: '#3E4C96',
+  base0B: '#883E96',
+  base0C: '#963E4C',
+  base0D: '#96883E',
+  base0E: '#4C963E',
+  base0F: '#3E965B',
+  base0H: '#f5fcfb',
+  base0I: '#f5fcfb',
+  base0J: '#f5fcfb',
+  base0K: '#2b2d2d',
+  base0L: '#f5fcfb',
+};
+
 const ChromeDark: Theme = {
   displayName: 'Chrome (dark)',
   hidden: true,
@@ -394,6 +444,8 @@ const TomorrowNight: Theme = {
 };
 
 module.exports = {
+  ApathyDark,
+  ApathyLight,
   ChromeDark,
   ChromeDefault,
   Dracula,
