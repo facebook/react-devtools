@@ -128,6 +128,7 @@ class Agent extends EventEmitter {
       window.addEventListener('click', this._onClick.bind(this), true);
       window.addEventListener('mouseover', this._onMouseOver.bind(this), true);
       window.addEventListener('resize', this._onResize.bind(this), true);
+      window.addEventListener('scroll', this._onScroll.bind(this), true);
     }
   }
 
@@ -162,6 +163,7 @@ class Agent extends EventEmitter {
     bridge.on('selected', id => this.emit('selected', id));
     bridge.on('setInspectEnabled', enabled => {
       this._inspectEnabled = enabled;
+      this.emit('stopInspecting');
     });
     bridge.on('shutdown', () => this.emit('shutdown'));
     bridge.on('changeTextContent', ({id, text}) => {
@@ -449,6 +451,10 @@ class Agent extends EventEmitter {
   }
 
   _onResize(event: Event) {
+    this.emit('stopInspecting');
+  }
+
+  _onScroll(event: Event) {
     this.emit('stopInspecting');
   }
 }
