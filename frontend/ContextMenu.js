@@ -11,7 +11,6 @@
 'use strict';
 
 var React = require('react');
-var ReactDOM = require('react-dom');
 var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
@@ -42,39 +41,20 @@ class ContextMenu extends React.Component {
     },
   };
 
-  componentWillMount() {
-    this._clickout = this.onMouseDown.bind(this);
-  }
+  handleBackdropClick: () => void;
 
-  componentDidUpdate(prevProps) {
-    if (this.props.open && !prevProps.open) {
-      window.addEventListener('mousedown', this._clickout, true);
-    } else if (prevProps.open && !this.props.open) {
-      window.removeEventListener('mousedown', this._clickout, true);
-    }
-  }
+  constructor(props) {
+    super(props);
 
-  componentWillUnmount() {
-    window.removeEventListener('mousedown', this._clickout, true);
-  }
-
-  onMouseDown(evt) {
-    var n = evt.target;
-    var container = ReactDOM.findDOMNode(this);
-    while (n) {
-      if (n === container) {
-        return;
-      }
-      n = n.offsetParent;
-    }
-
-    evt.preventDefault();
-    this.props.hideContextMenu();
+    this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
 
   onClick(i, evt) {
-    evt.preventDefault();
     this.props.items[i].action();
+  }
+
+  handleBackdropClick(evt) {
+    evt.preventDefault();
     this.props.hideContextMenu();
   }
 
@@ -87,18 +67,20 @@ class ContextMenu extends React.Component {
     }
 
     return (
-      <ul style={containerStyle(pos.x, pos.y, theme)}>
-        {!items.length && (
-          <li style={emptyStyle(theme)}>No actions</li>
-        )}
-        {items.map((item, i) => item && (
-          <li style={listItemStyle(theme)} key={item.key} onClick={evt => this.onClick(i, evt)}>
-            <HighlightHover style={styles.highlightHoverItem}>
-              {item.title}
-            </HighlightHover>
-          </li>
-        ))}
-      </ul>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick}>
+        <ul style={containerStyle(pos.x, pos.y, theme)}>
+          {!items.length && (
+            <li style={emptyStyle(theme)}>No actions</li>
+          )}
+          {items.map((item, i) => item && (
+            <li style={listItemStyle(theme)} key={item.key} onClick={evt => this.onClick(i, evt)}>
+              <HighlightHover style={styles.highlightHoverItem}>
+                {item.title}
+              </HighlightHover>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 }
@@ -169,6 +151,15 @@ var styles = {
     display: 'none',
   },
 
+  backdrop: {
+    position: 'fixed',
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 0,
+  },
+  
   highlightHoverItem: {
     padding: '0.25rem 0.5rem',
     cursor: 'default',
