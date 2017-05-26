@@ -481,14 +481,14 @@ const headStyle = ({
   let backgroundColor;
   if (isSelected && (isCollapsed || !isBottomTagSelected)) {
     backgroundColor = isWindowFocused
-      ? theme.base0H
-      : theme.base0I;
+      ? theme.state00
+      : theme.state01;
   } else if (isHovered && (isCollapsed || !isBottomTagHovered)) {
-    backgroundColor = theme.base0J;
+    backgroundColor = theme.state03;
   }
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
-  const color = isInverted ? theme.base0K : undefined;
+  const color = isInverted ? theme.state02 : undefined;
 
   return {
     cursor: 'default',
@@ -505,11 +505,11 @@ const headStyle = ({
 const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
   let color;
   if (inverted) {
-    color = theme.base0K;
+    color = theme.state02;
   } else if (isCustom) {
-    color = theme.base08;
+    color = theme.special00;
   } else {
-    color = theme.base04;
+    color = theme.special07;
   }
 
   return {
@@ -520,7 +520,7 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
 const tagTextStyle = (inverted: boolean, theme: Theme) => ({
   flex: 1,
   whiteSpace: 'nowrap',
-  color: inverted ? getInvertedWeak(theme.base0K) : theme.base0F,
+  color: inverted ? getInvertedWeak(theme.state02) : theme.special06,
 });
 
 const collapserStyle = (depth: number) => ({
@@ -534,7 +534,7 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
   if (isHeadInverted) {
     borderColor = theme.base00;
   } else if (hasState) {
-    borderColor = theme.base08;
+    borderColor = theme.special00;
   }
 
   if (isCollapsed) {
@@ -559,12 +559,12 @@ const arrowStyle = (isCollapsed: boolean, hasState: boolean, isHeadInverted: boo
 };
 
 const bracketStyle = (inverted: boolean, theme: Theme) => ({
-  color: inverted ? getInvertedWeak(theme.base0K) : theme.base04,
+  color: inverted ? getInvertedWeak(theme.state02) : theme.special07,
 });
 
 const highlightStyle = (theme: Theme) => ({
-  backgroundColor: theme.base0A,
-  color: theme.base0L,
+  backgroundColor: theme.state04,
+  color: theme.state05,
 });
 
 type tailStyleParams = {
@@ -589,10 +589,10 @@ const tailStyle = ({
   let backgroundColor;
   if (isSelected && isBottomTagSelected) {
     backgroundColor = isWindowFocused
-      ? theme.base0H
-      : theme.base0I;
+      ? theme.state00
+      : theme.state01;
   } else if (isHovered && isBottomTagHovered) {
-    backgroundColor = theme.base0J;
+    backgroundColor = theme.state03;
   }
 
   const isInverted = isSelected && isWindowFocused && isBottomTagSelected;
@@ -611,7 +611,7 @@ const tailStyle = ({
 const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, isBottomTagHovered: boolean, theme: Theme) => {
   let borderLeftColor = 'transparent';
   if (isSelected) {
-    borderLeftColor = hexToRgba(theme.base0H, 0.45);
+    borderLeftColor = hexToRgba(theme.state00, 0.45);
   } else if (isHovered && !isBottomTagHovered) {
     // Only show hover for the top tag, or it gets too noisy.
     borderLeftColor = hexToRgba(theme.base04, 0.2);

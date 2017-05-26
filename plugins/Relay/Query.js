@@ -95,7 +95,7 @@ const containeroOddRowStyle = (theme: Theme) => ({
 
 const containerSelectedStyle = (theme: Theme) => ({
   ...baseContainer,
-  backgroundColor: theme.base0H,
+  backgroundColor: theme.state00,
   color: theme.base04,
 });
 

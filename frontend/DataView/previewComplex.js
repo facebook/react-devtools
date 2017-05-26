@@ -17,7 +17,7 @@ var consts = require('../../agent/consts');
 import type {Theme} from '../types';
 
 function previewComplex(data: Object, theme: Theme) {
-  const style={ color: theme.base0D };
+  const style={ color: theme.special04 };
 
   if (Array.isArray(data)) {
     return (

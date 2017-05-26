@@ -255,7 +255,7 @@ const inspectMenuButtonStyle = (isInspectEnabled: boolean, theme: Theme) => ({
   background: 'none',
   border: 'none',
   outline: 'none', // Use custom active highlight instead
-  color: isInspectEnabled ? theme.base0H : 'inherit',
+  color: isInspectEnabled ? theme.state00 : 'inherit',
 });
 
 const searchIconStyle = (theme: Theme) => ({
@@ -285,13 +285,13 @@ const baseInputStyle = (theme: Theme) => ({
 
 const highlightedInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
-  border: `1px solid ${hexToRgba(theme.base0H, 0.75)}`,
+  border: `1px solid ${hexToRgba(theme.state00, 0.75)}`,
 });
 
 const errorInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
-  backgroundColor: hexToRgba(theme.base0C, 0.1),
-  border: `1px solid ${theme.base0C}`,
+  backgroundColor: hexToRgba(theme.special03, 0.1),
+  border: `1px solid ${theme.special03}`,
 });
 
 var styles = {
