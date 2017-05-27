@@ -10,33 +10,66 @@
  */
 'use strict';
 
+const Themes = require('./Themes');
+const {getSafeThemeName} = require('./utils');
+
 const LOCAL_STORAGE_VERSIONED_KEY = 'themeName';
 
-function get(): ?string {
-  let themeName;
+import type {Theme} from '../types';
 
-  try {
-    themeName = localStorage.getItem(LOCAL_STORAGE_VERSIONED_KEY);
-  } catch (error) {
-    console.error('Could not read saved theme.', error);
+class Store {
+  defaultThemeName: string;
+  theme: Theme;
+  themeName: string;
+  themes: { [key: string]: Theme };
+
+  constructor(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this.defaultThemeName = getSafeThemeName(defaultThemeName);
+
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const themeName = getSafeThemeName(this._get(), this.defaultThemeName);
+
+    this.theme = Themes[themeName];
+    this.themeName = themeName;
+    this.themes = Themes;
   }
 
-  return themeName || null;
-}
+  update(themeName: ?string) {
+    // Only apply a valid theme.
+    const safeThemeKey = getSafeThemeName(themeName, this.defaultThemeName);
 
-function set(themeName: ?string): boolean {
-  try {
-    localStorage.setItem(LOCAL_STORAGE_VERSIONED_KEY, themeName || '');
+    this.theme = this.themes[safeThemeKey];
+    this.themeName = safeThemeKey;
 
-    return true;
-  } catch (error) {
-    console.error('Could not save theme.', error);
+    // But allow users to restore "default" mode by selecting an empty theme.
+    this._set(themeName || null);
   }
 
-  return false;
+  _get(): ?string {
+    let themeName;
+
+    try {
+      themeName = localStorage.getItem(LOCAL_STORAGE_VERSIONED_KEY);
+    } catch (error) {
+      console.error('Could not read saved theme.', error);
+    }
+
+    return themeName || null;
+  }
+
+  _set(themeName: ?string): boolean {
+    try {
+      localStorage.setItem(LOCAL_STORAGE_VERSIONED_KEY, themeName || '');
+
+      return true;
+    } catch (error) {
+      console.error('Could not save theme.', error);
+    }
+
+    return false;
+  }
 }
 
-module.exports = {
-  get: get,
-  set: set,
-};
+module.exports = Store;

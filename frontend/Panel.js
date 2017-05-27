@@ -22,6 +22,7 @@ var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 var consts = require('../agent/consts');
 
@@ -73,6 +74,7 @@ class Panel extends React.Component {
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
+  _themeStore: ThemeStore;
   _unsub: ?() => void;
   // TODO: typecheck plugin interface
   plugins: Array<any>;
@@ -97,13 +99,13 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       browserName: this.props.browserName || '',
-      defaultThemeName: this._store && this._store.getDefaultThemeName() || '',
+      defaultThemeName: this._store && this._themeStore.defaultThemeName || '',
       showHiddenThemes: !!this.props.showHiddenThemes,
       showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
-      theme: this._store && this._store.theme || Themes.ChromeDefault,
-      themeName: this._store && this._store.themeName || '',
-      themes: this._store && this._store.themes || {},
+      theme: this._store && this._themeStore.theme || Themes.ChromeDefault,
+      themeName: this._store && this._themeStore.themeName || '',
+      themes: this._store && this._themeStore.themes || {},
     };
   }
 
@@ -216,7 +218,8 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge(wall);
 
-      this._store = new Store(this._bridge, this.state.themeName);
+      this._themeStore = new ThemeStore(this.state.themeName);
+      this._store = new Store(this._bridge, this._themeStore);
       
       var refresh = () => this.forceUpdate();
       this.plugins = [
@@ -229,7 +232,7 @@ class Panel extends React.Component {
       this._store.on('connected', () => {
         this.setState({
           loading: false,
-          themeName: this._store.themeName,
+          themeName: this._themeStore.themeName,
         });
         this.getNewSelection();
       });
@@ -241,7 +244,7 @@ class Panel extends React.Component {
       this._store.on('theme', () => {
         // Force a deep re-render when theme changes
         this.setState({
-          themeName: this._store.theme.displayName,
+          themeName: this._themeStore.theme.displayName,
         });
       });
     });
@@ -274,7 +277,7 @@ class Panel extends React.Component {
   }
 
   render() {
-    var theme = this._store ? this._store.theme : Themes.ChromeDefault;
+    var theme = this._store ? this._themeStore.theme : Themes.ChromeDefault;
     if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
