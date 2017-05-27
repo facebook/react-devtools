@@ -11,9 +11,8 @@
 'use strict';
 
 const Themes = require('./Themes');
-const {getSafeThemeName} = require('./utils');
 
-const LOCAL_STORAGE_VERSIONED_KEY = 'themeName';
+const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
 
 import type {Theme} from '../types';
 
@@ -29,7 +28,7 @@ class Store {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const themeName = getSafeThemeName(this._get(), this.defaultThemeName);
+    const themeName = getSafeThemeName(getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY), this.defaultThemeName);
 
     this.theme = Themes[themeName];
     this.themeName = themeName;
@@ -37,6 +36,10 @@ class Store {
   }
 
   update(themeName: ?string) {
+    if (themeName === 'custom') {
+
+    }
+
     // Only apply a valid theme.
     const safeThemeKey = getSafeThemeName(themeName, this.defaultThemeName);
 
@@ -44,32 +47,44 @@ class Store {
     this.themeName = safeThemeKey;
 
     // But allow users to restore "default" mode by selecting an empty theme.
-    this._set(themeName || null);
+    setInLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
   }
+}
 
-  _get(): ?string {
-    let themeName;
-
-    try {
-      themeName = localStorage.getItem(LOCAL_STORAGE_VERSIONED_KEY);
-    } catch (error) {
-      console.error('Could not read saved theme.', error);
-    }
-
-    return themeName || null;
+function getFromLocalStorage(key: string): any {
+  let value;
+  try {
+    value = localStorage.getItem(key);
+  } catch (error) {
+    console.error('Could not read from localStorage.', error);
   }
+  return value || null;
+}
 
-  _set(themeName: ?string): boolean {
-    try {
-      localStorage.setItem(LOCAL_STORAGE_VERSIONED_KEY, themeName || '');
-
-      return true;
-    } catch (error) {
-      console.error('Could not save theme.', error);
-    }
-
-    return false;
+function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
+  if (
+    themeName &&
+    Themes.hasOwnProperty(themeName)
+  ) {
+    return themeName;
+  } else if (
+    fallbackThemeName &&
+    Themes.hasOwnProperty(fallbackThemeName)
+  ) {
+    return fallbackThemeName;
+  } else {
+    return 'ChromeDefault';
   }
+}
+
+function setInLocalStorage(key: string, value: any): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.error('Could not write to localStorage.', error);
+  }
+  return false;
 }
 
 module.exports = Store;

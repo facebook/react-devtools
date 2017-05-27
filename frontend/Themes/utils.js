@@ -10,8 +10,6 @@
  */
 'use strict';
 
-const Themes = require('./Themes');
-
 type RGB = {
 	r: number,
 	g: number,
@@ -43,22 +41,6 @@ function getRgb(hex: string): RGB {
   return {r, g, b};
 }
 
-function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
-  if (
-    themeName &&
-    Themes.hasOwnProperty(themeName)
-  ) {
-    return themeName;
-  } else if (
-    fallbackThemeName &&
-    Themes.hasOwnProperty(fallbackThemeName)
-  ) {
-    return fallbackThemeName;
-  } else {
-    return 'ChromeDefault';
-  }
-}
-
 function hexToRgba(hex: string, alpha: number): string {
   const {r, g, b} = getRgb(hex);
 
@@ -75,7 +57,6 @@ module.exports = {
   getInvertedMid,
   getInvertedWeak,
   getRgb,
-  getSafeThemeName,
   hexToRgba,
   isBright,
 };
