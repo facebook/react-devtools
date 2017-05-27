@@ -22,7 +22,7 @@ class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
-    defaultThemeName: string,
+    browserName: string,
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
@@ -58,7 +58,7 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {defaultThemeName, showHiddenThemes, theme, themeName, themes} = this.context;
+    const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
     const {hide, open} = this.props;
     const {previewMode} = this.state;
 
@@ -87,8 +87,8 @@ class PreferencesPanel extends React.Component {
               ref={this._setSelectRef}
               value={themeName}
             >
-              {!showHiddenThemes && (<option value="">Match browser</option>)}
-              {!showHiddenThemes && (<option disabled="disabled">---</option>)}
+              {!showHiddenThemes && (<option value="">{browserName}</option>)}
+              <option disabled="disabled">---</option>
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
@@ -101,13 +101,6 @@ class PreferencesPanel extends React.Component {
             </button>
           </div>
           <div style={styles.buttonBar}>
-            <button
-              disabled={themeName === defaultThemeName}
-              onClick={this._reset}
-              style={styles.button}
-            >
-              Reset
-            </button>
             <button
               onClick={hide}
               style={styles.button}
@@ -153,11 +146,6 @@ class PreferencesPanel extends React.Component {
     }
   };
 
-  _reset = () => {
-    const {changeTheme} = this.props;
-    changeTheme('');
-  };
-
   _onKeyUp = ({ key }) => {
     if (key === 'Escape') {
       this.props.hide();
@@ -176,7 +164,7 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
-  defaultThemeName: React.PropTypes.string.isRequired,
+  browserName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
   themeName: React.PropTypes.string.isRequired,
