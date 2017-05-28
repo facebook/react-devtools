@@ -46,6 +46,7 @@ window.addEventListener('keydown', function(e) {
 
 var config = {
   alreadyFoundReact: true,
+  showHiddenThemes: true,
   inject(done) {
     inject(devtoolsSrc, () => {
       var wall = {
@@ -89,5 +90,5 @@ var sources = appSrc.split('|');
 injectMany(sources, () => {
   var node = document.getElementById('container');
 
-  ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
+  ReactDOM.render(<Panel {...config} />, node);
 });

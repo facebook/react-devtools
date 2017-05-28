@@ -11,12 +11,15 @@
 'use strict';
 
 const Themes = require('./Themes');
+const {CUSTOM_THEME_NAME} = require('./constants');
 
+const LOCAL_STORAGE_CUSTOM_THEME_KEY = 'customTheme';
 const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
 
 import type {Theme} from '../types';
 
 class Store {
+  customTheme: Theme;
   defaultThemeName: string;
   theme: Theme;
   themeName: string;
@@ -28,26 +31,52 @@ class Store {
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
-    const themeName = getSafeThemeName(getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY), this.defaultThemeName);
+    const themeName = getSafeThemeName(
+      getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY),
+      this.defaultThemeName,
+    );
 
-    this.theme = Themes[themeName];
+    // Load previous custom theme from localStorage.
+    // If there isn't one in local storage, start by cloning the default theme.
+    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
+    if (customTheme) {
+      // TODO (bvaughn) Add more gaurds around custom theme serialization
+      this.customTheme = JSON.parse(customTheme);
+    } else {
+      this.customTheme = Object.assign({}, Themes[this.defaultThemeName], {
+        displayName: CUSTOM_THEME_NAME,
+      });
+    }
+
+    // The user's active theme is either their custom one,
+    // Or one of the built-in sets (based on the default).
+    this.theme = themeName === CUSTOM_THEME_NAME ? this.customTheme : Themes[themeName];
     this.themeName = themeName;
     this.themes = Themes;
   }
 
   update(themeName: ?string) {
-    if (themeName === 'custom') {
+    if (themeName === CUSTOM_THEME_NAME) {
+      this.theme = this.customTheme;
+      this.themeName = CUSTOM_THEME_NAME;
+    } else {
+      // Only apply a valid theme.
+      const safeThemeKey = getSafeThemeName(themeName, this.defaultThemeName);
 
+      this.theme = this.themes[safeThemeKey];
+      this.themeName = safeThemeKey;
     }
-
-    // Only apply a valid theme.
-    const safeThemeKey = getSafeThemeName(themeName, this.defaultThemeName);
-
-    this.theme = this.themes[safeThemeKey];
-    this.themeName = safeThemeKey;
 
     // But allow users to restore "default" mode by selecting an empty theme.
     setInLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+  }
+
+  saveCustomTheme(theme: Theme) {
+    this.customTheme = theme;
+    this.theme = theme;
+
+    // TODO (bvaughn) Add more gaurds around custom theme serialization
+    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, JSON.stringify(theme));
   }
 }
 
@@ -62,7 +91,9 @@ function getFromLocalStorage(key: string): any {
 }
 
 function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
-  if (
+  if (themeName === CUSTOM_THEME_NAME) {
+    return CUSTOM_THEME_NAME;
+  } else if (
     themeName &&
     Themes.hasOwnProperty(themeName)
   ) {

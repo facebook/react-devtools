@@ -64,6 +64,7 @@ type State = {
   loading: boolean,
   isReact: boolean,
   preferencesPanelShown: boolean,
+  themeKey: number,
   themeName: ?string,
 };
 
@@ -89,6 +90,7 @@ class Panel extends React.Component {
       loading: true,
       preferencesPanelShown: false,
       isReact: props.alreadyFoundReact,
+      themeKey: 0,
       themeName: props.themeName,
     };
     this._unMounted = false;
@@ -242,10 +244,12 @@ class Panel extends React.Component {
         });
       });
       this._store.on('theme', () => {
-        // Force a deep re-render when theme changes
-        this.setState({
+        // Force a deep re-render when theme changes.
+        // Use an incrementor so changes to Custom theme also update.
+        this.setState(state => ({
+          themeKey: state.themeKey + 1,
           themeName: this._themeStore.theme.displayName,
-        });
+        }));
       });
     });
   }
@@ -303,7 +307,7 @@ class Panel extends React.Component {
     }
     return (
       <Container
-        key={this.state.themeName /* Force deep re-render when theme changes */}
+        key={this.state.themeKey /* Force deep re-render when theme changes */}
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path) => {

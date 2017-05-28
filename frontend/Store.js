@@ -20,7 +20,7 @@ var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
-import type {ControlState, DOMEvent, ElementID} from './types';
+import type {ControlState, DOMEvent, ElementID, Theme} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -331,6 +331,11 @@ class Store extends EventEmitter {
 
   changeTheme(themeName: ?string) {
     this.themeStore.update(themeName);
+    this.emit('theme');
+  }
+
+  saveCustomTheme(theme: Theme) {
+    this.themeStore.saveCustomTheme(theme);
     this.emit('theme');
   }
 
