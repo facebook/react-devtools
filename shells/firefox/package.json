@@ -6,7 +6,7 @@
   "main": "main/index.js",
   "author": "Facebook",
   "engines": {
-    "firefox": ">=38.0a1"
+    "firefox": ">=44.0"
   },
   "license": "BSD-3-Clause",
   "permissions": {

@@ -11,6 +11,9 @@
 
 const { Panel } = require('dev/panel.js');
 const { Class } = require('sdk/core/heritage');
+const { PanelVisibilityListener } = require('./PanelVisibilityListener');
+
+const panelVisibilityListener = new PanelVisibilityListener();
 
 // panel
 // for docs, see
@@ -23,10 +26,14 @@ const ReactPanel = Class({
   invertIconForLightTheme: true,
   url: './panel.html',
   setup(options) {
-    // this.debuggee = options.debuggee;
+    // Assume we're visible by default because PanelVisibilityListener
+    // does not notify us about the initial value.
+    this._visible = true;
+    panelVisibilityListener.addPanel(this);
   },
   dispose() {
-    // this.debuggee = null;
+    panelVisibilityListener.removePanel(this);
+    this._addonSide = null;
   },
   onReady() {
     const tabs = require('sdk/tabs');
@@ -73,7 +80,27 @@ const ReactPanel = Class({
     });
 
     this.postMessage('port', [panelSide, metaPanelSide]);
-    console.log('Panel ready');
+    this._addonSide = addonSide;
+
+    // Now that we can post messages, rexecute onShow()/onHide() handlers
+    // that might have been called before onReady().
+    if (this._visible) {
+      this.onShow();
+    } else {
+      this.onHide();
+    }
+  },
+  onShow() {
+    this._visible = true;
+    if (this._addonSide) {
+      this._addonSide.postMessage({type: 'resume'});
+    }
+  },
+  onHide() {
+    this._visible = false;
+    if (this._addonSide) {
+      this._addonSide.postMessage({type: 'pause'});
+    }
   },
 });
 
