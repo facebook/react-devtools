@@ -10,6 +10,7 @@
  */
 'use strict';
 
+const {deserialize, serialize} = require('./Serializer');
 const Themes = require('./Themes');
 const {CUSTOM_THEME_NAME} = require('./constants');
 
@@ -39,8 +40,7 @@ class Store {
     // If there isn't one in local storage, start by cloning the default theme.
     const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
     if (customTheme) {
-      // TODO (bvaughn) Add more gaurds around custom theme serialization
-      this.customTheme = JSON.parse(customTheme);
+      this.customTheme = deserialize(customTheme);
     } else {
       this.customTheme = Object.assign({}, Themes[this.defaultThemeName], {
         displayName: CUSTOM_THEME_NAME,
@@ -74,8 +74,7 @@ class Store {
     this.customTheme = theme;
     this.theme = theme;
 
-    // TODO (bvaughn) Add more gaurds around custom theme serialization
-    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, JSON.stringify(theme));
+    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
   }
 
   setDefaultThemeName(defaultThemeName: ?string) {

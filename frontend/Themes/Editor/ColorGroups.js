@@ -10,13 +10,12 @@
  */
 'use strict';
 
-// TODO (bvaughn) Make gradient names less specific?
 const Base = {
   base00: 'Default Background',
-  base01: 'Lighter Background',
-  base02: 'Borders, Menus',
-  base03: 'Borders, Comments',
-  base04: 'Lighter Foreground',
+  base01: 'Softer Background',
+  base02: 'Softer Middle',
+  base03: 'Stronger Middle',
+  base04: 'Softer Foreground',
   base05: 'Default Foreground',
 };
 
