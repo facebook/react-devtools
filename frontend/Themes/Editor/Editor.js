@@ -232,6 +232,8 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'flex-start',
+    position: 'relative',
+    zIndex: 1,
   },
   previewWrapper: {
     flex: '0 0 auto',

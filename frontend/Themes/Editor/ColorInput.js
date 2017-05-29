@@ -16,7 +16,7 @@ const ColorPicker = require('./ColorPicker');
 const {monospace} = require('../../Themes/Fonts');
 const {isBright} = require('../utils');
 
-import type {Rectangle, Theme} from '../../types';
+import type {Theme} from '../../types';
 
 type Props = {
   customTheme: Theme,
@@ -29,12 +29,14 @@ type Props = {
 type State = {
   color: string,
   isColorPickerOpen: boolean,
-  targetPos?: Rectangle,
+  maxHeight: ?number,
 };
 
 class ColorInput extends React.Component {
   props: Props;
   state: State;
+
+  _containerRef: any;
 
   constructor(props: Props, context: any) {
     super(props, context);
@@ -44,8 +46,7 @@ class ColorInput extends React.Component {
     this.state = {
       color: customTheme[propertyName],
       isColorPickerOpen: false,
-      left: 0,
-      top: 0,
+      maxHeight: null,
     };
   }
 
@@ -59,34 +60,38 @@ class ColorInput extends React.Component {
 
   render() {
     const {label, theme} = this.props;
-    const {color, isColorPickerOpen, targetPos} = this.state;
+    const {color, isColorPickerOpen, maxHeight} = this.state;
 
     const backgroundIsBright = isBright(theme.base00);
     const chipIsBright = isBright(color);
 
     return (
-      <div style={styles.container}>
+      <div
+        ref={this._setContainerRef}
+        style={containerStyle(maxHeight)}
+      >
         <label style={styles.label}>
           {label}
         </label>
-        <div style={inputContainerStyle(theme)}>
-          <div
-            onClick={this._onClick}
-            style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
-          ></div>
-          <input
-            onChange={this._onChange}
-            style={styles.input}
-            type="text"
-            value={color}
-          />
-        </div>
+        {!isColorPickerOpen && (
+          <div style={inputContainerStyle(theme)}>
+            <div
+              onClick={this._onClick}
+              style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
+            ></div>
+            <input
+              onChange={this._onChange}
+              style={styles.input}
+              type="text"
+              value={color}
+            />
+          </div>
+        )}
         {isColorPickerOpen && (
           <ColorPicker
             color={color}
             isOpen={isColorPickerOpen}
             hide={this._hideColorPicker}
-            targetPos={targetPos}
             theme={theme}
             updateColor={this._updateColor}
           />
@@ -99,6 +104,7 @@ class ColorInput extends React.Component {
   _hideColorPicker = () => {
     this.setState({
       isColorPickerOpen: false,
+      maxHeight: null,
     });
   };
 
@@ -109,19 +115,17 @@ class ColorInput extends React.Component {
 
   // $FlowFixMe ^ class property `_onClick`. Missing annotation
   _onClick = (event) => {
-    const node = findDOMNode(event.target);
-
-    const targetPos = {
-      height: node.offsetHeight,
-      left: node.offsetLeft,
-      top: node.offsetTop,
-      width: node.offsetWidth,
-    };
+    const container = findDOMNode(this._containerRef);
 
     this.setState({
       isColorPickerOpen: true,
-      targetPos,
+      maxHeight: container.offsetHeight,
     });
+  };
+
+  // $FlowFixMe ^ class property `_setContainerRef`. Missing annotation
+  _setContainerRef = (ref: any) => {
+    this._containerRef = ref;
   };
 
   // $FlowFixMe ^ class property `_onChange`. Missing annotation
@@ -137,6 +141,12 @@ class ColorInput extends React.Component {
     udpatePreview();
   };
 }
+
+const containerStyle = (maxHeight: ?number) => ({
+  margin: '0.25rem',
+  minWidth: '7.5rem',
+  maxHeight,
+});
 
 const colorChipStyle = (theme: Theme, color: string, showBorder: boolean) => {
   if (
@@ -170,10 +180,6 @@ const inputContainerStyle = (theme: Theme) => ({
 });
 
 const styles = {
-  container: {
-    margin: '0.25rem',
-    minWidth: '7.5rem',
-  },
   input: {
     width: '5rem',
     flex: '1 0 auto',
