@@ -19,6 +19,7 @@ const Preview = require('../Preview');
 const SvgIcon = require('../../SvgIcon');
 const Themes = require('../Themes');
 const {deserialize, serialize} = require('../Serializer');
+const {CUSTOM_THEME_NAME} = require('../constants');
 
 import type {DOMEvent, Theme} from '../../types';
 
@@ -155,7 +156,7 @@ class Editor extends React.Component {
   };
 
   _sanitizeCustomTheme() {
-    this._customTheme.displayName = 'Custom';
+    this._customTheme.displayName = CUSTOM_THEME_NAME;
 
     delete this._customTheme.hidden;
   }
