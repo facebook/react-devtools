@@ -101,13 +101,13 @@ class Panel extends React.Component {
   getChildContext(): Object {
     return {
       browserName: this.props.browserName || '',
-      defaultThemeName: this._store && this._themeStore.defaultThemeName || '',
+      defaultThemeName: this._themeStore && this._themeStore.defaultThemeName || '',
       showHiddenThemes: !!this.props.showHiddenThemes,
       showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
-      theme: this._store && this._themeStore.theme || Themes.ChromeDefault,
-      themeName: this._store && this._themeStore.themeName || '',
-      themes: this._store && this._themeStore.themes || {},
+      theme: this._themeStore && this._themeStore.theme || Themes.ChromeDefault,
+      themeName: this._themeStore && this._themeStore.themeName || '',
+      themes: this._themeStore && this._themeStore.themes || {},
     };
   }
 
