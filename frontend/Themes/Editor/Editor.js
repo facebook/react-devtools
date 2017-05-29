@@ -54,6 +54,7 @@ class Editor extends React.Component {
     };
 
     this._customTheme = Object.assign({}, props.theme);
+    this._sanitizeCustomTheme();
   }
 
   getChildContext() {
@@ -116,7 +117,7 @@ class Editor extends React.Component {
             20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z
           "/>
 
-          <label style={styles.shareLabel}>Share theme:</label>
+          <label style={styles.shareLabel}>Import/export:</label>
           <input
             onChange={this._onShareChange}
             style={shareInput(theme)}
@@ -131,7 +132,7 @@ class Editor extends React.Component {
   _onShareChange = (event: DOMEvent) => {
     try {
       this._customTheme = JSON.parse(event.target.value);
-      // TODO (bvaughn) Verify Theme somehow
+      this._sanitizeCustomTheme();
       this._udpatePreview();
     } catch (error) {
       // TODO (bvaughn) Show the user an error message
@@ -155,6 +156,12 @@ class Editor extends React.Component {
 
     this._udpatePreview();
   };
+
+  _sanitizeCustomTheme() {
+    this._customTheme.displayName = 'Custom';
+
+    delete this._customTheme.hidden;
+  }
 
   _save = () => {
     const {hide, saveTheme} = this.props;

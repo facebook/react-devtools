@@ -83,7 +83,7 @@ class ColorInput extends React.Component {
               onChange={this._onChange}
               style={styles.input}
               type="text"
-              value={color}
+              value={color || ''}
             />
           </div>
         )}
@@ -148,7 +148,7 @@ const containerStyle = (maxHeight: ?number) => ({
   maxHeight,
 });
 
-const colorChipStyle = (theme: Theme, color: string, showBorder: boolean) => {
+const colorChipStyle = (theme: Theme, color: string = '', showBorder: boolean = false) => {
   if (
     color.substring(0, 3) !== 'rgb' &&
     color.charAt(0) !== '#'

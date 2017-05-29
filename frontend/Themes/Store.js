@@ -26,8 +26,7 @@ class Store {
   themes: { [key: string]: Theme };
 
   constructor(defaultThemeName: ?string) {
-    // Don't accept an invalid themeName as a default.
-    this.defaultThemeName = getSafeThemeName(defaultThemeName);
+    this.setDefaultThemeName(defaultThemeName);
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
@@ -77,6 +76,11 @@ class Store {
 
     // TODO (bvaughn) Add more gaurds around custom theme serialization
     setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, JSON.stringify(theme));
+  }
+
+  setDefaultThemeName(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this.defaultThemeName = getSafeThemeName(defaultThemeName);
   }
 }
 

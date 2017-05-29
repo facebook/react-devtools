@@ -334,6 +334,10 @@ class Store extends EventEmitter {
     this.emit('theme');
   }
 
+  setDefaultThemeName(defaultThemeName: ?string) {
+    this.themeStore.setDefaultThemeName(defaultThemeName);
+  }
+
   saveCustomTheme(theme: Theme) {
     this.themeStore.saveCustomTheme(theme);
     this.emit('theme');
