@@ -122,10 +122,9 @@ const fauxStore = {
 
 const panelStyle = (theme: Theme) => ({
   maxWidth: '100%',
-  margin: '0.5rem',
   padding: '0.5rem',
   borderRadius: '0.25rem',
-  display: 'flex',
+  display: 'inline-flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
   zIndex: 1,

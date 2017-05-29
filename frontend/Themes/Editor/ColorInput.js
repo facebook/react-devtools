@@ -11,20 +11,25 @@
 'use strict';
 
 const React = require('react');
+const {findDOMNode} = require('react-dom');
+const ColorPicker = require('./ColorPicker');
 const {monospace} = require('../../Themes/Fonts');
 const {isBright} = require('../utils');
 
-import type {Theme} from '../../types';
+import type {Rectangle, Theme} from '../../types';
 
 type Props = {
   customTheme: Theme,
   label: string,
   propertyName: string,
   theme: Theme,
+  udpatePreview: () => void,
 };
 
 type State = {
   color: string,
+  isColorPickerOpen: boolean,
+  targetPos?: Rectangle,
 };
 
 class ColorInput extends React.Component {
@@ -38,12 +43,23 @@ class ColorInput extends React.Component {
 
     this.state = {
       color: customTheme[propertyName],
+      isColorPickerOpen: false,
+      left: 0,
+      top: 0,
     };
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    const {customTheme, propertyName} = nextProps;
+
+    this.setState({
+      color: customTheme[propertyName],
+    });
   }
 
   render() {
     const {label, theme} = this.props;
-    const {color} = this.state;
+    const {color, isColorPickerOpen, targetPos} = this.state;
 
     const backgroundIsBright = isBright(theme.base00);
     const chipIsBright = isBright(color);
@@ -54,44 +70,95 @@ class ColorInput extends React.Component {
           {label}
         </label>
         <div style={inputContainerStyle(theme)}>
-          <div style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}></div>
+          <div
+            onClick={this._onClick}
+            style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
+          ></div>
           <input
-            defaultValue={color.toUpperCase()}
             onChange={this._onChange}
             size={7}
             style={styles.input}
+            value={color.toUpperCase()}
           />
         </div>
+        {isColorPickerOpen && (
+          <ColorPicker
+            color={color}
+            isOpen={isColorPickerOpen}
+            hide={this._hideColorPicker}
+            targetPos={targetPos}
+            theme={theme}
+            updateColor={this._updateColor}
+          />
+        )}
       </div>
     );
   }
 
-  // $FlowFixMe Why is Flow saying "class property `_onChange`. Missing annotation"
-  _onChange = ({ target }) => {
-    const {customTheme, propertyName} = this.props;
+  // $FlowFixMe ^ class property `_hideColorPicker`. Missing annotation
+  _hideColorPicker = () => {
+    this.setState({
+      isColorPickerOpen: false,
+    });
+  };
 
-    const color = target.value;
+  // $FlowFixMe ^ class property `_onChange`. Missing annotation
+  _onChange = ({ target }) => {
+    this._updateColor(target.value);
+  };
+
+  // $FlowFixMe ^ class property `_onClick`. Missing annotation
+  _onClick = (event) => {
+    const node = findDOMNode(event.target);
+
+    const targetPos = {
+      height: node.offsetHeight,
+      left: node.offsetLeft,
+      top: node.offsetTop,
+      width: node.offsetWidth,
+    };
+
+    this.setState({
+      isColorPickerOpen: true,
+      targetPos,
+    });
+  };
+
+  // $FlowFixMe ^ class property `_onChange`. Missing annotation
+  _updateColor = (color: string) => {
+    const {customTheme, propertyName, udpatePreview} = this.props;
 
     customTheme[propertyName] = color;
 
-    this.setState({color});
+    this.setState({
+      color,
+    });
+
+    udpatePreview();
   };
 }
 
-const colorChipStyle = (theme: Theme, color: string, showBorder: boolean) => ({
-  height: '1.5rem',
-  width: '1.5rem',
-  borderRadius: '2px',
-  backgroundColor: color,
-  boxSizing: 'border-box',
-  border: showBorder ? `1px solid ${theme.base03}` : 'none',
-});
+const colorChipStyle = (theme: Theme, color: string, showBorder: boolean) => {
+  if (color.charAt(0) !== '#') {
+    color = '#' + color;
+  }
+
+  return {
+    height: '1.25rem',
+    width: '1.25rem',
+    borderRadius: '2px',
+    backgroundColor: color,
+    boxSizing: 'border-box',
+    cursor: 'pointer',
+    border: showBorder ? `1px solid ${theme.base03}` : 'none',
+  };
+};
 
 const inputContainerStyle = (theme: Theme) => ({
   display: 'flex',
   flexDirection: 'row',
   alignItems: 'center',
-  padding: '0.25rem',
+  padding: '0.125rem',
   backgroundColor: theme.base00,
   color: theme.base05,
   border: `1px solid ${theme.base03}`,

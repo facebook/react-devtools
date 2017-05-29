@@ -20,9 +20,10 @@ type Props = {
   descriptions: {[key: string]: string},
   label: string,
   theme: Theme,
+  udpatePreview: () => void,
 };
 
-const ColorInputGroups = ({ customTheme, descriptions, label, theme }: Props) => (
+const ColorInputGroups = ({ customTheme, descriptions, label, theme, udpatePreview }: Props) => (
   <div>
     <label style={labelStyle(theme)}>{label}</label>
     <div style={styles.group}>
@@ -32,6 +33,7 @@ const ColorInputGroups = ({ customTheme, descriptions, label, theme }: Props) =>
           key={key}
           label={descriptions[key]}
           propertyName={key}
+          udpatePreview={udpatePreview}
           theme={theme}
         />
       ))}

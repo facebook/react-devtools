@@ -76,6 +76,13 @@ export type ControlState = {
   enabled: boolean,
 } & Record;
 
+export type Rectangle = {
+  left: number,
+  height: number,
+  top: number,
+  width: number,
+};
+
 /**
  * A theme is a color template used throughout devtools.
  * All devtools coloring is declared by themes, with one minor exception: status colors.

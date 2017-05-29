@@ -22,6 +22,7 @@
     "raw-loader": "^0.5.1",
     "react": "15.4.2",
     "react-addons-create-fragment": "15.4.2",
+    "react-color": "^2.11.7",
     "react-dom": "15.4.2",
     "webpack": "1.12.9"
   },
