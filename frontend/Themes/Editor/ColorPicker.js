@@ -27,7 +27,6 @@ type Props = {
 };
 
 type State = {
-  color: string,
   height: number,
   width: number,
 };
@@ -35,7 +34,6 @@ type State = {
 class ColorPicker extends React.Component {
   props: Props;
   state: State = {
-    color: this.props.color,
     height: 0,
     width: 0,
   };
@@ -53,19 +51,13 @@ class ColorPicker extends React.Component {
     });
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    this.setState({
-      color: nextProps.color,
-    });
-  }
-
   componenWillUnmount() {
     document.removeEventListener('keydown', this._onKeyDown);
   }
 
   render() {
-    const {color, height, width} = this.state;
-    const {hide, isOpen, targetPos, theme} = this.props;
+    const {height, width} = this.state;
+    const {color, hide, isOpen, targetPos, theme} = this.props;
 
     if (!isOpen) {
       return null;
@@ -81,10 +73,9 @@ class ColorPicker extends React.Component {
           ref={this._setRef}
           style={positionerStyle(targetPos, width, height)}
         >
-          <CustomColorPicker
+          <DecoratedCustomColorPicker
             color={color}
             disableAlpha={true}
-            onChange={this._onChange}
             onChangeComplete={this._onChangeComplete}
             theme={theme}
           />
@@ -92,13 +83,6 @@ class ColorPicker extends React.Component {
       </div>
     );
   }
-
-  // $FlowFixMe ^ class property `_onChange`. Missing annotation
-  _onChange = (color) => {
-    this.setState({
-      color: color.hex,
-    });
-  };
 
   // $FlowFixMe ^ class property `_onChangeComplete`. Missing annotation
   _onChangeComplete = (color) => {
@@ -127,7 +111,7 @@ function blockEvent(event: DOMEvent) {
   event.stopPropagation();
 }
 
-class InnerColorPicker extends React.Component {
+class CustomColorPicker extends React.Component {
   render() {
     return (
       <div style={customColorPicker(this.props.theme)}>
@@ -149,7 +133,7 @@ class InnerColorPicker extends React.Component {
   }
 }
 
-const CustomColorPicker = CustomPicker(InnerColorPicker);
+const DecoratedCustomColorPicker = CustomPicker(CustomColorPicker);
 
 const customColorPicker = (theme) => ({
   display: 'flex',

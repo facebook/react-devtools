@@ -14,11 +14,12 @@ const decorate = require('../../decorate');
 const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
-const {sansSerif} = require('../Fonts');
+const {monospace, sansSerif} = require('../Fonts');
 const Preview = require('../Preview');
+const SvgIcon = require('../../SvgIcon');
 const Themes = require('../Themes');
 
-import type {Theme} from '../../types';
+import type {DOMEvent, Theme} from '../../types';
 
 // The editor itself should use a known safe theme,
 // In case a user messes up a custom theme and renders it unusable.
@@ -62,7 +63,7 @@ class Editor extends React.Component {
   }
 
   render() {
-    const {hide} = this.props;
+    const {hide, theme} = this.props;
     const {updateCounter} = this.state;
 
     return (
@@ -95,14 +96,47 @@ class Editor extends React.Component {
           </div>
         </div>
 
-        <div style={styles.buttons}>
-          <button onClick={hide}>Cancel</button>
-          <button onClick={this._reset}>Reset</button>
-          <button onClick={this._save}>Save</button>
+        <div style={styles.bottomRow}>
+          <div style={styles.buttons}>
+            <button onClick={hide}>
+              Cancel
+            </button> <button onClick={this._reset}>
+              Reset
+            </button> <button onClick={this._save}>
+              Save
+            </button>
+          </div>
+
+          <SvgIcon path="
+            M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,
+            11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,
+            3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,
+            9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,
+            18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,
+            20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z
+          "/>
+
+          <label style={styles.shareLabel}>Share theme:</label>
+          <input
+            onChange={this._onShareChange}
+            style={shareInput(theme)}
+            type="text"
+            value={JSON.stringify(this._customTheme, null, 0)}
+          />
         </div>
       </div>
     );
   }
+
+  _onShareChange = (event: DOMEvent) => {
+    try {
+      this._customTheme = JSON.parse(event.target.value);
+      // TODO (bvaughn) Verify Theme somehow
+      this._udpatePreview();
+    } catch (error) {
+      // TODO (bvaughn) Show the user an error message
+    }
+  };
 
   _udpatePreview = () => {
     this.setState(state => ({
@@ -170,13 +204,29 @@ const groupStyle = (theme: Theme) => ({
   borderRadius: '0.25rem',
 });
 
+const shareInput = (theme: Theme) => ({
+  flex: '0 1 15rem',
+  padding: '0.25rem',
+  border: `1px solid ${theme.base03}`,
+  borderRadius: '0.25rem',
+  fontFamily: monospace.family,
+  fontSize: monospace.sizes.normal,
+  color: 'inherit',
+});
+
 const styles = {
   header: {
     marginTop: 0,
     marginBottom: '0.5rem',
   },
-  buttons: {
+  bottomRow: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
     marginTop: '0.5rem',
+  },
+  buttons: {
+    flex: '1 0 auto',
   },
   row: {
     display: 'flex',
@@ -186,6 +236,10 @@ const styles = {
   previewWrapper: {
     flex: '0 0 auto',
     marginLeft: '0.5rem',
+  },
+  shareLabel: {
+    flex: '0 0 auto',
+    margin: '0 0.25rem',
   },
 };
 

@@ -76,9 +76,9 @@ class ColorInput extends React.Component {
           ></div>
           <input
             onChange={this._onChange}
-            size={7}
             style={styles.input}
-            value={color.toUpperCase()}
+            type="text"
+            value={color}
           />
         </div>
         {isColorPickerOpen && (
@@ -139,7 +139,10 @@ class ColorInput extends React.Component {
 }
 
 const colorChipStyle = (theme: Theme, color: string, showBorder: boolean) => {
-  if (color.charAt(0) !== '#') {
+  if (
+    color.substring(0, 3) !== 'rgb' &&
+    color.charAt(0) !== '#'
+  ) {
     color = '#' + color;
   }
 
@@ -159,6 +162,7 @@ const inputContainerStyle = (theme: Theme) => ({
   flexDirection: 'row',
   alignItems: 'center',
   padding: '0.125rem',
+  flex: '0 0 1.25rem',
   backgroundColor: theme.base00,
   color: theme.base05,
   border: `1px solid ${theme.base03}`,
@@ -171,6 +175,9 @@ const styles = {
     minWidth: '7.5rem',
   },
   input: {
+    width: '5rem',
+    flex: '1 0 auto',
+    textTransform: 'lowercase',
     boxSizing: 'border-box',
     background: 'transparent',
     border: 'none',
