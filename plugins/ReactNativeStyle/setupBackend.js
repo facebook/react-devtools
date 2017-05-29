@@ -65,6 +65,11 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
   }
 
   instance.measure((x, y, width, height, left, top) => {
+    // It may got undefined for measure some instance in Android
+    if (typeof x !== 'number') {
+      bridge.send('rn-style:measure', {style});
+      return;
+    }
     var margin = (style && resolveBoxStyle('margin', style)) || blank;
     var padding = (style && resolveBoxStyle('padding', style)) || blank;
     bridge.send('rn-style:measure', {
