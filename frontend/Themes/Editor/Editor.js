@@ -18,6 +18,7 @@ const {monospace, sansSerif} = require('../Fonts');
 const Preview = require('../Preview');
 const SvgIcon = require('../../SvgIcon');
 const Themes = require('../Themes');
+const {deserialize, serialize} = require('../Serializer');
 
 import type {DOMEvent, Theme} from '../../types';
 
@@ -122,7 +123,7 @@ class Editor extends React.Component {
             onChange={this._onShareChange}
             style={shareInput(theme)}
             type="text"
-            value={JSON.stringify(this._customTheme, null, 0)}
+            value={serialize(this._customTheme)}
           />
         </div>
       </div>
@@ -130,13 +131,9 @@ class Editor extends React.Component {
   }
 
   _onShareChange = (event: DOMEvent) => {
-    try {
-      this._customTheme = JSON.parse(event.target.value);
-      this._sanitizeCustomTheme();
-      this._udpatePreview();
-    } catch (error) {
-      // TODO (bvaughn) Show the user an error message
-    }
+    this._customTheme = deserialize(event.target.value);
+    this._sanitizeCustomTheme();
+    this._udpatePreview();
   };
 
   _udpatePreview = () => {
