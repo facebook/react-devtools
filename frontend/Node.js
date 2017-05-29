@@ -204,6 +204,10 @@ class Node extends React.Component {
     const sharedHeadBracketStyle = bracketStyle(inverted && !isBottomTagSelected, theme);
     const sharedTailBracketStyle = bracketStyle(inverted && isBottomTagSelected, theme);
 
+    let name = node.get('name') + '';
+
+    const isHigherOrderComponent = name.match(/[A-Za-z]+\({1}[A-Za-z]+\){1}/g);
+
     const sharedHeadStyle = headStyle({
       depth,
       isBottomTagHovered,
@@ -212,6 +216,8 @@ class Node extends React.Component {
       isHovered: hovered,
       isSelected: selected,
       isWindowFocused,
+      isHigherOrderComponent: isHigherOrderComponent,
+      isSearch: !!searchRegExp,
       theme,
     });
 
@@ -259,8 +265,6 @@ class Node extends React.Component {
     }
 
     var isCustom = nodeType === 'Composite';
-
-    let name = node.get('name') + '';
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
@@ -387,6 +391,8 @@ class Node extends React.Component {
       isHovered: hovered,
       isSelected: selected,
       isWindowFocused,
+      isHigherOrderComponent: isHigherOrderComponent,
+      isSearch: !!searchRegExp,
       theme,
     });
 
@@ -465,6 +471,8 @@ type headStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
+  isHigherOrderComponent: boolean,
+  isSearch: boolean,
   theme: Theme
 };
 
@@ -476,6 +484,8 @@ const headStyle = ({
   isHovered,
   isSelected,
   isWindowFocused,
+  isHigherOrderComponent,
+  isSearch,
   theme,
 }: headStyleParams) => {
   let backgroundColor;
@@ -489,12 +499,14 @@ const headStyle = ({
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
   const color = isInverted ? theme.state02 : undefined;
+  const isDimmed = isHigherOrderComponent && !isSelected && !isSearch;
 
   return {
     cursor: 'default',
     borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
+    opacity: isDimmed ? 0.5 : 1,
     paddingLeft: calcPaddingLeft(depth),
     paddingRight,
     backgroundColor,
@@ -574,6 +586,8 @@ type tailStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
+  isHigherOrderComponent: boolean,
+  isSearch: boolean,
   theme: Theme
 };
 
@@ -584,6 +598,8 @@ const tailStyle = ({
   isHovered,
   isSelected,
   isWindowFocused,
+  isHigherOrderComponent,
+  isSearch,
   theme,
 }: tailStyleParams) => {
   let backgroundColor;
@@ -597,12 +613,14 @@ const tailStyle = ({
 
   const isInverted = isSelected && isWindowFocused && isBottomTagSelected;
   const color = isInverted ? theme.base04 : undefined;
+  const isDimmed = isHigherOrderComponent && !isSelected && !isSearch;
 
   return {
     borderTop: '1px solid transparent',
     cursor: 'default',
     paddingLeft: calcPaddingLeft(depth),
     paddingRight,
+    opacity: isDimmed ? 0.5 : 1,
     backgroundColor,
     color,
   };
