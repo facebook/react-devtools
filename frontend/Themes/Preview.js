@@ -127,6 +127,7 @@ const panelStyle = (theme: Theme) => ({
   display: 'inline-flex',
   flexDirection: 'column',
   alignItems: 'flex-start',
+  overflow: 'auto',
   zIndex: 1,
   fontFamily: sansSerif.family,
   fontSize: sansSerif.sizes.normal,
