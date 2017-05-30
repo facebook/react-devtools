@@ -120,11 +120,11 @@ function getData(internalInstance: Object): DataType {
     }
   }
 
-  if (typeof element.setNativeProps === 'function') {
+  if (typeof internalInstance.setNativeProps === 'function') {
     // For editing styles in RN
     updater = {
       setNativeProps(nativeProps) {
-        element.setNativeProps(nativeProps);
+        internalInstance.setNativeProps(nativeProps);
       },
     };
   }
