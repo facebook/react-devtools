@@ -15,7 +15,7 @@ const {Map} = require('immutable');
 
 const consts = require('../../agent/consts');
 const Node = require('../Node');
-const {sansSerif} = require('./Fonts');
+const {monospace} = require('./Fonts');
 
 import type {Theme} from '../types';
 
@@ -129,8 +129,8 @@ const panelStyle = (theme: Theme) => ({
   alignItems: 'flex-start',
   overflow: 'auto',
   zIndex: 1,
-  fontFamily: sansSerif.family,
-  fontSize: sansSerif.sizes.normal,
+  fontFamily: monospace.family,
+  fontSize: monospace.sizes.normal,
   backgroundColor: theme.base00,
   border: `1px solid ${theme.base03}`,
   color: theme.base05,
