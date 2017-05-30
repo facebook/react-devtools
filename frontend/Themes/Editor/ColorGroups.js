@@ -12,15 +12,15 @@
 
 const Base = {
   base00: 'Default Background',
-  base01: 'Softer Background',
-  base02: 'Softer Middle',
-  base03: 'Stronger Middle',
-  base04: 'Softer Foreground',
+  base01: 'Soft Background',
+  base02: 'Soft Middle',
+  base03: 'Strong Middle',
+  base04: 'Soft Foreground',
   base05: 'Default Foreground',
 };
 
 const Syntax = {
-  special00: 'Custom Coponents',
+  special00: 'Custom Components',
   special01: 'Integers, Booleans',
   special02: 'Strings, Arrays',
   special03: 'Details Pane Text',
