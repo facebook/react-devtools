@@ -11,7 +11,6 @@
 'use strict';
 
 const React = require('react');
-const {findDOMNode} = require('react-dom');
 const {CustomPicker} = require('react-color');
 const {Hue, Saturation} = require('react-color/lib/components/common');
 
@@ -19,8 +18,6 @@ import type {Theme} from '../../types';
 
 type Props = {
   color: string,
-  hide: () => void,
-  isOpen: boolean,
   theme: Theme,
   updateColor: (color: string) => void,
 };
@@ -30,22 +27,8 @@ class ColorPicker extends React.Component {
 
   _ref: any;
 
-  componentDidMount() {
-    document.addEventListener('keydown', this._onDocumentKeyDown);
-    document.addEventListener('click', this._onDocumentClick);
-  }
-
-  componentWillUnmount() {
-    document.removeEventListener('keydown', this._onDocumentKeyDown);
-    document.removeEventListener('click', this._onDocumentClick);
-  }
-
   render() {
-    const {color, isOpen, theme} = this.props;
-
-    if (!isOpen) {
-      return null;
-    }
+    const {color, theme} = this.props;
 
     return (
       <DecoratedCustomColorPicker
@@ -60,32 +43,8 @@ class ColorPicker extends React.Component {
 
   // $FlowFixMe ^ class property `_onChangeComplete`. Missing annotation
   _onChangeComplete = (color) => {
+//    this.props.closePortal();
     this.props.updateColor(color.hex);
-  };
-
-  // $FlowFixMe ^ class property `_onClose`. Missing annotation
-  _onClose = () => {
-    this.props.hide();
-  };
-
-  // $FlowFixMe ^ class property `_onDocumentClick`. Missing annotation
-  _onDocumentClick = (event: Event) => {
-    if (this._ref) {
-      const node = findDOMNode(this._ref);
-      if (node.contains(event.target)) {
-        event.stopPropagation();
-        return;
-      }
-    }
-
-    this.props.hide();
-  };
-
-  // $FlowFixMe ^ class property `_onDocumentKeyDown`. Missing annotation
-  _onDocumentKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') {
-      this.props.hide();
-    }
   };
 
   // $FlowFixMe ^ class property `_setRef`. Missing annotation

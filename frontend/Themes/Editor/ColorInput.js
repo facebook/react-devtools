@@ -12,11 +12,17 @@
 
 const React = require('react');
 const {findDOMNode} = require('react-dom');
+const Portal = require('react-portal');
 const ColorPicker = require('./ColorPicker');
 const {monospace} = require('../../Themes/Fonts');
 const {isBright} = require('../utils');
 
 import type {Theme} from '../../types';
+
+type Position = {
+  left: number,
+  top: number,
+};
 
 type Props = {
   customTheme: Theme,
@@ -30,12 +36,14 @@ type State = {
   color: string,
   isColorPickerOpen: boolean,
   maxHeight: ?number,
+  targetPosition: Position,
 };
 
 class ColorInput extends React.Component {
   props: Props;
   state: State;
 
+  _colorChipRef: any;
   _containerRef: any;
 
   constructor(props: Props, context: any) {
@@ -47,6 +55,10 @@ class ColorInput extends React.Component {
       color: customTheme[propertyName],
       isColorPickerOpen: false,
       maxHeight: null,
+      targetPosition: {
+        left: 0,
+        top: 0,
+      },
     };
   }
 
@@ -60,7 +72,7 @@ class ColorInput extends React.Component {
 
   render() {
     const {label, theme} = this.props;
-    const {color, isColorPickerOpen, maxHeight} = this.state;
+    const {color, isColorPickerOpen, maxHeight, targetPosition} = this.state;
 
     const backgroundIsBright = isBright(theme.base00);
     const chipIsBright = isBright(color);
@@ -73,40 +85,36 @@ class ColorInput extends React.Component {
         <label style={styles.label}>
           {label}
         </label>
-        {!isColorPickerOpen && (
-          <div style={inputContainerStyle(theme)}>
-            <div
-              onClick={this._onClick}
-              style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
-            ></div>
-            <input
-              onChange={this._onChange}
-              style={styles.input}
-              type="text"
-              value={color || ''}
+        <div style={inputContainerStyle(theme)}>
+          <div
+            onClick={this._onClick}
+            ref={this._setColorChipRef}
+            style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
+          ></div>
+          <input
+            onChange={this._onChange}
+            style={styles.input}
+            type="text"
+            value={color || ''}
+          />
+        </div>
+        <Portal
+          closeOnEsc={true}
+          closeOnOutsideClick={true}
+          isOpened={isColorPickerOpen}
+          onClose={this._onClose}
+        >
+          <div style={colorPickerPosition(targetPosition)}>
+            <ColorPicker
+              color={color}
+              theme={theme}
+              updateColor={this._updateColor}
             />
           </div>
-        )}
-        {isColorPickerOpen && (
-          <ColorPicker
-            color={color}
-            isOpen={isColorPickerOpen}
-            hide={this._hideColorPicker}
-            theme={theme}
-            updateColor={this._updateColor}
-          />
-        )}
+        </Portal>
       </div>
     );
   }
-
-  // $FlowFixMe ^ class property `_hideColorPicker`. Missing annotation
-  _hideColorPicker = () => {
-    this.setState({
-      isColorPickerOpen: false,
-      maxHeight: null,
-    });
-  };
 
   // $FlowFixMe ^ class property `_onChange`. Missing annotation
   _onChange = ({ target }) => {
@@ -116,11 +124,25 @@ class ColorInput extends React.Component {
   // $FlowFixMe ^ class property `_onClick`. Missing annotation
   _onClick = (event) => {
     const container = findDOMNode(this._containerRef);
+    const targetPosition = findDOMNode(this._colorChipRef).getBoundingClientRect();
 
     this.setState({
       isColorPickerOpen: true,
       maxHeight: container.offsetHeight,
+      targetPosition,
     });
+  };
+
+  // $FlowFixMe ^ class property `_onClose`. Missing annotation
+  _onClose = () => {
+    this.setState({
+      isColorPickerOpen: false,
+    });
+  };
+
+  // $FlowFixMe ^ class property `_setColorChipRef`. Missing annotation
+  _setColorChipRef = (ref: any) => {
+    this._colorChipRef = ref;
   };
 
   // $FlowFixMe ^ class property `_setContainerRef`. Missing annotation
@@ -141,6 +163,12 @@ class ColorInput extends React.Component {
     udpatePreview();
   };
 }
+
+const colorPickerPosition = (position: Position) => ({
+  position: 'absolute',
+  left: `${position.left}px`,
+  top: `${position.top}px`,
+});
 
 const containerStyle = (maxHeight: ?number) => ({
   margin: '0.25rem',
