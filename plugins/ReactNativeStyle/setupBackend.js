@@ -15,6 +15,8 @@ var resolveBoxStyle = require('./resolveBoxStyle');
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+var styleOverridesByHostComponentId = {};
+
 module.exports = function setupRNStyle(
   bridge: Bridge,
   agent: Agent,
@@ -56,7 +58,12 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
     bridge.send('rn-style:measure', {});
     return;
   }
-  const style = resolveRNStyle(node.props.style);
+
+  let style = resolveRNStyle(node.props.style);
+  // If it's a host component we edited before, amend styles.
+  if (styleOverridesByHostComponentId[id]) {
+    style = Object.assign({}, style, styleOverridesByHostComponentId[id]);
+  }
 
   var instance = node.publicInstance;
   if (!instance || !instance.measure) {
@@ -100,6 +107,7 @@ function shallowClone(obj) {
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[oldName]: undefined, [newName]: val};
+
   if (data && data.updater && data.updater.setInProps) {
     // First attempt: use setInProps().
     // We do this for composite components, and it works relatively well.
@@ -131,7 +139,12 @@ function renameStyle(agent, id, oldName, newName, val) {
     }
   } else if (data && data.updater && data.updater.setNativeProps) {
     // Fallback: use setNativeProps(). We're dealing with a host component.
-    // The downside is it (currently) doesn't actually update the props object.
+    // Remember to "correct" resolved styles when we read them next time.
+    if (!styleOverridesByHostComponentId[id]) {
+      styleOverridesByHostComponentId[id] = newStyle;
+    } else {
+      Object.assign(styleOverridesByHostComponentId[id], newStyle);
+    }
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;
@@ -142,6 +155,7 @@ function renameStyle(agent, id, oldName, newName, val) {
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
+
   if (data && data.updater && data.updater.setInProps) {
     // First attempt: use setInProps().
     // We do this for composite components, and it works relatively well.
@@ -161,7 +175,12 @@ function setStyle(agent, id, attr, val) {
     }
   } else if (data && data.updater && data.updater.setNativeProps) {
     // Fallback: use setNativeProps(). We're dealing with a host component.
-    // The downside is it (currently) doesn't actually update the props object.
+    // Remember to "correct" resolved styles when we read them next time.
+    if (!styleOverridesByHostComponentId[id]) {
+      styleOverridesByHostComponentId[id] = newStyle;
+    } else {
+      Object.assign(styleOverridesByHostComponentId[id], newStyle);
+    }
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;
