@@ -85,7 +85,7 @@ class ContextMenu extends React.Component {
     const { elementHeight, windowHeight } = this.state;
 
     if (pos && (pos.y + elementHeight) > windowHeight)
-       pos.y = pos.y - 50;
+       pos.y = pos.y - elementHeight;
 
     if (!open) {
       return <div style={styles.hidden} />;
