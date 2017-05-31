@@ -127,13 +127,18 @@ class PreferencesPanel extends React.Component {
   }
 
   _changeTheme = (event) => {
-    const {showHiddenThemes, themes} = this.context;
+    const {defaultThemeName, showHiddenThemes, themes} = this.context;
     const {changeTheme} = this.props;
 
     const themeName = event.target.value;
     const theme = themes[themeName];
 
-    if (!themeName || !theme || (theme.hidden && !showHiddenThemes)) {
+    if (
+      !themeName ||
+      !theme ||
+      (theme.hidden && !showHiddenThemes) ||
+      themeName === defaultThemeName
+    ) {
       changeTheme('');
     } else {
       changeTheme(themeName);
