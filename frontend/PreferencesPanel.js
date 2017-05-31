@@ -14,7 +14,9 @@ const React = require('react');
 
 const decorate = require('./decorate');
 const {sansSerif} = require('./Themes/Fonts');
-const Preview = require('./Themes/Preview');
+const {CUSTOM_THEME_NAME} = require('./Themes/constants');
+const SvgIcon = require('./SvgIcon');
+const ThemeEditor = require('./Themes/Editor/Editor');
 
 import type {Theme} from './types';
 
@@ -22,7 +24,7 @@ class PreferencesPanel extends React.Component {
   _selectRef: any;
 
   context: {
-    defaultThemeName: string,
+    browserName: string,
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
@@ -30,18 +32,19 @@ class PreferencesPanel extends React.Component {
   };
   props: {
     changeTheme: (themeName: string) => void,
+    hasCustomTheme: boolean,
     hide: () => void,
     open: bool,
   };
   state: {
-    previewMode: bool,
+    editMode: bool,
   };
 
   constructor(props, context) {
     super(props, context);
 
     this.state = {
-      previewMode: false,
+      editMode: false,
     };
   }
 
@@ -58,18 +61,18 @@ class PreferencesPanel extends React.Component {
   }
 
   render() {
-    const {defaultThemeName, showHiddenThemes, theme, themeName, themes} = this.context;
-    const {hide, open} = this.props;
-    const {previewMode} = this.state;
+    const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
+    const {hasCustomTheme, hide, open} = this.props;
+    const {editMode} = this.state;
 
     if (!open) {
       return null;
     }
 
     let content;
-    if (previewMode) {
+    if (editMode) {
       content = (
-        <Preview theme={theme} />
+        <ThemeEditor hide={this._hide} theme={theme} />
       );
     } else {
       let themeNames = Object.keys(themes);
@@ -87,27 +90,21 @@ class PreferencesPanel extends React.Component {
               ref={this._setSelectRef}
               value={themeName}
             >
-              {!showHiddenThemes && (<option value="">Match browser</option>)}
-              {!showHiddenThemes && (<option disabled="disabled">---</option>)}
+              {!showHiddenThemes && (<option value="">{browserName}</option>)}
+              {hasCustomTheme && (<option value={CUSTOM_THEME_NAME}>Custom</option>)}
+              {(!showHiddenThemes || hasCustomTheme) && <option disabled="disabled">---</option>}
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
             </select>
             <button
-              onClick={this._onPreviewClick}
-              style={styles.previewButton}
+              onClick={this._onEditCustomThemeClick}
+              style={styles.iconButton}
             >
-              <PreviewIcon />
+              <EditIcon />
             </button>
           </div>
           <div style={styles.buttonBar}>
-            <button
-              disabled={themeName === defaultThemeName}
-              onClick={this._reset}
-              style={styles.button}
-            >
-              Reset
-            </button>
             <button
               onClick={hide}
               style={styles.button}
@@ -127,35 +124,28 @@ class PreferencesPanel extends React.Component {
   }
 
   _changeTheme = (event) => {
-    const {showHiddenThemes, themes} = this.context;
     const {changeTheme} = this.props;
 
-    const themeName = event.target.value;
-    const theme = themes[themeName];
-
-    if (!themeName || !theme || (theme.hidden && !showHiddenThemes)) {
-      changeTheme('');
-    } else {
-      changeTheme(themeName);
-    }
+    changeTheme(event.target.value);
   };
 
   _hide = () => {
     const {hide} = this.props;
-    const {previewMode} = this.state;
+    const {editMode} = this.state;
 
-    if (previewMode) {
+    if (editMode) {
       this.setState({
-        previewMode: false,
+        editMode: false,
       });
     } else {
       hide();
     }
   };
 
-  _reset = () => {
-    const {changeTheme} = this.props;
-    changeTheme('');
+  _onEditCustomThemeClick = () => {
+    this.setState({
+      editMode: true,
+    });
   };
 
   _onKeyUp = ({ key }) => {
@@ -164,19 +154,13 @@ class PreferencesPanel extends React.Component {
     }
   };
 
-  _onPreviewClick = () => {
-    this.setState(state => ({
-      previewMode: !state.previewMode,
-    }));
-  };
-
   _setSelectRef = (ref) => {
     this._selectRef = ref;
   };
 }
 
 PreferencesPanel.contextTypes = {
-  defaultThemeName: React.PropTypes.string.isRequired,
+  browserName: React.PropTypes.string.isRequired,
   showHiddenThemes: React.PropTypes.bool.isRequired,
   theme: React.PropTypes.object.isRequired,
   themeName: React.PropTypes.string.isRequired,
@@ -188,17 +172,11 @@ PreferencesPanel.propTypes = {
   open: React.PropTypes.bool,
 };
 
-const PreviewIcon = () => (
-  <svg
-    style={styles.previewIcon}
-    viewBox="0 0 24 24"
-  >
-    <path d="
-      M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,
-      1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,
-      12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z
-    " />
-  </svg>
+const EditIcon = () => (
+  <SvgIcon path="
+    M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,
+    5.12L18.87,8.87M3,17.25V21H6.75L17.81,9.93L14.06,6.18L3,17.25Z
+  "/>
 );
 
 const blockClick = event => event.stopPropagation();
@@ -210,6 +188,7 @@ const WrappedPreferencesPanel = decorate({
   props(store, props) {
     return {
       changeTheme: themeName => store.changeTheme(themeName),
+      hasCustomTheme: !!store.themeStore.customTheme,
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
     };
@@ -259,17 +238,14 @@ const styles = {
     direction: 'row',
     alignItems: 'center',
   },
-  previewButton: {
+  iconButton: {
+    padding: '0.25rem',
     marginLeft: '0.25rem',
+    height: '1.5rem',
     background: 'none',
     border: 'none',
     color: 'inherit',
     cursor: 'pointer',
-  },
-  previewIcon: {
-    fill: 'currentColor',
-    width: '1rem',
-    height: '1rem',
   },
 };
 

@@ -23,11 +23,12 @@ var port = {};
 
 // TODO (bvaughn) Read default :themeName and switch between 'FirefoxLight' and 'FirefoxDark'
 // Refer to 'shells/chrome/src/panel.js' for an example
+const browserName = 'Firefox';
 const themeName = 'FirefoxLight';
 
 function reload() {
   ReactDOM.unmountComponentAtNode(node);
-  ReactDOM.render(<Panel alreadyFoundReact={true} themeName={themeName} {...config} />, node);
+  ReactDOM.render(<Panel alreadyFoundReact={true} {...config} />, node);
 }
 
 window.addEventListener('message', function(event) {
@@ -55,7 +56,9 @@ window.addEventListener('message', function(event) {
 });
 
 var config = {
+  browserName,
   reload,
+  themeName,
   // checkForReact,
   inject(done) {
     var disconnected = false;
