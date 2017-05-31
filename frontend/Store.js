@@ -17,8 +17,11 @@ var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
+var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
+import type {Theme} from './types';
 import type {ControlState, DOMEvent, ElementID} from './types';
 
 type ListenerFunction = () => void;
@@ -83,6 +86,7 @@ const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
  */
 class Store extends EventEmitter {
   _bridge: Bridge;
+  _defaultThemeName: string;
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
@@ -90,6 +94,7 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
+  isInspectEnabled: boolean;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -97,12 +102,16 @@ class Store extends EventEmitter {
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
   placeholderText: string;
+  preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  theme: Theme;
+  themeName: string;
+  themes: { [key: string]: Theme };
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -111,14 +120,18 @@ class Store extends EventEmitter {
     rnStyleMeasure?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, defaultThemeName: ?string) {
     super();
+
+    this.setDefaultThemeName(defaultThemeName);
+
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
 
     // Public state
+    this.isInspectEnabled = false;
     this.roots = new List();
     this.contextMenu = null;
     this.searchRoots = null;
@@ -134,6 +147,14 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
+
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const themeName = this._safeThemeName(ThemeStore.get(), this._defaultThemeName);
+
+    this.theme = Themes[themeName];
+    this.themeName = themeName;
+    this.themes = Themes;
 
     // for debugging
     window.store = this;
@@ -157,6 +178,7 @@ class Store extends EventEmitter {
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('evalgetterresult', (data) => this._setGetterValue(data));
+    this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
     this._bridge.on('select', ({id, quiet}) => {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
@@ -321,6 +343,43 @@ class Store extends EventEmitter {
   hideContextMenu() {
     this.contextMenu = null;
     this.emit('contextMenu');
+  }
+
+  _safeThemeName(maybeThemeName: ?string, safeThemeName: ?string): string {
+    return maybeThemeName && Themes.hasOwnProperty(maybeThemeName)
+      ? maybeThemeName
+      : typeof safeThemeName === 'string' ? safeThemeName : 'ChromeDefault';
+  }
+
+  changeTheme(themeName: ?string) {
+    // Only apply a valid theme.
+    const safeThemeKey = this._safeThemeName(themeName, this._defaultThemeName);
+
+    this.theme = this.themes[safeThemeKey];
+    this.themeName = safeThemeKey;
+    this.emit('theme');
+
+    // But allow users to restore "default" mode by selecting an empty theme.
+    ThemeStore.set(themeName || null);
+  }
+
+  getDefaultThemeName(): string {
+    return this._defaultThemeName;
+  }
+
+  setDefaultThemeName(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this._defaultThemeName = this._safeThemeName(defaultThemeName);
+  }
+
+  showPreferencesPanel() {
+    this.preferencesPanelShown = true;
+    this.emit('preferencesPanelShown');
+  }
+
+  hidePreferencesPanel() {
+    this.preferencesPanelShown = false;
+    this.emit('preferencesPanelShown');
   }
 
   selectFirstSearchResult() {
@@ -504,6 +563,12 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
+  }
+
+  setInspectEnabled(isInspectEnabled: boolean) {
+    this.isInspectEnabled = isInspectEnabled;
+    this.emit('isInspectEnabled');
+    this._bridge.send('setInspectEnabled', isInspectEnabled);
   }
 
   // Private stuff

@@ -95,6 +95,7 @@ class Agent extends EventEmitter {
   _scrollUpdate: boolean;
   capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
+  _inspectEnabled: boolean;
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -125,6 +126,9 @@ class Agent extends EventEmitter {
     if (isReactDOM) {
       this._updateScroll = this._updateScroll.bind(this);
       window.addEventListener('scroll', this._onScroll.bind(this), true);
+      window.addEventListener('click', this._onClick.bind(this), true);
+      window.addEventListener('mouseover', this._onMouseOver.bind(this), true);
+      window.addEventListener('resize', this._onResize.bind(this), true);
     }
   }
 
@@ -158,6 +162,10 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('setInspectEnabled', enabled => {
+      this._inspectEnabled = enabled;
+      this.emit('stopInspecting');
+    });
     bridge.on('shutdown', () => this.emit('shutdown'));
     bridge.on('changeTextContent', ({id, text}) => {
       var node = this.getNodeForID(id);
@@ -211,6 +219,7 @@ class Agent extends EventEmitter {
     });
     this.on('setSelection', data => bridge.send('select', data));
     this.on('sendGetterValue', (data) => bridge.send('evalgetterresult', data));
+    this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
   }
 
   scrollToNode(id: ElementID): void {
@@ -422,7 +431,40 @@ class Agent extends EventEmitter {
 
   _updateScroll() {
     this.emit('refreshMultiOverlay');
+    this.emit('stopInspecting');
     this._scrollUpdate = false;
+  }
+
+  _onClick(event: Event) {
+    if (!this._inspectEnabled) {
+      return;
+    }
+
+    var id = this.getIDForNode(event.target);
+    if (!id) {
+      return;
+    }
+
+    event.stopPropagation();
+    event.preventDefault();
+
+    this.emit('setSelection', {id});
+    this.emit('setInspectEnabled', false);
+  }
+
+  _onMouseOver(event: Event) {
+    if (this._inspectEnabled) {
+      const id = this.getIDForNode(event.target);
+      if (!id) {
+        return;
+      }
+
+      this.highlight(id);
+    }
+  }
+
+  _onResize(event: Event) {
+    this.emit('stopInspecting');
   }
 }
 

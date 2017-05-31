@@ -88,5 +88,6 @@ var sources = appSrc.split('|');
 
 injectMany(sources, () => {
   var node = document.getElementById('container');
-  ReactDOM.render(<Panel {...config} />, node);
+
+  ReactDOM.render(<Panel showHiddenThemes={true} {...config} />, node);
 });

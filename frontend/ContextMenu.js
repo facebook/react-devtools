@@ -11,11 +11,12 @@
 'use strict';
 
 var React = require('react');
-var ReactDOM = require('react-dom');
+var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
-var assign = require('object-assign');
 var decorate = require('./decorate');
+
+import type {Theme} from './types';
 
 export type MenuItem = {
   key: string,
@@ -26,6 +27,10 @@ export type MenuItem = {
 class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
+  context: {
+    theme: Theme,
+  };
+
   props: {
     open: boolean,
     hideContextMenu: () => void,
@@ -33,69 +38,56 @@ class ContextMenu extends React.Component {
     pos: {
       x: number,
       y: number,
-    }
+    },
   };
 
-  componentWillMount() {
-    this._clickout = this.onMouseDown.bind(this);
-  }
+  handleBackdropClick: () => void;
 
-  componentDidUpdate(prevProps) {
-    if (this.props.open && !prevProps.open) {
-      window.addEventListener('mousedown', this._clickout, true);
-    } else if (prevProps.open && !this.props.open) {
-      window.removeEventListener('mousedown', this._clickout, true);
-    }
-  }
+  constructor(props) {
+    super(props);
 
-  componentWillUnmount() {
-    window.removeEventListener('mousedown', this._clickout, true);
-  }
-
-  onMouseDown(evt) {
-    var n = evt.target;
-    var container = ReactDOM.findDOMNode(this);
-    while (n) {
-      if (n === container) {
-        return;
-      }
-      n = n.offsetParent;
-    }
-
-    evt.preventDefault();
-    this.props.hideContextMenu();
+    this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
 
   onClick(i, evt) {
-    evt.preventDefault();
     this.props.items[i].action();
+  }
+
+  handleBackdropClick(evt) {
+    evt.preventDefault();
     this.props.hideContextMenu();
   }
 
   render() {
-    if (!this.props.open) {
+    const {theme} = this.context;
+    const {items, open, pos} = this.props;
+
+    if (!open) {
       return <div style={styles.hidden} />;
     }
 
-    var containerStyle = assign({}, styles.container, {
-      top: this.props.pos.y + 'px',
-      left: this.props.pos.x + 'px',
-    });
-
     return (
-      <ul style={containerStyle}>
-        {!this.props.items.length && <li style={styles.empty}>No actions</li>}
-        {this.props.items.map((item, i) => item && (
-          <li key={item.key} onClick={evt => this.onClick(i, evt)}>
-            <HighlightHover style={styles.item}>
-              {item.title}
-            </HighlightHover>
-          </li>
-        ))}
-      </ul>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick}>
+        <ul style={containerStyle(pos.x, pos.y, theme)}>
+          {!items.length && (
+            <li style={emptyStyle(theme)}>No actions</li>
+          )}
+          {items.map((item, i) => item && (
+            <li style={listItemStyle(theme)} key={item.key} onClick={evt => this.onClick(i, evt)}>
+              <HighlightHover style={styles.highlightHoverItem}>
+                {item.title}
+              </HighlightHover>
+            </li>
+          ))}
+        </ul>
+      </div>
     );
   }
 }
+
+ContextMenu.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
 var Wrapped = decorate({
   listeners() {
@@ -129,36 +121,51 @@ var Wrapped = decorate({
   },
 }, ContextMenu);
 
+
+const containerStyle = (xPos: number, yPos: number, theme: Theme) => ({
+  top: `${yPos}px`,
+  left: `${xPos}px`,
+  position: 'fixed',
+  listStyle: 'none',
+  margin: 0,
+  padding: '0.25rem 0',
+  fontSize: sansSerif.sizes.large,
+  fontFamily: sansSerif.family,
+  borderRadius: '0.25rem',
+  overflow: 'hidden',
+  zIndex: 1,
+  backgroundColor: theme.base01,
+});
+
+const emptyStyle = (theme: Theme) => ({
+  padding: '0.25rem 0.5rem',
+  color: theme.base03,
+});
+
+const listItemStyle = (theme: Theme) => ({
+  color: theme.base05,
+});
+
 var styles = {
   hidden: {
     display: 'none',
   },
 
-  container: {
+  backdrop: {
     position: 'fixed',
-    backgroundColor: 'white',
-    boxShadow: '0 1px 6px rgba(0,0,0,0.3)',
-    listStyle: 'none',
-    margin: 0,
-    padding: '4px 0',
-    fontSize: 14,
-    borderRadius: '3px',
-    overflow: 'hidden',
-    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", "Ubuntu", "Helvetica Neue", sans-serif',
-    zIndex: 1,
+    left: 0,
+    right: 0,
+    top: 0,
+    bottom: 0,
+    zIndex: 0,
   },
-
-  item: {
-    padding: '3px 10px',
+  
+  highlightHoverItem: {
+    padding: '0.25rem 0.5rem',
     cursor: 'default',
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
     userSelect: 'none',
-  },
-
-  empty: {
-    padding: '5px 10px',
-    color: '#888',
   },
 };
 

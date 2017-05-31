@@ -66,9 +66,17 @@ class BlurInput extends React.Component {
         onChange={e => this.setState({text: e.target.value})}
         onBlur={this.done.bind(this)}
         onKeyDown={e => this.onKeyDown(e)}
+        size={1 /* Allow to shrink */}
+        style={styles.input}
       />
     );
   }
 }
+
+var styles = {
+  input: {
+    width: '100%',
+  },
+};
 
 module.exports = BlurInput;
