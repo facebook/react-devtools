@@ -125,14 +125,15 @@ class AutoSizeInput extends React.Component {
   }
 
   render() {
-    styles.input.color = this.getColor();
-    styles.input.width = this.state.inputWidth + 'px';
+    const style = inputStyle(this.state.text);
+    style.color = this.getColor();
+    style.width = this.state.inputWidth + 'px';
     return (
       <div style={styles.wrapper}>
         <input
           ref={i => this.input = i}
           value={this.state.text}
-          style={styles.input}
+          style={style}
           onChange={e => this.setState({text: e.target.value})}
           onFocus={() => this.onFocus()}
           onBlur={() => this.done()}
@@ -143,6 +144,19 @@ class AutoSizeInput extends React.Component {
     );
   }
 }
+
+const inputStyle = (text: ?string) => ({
+  fontFamily: monospace.family,
+  fontSize: monospace.sizes.normal,
+  boxSizing: 'content-box',
+  border: 'none',
+  padding: '1px 2px',
+  marginLeft: 6,
+  outline: 'none',
+  width: '0px',
+  color: '#333',
+  minWidth: text ? '0' : '1rem', // Make it easier to click initially
+});
 
 var styles = {
   wrapper: {
@@ -156,17 +170,6 @@ var styles = {
     height: 0,
     overflow: 'scroll',
     whiteSpace: 'pre',
-  },
-  input: {
-    fontFamily: monospace.family,
-    fontSize: monospace.sizes.normal,
-    boxSizing: 'content-box',
-    border: 'none',
-    padding: '1px 2px',
-    marginLeft: 6,
-    outline: 'none',
-    width: '0px',
-    color: '#333',
   },
 };
 
