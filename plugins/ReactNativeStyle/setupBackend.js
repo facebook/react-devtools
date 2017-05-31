@@ -102,6 +102,9 @@ function renameStyle(agent, id, oldName, newName, val) {
   var newStyle = {[newName]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.internalInstancesById.get(id);
+    if (typeof el.tag === 'number') {
+      el = el.stateNode;
+    }
     if (el && el.setNativeProps) {
       el.setNativeProps({ style: newStyle });
     } else {
@@ -143,6 +146,9 @@ function setStyle(agent, id, attr, val) {
   var newStyle = {[attr]: val};
   if (!data || !data.updater || !data.updater.setInProps) {
     var el = agent.internalInstancesById.get(id);
+    if (typeof el.tag === 'number') {
+      el = el.stateNode;
+    }
     if (el && el.setNativeProps) {
       el.setNativeProps({ style: newStyle });
     } else {
