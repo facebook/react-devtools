@@ -398,6 +398,27 @@ for (var mCount = 200; mCount--;) {
 }
 
 
+var protoWithGetter = {
+  get upperName() {
+    return this.name.toUpperCase();
+  },
+};
+
+var getterOnProtoProp = Object.create(protoWithGetter);
+getterOnProtoProp.name = 'Foo';
+
+let setterTestProp = {
+  _value: 'hello',
+  _editsCounter: 0,
+  get lol() {
+    return this._value.toUpperCase();
+  },
+  set lol(val) {
+    this._editsCounter ++;
+    this._value = val;
+  },
+};
+
 class Wrap extends React.Component {
   render() {
     return (
@@ -421,6 +442,7 @@ class Wrap extends React.Component {
         <PropTester {...complexProps}/>
         <PropTester {...uninspectableProps}/>
         <PropTester massiveMap={massiveMap}/>
+        <PropTester withGetter={getterOnProtoProp} withSetter={setterTestProp}/>
       </div>
     );
   }
