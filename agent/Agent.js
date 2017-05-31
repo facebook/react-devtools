@@ -330,7 +330,7 @@ class Agent extends EventEmitter {
     if (data && data.updater && data.updater.setInContext) {
       data.updater.setInContext(path, value);
     } else {
-      console.warn("trying to set state on a component that doesn't support it");
+      console.warn("trying to set context on a component that doesn't support it");
     }
   }
 
