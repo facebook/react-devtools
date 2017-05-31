@@ -157,9 +157,9 @@ var styles = {
     right: 0,
     top: 0,
     bottom: 0,
-    zIndex: 0,
+    zIndex: 1,
   },
-  
+
   highlightHoverItem: {
     padding: '0.25rem 0.5rem',
     cursor: 'default',
