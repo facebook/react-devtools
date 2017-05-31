@@ -11,8 +11,6 @@
 var app = require('electron').app;  // Module to control application life.
 var BrowserWindow = require('electron').BrowserWindow;  // Module to create native browser window.
 var path = require('path');
-var updateNotifier = require('update-notifier');
-var pkg = require('./package.json');
 
 var mainWindow = null;
 var argv = require('minimist')(process.argv.slice(2));
@@ -24,9 +22,6 @@ app.on('window-all-closed', function() {
 });
 
 app.on('ready', function() {
-  // notify if there's an update
-  updateNotifier({pkg}).notify({defer: false});
-
   // Create the browser window.
   mainWindow = new BrowserWindow({width: 800, height: 600, icon: path.join(__dirname, 'icons/icon128.png')});
 
