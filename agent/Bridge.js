@@ -18,7 +18,7 @@ var performanceNow = require('fbjs/lib/performanceNow');
 
 // Use the polyfill if the function is not native implementation
 function getWindowFunction(name, polyfill): Function {
-  if (String(window[name]).indexOf(`[native code]`) === -1) {
+  if (String(window[name]).indexOf('[native code]') === -1) {
     return polyfill;
   }
   return window[name];
