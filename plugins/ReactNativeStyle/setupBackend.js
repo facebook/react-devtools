@@ -106,7 +106,9 @@ function shallowClone(obj) {
 
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
-  var newStyle = {[oldName]: undefined, [newName]: val};
+  var newStyle = newName
+    ? {[oldName]: undefined, [newName]: val}
+    : {[oldName]: undefined};
 
   if (data && data.updater && data.updater.setInProps) {
     // First attempt: use setInProps().
@@ -117,7 +119,11 @@ function renameStyle(agent, id, oldName, newName, val) {
       if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
         customStyle = shallowClone(style[style.length - 1]);
         delete customStyle[oldName];
-        customStyle[newName] = val;
+        if (newName) {
+          customStyle[newName] = val;
+        } else {
+          customStyle[oldName] = undefined;
+        }
         // $FlowFixMe we know that updater is not null here
         data.updater.setInProps(['style', style.length - 1], customStyle);
       } else {
@@ -129,7 +135,11 @@ function renameStyle(agent, id, oldName, newName, val) {
       if (typeof style === 'object') {
         customStyle = shallowClone(style);
         delete customStyle[oldName];
-        customStyle[newName] = val;
+        if (newName) {
+          customStyle[newName] = val;
+        } else {
+          customStyle[oldName] = undefined;
+        }
         // $FlowFixMe we know that updater is not null here
         data.updater.setInProps(['style'], customStyle);
       } else {
