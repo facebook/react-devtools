@@ -134,7 +134,7 @@ class Editor extends React.Component {
   }
 
   _onShareChange = (event: DOMEvent) => {
-    this._customTheme = deserialize(event.target.value);
+    this._customTheme = deserialize(event.target.value, this.props.theme);
     this._sanitizeCustomTheme();
     this._udpatePreview();
   };

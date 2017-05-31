@@ -16,7 +16,7 @@ import type {Theme} from '../types';
 
 const themeKeys = Object.keys(ChromeDefault);
 
-function deserialize(string: string): Theme {
+function deserialize(string: string, fallbackTheme: Theme = ChromeDefault): Theme {
   const theme = {};
 
   try {
@@ -38,7 +38,7 @@ function deserialize(string: string): Theme {
   themeKeys.forEach(key => {
     const maybeColor = theme[key];
     if (typeof maybeColor !== 'string' || maybeColor === '') {
-      theme[key] = ChromeDefault[key];
+      theme[key] = fallbackTheme[key];
     }
   });
 
