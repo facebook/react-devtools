@@ -14,7 +14,8 @@ const React = require('react');
 const {findDOMNode} = require('react-dom');
 const Portal = require('react-portal');
 const ColorPicker = require('./ColorPicker');
-const {monospace} = require('../../Themes/Fonts');
+const Input = require('../../Input');
+const {monospace} = require('../Fonts');
 const {isBright} = require('../utils');
 
 import type {Theme} from '../../types';
@@ -91,9 +92,10 @@ class ColorInput extends React.Component {
             ref={this._setColorChipRef}
             style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
           ></div>
-          <input
+          <Input
             onChange={this._onChange}
             style={styles.input}
+            theme={theme}
             type="text"
             value={color || ''}
           />

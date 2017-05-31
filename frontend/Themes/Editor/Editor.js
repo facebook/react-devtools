@@ -14,6 +14,7 @@ const decorate = require('../../decorate');
 const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
+const Input = require('../../Input');
 const {monospace, sansSerif} = require('../Fonts');
 const Preview = require('../Preview');
 const SvgIcon = require('../../SvgIcon');
@@ -72,7 +73,7 @@ class Editor extends React.Component {
   }
 
   render() {
-    const {hide, theme} = this.props;
+    const {hide} = this.props;
     const {isResetEnabled, updateCounter} = this.state;
 
     return (
@@ -126,9 +127,10 @@ class Editor extends React.Component {
             "/>
 
             <label style={styles.shareLabel}>Import/export:</label>
-            <input
+            <Input
               onChange={this._onShareChange}
-              style={shareInput(theme)}
+              style={shareInput(safeTheme)}
+              theme={safeTheme}
               type="text"
               value={serialize(this._customTheme)}
             />

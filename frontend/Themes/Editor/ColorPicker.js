@@ -43,7 +43,6 @@ class ColorPicker extends React.Component {
 
   // $FlowFixMe ^ class property `_onChangeComplete`. Missing annotation
   _onChangeComplete = (color) => {
-//    this.props.closePortal();
     this.props.updateColor(color.hex);
   };
 

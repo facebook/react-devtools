@@ -118,7 +118,7 @@ StyleEdit.contextTypes = {
 };
 
 const tagStyle = (theme: Theme) => ({
-  color: theme.base03,
+  color: theme.base04,
 });
 
 const styles = {
