@@ -82,7 +82,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       nodeType = 'Native';
       name = fiber.type;
 
-      // TODO: we plan to remove this prefix anyway.
+      // TODO (bvaughn) we plan to remove this prefix anyway.
       // We can cut this special case out when it's gone.
       name = name.replace('topsecret-', '');
 
