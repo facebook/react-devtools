@@ -38,6 +38,7 @@ class Editor extends React.Component {
   _customTheme: Theme;
 
   props: {
+    changeTheme: (themeName: string) => void,
     defaultThemeName: string,
     hide: () => {},
     saveTheme: (theme: Theme) => {},
@@ -55,7 +56,7 @@ class Editor extends React.Component {
       updateCounter: 0,
     };
 
-    this._customTheme = Object.assign({}, props.theme);
+    this._reset();
     this._sanitizeCustomTheme();
   }
 
@@ -145,14 +146,7 @@ class Editor extends React.Component {
   };
 
   _reset = () => {
-    const {defaultThemeName} = this.props;
-
-    const defaultTheme = Themes[defaultThemeName];
-
-    for (const key in defaultTheme) {
-      this._customTheme[key] = defaultTheme[key];
-    }
-
+    this._customTheme = Object.assign({}, this.props.theme);
     this._udpatePreview();
   };
 
@@ -163,9 +157,10 @@ class Editor extends React.Component {
   }
 
   _save = () => {
-    const {hide, saveTheme} = this.props;
+    const {changeTheme, hide, saveTheme} = this.props;
 
     saveTheme(this._customTheme);
+    changeTheme(CUSTOM_THEME_NAME);
     hide();
   };
 }
@@ -180,6 +175,7 @@ const WrappedEditor = decorate({
   },
   props(store, props) {
     return {
+      changeTheme: themeName => store.changeTheme(themeName),
       defaultThemeName: store.themeStore.defaultThemeName,
       saveTheme: (theme: Theme) => store.saveCustomTheme(theme),
     };

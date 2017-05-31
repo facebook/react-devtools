@@ -148,24 +148,15 @@ const containerStyle = (maxHeight: ?number) => ({
   maxHeight,
 });
 
-const colorChipStyle = (theme: Theme, color: string = '', showBorder: boolean = false) => {
-  if (
-    color.substring(0, 3) !== 'rgb' &&
-    color.charAt(0) !== '#'
-  ) {
-    color = '#' + color;
-  }
-
-  return {
-    height: '1.25rem',
-    width: '1.25rem',
-    borderRadius: '2px',
-    backgroundColor: color,
-    boxSizing: 'border-box',
-    cursor: 'pointer',
-    border: showBorder ? `1px solid ${theme.base03}` : 'none',
-  };
-};
+const colorChipStyle = (theme: Theme, color: string = '', showBorder: boolean = false) => ({
+  height: '1.25rem',
+  width: '1.25rem',
+  borderRadius: '2px',
+  backgroundColor: color,
+  boxSizing: 'border-box',
+  cursor: 'pointer',
+  border: showBorder ? `1px solid ${theme.base03}` : 'none',
+});
 
 const inputContainerStyle = (theme: Theme) => ({
   display: 'flex',

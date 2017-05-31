@@ -14,7 +14,6 @@ const React = require('react');
 
 const decorate = require('./decorate');
 const {sansSerif} = require('./Themes/Fonts');
-const Preview = require('./Themes/Preview');
 const {CUSTOM_THEME_NAME} = require('./Themes/constants');
 const SvgIcon = require('./SvgIcon');
 const ThemeEditor = require('./Themes/Editor/Editor');
@@ -33,12 +32,12 @@ class PreferencesPanel extends React.Component {
   };
   props: {
     changeTheme: (themeName: string) => void,
+    hasCustomTheme: boolean,
     hide: () => void,
     open: bool,
   };
   state: {
     editMode: bool,
-    previewMode: bool,
   };
 
   constructor(props, context) {
@@ -46,7 +45,6 @@ class PreferencesPanel extends React.Component {
 
     this.state = {
       editMode: false,
-      previewMode: false,
     };
   }
 
@@ -64,8 +62,8 @@ class PreferencesPanel extends React.Component {
 
   render() {
     const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
-    const {hide, open} = this.props;
-    const {editMode, previewMode} = this.state;
+    const {hasCustomTheme, hide, open} = this.props;
+    const {editMode} = this.state;
 
     if (!open) {
       return null;
@@ -75,10 +73,6 @@ class PreferencesPanel extends React.Component {
     if (editMode) {
       content = (
         <ThemeEditor hide={this._hide} theme={theme} />
-      );
-    } else if (previewMode) {
-      content = (
-        <Preview theme={theme} />
       );
     } else {
       let themeNames = Object.keys(themes);
@@ -97,28 +91,18 @@ class PreferencesPanel extends React.Component {
               value={themeName}
             >
               {!showHiddenThemes && (<option value="">{browserName}</option>)}
-              <option value={CUSTOM_THEME_NAME}>Custom</option>
-              <option disabled="disabled">---</option>
+              {hasCustomTheme && (<option value={CUSTOM_THEME_NAME}>Custom</option>)}
+              {(!showHiddenThemes || hasCustomTheme) && <option disabled="disabled">---</option>}
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
             </select>
-            {themeName !== CUSTOM_THEME_NAME && (
-              <button
-                onClick={this._onPreviewClick}
-                style={styles.iconButton}
-              >
-                <PreviewIcon />
-              </button>
-            )}
-            {themeName === CUSTOM_THEME_NAME && (
-              <button
-                onClick={this._onEditCustomThemeClick}
-                style={styles.iconButton}
-              >
-                <EditIcon />
-              </button>
-            )}
+            <button
+              onClick={this._onEditCustomThemeClick}
+              style={styles.iconButton}
+            >
+              <EditIcon />
+            </button>
           </div>
           <div style={styles.buttonBar}>
             <button
@@ -147,13 +131,9 @@ class PreferencesPanel extends React.Component {
 
   _hide = () => {
     const {hide} = this.props;
-    const {editMode, previewMode} = this.state;
+    const {editMode} = this.state;
 
-    if (previewMode) {
-      this.setState({
-        previewMode: false,
-      });
-    } else if (editMode) {
+    if (editMode) {
       this.setState({
         editMode: false,
       });
@@ -174,12 +154,6 @@ class PreferencesPanel extends React.Component {
     }
   };
 
-  _onPreviewClick = () => {
-    this.setState({
-      previewMode: true,
-    });
-  };
-
   _setSelectRef = (ref) => {
     this._selectRef = ref;
   };
@@ -198,14 +172,6 @@ PreferencesPanel.propTypes = {
   open: React.PropTypes.bool,
 };
 
-const PreviewIcon = () => (
-  <SvgIcon path="
-    M12,9A3,3 0 0,0 9,12A3,3 0 0,0 12,15A3,3 0 0,0 15,12A3,3 0 0,0 12,9M12,17A5,5 0 0,
-    1 7,12A5,5 0 0,1 12,7A5,5 0 0,1 17,12A5,5 0 0,1 12,17M12,4.5C7,4.5 2.73,7.61 1,
-    12C2.73,16.39 7,19.5 12,19.5C17,19.5 21.27,16.39 23,12C21.27,7.61 17,4.5 12,4.5Z
-  " />
-);
-
 const EditIcon = () => (
   <SvgIcon path="
     M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,
@@ -222,6 +188,7 @@ const WrappedPreferencesPanel = decorate({
   props(store, props) {
     return {
       changeTheme: themeName => store.changeTheme(themeName),
+      hasCustomTheme: !!store.themeStore.customTheme,
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
     };

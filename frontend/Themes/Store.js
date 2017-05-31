@@ -41,10 +41,6 @@ class Store {
     const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
     if (customTheme) {
       this.customTheme = deserialize(customTheme);
-    } else {
-      this.customTheme = Object.assign({}, Themes[this.defaultThemeName], {
-        displayName: CUSTOM_THEME_NAME,
-      });
     }
 
     // The user's active theme is either their custom one,
