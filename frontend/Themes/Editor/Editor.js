@@ -36,6 +36,7 @@ const colors = Object.assign({},
 
 class Editor extends React.Component {
   _customTheme: Theme;
+  _serializedPropsTheme: string;
 
   props: {
     changeTheme: (themeName: string) => void,
@@ -46,6 +47,7 @@ class Editor extends React.Component {
   };
 
   state: {
+    isResetEnabled: boolean,
     updateCounter: number,
   };
 
@@ -53,8 +55,11 @@ class Editor extends React.Component {
     super(props, context);
 
     this.state = {
+      isResetEnabled: false,
       updateCounter: 0,
     };
+
+    this._serializedPropsTheme = serialize(props.theme);
 
     this._reset();
     this._sanitizeCustomTheme();
@@ -68,7 +73,7 @@ class Editor extends React.Component {
 
   render() {
     const {hide, theme} = this.props;
-    const {updateCounter} = this.state;
+    const {isResetEnabled, updateCounter} = this.state;
 
     return (
       <div
@@ -103,7 +108,7 @@ class Editor extends React.Component {
           <div style={styles.buttons}>
             <button onClick={hide}>
               Cancel
-            </button> <button onClick={this._reset}>
+            </button> <button disabled={!isResetEnabled} onClick={this._reset}>
               Reset
             </button> <button onClick={this._save}>
               Save
@@ -141,6 +146,7 @@ class Editor extends React.Component {
 
   _udpatePreview = () => {
     this.setState(state => ({
+      isResetEnabled: this._serializedPropsTheme !== serialize(this._customTheme),
       updateCounter: state.updateCounter + 1,
     }));
   };
