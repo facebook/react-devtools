@@ -123,7 +123,7 @@ class SettingsPane extends React.Component {
         />
 
         <TraceUpdatesFrontendControl {...this.props} />
-        
+
         <div style={styles.growToFill}>
           <ColorizerFrontendControl {...this.props} />
         </div>
@@ -131,7 +131,7 @@ class SettingsPane extends React.Component {
         <div style={styles.searchInputWrapper}>
           <Input
             style={inputStyle}
-            ref={i => this.input = i}
+            innerRef={i => this.input = i}
             value={searchText}
             onFocus={() => this.setState({focused: true})}
             onBlur={() => this.setState({focused: false})}

@@ -132,7 +132,7 @@ class AutoSizeInput extends React.Component {
     return (
       <div style={styles.wrapper}>
         <Input
-          ref={i => this.input = i}
+          innerRef={i => this.input = i}
           value={this.state.text}
           style={style}
           onChange={e => this.setState({text: e.target.value})}
