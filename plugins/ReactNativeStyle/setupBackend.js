@@ -116,8 +116,9 @@ function renameStyle(agent, id, oldName, newName, val) {
     var style = data && data.props && data.props.style;
     var customStyle;
     if (Array.isArray(style)) {
-      if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-        customStyle = shallowClone(style[style.length - 1]);
+      var lastLength = style.length - 1;
+      if (typeof style[lastLength] === 'object' && !Array.isArray(style[lastLength])) {
+        customStyle = shallowClone(style[lastLength]);
         delete customStyle[oldName];
         if (newName) {
           customStyle[newName] = val;
@@ -125,7 +126,7 @@ function renameStyle(agent, id, oldName, newName, val) {
           customStyle[oldName] = undefined;
         }
         // $FlowFixMe we know that updater is not null here
-        data.updater.setInProps(['style', style.length - 1], customStyle);
+        data.updater.setInProps(['style', lastLength], customStyle);
       } else {
         style = style.concat([newStyle]);
         // $FlowFixMe we know that updater is not null here
@@ -171,9 +172,10 @@ function setStyle(agent, id, attr, val) {
     // We do this for composite components, and it works relatively well.
     var style = data.props && data.props.style;
     if (Array.isArray(style)) {
-      if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
+      var lastLength = style.length - 1;
+      if (typeof style[lastLength] === 'object' && !Array.isArray(style[lastLength])) {
         // $FlowFixMe we know that updater is not null here
-        data.updater.setInProps(['style', style.length - 1, attr], val);
+        data.updater.setInProps(['style', lastLength, attr], val);
       } else {
         style = style.concat([newStyle]);
         // $FlowFixMe we know that updater is not null here
