@@ -64,14 +64,16 @@ class ContextMenu extends React.Component {
   }
 
   getHeight = element => {
-    if (! element)
+    if (!element) {
       return;
+    }
 
     const elementHeight = element.querySelector('ul').clientHeight;
     const windowHeight = window.innerHeight;
 
-    if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight)
+    if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
       return;
+    }
 
     this.setState({
       elementHeight: elementHeight,
@@ -84,8 +86,9 @@ class ContextMenu extends React.Component {
     const { items, open, pos } = this.props;
     const { elementHeight, windowHeight } = this.state;
 
-    if (pos && (pos.y + elementHeight) > windowHeight)
-       pos.y = pos.y - elementHeight;
+    if (pos && (pos.y + elementHeight) > windowHeight) {
+      pos.y -= elementHeight;
+    }
 
     if (!open) {
       return <div style={styles.hidden} />;
