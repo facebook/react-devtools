@@ -115,7 +115,7 @@ class Simple extends React.Component {
       return (
         <Input
           autoFocus={true}
-          ref={i => this.input = i}
+          innerRef={i => this.input = i}
           style={inputStyle(theme)}
           onChange={e => this.onChange(e)}
           onBlur={() => this.onSubmit(false)}

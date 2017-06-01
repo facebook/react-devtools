@@ -21,6 +21,7 @@ type Context = {
 type Props = {
   theme?: Theme,
   style?: Object,
+  innerRef? : Function,
 };
 
 /**
@@ -31,6 +32,7 @@ const Input = (props: Props, context: Context) => {
   const {
     style = {},
     theme,
+    innerRef,
     ...rest,
   } = props;
 
@@ -42,6 +44,7 @@ const Input = (props: Props, context: Context) => {
         ...style,
         ...inputStyle(chosenTheme),
       }}
+      ref={innerRef}
       {...rest}
     />
   );

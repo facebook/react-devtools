@@ -64,7 +64,7 @@ class BlurInput extends React.Component {
     return (
       <Input
         value={this.state.text}
-        ref={i => this.node = i}
+        innerRef={i => this.node = i}
         onChange={e => this.setState({text: e.target.value})}
         onBlur={this.done.bind(this)}
         onKeyDown={e => this.onKeyDown(e)}
