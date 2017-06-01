@@ -218,7 +218,7 @@ const FirefoxFirebug: Theme = {
   special06: '#000062',
   special07: '#0000ff',
   state00: '#3399ff',
-  state01: '#85c0fb',
+  state01: '#e4f1fa',
   state02: '#ffffff',
   state03: '#e6e6e6',
   state04: '#ffee99',
