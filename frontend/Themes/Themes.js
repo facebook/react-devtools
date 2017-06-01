@@ -475,7 +475,7 @@ module.exports = {
   Eighties,
   FirefoxDark,
   FirefoxLight,
-  Firebug,
+  FirefoxFirebug,
   Flat,
   GruvboxDark,
   GruvboxLight,
