@@ -164,7 +164,17 @@ class Store extends EventEmitter {
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
-    this._bridge.on('select', ({id, quiet}) => {
+    this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
+      // Backtrack if we want to skip leaf nodes
+      while (offsetFromLeaf > 0) {
+        offsetFromLeaf--;
+        var pid = this._parents.get(id);
+        if (pid) {
+          id = pid;
+        } else {
+          break;
+        }
+      }
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
@@ -487,9 +497,6 @@ class Store extends EventEmitter {
       return undefined;
     }
     var node = this.get(id);
-    if (!node) {
-      return undefined;
-    }
     var nodeType = node.get('nodeType');
     if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
       return id;
