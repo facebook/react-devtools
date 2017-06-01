@@ -11,12 +11,12 @@
 'use strict';
 
 var React = require('react');
-var { sansSerif } = require('./Themes/Fonts');
+var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
 var decorate = require('./decorate');
 
-import type {Theme } from './types';
+import type {Theme} from './types';
 
 export type MenuItem = {
   key: string,
