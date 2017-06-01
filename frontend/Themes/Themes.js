@@ -246,8 +246,8 @@ const FirefoxFirebug: Theme = {
   state01: "#85c0fb",
   state02: "#ffffff",
   state03: "#e6e6e6",
-  state04: "#3399ff",
-  state05: "#ffffff",
+  state04: "#ffee99",
+  state05: "#000000",
 }
 
 const Flat: Theme = {
