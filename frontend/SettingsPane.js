@@ -136,8 +136,9 @@ class SettingsPane extends React.Component {
             onFocus={() => this.setState({focused: true})}
             onBlur={() => this.setState({focused: false})}
             onKeyDown={e => this.onKeyDown(e.key)}
-            placeholder={this.props.placeholderText}
+            placeholder="Search (text or /regex/)"
             onChange={e => this.props.onChangeSearch(e.target.value)}
+            title="Search React elements"
           />
           <SearchIcon theme={theme} />
           {!!searchText && (
@@ -159,18 +160,16 @@ SettingsPane.propTypes = {
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
   onChangeSearch: PropTypes.func,
-  placeholderText: PropTypes.string,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'searchText', 'placeholderchange'];
+    return ['isInspectEnabled', 'searchText'];
   },
   props(store) {
     return {
       isInspectEnabled: store.isInspectEnabled,
       onChangeSearch: text => store.changeSearch(text),
-      placeholderText: store.placeholderText,
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
       showPreferencesPanel() {
@@ -185,6 +184,7 @@ const InspectMenuButton = ({ isInspectEnabled, onClick, theme }) => (
   <button
     onClick={onClick}
     style={inspectMenuButtonStyle(isInspectEnabled, theme)}
+    title="Select an element in the page to inspect it"
   >
     <SvgIcon path="
       M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,
@@ -196,7 +196,11 @@ const InspectMenuButton = ({ isInspectEnabled, onClick, theme }) => (
 );
 
 const SettingsMenuButton = ({ onClick, theme }) => (
-  <button onClick={onClick} style={styles.settingsMenuButton}>
+  <button
+    onClick={onClick}
+    style={styles.settingsMenuButton}
+    title="Customize devtools"
+  >
     <SvgIcon path="
       M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
       1 12,15.5M19.43,12.97C19.47,12.65 19.5,12.33 19.5,12C19.5,11.67 19.47,11.34 19.43,
