@@ -225,8 +225,9 @@ const FirefoxLight: Theme = {
   state05: '#585959',
 };
 
-const Firebug: Theme = {
-  displayName: "Firebug",
+const FirefoxFirebug: Theme = {
+  displayName: "Firefox (Firebug)",
+  hidden: true,
   base00: "#ffffff",
   base01: "#f5f5f5",
   base02: "#dde1e4",
@@ -244,7 +245,7 @@ const Firebug: Theme = {
   state00: "#3399ff",
   state01: "#85c0fb",
   state02: "#ffffff",
-  state03: "#e0e0e0",
+  state03: "#e6e6e6",
   state04: "#3399ff",
   state05: "#ffffff",
 }
