@@ -482,9 +482,6 @@ class Store extends EventEmitter {
       return undefined;
     }
     var node = this.get(id);
-    if (!node) {
-      return undefined;
-    }
     var nodeType = node.get('nodeType');
     if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
       return id;
