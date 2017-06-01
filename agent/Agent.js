@@ -354,6 +354,16 @@ class Agent extends EventEmitter {
       return internalInstance;
     }
     if (!this.idsByInternalInstances.has(internalInstance)) {
+
+      // FIXME: this section is Fiber-specific but we shouldn't rely on its data structure.
+      // We need to rethink how ID <-> internal instance mapping works in the future.
+      const alternate = (internalInstance: any).alternate;
+      if (alternate) {
+        if (this.idsByInternalInstances.has(alternate)) {
+          return this.idsByInternalInstances.get(alternate);
+        }
+      }
+
       this.idsByInternalInstances.set(internalInstance, guid());
       this.internalInstancesById.set(
         this.idsByInternalInstances.get(internalInstance),
