@@ -80,11 +80,12 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       break;
     case HostComponent:
       nodeType = 'Native';
-      name = typeof fiber.type === 'string' ?
-        fiber.type :
-        // Necessary for React Native Fiber if host types are not strings.
-        // https://github.com/facebook/react/pull/9013
-        getDisplayName(fiber.type);
+      name = fiber.type;
+
+      // TODO (bvaughn) we plan to remove this prefix anyway.
+      // We can cut this special case out when it's gone.
+      name = name.replace('topsecret-', '');
+
       publicInstance = fiber.stateNode;
       props = fiber.memoizedProps;
       if (
