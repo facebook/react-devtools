@@ -46,13 +46,13 @@ class ContextMenu extends React.Component {
   constructor(props) {
     super(props);
 
-    this.state = {
-      elementHeight: 0,
-      windowHeight: 0,
-    };
-
     this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
+
+  state = {
+    elementHeight: 0,
+    windowHeight: 0,
+  };
 
   onClick(i, evt) {
     this.props.items[i].action();
@@ -79,7 +79,7 @@ class ContextMenu extends React.Component {
       elementHeight: elementHeight,
       windowHeight: windowHeight,
     });
-  }
+  };
 
   render() {
     const { theme } = this.context;
