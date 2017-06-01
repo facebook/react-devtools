@@ -95,11 +95,25 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
 
   if (dest === 'parent') {
-    return pid;
+    let parentNode = store.get(pid);
+    if (parentNode.get('nodeType') !== 'Wrapper') {
+      return pid;
+    }
+    while (parentNode.get('nodeType') === 'Wrapper') {
+      id = pid;
+      pid = store.getParent(id);
+      parentNode = store.get(pid);
+    }
+    dest = 'prevSibling';
   }
   if (dest === 'parentBottom') {
-    store.isBottomTagSelected = true;
-    return pid;
+    const parentNode = store.get(pid);
+    if (parentNode.get('nodeType') !== 'Wrapper') {
+      store.isBottomTagSelected = true;
+      return pid;
+    }
+    id = pid;
+    dest = 'nextSibling';
   }
 
   if (dest === 'collapse' || dest === 'uncollapse') {
@@ -169,7 +183,13 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (pix === 0) {
       return getNewSelection('parent', store);
     }
-    var prevCid = store.skipWrapper(pchildren[pix - 1]);
+    var childId = pchildren[pix - 1];
+    var child = store.get(childId);
+    var prevCid = store.skipWrapper(
+      childId,
+      false,
+      child.get('nodeType') === 'Wrapper'
+    );
     if (prevCid && store.hasBottom(prevCid)) {
       store.isBottomTagSelected = true;
     }

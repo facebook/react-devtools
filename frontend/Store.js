@@ -492,22 +492,37 @@ class Store extends EventEmitter {
     return this._parents.get(id);
   }
 
-  skipWrapper(id: ElementID, up?: boolean): ?ElementID {
+  skipWrapper(id: ElementID, up?: boolean, end?: boolean): ?ElementID {
     if (!id) {
       return undefined;
+    }    
+    while (true) {
+      var node = this.get(id);
+      var nodeType = node.get('nodeType');
+      
+      if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
+        return id;
+      }
+      if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
+        return id;
+      }
+      if (up) {
+        var parentId = this._parents.get(id);
+
+        if (!parentId) {
+          return id;
+        }
+        id = parentId;
+      } else {
+        var children = node.get('children');
+        var index = end ? children.length - 1 : 0;
+        var childId = children[index > 0 ? index : 0];
+        if (!childId) {
+          return id;
+        }
+        id = childId;
+      }
     }
-    var node = this.get(id);
-    var nodeType = node.get('nodeType');
-    if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
-      return id;
-    }
-    if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
-      return id;
-    }
-    if (up) {
-      return this._parents.get(id);
-    }
-    return node.get('children')[0];
   }
 
   off(evt: string, fn: ListenerFunction): void {
