@@ -13,6 +13,7 @@
 var {EventEmitter} = require('events');
 var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
+var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
 var invariant = require('./invariant');
@@ -200,6 +201,10 @@ class Store extends EventEmitter {
   // Public actions
   scrollToNode(id: ElementID): void {
     this._bridge.send('scrollToNode', id);
+  }
+
+  copyNodeName(name: string): void {
+    copy(name);
   }
 
   setSelectedTab(name: string): void {

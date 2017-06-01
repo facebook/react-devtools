@@ -49,6 +49,11 @@ class ContextMenu extends React.Component {
     this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
 
+  state = {
+    elementHeight: 0,
+    windowHeight: 0,
+  };
+
   onClick(i, evt) {
     this.props.items[i].action();
   }
@@ -58,16 +63,39 @@ class ContextMenu extends React.Component {
     this.props.hideContextMenu();
   }
 
+  _setRef = element => {
+    if (!element) {
+      return;
+    }
+
+    const elementHeight = element.querySelector('ul').clientHeight;
+    const windowHeight = window.innerHeight;
+
+    if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
+      return;
+    }
+
+    this.setState({
+      elementHeight: elementHeight,
+      windowHeight: windowHeight,
+    });
+  };
+
   render() {
-    const {theme} = this.context;
-    const {items, open, pos} = this.props;
+    const { theme } = this.context;
+    const { items, open, pos } = this.props;
+    const { elementHeight, windowHeight } = this.state;
+
+    if (pos && (pos.y + elementHeight) > windowHeight) {
+      pos.y -= elementHeight;
+    }
 
     if (!open) {
       return <div style={styles.hidden} />;
     }
 
     return (
-      <div style={styles.backdrop} onClick={this.handleBackdropClick}>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick} ref={this._setRef}>
         <ul style={containerStyle(pos.x, pos.y, theme)}>
           {!items.length && (
             <li style={emptyStyle(theme)}>No actions</li>
@@ -95,9 +123,9 @@ var Wrapped = decorate({
   },
   props(store, props) {
     if (!store.contextMenu) {
-      return {open: false};
+      return { open: false };
     }
-    var {x, y, type, args} = store.contextMenu;
+    var { x, y, type, args } = store.contextMenu;
 
     var items = [];
     args.push(store);
@@ -114,7 +142,7 @@ var Wrapped = decorate({
 
     return {
       open: true,
-      pos: {x, y},
+      pos: { x, y },
       hideContextMenu: () => store.hideContextMenu(),
       items,
     };
