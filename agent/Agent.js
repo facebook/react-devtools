@@ -272,14 +272,18 @@ class Agent extends EventEmitter {
     return null;
   }
 
-  selectFromDOMNode(node: Object, quiet?: boolean) {
+  selectFromDOMNode(node: Object, quiet?: boolean, offsetFromLeaf: ?number = 0) {
     var id = this.getIDForNode(node);
     if (!id) {
       return;
     }
-    this.emit('setSelection', {id, quiet});
+    this.emit('setSelection', {id, quiet, offsetFromLeaf});
   }
 
+  // TODO: remove this method because it's breaking encapsulation.
+  // It was used by RN inspector but this required leaking Fibers to it.
+  // RN inspector will use selectFromDOMNode() instead now.
+  // Remove this method in a few months after this comment was added.
   selectFromReactInstance(instance: OpaqueNodeHandle, quiet?: boolean) {
     var id = this.getId(instance);
     if (!id) {
