@@ -63,7 +63,7 @@ class ContextMenu extends React.Component {
     this.props.hideContextMenu();
   }
 
-  getHeight = element => {
+  _setRef = element => {
     if (!element) {
       return;
     }
@@ -95,7 +95,7 @@ class ContextMenu extends React.Component {
     }
 
     return (
-      <div style={styles.backdrop} onClick={this.handleBackdropClick} ref={this.getHeight}>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick} ref={this._setRef}>
         <ul style={containerStyle(pos.x, pos.y, theme)}>
           {!items.length && (
             <li style={emptyStyle(theme)}>No actions</li>
