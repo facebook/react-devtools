@@ -200,6 +200,11 @@ var DevtoolsUI = {
     return DevtoolsUI;
   },
 
+  setBrowserName(name) {
+    config.browserName = name;
+    return DevtoolsUI;
+  },
+
   startServer,
 };
 
