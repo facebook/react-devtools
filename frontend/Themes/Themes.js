@@ -225,6 +225,31 @@ const FirefoxLight: Theme = {
   state05: '#585959',
 };
 
+const FirefoxFirebug: Theme = {
+  displayName: "Firefox (Firebug)",
+  hidden: true,
+  base00: "#ffffff",
+  base01: "#f5f5f5",
+  base02: "#dde1e4",
+  base03: "#c1c1c1",
+  base04: "#888888",
+  base05: "#2a2a2a",
+  special00: "#0000ff",
+  special01: "#ff0000",
+  special02: "#ff0000",
+  special03: "#292e33",
+  special04: "#ff0000",
+  special05: "#0000ff",
+  special06: "#000062",
+  special07: "#0000ff",
+  state00: "#3399ff",
+  state01: "#85c0fb",
+  state02: "#ffffff",
+  state03: "#e6e6e6",
+  state04: "#ffee99",
+  state05: "#000000",
+}
+
 const Flat: Theme = {
   displayName: 'Flat',
   base00: '#2C3E50',
@@ -450,6 +475,7 @@ module.exports = {
   Eighties,
   FirefoxDark,
   FirefoxLight,
+  FirefoxFirebug,
   Flat,
   GruvboxDark,
   GruvboxLight,
