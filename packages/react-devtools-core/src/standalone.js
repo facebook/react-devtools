@@ -16,7 +16,6 @@ var path = require('path');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
 var Panel = require('../../../frontend/Panel');
-var ThemeStore = require('../../../frontend/Themes/Store');
 var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
@@ -195,7 +194,7 @@ var DevtoolsUI = {
       // Render devtools with the current theme.
       // If user has selected a theme then ThemeStore will return it.
       // If not the new default we set above will be used.
-      store.changeTheme(ThemeStore.get());
+      store.changeTheme(store.themeStore.defaultThemeName);
     }
     return DevtoolsUI;
   },
