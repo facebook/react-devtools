@@ -13,6 +13,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
+var Input = require('../Input');
 var flash = require('../flash');
 var {monospace} = require('../Themes/Fonts');
 
@@ -112,7 +113,7 @@ class Simple extends React.Component {
 
     if (editing) {
       return (
-        <input
+        <Input
           autoFocus={true}
           ref={i => this.input = i}
           style={inputStyle(theme)}

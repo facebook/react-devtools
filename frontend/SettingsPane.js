@@ -17,6 +17,7 @@ const {sansSerif} = require('./Themes/Fonts');
 const SearchUtils = require('./SearchUtils');
 const SvgIcon = require('./SvgIcon');
 const {PropTypes} = React;
+const Input = require('./Input');
 
 const decorate = require('./decorate');
 const {hexToRgba} = require('./Themes/utils');
@@ -128,7 +129,7 @@ class SettingsPane extends React.Component {
         </div>
 
         <div style={styles.searchInputWrapper}>
-          <input
+          <Input
             style={inputStyle}
             ref={i => this.input = i}
             value={searchText}

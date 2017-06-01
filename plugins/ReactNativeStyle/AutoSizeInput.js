@@ -12,6 +12,7 @@
 
 var React = require('react');
 var {monospace} = require('../../frontend/Themes/Fonts');
+var Input = require('../../frontend/Input');
 
 type Props = {
   onChange: (text: string|number) => any,
@@ -129,7 +130,7 @@ class AutoSizeInput extends React.Component {
     styles.input.width = this.state.inputWidth + 'px';
     return (
       <div style={styles.wrapper}>
-        <input
+        <Input
           ref={i => this.input = i}
           value={this.state.text}
           style={styles.input}
