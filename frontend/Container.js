@@ -133,6 +133,11 @@ var DEFAULT_MENU_ITEMS = {
         title: 'Show all ' + node.get('name'),
         action: () => store.changeSearch(node.get('name')),
       });
+      items.push({
+        key: 'copyNodeName',
+        title: 'Copy element name',
+        action: () => store.copyNodeName(node.get('name')),
+      });
     }
     if (store.capabilities.scroll) {
       items.push({

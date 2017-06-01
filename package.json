@@ -8,6 +8,7 @@
     "babel-preset-react": "6.3.13",
     "babel-preset-stage-0": "6.3.13",
     "classnames": "2.2.1",
+    "clipboard-js": "^0.3.3",
     "es6-symbol": "3.0.2",
     "eslint": "2.10.2",
     "eslint-plugin-react": "5.1.1",

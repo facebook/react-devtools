@@ -1155,6 +1155,10 @@ cli-width@^2.0.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cli-width/-/cli-width-2.1.0.tgz#b234ca209b29ef66fc518d9b98d5847b00edf00a"
 
+clipboard-js@^0.3.3:
+  version "0.3.3"
+  resolved "https://registry.yarnpkg.com/clipboard-js/-/clipboard-js-0.3.3.tgz#62264c17c80ebf84f4022286f032501e890b8922"
+
 cliui@^2.1.0:
   version "2.1.0"
   resolved "https://registry.yarnpkg.com/cliui/-/cliui-2.1.0.tgz#4b475760ff80264c762c3a1719032e91c7fea0d1"
