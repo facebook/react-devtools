@@ -41,6 +41,11 @@ class ContextMenu extends React.Component {
     },
   };
 
+  state = {
+    elementHeight: 0,
+    windowHeight: 0,
+  };
+
   handleBackdropClick: () => void;
 
   constructor(props) {
@@ -48,11 +53,6 @@ class ContextMenu extends React.Component {
 
     this.handleBackdropClick = this.handleBackdropClick.bind(this);
   }
-
-  state = {
-    elementHeight: 0,
-    windowHeight: 0,
-  };
 
   onClick(i, evt) {
     this.props.items[i].action();
@@ -82,9 +82,9 @@ class ContextMenu extends React.Component {
   };
 
   render() {
-    const { theme } = this.context;
-    const { items, open, pos } = this.props;
-    const { elementHeight, windowHeight } = this.state;
+    const {theme} = this.context;
+    const {items, open, pos} = this.props;
+    const {elementHeight, windowHeight} = this.state;
 
     if (pos && (pos.y + elementHeight) > windowHeight) {
       pos.y -= elementHeight;
@@ -123,9 +123,9 @@ var Wrapped = decorate({
   },
   props(store, props) {
     if (!store.contextMenu) {
-      return { open: false };
+      return {open: false};
     }
-    var { x, y, type, args } = store.contextMenu;
+    var {x, y, type, args} = store.contextMenu;
 
     var items = [];
     args.push(store);
