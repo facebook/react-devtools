@@ -138,7 +138,7 @@ class SettingsPane extends React.Component {
             onKeyDown={e => this.onKeyDown(e.key)}
             placeholder="Search (text or /regex/)"
             onChange={e => this.props.onChangeSearch(e.target.value)}
-            title="Search React component names and text"
+            title="Search by React component name or text"
           />
           <SearchIcon theme={theme} />
           {!!searchText && (
