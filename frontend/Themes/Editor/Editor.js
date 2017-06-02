@@ -255,7 +255,7 @@ const styles = {
     display: 'flex',
     flex: '1 0 auto',
     marginLeft: '0.5rem',
-    alignItems: 'flex-start',
+    alignItems: 'stretch',
   },
   importExportRow: {
     display: 'flex',
