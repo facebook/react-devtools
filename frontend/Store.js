@@ -32,8 +32,6 @@ type ContextMenu = {
   args: Array<any>,
 };
 
-const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
-
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
  * state. It emits events when things change that you can subscribe to. The
@@ -98,7 +96,6 @@ class Store extends EventEmitter {
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
-  placeholderText: string;
   preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
@@ -138,7 +135,6 @@ class Store extends EventEmitter {
     this.capabilities = {};
     this.traceupdatesState = null;
     this.colorizerState = null;
-    this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
     this.themeStore = themeStore;
 
@@ -537,7 +533,6 @@ class Store extends EventEmitter {
 
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
-    this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
     if (this.colorizerState && this.colorizerState.enabled) {
