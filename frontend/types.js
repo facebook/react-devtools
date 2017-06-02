@@ -15,7 +15,7 @@ var {Record} = require('immutable');
 export type Dir = 'up' | 'down' | 'left' | 'right';
 export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom';
 
-export type ElementID = string;
+export type ElementID = string | number;
 
 export type Window = {
   frameElement: DOMNode | null,
