@@ -138,7 +138,7 @@ class SettingsPane extends React.Component {
             onKeyDown={e => this.onKeyDown(e.key)}
             placeholder="Search (text or /regex/)"
             onChange={e => this.props.onChangeSearch(e.target.value)}
-            title="Search React elements"
+            title="Search React component names and text"
           />
           <SearchIcon theme={theme} />
           {!!searchText && (
@@ -184,7 +184,7 @@ const InspectMenuButton = ({ isInspectEnabled, onClick, theme }) => (
   <button
     onClick={onClick}
     style={inspectMenuButtonStyle(isInspectEnabled, theme)}
-    title="Select an element in the page to inspect it"
+    title="Select a React element in the page to inspect it"
   >
     <SvgIcon path="
       M12,8A4,4 0 0,1 16,12A4,4 0 0,1 12,16A4,4 0 0,1 8,12A4,4 0 0,1 12,8M3.05,
@@ -199,7 +199,7 @@ const SettingsMenuButton = ({ onClick, theme }) => (
   <button
     onClick={onClick}
     style={styles.settingsMenuButton}
-    title="Customize devtools"
+    title="Customize React DevTools"
   >
     <SvgIcon path="
       M12,15.5A3.5,3.5 0 0,1 8.5,12A3.5,3.5 0 0,1 12,8.5A3.5,3.5 0 0,1 15.5,12A3.5,3.5 0 0,
