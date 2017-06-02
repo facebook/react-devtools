@@ -495,7 +495,7 @@ class Store extends EventEmitter {
   skipWrapper(id: ElementID, up?: boolean, end?: boolean): ?ElementID {
     if (!id) {
       return undefined;
-    }    
+    }
     while (true) {
       var node = this.get(id);
       var nodeType = node.get('nodeType');

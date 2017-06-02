@@ -93,31 +93,31 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   if (store.searchRoots && store.searchRoots.contains(id)) {
     pid = null;
   }
-
-  if (dest === 'parent') {
-    let parentNode = store.get(pid);
-    if (parentNode.get('nodeType') !== 'Wrapper') {
-      return pid;
+  if (pid) {
+    if (dest === 'parent') {
+      let parentNode = store.get((pid: string));
+      if (parentNode.get('nodeType') !== 'Wrapper') {
+        return pid;
+      }
+      while (parentNode.get('nodeType') === 'Wrapper') {
+        id = pid;
+        pid = store.getParent(id);
+        parentNode = store.get(pid);
+      }
+      dest = 'prevSibling';
+    } else if (dest === 'parentBottom') {
+      let parentNode = store.get((pid: string));
+      if (parentNode.get('nodeType') !== 'Wrapper') {
+        store.isBottomTagSelected = true;
+        return pid;
+      }
+      while (parentNode.get('nodeType') === 'Wrapper') {
+        id = pid;
+        pid = store.getParent(id);
+        parentNode = store.get(pid);
+      }
+      dest = 'nextSibling';
     }
-    while (parentNode.get('nodeType') === 'Wrapper') {
-      id = pid;
-      pid = store.getParent(id);
-      parentNode = store.get(pid);
-    }
-    dest = 'prevSibling';
-  }
-  if (dest === 'parentBottom') {
-    let parentNode = store.get(pid);
-    if (parentNode.get('nodeType') !== 'Wrapper') {
-      store.isBottomTagSelected = true;
-      return pid;
-    }
-    while (parentNode.get('nodeType') === 'Wrapper') {
-      id = pid;
-      pid = store.getParent(id);
-      parentNode = store.get(pid);
-    }
-    dest = 'nextSibling';
   }
 
   if (dest === 'collapse' || dest === 'uncollapse') {
