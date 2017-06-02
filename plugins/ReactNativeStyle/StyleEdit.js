@@ -74,11 +74,11 @@ class StyleEdit extends React.Component {
   render() {
     var attrs = Object.keys(this.props.style);
     return (
-      <ul style={styles.container} onClick={e => this.onListClick(e)}>
+      <ul style={styles.list} onClick={e => this.onListClick(e)}>
         <span style={tagStyle(this.context.theme)}>style</span>
         <span>{' {'}</span>
         {attrs.map(name => (
-          <li key={'style-' + name} style={styles.attr}>
+          <li key={'style-' + name} style={styles.listItem} onClick={blockClick}>
             <AutoSizeInput
               type="attr"
               value={name}
@@ -93,7 +93,7 @@ class StyleEdit extends React.Component {
           </li>
         ))}
         {this.state.showNew &&
-          <li style={styles.attr}>
+          <li style={styles.listItem}>
             <AutoSizeInput
               isNew={true}
               type="attr"
@@ -117,12 +117,14 @@ StyleEdit.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
+const blockClick = event => event.stopPropagation();
+
 const tagStyle = (theme: Theme) => ({
   color: theme.base04,
 });
 
 const styles = {
-  container: {
+  list: {
     listStyle: 'none',
     padding: 0,
     margin: '5px 0px',
@@ -131,10 +133,11 @@ const styles = {
   colon: {
     margin: '-3px',
   },
-  attr: {
+  listItem: {
+    margin: 0,
     display: 'flex',
     alignItems: 'center',
-    margin: '1px 3px',
+    cursor: 'default',
   },
 };
 
