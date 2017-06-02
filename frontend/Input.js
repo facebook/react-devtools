@@ -41,8 +41,8 @@ const Input = (props: Props, context: Context) => {
   return (
     <input
       style={{
-        ...style,
         ...inputStyle(chosenTheme),
+        ...style,
       }}
       ref={innerRef}
       {...rest}

@@ -14,6 +14,11 @@ var React = require('react');
 var {monospace} = require('../../frontend/Themes/Fonts');
 var Input = require('../../frontend/Input');
 
+import type {Theme} from '../../frontend/types';
+
+type Context = {
+  theme: Theme,
+};
 type Props = {
   onChange: (text: string|number) => any,
   value: string|number,
@@ -27,14 +32,16 @@ type State = {
 };
 
 class AutoSizeInput extends React.Component {
+  context: Context;
   props: Props;
   defaultProps: DefaultProps;
   state: State;
   input: HTMLInputElement;
   sizer: HTMLDivElement;
 
-  constructor(props: Object) {
-    super(props);
+  constructor(props: Props, context: Context) {
+    super(props, context);
+
     this.state = {
       text: '' + this.props.value,
       inputWidth: 1,
@@ -101,12 +108,14 @@ class AutoSizeInput extends React.Component {
   }
 
   onFocus() {
+    const {theme} = this.context;
+
     const input = this.input;
     input.selectionStart = 0;
     input.selectionEnd = input.value.length;
-    input.style.color = '#333';
-    input.style.boxShadow = '0 0 3px #ccc';
-    input.style.border = '1px solid #ccc';
+    input.style.color = theme.base05;
+    input.style.boxShadow = `0 0 3px ${theme.base03}`;
+    input.style.border = `1px solid ${theme.base03}`;
     input.style.padding = '0px 1px';
   }
 
@@ -122,11 +131,12 @@ class AutoSizeInput extends React.Component {
   }
 
   getColor() {
-    return this.props.type === 'attr' ? '#c41a16' : '#333';
+    const {theme} = this.context;
+    return this.props.type === 'attr' ? theme.special06 : theme.base05;
   }
 
   render() {
-    const style = inputStyle(this.state.text);
+    const style = (inputStyle(this.state.text): any);
     style.color = this.getColor();
     style.width = this.state.inputWidth + 'px';
     return (
@@ -146,6 +156,10 @@ class AutoSizeInput extends React.Component {
   }
 }
 
+AutoSizeInput.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 const inputStyle = (text: ?string) => ({
   fontFamily: monospace.family,
   fontSize: monospace.sizes.normal,
@@ -155,7 +169,6 @@ const inputStyle = (text: ?string) => ({
   marginLeft: 6,
   outline: 'none',
   width: '0px',
-  color: '#333',
   minWidth: text ? '0' : '1rem', // Make it easier to click initially
 });
 
