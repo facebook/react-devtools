@@ -107,12 +107,16 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     dest = 'prevSibling';
   }
   if (dest === 'parentBottom') {
-    const parentNode = store.get(pid);
+    let parentNode = store.get(pid);
     if (parentNode.get('nodeType') !== 'Wrapper') {
       store.isBottomTagSelected = true;
       return pid;
     }
-    id = pid;
+    while (parentNode.get('nodeType') === 'Wrapper') {
+      id = pid;
+      pid = store.getParent(id);
+      parentNode = store.get(pid);
+    }
     dest = 'nextSibling';
   }
 
@@ -141,7 +145,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (typeof children === 'string') {
       return getNewSelection('prevSibling', store);
     }
-    var cid = store.skipWrapper(children[children.length - 1]);
+    var cid = store.skipWrapper(children[children.length - 1], false, true);
     if (cid && !store.hasBottom(cid)) {
       store.isBottomTagSelected = false;
     }
@@ -183,8 +187,8 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (pix === 0) {
       return getNewSelection('parent', store);
     }
-    var childId = pchildren[pix - 1];
-    var child = store.get(childId);
+    const childId = pchildren[pix - 1];
+    const child = store.get(childId);
     var prevCid = store.skipWrapper(
       childId,
       false,
@@ -197,6 +201,12 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
   if (dest === 'nextSibling') {
     if (pix === pchildren.length - 1) {
+      const childId = pchildren[pix];
+      const child = store.get(childId);
+      if (child.get('nodeType') === 'Wrapper') {
+        store.isBottomTagSelected = true;
+        return store.getParent(id);
+      }
       return getNewSelection('parentBottom', store);
     }
     store.isBottomTagSelected = false;
