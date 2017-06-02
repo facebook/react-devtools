@@ -82,6 +82,30 @@ function getDest(dir: Dir, store: Store): ?Dest {
   return dirToDest(dir, bottom, collapsed, hasChildren);
 }
 
+function getRootSelection(dest, store, id) {
+  var roots = store.searchRoots || store.roots;
+  var ix = roots.indexOf(id);
+  if (ix === -1) {
+    ix = roots.indexOf(store._parents.get(id));
+  }
+  if (dest === 'prevSibling') {
+    // prev root
+    if (ix === 0) {
+      return null;
+    }
+    var prev = store.skipWrapper(roots.get(ix - 1), false, true);
+    store.isBottomTagSelected = prev ? store.hasBottom(prev) : false; // flowtype requires the ternary
+    return prev;
+  } else if (dest === 'nextSibling') {
+    if (ix >= roots.size - 1) {
+      return null;
+    }
+    store.isBottomTagSelected = false;
+    return store.skipWrapper(roots.get(ix + 1));
+  }
+  return null;
+	}
+
 function getNewSelection(dest: Dest, store: Store): ?ElementID {
   var id = store.selected;
   if (!id) {
@@ -90,18 +114,52 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   var node = store.get(id);
   var pid = store.skipWrapper(store.getParent(id), true);
 
-  if (store.searchRoots && store.searchRoots.contains(id)) {
+  if (pid) {
+    var lastId = id;
+    if (dest === 'parent') {
+      let parentNode = store.get(pid);
+      if (parentNode.get('nodeType') !== 'Wrapper') {
+        return pid;
+      }
+      while (parentNode.get('nodeType') === 'Wrapper') {
+        lastId = id;
+        id = pid;
+        pid = store.getParent(id);
+        if (!pid) {
+          pid = id;
+          id = lastId;
+          break;
+        }
+        parentNode = store.get(pid);
+      }
+      dest = 'prevSibling';
+    } else if (dest === 'parentBottom') {
+      let parentNode = store.get(pid);
+      if (parentNode.get('nodeType') !== 'Wrapper') {
+        store.isBottomTagSelected = true;
+        return pid;
+      }
+      while (parentNode.get('nodeType') === 'Wrapper') {
+        lastId = id;
+        id = pid;
+        pid = store.getParent(id);
+        if (!pid) {
+          pid = id;
+          id = lastId;
+          break;
+        }
+        parentNode = store.get(pid);
+      }
+      dest = 'nextSibling';
+    }
+  }
+  if (!id) {
+    return undefined;
+  }
+
+  if (store.searchRoots && store.searchRoots.contains(pid)) {
     pid = null;
-  }
-
-  if (dest === 'parent') {
-    return pid;
-  }
-  if (dest === 'parentBottom') {
-    store.isBottomTagSelected = true;
-    return pid;
-  }
-
+  }  
   if (dest === 'collapse' || dest === 'uncollapse') {
     if (dest === 'collapse') {
       store.isBottomTagSelected = false;
@@ -127,7 +185,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (typeof children === 'string') {
       return getNewSelection('prevSibling', store);
     }
-    var cid = store.skipWrapper(children[children.length - 1]);
+    var cid = store.skipWrapper(children[children.length - 1], false, true);
     if (cid && !store.hasBottom(cid)) {
       store.isBottomTagSelected = false;
     }
@@ -136,26 +194,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
 
   // Siblings at the root node
   if (!pid) {
-    var roots = store.searchRoots || store.roots;
-    var ix = roots.indexOf(id);
-    if (ix === -1) {
-      ix = roots.indexOf(store._parents.get(id));
-    }
-    if (dest === 'prevSibling') { // prev root
-      if (ix === 0) {
-        return null;
-      }
-      var prev = store.skipWrapper(roots.get(ix - 1));
-      store.isBottomTagSelected = prev ? store.hasBottom(prev) : false; // flowtype requires the ternary
-      return prev;
-    } else if (dest === 'nextSibling') {
-      if (ix >= roots.size - 1) {
-        return null;
-      }
-      store.isBottomTagSelected = false;
-      return store.skipWrapper(roots.get(ix + 1));
-    }
-    return null;
+    return getRootSelection(dest, store, id);
   }
 
   // Siblings
@@ -167,9 +206,24 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
   if (dest === 'prevSibling') {
     if (pix === 0) {
+      const roots = store.searchRoots || store.roots;
+      if (roots.indexOf(store.getParent(id)) > -1) {
+        return getRootSelection(dest, store, id);
+      }
+      const childId = pchildren[pix];
+      const child = store.get(childId);
+      if (child.get('nodeType') === 'Wrapper') {
+        return store.getParent(id);
+      }				
       return getNewSelection('parent', store);
     }
-    var prevCid = store.skipWrapper(pchildren[pix - 1]);
+    const childId = pchildren[pix - 1];
+    const child = store.get(childId);
+    const prevCid = store.skipWrapper(
+      childId,
+      false,
+      child.get('nodeType') === 'Wrapper'
+    );
     if (prevCid && store.hasBottom(prevCid)) {
       store.isBottomTagSelected = true;
     }
@@ -177,10 +231,21 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
   if (dest === 'nextSibling') {
     if (pix === pchildren.length - 1) {
+      const roots = store.searchRoots || store.roots;
+      if (roots.indexOf(store.getParent(id)) > -1) {
+        return getRootSelection(dest, store, id);
+      }
+      const childId = pchildren[pix];
+      const child = store.get(childId);
+      if (child.get('nodeType') === 'Wrapper') {
+        store.isBottomTagSelected = true;
+        return store.getParent(id);
+      }
       return getNewSelection('parentBottom', store);
     }
     store.isBottomTagSelected = false;
     return store.skipWrapper(pchildren[pix + 1]);
   }
+
   return null;
 }
