@@ -92,7 +92,7 @@ class PreferencesPanel extends React.Component {
             >
               {browserName && (<option value="">{browserName}</option>)}
               {hasCustomTheme && (<option value={CUSTOM_THEME_NAME}>Custom</option>)}
-              {(!showHiddenThemes || hasCustomTheme) && <option disabled="disabled">---</option>}
+              {(browserName || hasCustomTheme) && <option disabled="disabled">---</option>}
               {themeNames.map(key => (
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
