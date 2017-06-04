@@ -16,7 +16,7 @@ const Portal = require('react-portal');
 const ColorPicker = require('./ColorPicker');
 const Input = require('../../Input');
 const {monospace} = require('../Fonts');
-const {isBright} = require('../utils');
+const {getBrightness, isBright} = require('../utils');
 
 import type {Theme} from '../../types';
 
@@ -77,6 +77,8 @@ class ColorInput extends React.Component {
 
     const backgroundIsBright = isBright(theme.base00);
     const chipIsBright = isBright(color);
+    const showColorChipBorder = backgroundIsBright === chipIsBright &&
+      getBrightness(color) > getBrightness(theme.base03);
 
     return (
       <div
@@ -90,7 +92,7 @@ class ColorInput extends React.Component {
           <div
             onClick={this._onClick}
             ref={this._setColorChipRef}
-            style={colorChipStyle(theme, color, backgroundIsBright === chipIsBright)}
+            style={colorChipStyle(theme, color, showColorChipBorder)}
           ></div>
           <Input
             onChange={this._onChange}
