@@ -180,7 +180,6 @@ const colorChipStyle = (theme: Theme, color: string = '', showBorder: boolean = 
   borderRadius: '2px',
   backgroundColor: color,
   boxSizing: 'border-box',
-  cursor: 'pointer',
   border: showBorder ? `1px solid ${theme.base03}` : 'none',
 });
 

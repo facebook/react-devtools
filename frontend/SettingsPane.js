@@ -249,7 +249,6 @@ const cancelButtonStyle = (theme: Theme) => ({
 
 const inspectMenuButtonStyle = (isInspectEnabled: boolean, theme: Theme) => ({
   display: 'flex',
-  cursor: 'pointer',
   background: 'none',
   border: 'none',
   outline: 'none', // Use custom active highlight instead
@@ -299,7 +298,6 @@ var styles = {
 
   settingsMenuButton: {
     display: 'flex',
-    cursor: 'pointer',
     background: 'none',
     border: 'none',
     color: 'inherit',

@@ -245,7 +245,6 @@ const styles = {
     background: 'none',
     border: 'none',
     color: 'inherit',
-    cursor: 'pointer',
   },
 };
 
