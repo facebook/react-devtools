@@ -118,13 +118,11 @@ class ColorInput extends React.Component {
     );
   }
 
-  // $FlowFixMe ^ class property `_onChange`. Missing annotation
-  _onChange = ({ target }) => {
+  _onChange: Function = ({ target }): void => {
     this._updateColor(target.value);
   };
 
-  // $FlowFixMe ^ class property `_onClick`. Missing annotation
-  _onClick = (event) => {
+  _onClick: Function = (event): void => {
     const container = findDOMNode(this._containerRef);
     const targetPosition = findDOMNode(this._colorChipRef).getBoundingClientRect();
 
@@ -135,25 +133,21 @@ class ColorInput extends React.Component {
     });
   };
 
-  // $FlowFixMe ^ class property `_onClose`. Missing annotation
-  _onClose = () => {
+  _onClose: Function = (): void => {
     this.setState({
       isColorPickerOpen: false,
     });
   };
 
-  // $FlowFixMe ^ class property `_setColorChipRef`. Missing annotation
-  _setColorChipRef = (ref: any) => {
+  _setColorChipRef: Function = (ref: any): void => {
     this._colorChipRef = ref;
   };
 
-  // $FlowFixMe ^ class property `_setContainerRef`. Missing annotation
-  _setContainerRef = (ref: any) => {
+  _setContainerRef: Function = (ref: any): void => {
     this._containerRef = ref;
   };
 
-  // $FlowFixMe ^ class property `_onChange`. Missing annotation
-  _updateColor = (color: string) => {
+  _updateColor: Function = (color: string): void => {
     const {customTheme, propertyName, udpatePreview} = this.props;
 
     customTheme[propertyName] = color;

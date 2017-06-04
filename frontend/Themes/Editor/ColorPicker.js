@@ -41,13 +41,11 @@ class ColorPicker extends React.Component {
     );
   }
 
-  // $FlowFixMe ^ class property `_onChangeComplete`. Missing annotation
-  _onChangeComplete = (color) => {
+  _onChangeComplete: Function = (color: any): void => {
     this.props.updateColor(color.hex);
   };
 
-  // $FlowFixMe ^ class property `_setRef`. Missing annotation
-  _setRef = (ref) => {
+  _setRef: Function = (ref: any): void => {
     this._ref = ref;
   };
 }
