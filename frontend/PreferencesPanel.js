@@ -17,6 +17,7 @@ const {sansSerif} = require('./Themes/Fonts');
 const {CUSTOM_THEME_NAME} = require('./Themes/constants');
 const SvgIcon = require('./SvgIcon');
 const ThemeEditor = require('./Themes/Editor/Editor');
+const Hoverable = require('./Hoverable');
 
 import type {Theme} from './types';
 
@@ -97,12 +98,12 @@ class PreferencesPanel extends React.Component {
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
             </select>
-            <button
+            <EditButton
               onClick={this._onEditCustomThemeClick}
-              style={styles.iconButton}
+              theme={theme}
             >
               <EditIcon />
-            </button>
+            </EditButton>
           </div>
           <div style={styles.buttonBar}>
             <button
@@ -172,6 +173,20 @@ PreferencesPanel.propTypes = {
   open: React.PropTypes.bool,
 };
 
+
+const EditButton = Hoverable(
+  ({ isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+    <button
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={buttonStyle(isHovered, theme)}
+    >
+      <EditIcon/>
+    </button>
+  )
+);
+
 const EditIcon = () => (
   <SvgIcon path="
     M20.71,7.04C21.1,6.65 21.1,6 20.71,5.63L18.37,3.29C18,2.9 17.35,2.9 16.96,3.29L15.12,
@@ -210,6 +225,15 @@ const panelStyle = (theme: Theme) => ({
   color: theme.base05,
 });
 
+const buttonStyle = (isHovered: boolean, theme: Theme) => ({
+  padding: '0.25rem',
+  marginLeft: '0.25rem',
+  height: '1.5rem',
+  background: 'none',
+  border: 'none',
+  color: isHovered ? theme.state06 : 'inherit',
+});
+
 const styles = {
   backdrop: {
     position: 'absolute',
@@ -237,14 +261,6 @@ const styles = {
     display: 'flex',
     direction: 'row',
     alignItems: 'center',
-  },
-  iconButton: {
-    padding: '0.25rem',
-    marginLeft: '0.25rem',
-    height: '1.5rem',
-    background: 'none',
-    border: 'none',
-    color: 'inherit',
   },
 };
 
