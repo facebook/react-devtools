@@ -25,7 +25,7 @@ function deserialize(string: string, fallbackTheme: Theme = ChromeDefault): Them
     // Make sure serialized theme has no extra keys.
     themeKeys.forEach(key => {
       const maybeColor = maybeTheme[key];
-      if (typeof maybeColor === 'string' && maybeColor !== '') {
+      if (isColorSet(maybeColor)) {
         theme[key] = maybeColor;
       }
     });
@@ -34,15 +34,24 @@ function deserialize(string: string, fallbackTheme: Theme = ChromeDefault): Them
     console.error('Could not deserialize theme', error);
   }
 
+  // Update outdated custom theme formats and set reasonable defaults.
+  if (!isColorSet(theme.state06)) { // Added in version > 2.3.0
+    theme.state06 = theme.base05;
+  }
+
   // Make sure serialized theme has all of the required color values.
   themeKeys.forEach(key => {
     const maybeColor = theme[key];
-    if (typeof maybeColor !== 'string' || maybeColor === '') {
+    if (!isColorSet(maybeColor)) {
       theme[key] = fallbackTheme[key];
     }
   });
 
   return ((theme: any): Theme);
+}
+
+function isColorSet(maybeColor: any): boolean {
+  return typeof maybeColor === 'string' && maybeColor !== '';
 }
 
 function serialize(theme: Theme): string {

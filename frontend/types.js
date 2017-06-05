@@ -119,4 +119,5 @@ export type Theme = {
   state02: string; // Focused Foreground
   state04: string; // Search Background
   state05: string; // Search Foreground
+  state06: string; // Interactive Hover
 };

@@ -37,6 +37,7 @@ const Selection = {
   state02: 'Focused Foreground',
   state04: 'Search Background',
   state05: 'Search Foreground',
+  state06: 'Interactive Hover',
 };
 
 module.exports = {
