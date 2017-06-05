@@ -310,7 +310,7 @@ class Node extends React.Component {
                   {content}
                 </span>,
                 <span key="close">
-                  <span style={sharedHeadBracketStyle}>&lt;</span>
+                  <span style={sharedHeadBracketStyle}>&lt;/</span>
                   <span style={jsxSingleLineTagStyle}>{name}</span>
                   <span style={sharedHeadBracketStyle}>&gt;</span>
                 </span>,
