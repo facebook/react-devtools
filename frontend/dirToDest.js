@@ -42,7 +42,7 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
     }
     if (hasChildren) {
       if (bottom) {
-        return 'lastChild';
+        return null;
       } else {
         return 'firstChild';
       }
