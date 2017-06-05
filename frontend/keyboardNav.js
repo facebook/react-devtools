@@ -104,7 +104,7 @@ function getRootSelection(dest, store, id) {
     return store.skipWrapper(roots.get(ix + 1));
   }
   return null;
-	}
+}
 
 function getNewSelection(dest: Dest, store: Store): ?ElementID {
   var id = store.selected;
