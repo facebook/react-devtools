@@ -104,7 +104,7 @@ function getRootSelection(dest, store, id) {
     return store.skipWrapper(roots.get(ix + 1));
   }
   return null;
-	}
+}
 
 function getNewSelection(dest: Dest, store: Store): ?ElementID {
   var id = store.selected;
@@ -112,7 +112,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     return undefined;
   }
   var node = store.get(id);
-  var pid = store.skipWrapper(store.getParent(id), true);
+  var pid = store.getParent(id);
 
   if (pid) {
     var lastId = id;
