@@ -112,7 +112,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     return undefined;
   }
   var node = store.get(id);
-  var pid = store.skipWrapper(store.getParent(id), true);
+  var pid = store.getParent(id);
 
   if (pid) {
     var lastId = id;
