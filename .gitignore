@@ -2,6 +2,7 @@
 /shells/chrome.pem
 /shells/firefox/*.xpi
 build
+/shells/chrome/extension
 node_modules
 npm-debug.log
 .DS_Store

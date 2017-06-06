@@ -1,0 +1,10 @@
+{
+  "title": "React Devtools",
+  "name": "react-devtools",
+  "description": "Adds React debugging tools to Chrome.",
+  "author": "Facebook",
+  "license": "BSD-3-Clause",
+  "scripts": {
+    "build": "node build.js"
+  }
+}
