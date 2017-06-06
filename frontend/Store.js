@@ -504,9 +504,9 @@ class Store extends EventEmitter {
       }
       if (up) {
         var parentId = this._parents.get(id);
-
         if (!parentId) {
-          return id;
+          // Don't show the Stack root wrapper in breadcrumbs
+          return undefined;
         }
         id = parentId;
       } else {
