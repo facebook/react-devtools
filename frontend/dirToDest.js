@@ -31,7 +31,7 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
 
   if (dir === 'left') {
     if (!collapsed && hasChildren) {
-      return 'selectTop';
+      return bottom ? 'selectTop' : 'collapse';
     }
     return 'parent';
   }
