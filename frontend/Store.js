@@ -506,7 +506,8 @@ class Store extends EventEmitter {
         var parentId = this._parents.get(id);
 
         if (!parentId) {
-          return id;
+          // we don't want to show thw root wrapper
+          return undefined;
         }
         id = parentId;
       } else {
