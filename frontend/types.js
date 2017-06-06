@@ -13,7 +13,7 @@
 var {Record} = require('immutable');
 
 export type Dir = 'up' | 'down' | 'left' | 'right';
-export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom';
+export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom' | 'selectTop';
 
 export type ElementID = string;
 

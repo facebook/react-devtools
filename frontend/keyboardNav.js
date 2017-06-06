@@ -159,13 +159,17 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
 
   if (store.searchRoots && store.searchRoots.contains(pid)) {
     pid = null;
-  }  
+  }
   if (dest === 'collapse' || dest === 'uncollapse') {
     if (dest === 'collapse') {
       store.isBottomTagSelected = false;
     }
     store.toggleCollapse(id);
     return undefined;
+  }
+
+  if (dest === 'selectTop') {
+    store.selectTop(id);
   }
 
   var children = node.get('children');
@@ -214,7 +218,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
       const child = store.get(childId);
       if (child.get('nodeType') === 'Wrapper') {
         return store.getParent(id);
-      }				
+      }
       return getNewSelection('parent', store);
     }
     const childId = pchildren[pix - 1];
