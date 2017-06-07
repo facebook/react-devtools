@@ -20,7 +20,7 @@ const logPromise = async (promise, primaryLabel, secondaryLabel = '') => {
 
 const build = async (manifestPath, destinationPath) => {
   try {
-    const buildScriptPath = join(__dirname, 'build.sh');
+    const buildScriptPath = join(__dirname, 'build_helper.sh');
     const buildScriptOptions = {cwd: __dirname};
     const builtArtifactsPath = join(__dirname, 'build');
     const builtZipPath = join(destinationPath, 'react-devtools-chrome.zip'); // TODO
