@@ -1,20 +1,35 @@
-# The Firefox addon
-This shell lets you use react devtools as a firefox devtools extension.
+# The Firefox ~~add-on~~ extension
 
-{{screenshot}}
+The firefox add-on used to have its own shell. However Mozilla has been gradually deprecating add-ons in favor of the newer WebExtensions API. By the end of 2017 (eg Firefox 57) they plan to [only support WebExtensions](https://blog.mozilla.org/addons/2016/11/23/add-ons-in-2017/).
+
+In order to stay compatible with future Firefox versions the old React DevTools add-on has been deprecated. The Chrome WebExtension should be used for both Chrome and Firefox.
 
 ## Installation
 
-- `npm install -g jpm`
-- `npm install` in the repo root folder
-- `./build.sh`
-
-This will produce an `xpi` file. You can load it in Firefox via Addons > gear icon > Debug Addons > Load Temporary Addon.
+Follow installation instructions in `shells/chrome`.
 
 ## Hacking
 
-The files in `main` are *not* transpiled by webkit/babel, but are run in firefox
-extension context. Still, you have some es6 things like string template
-literals, object literal shorthand, and object destructuring, and let/const.
+First install the [`web-ext` command line tool](https://developer.mozilla.org/en-US/Add-ons/WebExtensions/Getting_started_with_web-ext#Installation).
 
-Everything else is transpiled.
+```bash
+npm install --global web-ext
+```
+
+Now you can build the WebExtension and test it as follows:
+
+```bash
+cd shells/chrome
+
+# Build source (to include local changes)
+./build.sh
+
+# Test the local extension in Firefox
+web-ext run
+```
+
+You can also test against a specific Firefox version (eg Nightly) by passing a path to the `firefox` instance, eg:
+
+```bash
+web-ext run --firefox=/Applications/FirefoxNightly.app/Contents/MacOS/firefox-bin
+```
