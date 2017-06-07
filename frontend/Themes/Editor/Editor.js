@@ -193,8 +193,8 @@ const WrappedEditor = decorate({
 const editorStyle = (theme: Theme) => ({
   display: 'flex',
   flexDirection: 'column',
-  maxWidth: 'calc(100vw - 2rem)',
-  maxHeight: 'calc(100vh - 2rem)',
+  maxWidth: 'calc(100% - 2rem)',
+  maxHeight: 'calc(100% - 2rem)',
   boxSizing: 'border-box',
   zIndex: 1,
   padding: '0.5rem',
