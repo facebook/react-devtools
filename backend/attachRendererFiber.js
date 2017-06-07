@@ -16,6 +16,9 @@ var {
   ClassComponent,
   HostRoot,
 } = require('./ReactTypeOfWork');
+var {
+  Bailout,
+} = require('./ReactTypeOfSideEffect');
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   // This is a slightly annoying indirection.
@@ -39,6 +42,10 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function hasDataChanged(prevFiber, nextFiber) {
     if (prevFiber.tag === ClassComponent) {
+      // Skip subtrees that bailed out with shouldComponentUpdate.
+      if ((nextFiber.effectTag & Bailout) === Bailout) {
+        return false;
+      }
       // Only classes have context.
       if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
         return true;
