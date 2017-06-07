@@ -90,6 +90,7 @@ class Store extends EventEmitter {
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
+  _gettersCache: Map;
   _eventQueue: Array<string>;
   _eventTimer: ?number;
 
@@ -128,6 +129,7 @@ class Store extends EventEmitter {
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
+    this._gettersCache = new Map();
     this._bridge = bridge;
 
     // Public state
@@ -414,6 +416,10 @@ class Store extends EventEmitter {
   }
 
   setProps(id: ElementID, path: Array<string>, value: any) {
+    if (this._gettersCache.has(id)) {
+      this._gettersCache = this._gettersCache.deleteIn([id, path[0]]);
+    }
+    this._gettersCache = this._gettersCache.remove(path[0]);
     this._bridge.send('setProps', {id, path, value});
   }
 
@@ -535,6 +541,9 @@ class Store extends EventEmitter {
   inspect(id: ElementID, path: Array<string>, cb: () => void) {
     invariant(path[0] === 'props' || path[0] === 'state' || path[0] === 'context',
               'Inspected path must be one of props, state, or context');
+
+    this._gettersCache.clear();
+
     this._bridge.inspect(id, path, value => {
       var base = this.get(id).get(path[0]);
       var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
@@ -647,6 +656,16 @@ class Store extends EventEmitter {
       return;
     }
     data.renders = node.get('renders') + 1;
+    if (this._gettersCache.has(data.id)) {
+      var props = data.props;
+      for (var prop of this._gettersCache.get(data.id).keys()) {
+        var evaledValue = this._gettersCache.getIn([data.id, prop]);
+        var path = evaledValue.path;
+        var propObj = path.slice(0, path.length - 1).reduce( (obj, attr) => obj ? obj[attr] : null, props);
+        propObj[path[path.length-1]] = evaledValue.value;
+      }
+
+    }
     this._nodes = this._nodes.mergeIn([data.id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
@@ -713,6 +732,7 @@ class Store extends EventEmitter {
     propObj[data.path[last]] = data.value;
     var newProps = assign({}, props);
     this._nodes = this._nodes.setIn([data.id, 'props'], newProps);
+    this._gettersCache = this._gettersCache.setIn([data.id, data.path[0]], { path: data.path, value: data.value });
     this.emit(data.id);
   }
 }
