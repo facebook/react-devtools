@@ -28,8 +28,8 @@ cd shells/chrome
 web-ext run
 ```
 
-You can also test against a specific Firefox version (eg Nightly) by passing a path to the `firefox` instance, eg:
+You can also test against a specific Firefox version by passing a path to the `firefox` instance. For the Nightly build this can be done by passing the string "nightly":
 
 ```bash
-web-ext run --firefox=/Applications/FirefoxNightly.app/Contents/MacOS/firefox-bin
+web-ext run --firefox=nightly
 ```
