@@ -16,9 +16,9 @@ var {
   ClassComponent,
   HostRoot,
 } = require('./ReactTypeOfWork');
-var {
-  Bailout,
-} = require('./ReactTypeOfSideEffect');
+
+// Inlined from ReactTypeOfSideEffect
+var PerformedWork = 1;
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   // This is a slightly annoying indirection.
@@ -42,10 +42,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function hasDataChanged(prevFiber, nextFiber) {
     if (prevFiber.tag === ClassComponent) {
-      // Skip subtrees that bailed out with shouldComponentUpdate.
-      if ((nextFiber.effectTag & Bailout) === Bailout) {
+      // Skip if the class performed no work (shouldComponentUpdate bailout).
+      // eslint-disable-next-line no-bitwise
+      if ((nextFiber.effectTag & PerformedWork) !== PerformedWork) {
         return false;
       }
+
       // Only classes have context.
       if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
         return true;
