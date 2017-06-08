@@ -16,6 +16,7 @@ const main = async () => {
   );
 
   console.log('\nThe Chrome extension has been built!');
+  console.log('You can test it by following the steps below:');
   console.log(chalk.gray('\n# Open the following URL in Chrome:'));
   console.log('chrome://extensions/');
   console.log(chalk.gray('\n# Click "Load unpacked extension" and browse to:'));

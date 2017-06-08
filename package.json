@@ -35,6 +35,9 @@
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
   "scripts": {
+    "build:extension": "npm run build:extension:chrome && npm run build:extension:firefox",
+    "build:extension:chrome": "node ./shells/chrome/build",
+    "build:extension:firefox": "node ./shells/firefox/build",
     "lint": "eslint .",
     "postinstall": "lerna bootstrap",
     "test": "node --harmony ./node_modules/.bin/jest",

@@ -8,6 +8,5 @@ Modify the source code there and then rebuild this extension by running `node bu
 
 You can test a local build of the web extension like so:
 
- 1. Open [`chrome://extensions/`](chrome://extensions/) in Chrome.
- 1. Click the "_Load unpacked extension..._" button.
- 1. Select the directory `shells/chrome/build/unpacked`.
+ 1. Build the extension: `node build`
+ 1. Follow the on-screen instructions.
