@@ -21,9 +21,12 @@ const main = async () => {
   console.log(`cd ${unpackedPath}`);
   console.log(chalk.gray('\n# And launch Firefox with the extension enabled:'));
   console.log('web-ext run');
-  console.log(chalk.gray('\n# You can also test against specific Firefox versions:'));
-  console.log('web-ext run --firefox=nightly');
-  console.log('web-ext run --firefox=/Applications/Firefox54.app/Contents/MacOS/firefox-bin');
+  console.log(chalk.gray('\n# You can also test against upcoming Firefox releases.'));
+  console.log(chalk.gray('# First download a release from https://www.mozilla.org/en-US/firefox/channel/desktop/'));
+  console.log(chalk.gray('# And then tell web-ext which release to use (eg nigthly, beta):'));
+  console.log('web-ext run --firefox=beta');
+  console.log(chalk.gray('\n# You can test against older versions too:'));
+  console.log('web-ext run --firefox=/Applications/Firefox52.app/Contents/MacOS/firefox-bin');
 };
 
 main();
