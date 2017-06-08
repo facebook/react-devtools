@@ -7,6 +7,7 @@
 const AdmZip = require('adm-zip');
 const chalk = require('chalk');
 const {exec} = require('child-process-promise');
+const {dots} = require('cli-spinners');
 const {copy, ensureDir, move, remove} = require('fs-extra');
 const logUpdate = require('log-update');
 const {join, relative} = require('path');
@@ -23,11 +24,20 @@ const STATIC_FILES = [
 const relativePath = path => relative(process.env.PWD, path);
 
 const logPromise = async (promise, text, completedLabel = '') => {
-  logUpdate(`${chalk.bgYellow.black('STARTING')} ${text} ${chalk.gray('...')}`);
+  const {frames, interval} = dots;
+
+  let index = 0;
+
+  const id = setInterval(() => {
+    index = ++index % frames.length;
+    logUpdate(`${chalk.yellow(frames[index])} ${text} ${chalk.gray('- this may take a few seconds')}`);
+  }, interval);
 
   const returnValue = await promise;
 
-  logUpdate(`${chalk.bgGreen.black('COMPLETE')} ${text} ${chalk.gray(completedLabel)}`);
+  clearInterval(id);
+
+  logUpdate(`${chalk.green('✓')} ${text} ${chalk.gray(completedLabel)}`);
   logUpdate.done();
 
   return returnValue;
@@ -86,7 +96,7 @@ const main = async (buildId, manifestPath, destinationPath) => {
     await logPromise(
       build(tempPath, manifestPath),
       'Building extension',
-      `[temporary files in ${relativePath(tempPath)}]`
+      `- temporary files in ${relativePath(tempPath)}`
     );
 
     const builtUnpackedPath = join(destinationPath, 'unpacked');
@@ -94,7 +104,7 @@ const main = async (buildId, manifestPath, destinationPath) => {
     await logPromise(
       postProcess(tempPath, destinationPath),
       'Unpacking extension',
-      `[artifacts in ${relativePath(destinationPath)}]`
+      `- artifacts in ${relativePath(destinationPath)}`
     );
 
     return builtUnpackedPath;
