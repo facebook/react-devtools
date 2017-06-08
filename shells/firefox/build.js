@@ -19,7 +19,7 @@ const main = async () => {
   console.log(chalk.gray('\n# Go to the unpacked directory:'));
   console.log(`cd ${unpackedPath}`);
   console.log(chalk.gray('\n# And launch Firefox with the extension enabled:'));
-  console.log('web-ext run --firefox=nightly');
+  console.log('web-ext run');
 };
 
 main();
