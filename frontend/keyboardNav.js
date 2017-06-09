@@ -178,12 +178,13 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
 
   // Children
+  var cid;
   if (dest === 'firstChild') {
     if (typeof children === 'string') {
       return getNewSelection('nextSibling', store);
     }
     for (var i = 0; i < children.length; i++) {
-      var cid = store.skipWrapper(children[i]);
+      cid = store.skipWrapper(children[i]);
       if (cid) {
         store.isBottomTagSelected = false;
         return cid;
@@ -194,7 +195,7 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (typeof children === 'string') {
       return getNewSelection('prevSibling', store);
     }
-    var cid = store.skipWrapper(children[children.length - 1], false, true);
+    cid = store.skipWrapper(children[children.length - 1], false, true);
     if (cid && !store.hasBottom(cid)) {
       store.isBottomTagSelected = false;
     }
