@@ -182,8 +182,13 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     if (typeof children === 'string') {
       return getNewSelection('nextSibling', store);
     }
-    store.isBottomTagSelected = false;
-    return store.skipWrapper(children[0]);
+    for (var i = 0; i < children.length; i++) {
+      var cid = store.skipWrapper(children[i]);
+      if (cid) {
+        store.isBottomTagSelected = false;
+        return cid;
+      }
+    }
   }
   if (dest === 'lastChild') {
     if (typeof children === 'string') {
@@ -209,29 +214,32 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     pix = pchildren.indexOf(store._parents.get(id));
   }
   if (dest === 'prevSibling') {
-    if (pix === 0) {
-      const roots = store.searchRoots || store.roots;
-      if (roots.indexOf(store.getParent(id)) > -1) {
-        return getRootSelection(dest, store, id);
-      }
-      const childId = pchildren[pix];
+    while (pix > 0) {
+      const childId = pchildren[pix - 1];
       const child = store.get(childId);
-      if (child.get('nodeType') === 'Wrapper') {
-        return store.getParent(id);
+      const prevCid = store.skipWrapper(
+        childId,
+        false,
+        child.get('nodeType') === 'Wrapper'
+      );
+      if (prevCid) {
+        if (store.hasBottom(prevCid)) {
+          store.isBottomTagSelected = true;
+        }
+        return prevCid;
       }
-      return getNewSelection('parent', store);
+      pix--;
     }
-    const childId = pchildren[pix - 1];
+    const roots = store.searchRoots || store.roots;
+    if (roots.indexOf(store.getParent(id)) > -1) {
+      return getRootSelection(dest, store, id);
+    }
+    const childId = pchildren[pix];
     const child = store.get(childId);
-    const prevCid = store.skipWrapper(
-      childId,
-      false,
-      child.get('nodeType') === 'Wrapper'
-    );
-    if (prevCid && store.hasBottom(prevCid)) {
-      store.isBottomTagSelected = true;
+    if (child.get('nodeType') === 'Wrapper') {
+      return store.getParent(id);
     }
-    return prevCid;
+    return getNewSelection('parent', store);
   }
   if (dest === 'nextSibling') {
     if (pix === pchildren.length - 1) {
