@@ -205,8 +205,7 @@ class Node extends React.Component {
     const sharedTailBracketStyle = bracketStyle(inverted && isBottomTagSelected, theme);
 
     let name = node.get('name') + '';
-
-    const isHigherOrderComponent = name.match(/[A-Za-z]+\({1}[A-Za-z]+\){1}/g);
+    const isHigherOrderComponent = !!name.match(/[A-Za-z]+\({1}[A-Za-z]+\){1}/g);
 
     const sharedHeadStyle = headStyle({
       depth,
@@ -216,8 +215,6 @@ class Node extends React.Component {
       isHovered: hovered,
       isSelected: selected,
       isWindowFocused,
-      isHigherOrderComponent: isHigherOrderComponent,
-      isSearch: !!searchRegExp,
       theme,
     });
 
@@ -288,7 +285,7 @@ class Node extends React.Component {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, isHigherOrderComponent, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -326,7 +323,7 @@ class Node extends React.Component {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
+    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, isHigherOrderComponent, theme);
     const closeTagBracketStyle = collapsed ? sharedHeadBracketStyle : sharedTailBracketStyle;
     const closeTag = (
       <span>
@@ -350,7 +347,7 @@ class Node extends React.Component {
         <span style={arrowStyle(collapsed, hasState, headInverted, theme)}/>
       </span>;
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, theme);
+    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, isHigherOrderComponent, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
@@ -391,8 +388,6 @@ class Node extends React.Component {
       isHovered: hovered,
       isSelected: selected,
       isWindowFocused,
-      isHigherOrderComponent: isHigherOrderComponent,
-      isSearch: !!searchRegExp,
       theme,
     });
 
@@ -471,8 +466,6 @@ type headStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
-  isHigherOrderComponent: boolean,
-  isSearch: boolean,
   theme: Theme
 };
 
@@ -484,8 +477,6 @@ const headStyle = ({
   isHovered,
   isSelected,
   isWindowFocused,
-  isHigherOrderComponent,
-  isSearch,
   theme,
 }: headStyleParams) => {
   let backgroundColor;
@@ -499,14 +490,12 @@ const headStyle = ({
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
   const color = isInverted ? theme.state02 : undefined;
-  const isDimmed = isHigherOrderComponent && !isSelected && !isSearch;
 
   return {
     cursor: 'default',
     borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
-    opacity: isDimmed ? 0.5 : 1,
     paddingLeft: calcPaddingLeft(depth),
     paddingRight,
     backgroundColor,
@@ -514,10 +503,13 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
+const jsxTagStyle = (inverted: boolean, isCustom: boolean, isHigherOrderComponent: boolean, theme: Theme) => {
   let color;
+
   if (inverted) {
     color = theme.state02;
+  } else if (isHigherOrderComponent) {
+    color = theme.special08;
   } else if (isCustom) {
     color = theme.special00;
   } else {
@@ -586,8 +578,6 @@ type tailStyleParams = {
   isHovered: boolean,
   isSelected: boolean,
   isWindowFocused: boolean,
-  isHigherOrderComponent: boolean,
-  isSearch: boolean,
   theme: Theme
 };
 
@@ -598,8 +588,6 @@ const tailStyle = ({
   isHovered,
   isSelected,
   isWindowFocused,
-  isHigherOrderComponent,
-  isSearch,
   theme,
 }: tailStyleParams) => {
   let backgroundColor;
@@ -613,14 +601,12 @@ const tailStyle = ({
 
   const isInverted = isSelected && isWindowFocused && isBottomTagSelected;
   const color = isInverted ? theme.base04 : undefined;
-  const isDimmed = isHigherOrderComponent && !isSelected && !isSearch;
 
   return {
     borderTop: '1px solid transparent',
     cursor: 'default',
     paddingLeft: calcPaddingLeft(depth),
     paddingRight,
-    opacity: isDimmed ? 0.5 : 1,
     backgroundColor,
     color,
   };

@@ -95,14 +95,14 @@ const styles = {
   saturation: {
     flex: '0 0 auto',
     position: 'relative',
-    width: '6rem',
-    height: '6rem',
+    width: '9rem',
+    height: '9rem',
   },
   hue: {
     flex: '1 0 auto',
     position: 'relative',
-    width: '0.75rem',
-    height: '6rem',
+    width: '1rem',
+    height: '7rem',
     marginLeft: '0.125rem',
   },
   pointer: {

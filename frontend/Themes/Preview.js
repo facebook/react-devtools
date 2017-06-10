@@ -76,7 +76,7 @@ const childNode = Map({
 const grandparentNode = Map({
   id: 'grandparent',
   children: ['parent'],
-  name: 'Grandparent',
+  name: 'Grandparent(Hello)',
   nodeType: 'Composite',
   props: {
     depth: 0,
@@ -104,8 +104,8 @@ const nodes = {
 const noop = () => {};
 
 const fauxStore = {
-  hovered: 'parent',
-  selected: 'grandparent',
+  hovered: 'child',
+  selected: 'parent',
   get: (id: any) => nodes[id],
   off: noop,
   on: noop,

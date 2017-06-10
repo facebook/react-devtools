@@ -170,7 +170,7 @@ const colorPickerPosition = (position: Position) => ({
 
 const containerStyle = (maxHeight: ?number) => ({
   margin: '0.25rem',
-  minWidth: '7.5rem',
+  minWidth: '9.5rem',
   maxHeight,
 });
 
