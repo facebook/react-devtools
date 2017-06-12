@@ -44,6 +44,8 @@ class StyleEdit extends React.Component {
     this.state = {showNew: false, newAttr: '', newValue: ''};
   }
 
+  title: HTMLElement | null = null;
+
   onChange(name: string, val: string | number) {
     var num = Number(val);
     this.props.onChange(name, num == val ? num : val);
@@ -62,7 +64,7 @@ class StyleEdit extends React.Component {
     }
   }
 
-  onListClick = (e: Event) => {
+  onListClick(e: SyntheticInputEvent) {
     if (
       (e.target instanceof Element && e.target.tagName === 'INPUT') ||
       e.target === this.title
@@ -72,7 +74,7 @@ class StyleEdit extends React.Component {
     this.setState({showNew: true});
   }
 
-  onInputBlur = (isLastInput: boolean) => () => {
+  onInputBlur(isLastInput: boolean) {
     if (isLastInput) {
       this.setState({showNew: true});
     }
@@ -81,7 +83,7 @@ class StyleEdit extends React.Component {
   render() {
     var attrs = Object.keys(this.props.style);
     return (
-      <ul style={styles.list} onClick={this.onListClick}>
+      <ul style={styles.list} onClick={e => this.onListClick(e)}>
         <span
           ref={title => this.title = title}
           style={tagStyle(this.context.theme)}
@@ -98,7 +100,7 @@ class StyleEdit extends React.Component {
             <AutoSizeInput
               value={this.props.style[name]}
               onChange={val => this.onChange(name, val)}
-              onBlur={this.onInputBlur(/* isLastInput */(attrs.length - 1) === index)}
+              onBlur={() => this.onInputBlur(/* isLastInput */(attrs.length - 1) === index)}
             />
             <span style={styles.colon}>;</span>
           </li>
