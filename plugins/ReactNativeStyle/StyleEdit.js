@@ -62,11 +62,12 @@ class StyleEdit extends React.Component {
     }
   }
 
-  onListClick(e: Event) {
-    if (e.target instanceof Element) {
-      if (e.target.tagName === 'INPUT') {
-        return;
-      }
+  onListClick = (e: Event) => {
+    if (
+      (e.target instanceof Element && e.target.tagName === 'INPUT') ||
+      e.target === this.title
+    ) {
+      return;
     }
     this.setState({showNew: true});
   }
@@ -74,8 +75,11 @@ class StyleEdit extends React.Component {
   render() {
     var attrs = Object.keys(this.props.style);
     return (
-      <ul style={styles.list} onClick={e => this.onListClick(e)}>
-        <span style={tagStyle(this.context.theme)}>style</span>
+      <ul style={styles.list} onClick={this.onListClick}>
+        <span
+          ref={title => this.title = title}
+          style={tagStyle(this.context.theme)}
+        >style</span>
         <span>{' {'}</span>
         {attrs.map(name => (
           <li key={'style-' + name} style={styles.listItem} onClick={blockClick}>

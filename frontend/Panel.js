@@ -222,7 +222,7 @@ class Panel extends React.Component {
 
       this._themeStore = new ThemeStore(this.state.themeName);
       this._store = new Store(this._bridge, this._themeStore);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
