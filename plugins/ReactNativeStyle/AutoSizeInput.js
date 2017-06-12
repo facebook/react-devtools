@@ -119,6 +119,13 @@ class AutoSizeInput extends React.Component {
     input.style.padding = '0px 1px';
   }
 
+  onBlur() {
+    if (typeof this.props.onBlur === 'function') {
+      this.props.onBlur();
+    }
+    this.done();
+  }
+
   done() {
     const input = this.input;
     input.style.color = this.getColor();
@@ -147,7 +154,7 @@ class AutoSizeInput extends React.Component {
           style={style}
           onChange={e => this.setState({text: e.target.value})}
           onFocus={() => this.onFocus()}
-          onBlur={() => this.done()}
+          onBlur={() => this.onBlur()}
           onKeyDown={e => this.onKeyDown(e)}
         />
         <div ref={el => this.sizer = el} style={styles.sizer}>{this.state.text}</div>

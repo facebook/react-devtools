@@ -72,6 +72,12 @@ class StyleEdit extends React.Component {
     this.setState({showNew: true});
   }
 
+  onInputBlur = (isLastInput: boolean) => () => {
+    if (isLastInput) {
+      this.setState({showNew: true});
+    }
+  }
+
   render() {
     var attrs = Object.keys(this.props.style);
     return (
@@ -81,7 +87,7 @@ class StyleEdit extends React.Component {
           style={tagStyle(this.context.theme)}
         >style</span>
         <span>{' {'}</span>
-        {attrs.map(name => (
+        {attrs.map((name, index) => (
           <li key={'style-' + name} style={styles.listItem} onClick={blockClick}>
             <AutoSizeInput
               type="attr"
@@ -92,6 +98,7 @@ class StyleEdit extends React.Component {
             <AutoSizeInput
               value={this.props.style[name]}
               onChange={val => this.onChange(name, val)}
+              onBlur={this.onInputBlur(/* isLastInput */(attrs.length - 1) === index)}
             />
             <span style={styles.colon}>;</span>
           </li>
