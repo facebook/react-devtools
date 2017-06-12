@@ -125,6 +125,10 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
         lastId = id;
         id = pid;
         pid = store.getParent(id);
+        // we keep traversing up each parent until we have
+        // a non wrapper. if we find an empty parent, that means
+        // we've hit the top of the tree, meaning we need to
+        // use the root as the pid (so we get the roots)
         if (!pid) {
           pid = id;
           id = lastId;
@@ -143,6 +147,10 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
         lastId = id;
         id = pid;
         pid = store.getParent(id);
+        // we keep traversing up each parent until we have
+        // a non wrapper. if we find an empty parent, that means
+        // we've hit the top of the tree, meaning we need to
+        // use the root as the pid (so we get the roots)        
         if (!pid) {
           pid = id;
           id = lastId;
@@ -156,7 +164,8 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   if (!id) {
     return undefined;
   }
-
+  // if the parent is a root node, we should set pid to null
+  // so we go through the getRootSelection() route below
   if (store.searchRoots && store.searchRoots.contains(pid)) {
     pid = null;
   }
@@ -178,18 +187,24 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
   }
 
   // Children
+  var cid;
   if (dest === 'firstChild') {
     if (typeof children === 'string') {
       return getNewSelection('nextSibling', store);
     }
-    store.isBottomTagSelected = false;
-    return store.skipWrapper(children[0]);
+    for (var i = 0; i < children.length; i++) {
+      cid = store.skipWrapper(children[i]);
+      if (cid) {
+        store.isBottomTagSelected = false;
+        return cid;
+      }
+    }
   }
   if (dest === 'lastChild') {
     if (typeof children === 'string') {
       return getNewSelection('prevSibling', store);
     }
-    var cid = store.skipWrapper(children[children.length - 1], false, true);
+    cid = store.skipWrapper(children[children.length - 1], false, true);
     if (cid && !store.hasBottom(cid)) {
       store.isBottomTagSelected = false;
     }
@@ -209,33 +224,41 @@ function getNewSelection(dest: Dest, store: Store): ?ElementID {
     pix = pchildren.indexOf(store._parents.get(id));
   }
   if (dest === 'prevSibling') {
-    if (pix === 0) {
-      const roots = store.searchRoots || store.roots;
-      if (roots.indexOf(store.getParent(id)) > -1) {
-        return getRootSelection(dest, store, id);
-      }
-      const childId = pchildren[pix];
+    while (pix > 0) {
+      const childId = pchildren[pix - 1];
       const child = store.get(childId);
-      if (child.get('nodeType') === 'Wrapper') {
-        return store.getParent(id);
+      const prevCid = store.skipWrapper(
+        childId,
+        false,
+        child.get('nodeType') === 'Wrapper'
+      );
+      if (prevCid) {
+        if (store.hasBottom(prevCid)) {
+          store.isBottomTagSelected = true;
+        }
+        return prevCid;
       }
-      return getNewSelection('parent', store);
+      pix--;
     }
-    const childId = pchildren[pix - 1];
+    const roots = store.searchRoots || store.roots;
+    // if the the previous sibling is a root, we need
+    // to go the getRootSelection() route to select it
+    if (roots.indexOf(store.getParent(id)) > -1) {
+      return getRootSelection(dest, store, id);
+    }
+    const childId = pchildren[pix];
     const child = store.get(childId);
-    const prevCid = store.skipWrapper(
-      childId,
-      false,
-      child.get('nodeType') === 'Wrapper'
-    );
-    if (prevCid && store.hasBottom(prevCid)) {
-      store.isBottomTagSelected = true;
+    if (child.get('nodeType') === 'Wrapper') {
+      return store.getParent(id);
     }
-    return prevCid;
+    return getNewSelection('parent', store);
   }
   if (dest === 'nextSibling') {
+    // check if we're at the end of the children array
     if (pix === pchildren.length - 1) {
       const roots = store.searchRoots || store.roots;
+      // if the the next sibling is a root, we need
+      // to go the getRootSelection() route to select it
       if (roots.indexOf(store.getParent(id)) > -1) {
         return getRootSelection(dest, store, id);
       }

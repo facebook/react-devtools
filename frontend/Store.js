@@ -511,11 +511,11 @@ class Store extends EventEmitter {
         id = parentId;
       } else {
         var children = node.get('children');
-        var index = end ? children.length - 1 : 0;
-        var childId = children[index > 0 ? index : 0];
-        if (!childId) {
-          return id;
+        if (children.length === 0) {
+          return undefined;
         }
+        var index = end ? children.length - 1 : 0;
+        var childId = children[index];
         id = childId;
       }
     }
