@@ -31,7 +31,8 @@ class Store {
   }
 
   setDefaultTheme(defaultThemeName: ?string) {
-    this.setDefaultThemeName(defaultThemeName);
+    // Don't accept an invalid themeName as a default.
+    this.defaultThemeName = getSafeThemeName(defaultThemeName);
 
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
@@ -75,11 +76,6 @@ class Store {
     this.theme = theme;
 
     setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
-  }
-
-  setDefaultThemeName(defaultThemeName: ?string) {
-    // Don't accept an invalid themeName as a default.
-    this.defaultThemeName = getSafeThemeName(defaultThemeName);
   }
 }
 

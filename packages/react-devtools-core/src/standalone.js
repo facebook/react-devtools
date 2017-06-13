@@ -190,8 +190,7 @@ var DevtoolsUI = {
     if (panel) {
       var {store} = panel.getChildContext();
       // Change default themeName if panel mounted
-      store.setDefaultThemeName(themeName);
-      store.emit('theme');
+      store.changeDefaultTheme(themeName);
     }
     return DevtoolsUI;
   },

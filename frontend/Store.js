@@ -345,8 +345,9 @@ class Store extends EventEmitter {
     this.emit('theme');
   }
 
-  setDefaultThemeName(defaultThemeName: ?string) {
-    this.themeStore.setDefaultThemeName(defaultThemeName);
+  changeDefaultTheme(defaultThemeName: ?string) {
+    this.themeStore.setDefaultTheme(defaultThemeName);
+    this.emit('theme');
   }
 
   saveCustomTheme(theme: Theme) {
@@ -495,7 +496,7 @@ class Store extends EventEmitter {
     while (true) {
       var node = this.get(id);
       var nodeType = node.get('nodeType');
-      
+
       if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
         return id;
       }
