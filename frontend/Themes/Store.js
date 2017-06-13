@@ -27,6 +27,10 @@ class Store {
   themes: { [key: string]: Theme };
 
   constructor(defaultThemeName: ?string) {
+    this.setDefaultTheme(defaultThemeName);
+  }
+
+  setDefaultTheme(defaultThemeName: ?string) {
     this.setDefaultThemeName(defaultThemeName);
 
     // Don't restore an invalid themeName.
@@ -76,12 +80,6 @@ class Store {
   setDefaultThemeName(defaultThemeName: ?string) {
     // Don't accept an invalid themeName as a default.
     this.defaultThemeName = getSafeThemeName(defaultThemeName);
-    // Replace theme with new default if user hasn't select theme
-    const storedThemeKey = getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY);
-    if (storedThemeKey !== CUSTOM_THEME_NAME && !Themes.hasOwnProperty(storedThemeKey)) {
-      this.theme = Themes[this.defaultThemeName];
-      this.themeName = this.defaultThemeName;
-    }
   }
 }
 
