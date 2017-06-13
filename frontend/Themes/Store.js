@@ -27,6 +27,15 @@ class Store {
   themes: { [key: string]: Theme };
 
   constructor(defaultThemeName: ?string) {
+    this.themes = Themes;
+
+    // Load previous custom theme from localStorage.
+    // If there isn't one in local storage, start by cloning the default theme.
+    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
+    if (customTheme) {
+      this.customTheme = deserialize(customTheme);
+    }
+
     this.setDefaultTheme(defaultThemeName);
   }
 
@@ -41,18 +50,10 @@ class Store {
       this.defaultThemeName,
     );
 
-    // Load previous custom theme from localStorage.
-    // If there isn't one in local storage, start by cloning the default theme.
-    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
-    if (customTheme) {
-      this.customTheme = deserialize(customTheme);
-    }
-
     // The user's active theme is either their custom one,
     // Or one of the built-in sets (based on the default).
     this.theme = themeName === CUSTOM_THEME_NAME ? this.customTheme : Themes[themeName];
     this.themeName = themeName;
-    this.themes = Themes;
   }
 
   update(themeName: ?string) {
