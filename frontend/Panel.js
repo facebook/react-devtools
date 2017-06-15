@@ -384,7 +384,7 @@ var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
 
 const containerStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
-  padding: '0.25rem',
+  padding: '0.5rem',
   marginBottom: '0.25rem',
   flexShrink: 0,
 });
