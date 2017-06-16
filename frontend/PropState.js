@@ -37,6 +37,9 @@ class PropState extends React.Component {
       onEvalGetter: (path) => {
         this.props.onEvalGetter(path);
       },
+      isPropertyFrozen: (path) => {
+        return this.props.isPathFrozen(path);
+      },
     };
   }
 
@@ -180,6 +183,8 @@ PropState.contextTypes = {
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
   onEvalGetter: React.PropTypes.func,
+  isPropertyFrozen: React.PropTypes.func,
+
 };
 
 var WrappedPropState = decorate({
@@ -193,6 +198,9 @@ var WrappedPropState = decorate({
       id: store.selected,
       node,
       canEditTextContent: store.capabilities.editTextContent,
+      isPathFrozen(path) {
+        return store.isPathFrozen(path);
+      },
       onChangeText(text) {
         store.changeTextContent(store.selected, text);
       },

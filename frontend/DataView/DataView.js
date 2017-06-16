@@ -143,6 +143,7 @@ DataView.contextTypes = {
 class DataItem extends React.Component {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
+    isPropertyFrozen: (path: Array<string>) => boolean,
     theme: Theme,
   };
   props: {
@@ -172,6 +173,14 @@ class DataItem extends React.Component {
   componentWillReceiveProps(nextProps) {
     if (this.state.open && nextProps.value && nextProps.value[consts.inspected] === false) {
       this.inspect();
+    }
+  }
+
+  shouldComponentUpdate(nextProps) {
+    if (nextProps.value[consts.type] === 'getter') {
+      return !this.context.isPropertyFrozen(nextProps.path);
+    } else {
+      return true;
     }
   }
 
@@ -298,6 +307,7 @@ class DataItem extends React.Component {
 
 DataItem.contextTypes = {
   onChange: React.PropTypes.func,
+  isPropertyFrozen: React.PropTypes.func,
   theme: React.PropTypes.object.isRequired,
 };
 
