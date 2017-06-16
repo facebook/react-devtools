@@ -166,7 +166,7 @@ const inputStyle = (text: ?string) => ({
   boxSizing: 'content-box',
   border: 'none',
   padding: '1px 2px',
-  marginLeft: 6,
+  marginLeft: '0.75rem',
   outline: 'none',
   width: '0px',
   minWidth: text ? '0' : '1rem', // Make it easier to click initially

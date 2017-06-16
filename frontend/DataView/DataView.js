@@ -323,7 +323,7 @@ const previewStyle = (theme: Theme) => ({
 });
 
 const emptyStyle = (theme: Theme) => ({
-  marginLeft: 10,
+  marginLeft: '0.75rem',
   padding: '0 5px',
   color: theme.base04,
   fontFamily: sansSerif.family,
@@ -334,7 +334,7 @@ const emptyStyle = (theme: Theme) => ({
 const missingStyle = (theme: Theme) => ({
   fontSize: sansSerif.sizes.normal,
   fontWeight: 'bold',
-  marginLeft: 10,
+  marginLeft: '0.75rem',
   padding: '2px 5px',
   color: theme.base03,
 });
@@ -368,7 +368,7 @@ var styles = {
     listStyle: 'none',
     margin: 0,
     padding: 0,
-    marginLeft: 10,
+    marginLeft: '0.75rem',
   },
 
   children: {
@@ -376,7 +376,7 @@ var styles = {
 
   opener: {
     cursor: 'pointer',
-    marginLeft: -8,
+    marginLeft: -10,
     paddingRight: 3,
     position: 'absolute',
     top: 4,
