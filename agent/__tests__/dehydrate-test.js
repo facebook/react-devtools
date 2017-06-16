@@ -63,4 +63,18 @@ describe('dehydrate', () => {
     var result = dehydrate(object, cleaned);
     expect(result.a).toEqual({type: 'date', name: d.toString(), meta: {uninspectable: true}});
   });
+
+  it('cleans getters', () => {
+    var grand = {
+      get getter() {
+        return 'a';
+      },
+    };
+
+    var parent = Object.create(grand);
+    var object = Object.create(parent);
+    var cleaned = [];
+    var result = dehydrate(object, cleaned);
+    expect(result.getter).toEqual( { name: 'getter', type: 'getter' });
+  });
 });

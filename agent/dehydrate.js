@@ -175,7 +175,10 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
 
 function isPropertyGetter(obj, prop) {
   /* eslint-disable no-proto */
-  const descriptor = Object.getOwnPropertyDescriptor(obj.hasOwnProperty(prop) ? obj : obj.__proto__, prop);
+  while (!obj.hasOwnProperty(prop)) {
+    obj = obj.__proto__;
+  }
+  const descriptor = Object.getOwnPropertyDescriptor(obj, prop);
   return descriptor.get !== undefined;
   /* eslint-enable no-proto */
 }

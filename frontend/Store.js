@@ -90,6 +90,7 @@ class Store extends EventEmitter {
   _nodes: Map;
   _parents: Map;
   _nodesByName: Map;
+  _frozenPaths: Map;
   _eventQueue: Array<string>;
   _eventTimer: ?number;
 
