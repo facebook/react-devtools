@@ -141,6 +141,13 @@ var DEFAULT_MENU_ITEMS = {
         action: () => store.scrollToNode(id),
       });
     }
+    if (node.get('nodeType') === 'Composite' && node.get('name')) {
+      items.push({
+        key: 'copyNodeName',
+        title: 'Copy element name',
+        action: () => store.copyNodeName(node.get('name')),
+      });
+    }
     return items;
   },
   attr: (id, node, val, path, name, store) => {

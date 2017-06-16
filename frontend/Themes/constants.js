@@ -10,20 +10,8 @@
  */
 'use strict';
 
+const CUSTOM_THEME_NAME = 'Custom';
+
 module.exports = {
-  monospace: {
-    family: 'Menlo, Consolas, monospace',
-    sizes: {
-      normal: 11,
-      large: 14,
-    },
-  },
-  sansSerif: {
-    family: '"Helvetica Neue", "Lucida Grande", -apple-system, BlinkMacSystemFont, "Segoe UI", Ubuntu, sans-serif',
-    sizes: {
-      small: 10,
-      normal: 12,
-      large: 14,
-    },
-  },
+  CUSTOM_THEME_NAME,
 };

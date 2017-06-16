@@ -51,6 +51,7 @@ const ApathyDark: Theme = {
   state03: '#28423d',
   state04: '#3E4C96',
   state05: '#f5fcfb',
+  state06: '#ffffff',
 };
 
 const ApathyLight: Theme = {
@@ -75,6 +76,7 @@ const ApathyLight: Theme = {
   state03: '#f5fcfb',
   state04: '#3E4C96',
   state05: '#f5fcfb',
+  state06: '#000000',
 };
 
 const ChromeDark: Theme = {
@@ -100,6 +102,7 @@ const ChromeDark: Theme = {
   state03: '#342e24',
   state04: '#66ff88',
   state05: '#242424',
+  state06: '#cccccc',
 };
 
 const ChromeDefault: Theme = {
@@ -125,6 +128,7 @@ const ChromeDefault: Theme = {
   state03: '#ebf1fb',
   state04: '#FFFF00',
   state05: '#222222',
+  state06: '#222222',
 };
 
 const Dracula: Theme = {
@@ -149,6 +153,7 @@ const Dracula: Theme = {
   state03: '#323547',
   state04: '#fafa8c',
   state05: '#000000',
+  state06: '#ffffff',
 };
 
 const Eighties: Theme = {
@@ -173,6 +178,7 @@ const Eighties: Theme = {
   state03: '#3f3e3e',
   state04: '#4afa7b',
   state05: '#121212',
+  state06: '#e3e0d8',
 };
 
 const FirefoxDark: Theme = {
@@ -198,6 +204,33 @@ const FirefoxDark: Theme = {
   state03: '#475983',
   state04: '#00ff7f',
   state05: '#181d20',
+  state06: '#b9cadb',
+};
+
+const FirefoxFirebug: Theme = {
+  displayName: 'Firefox (firebug)',
+  hidden: true,
+  base00: '#ffffff',
+  base01: '#f5f5f5',
+  base02: '#dde1e4',
+  base03: '#c1c1c1',
+  base04: '#888888',
+  base05: '#2a2a2a',
+  special00: '#0000ff',
+  special01: '#ff0000',
+  special02: '#ff0000',
+  special03: '#292e33',
+  special04: '#ff0000',
+  special05: '#0000ff',
+  special06: '#000062',
+  special07: '#0000ff',
+  state00: '#3399ff',
+  state01: '#e4f1fa',
+  state02: '#ffffff',
+  state03: '#e6e6e6',
+  state04: '#ffee99',
+  state05: '#000000',
+  state06: '#000000',
 };
 
 const FirefoxLight: Theme = {
@@ -223,6 +256,7 @@ const FirefoxLight: Theme = {
   state03: '#e4f1fa',
   state04: '#FFFF00',
   state05: '#585959',
+  state06: '#444444',
 };
 
 const Flat: Theme = {
@@ -247,6 +281,7 @@ const Flat: Theme = {
   state03: '#364c62',
   state04: '#64fa82',
   state05: '#2C3E50',
+  state06: '#ffffff',
 };
 
 const GruvboxDark: Theme = {
@@ -271,6 +306,7 @@ const GruvboxDark: Theme = {
   state03: '#3c3836',
   state04: '#7c6f64',
   state05: '#fbf1c7',
+  state06: '#fbebc2',
 };
 
 const GruvboxLight: Theme = {
@@ -295,6 +331,7 @@ const GruvboxLight: Theme = {
   state03: '#d5c4a1',
   state04: '#d5c4a1',
   state05: '#282828',
+  state06: '#000000',
 };
 
 const Materia: Theme = {
@@ -319,6 +356,7 @@ const Materia: Theme = {
   state03: '#314048',
   state04: '#00ff84',
   state05: '#263238',
+  state06: '#DDE3EE',
 };
 
 const MaterialDark: Theme = {
@@ -343,6 +381,7 @@ const MaterialDark: Theme = {
   state03: '#212b30',
   state04: '#4a55b9',
   state05: '#ffffff',
+  state06: '#D2ECF6',
 };
 
 const OceanDark: Theme = {
@@ -367,6 +406,7 @@ const OceanDark: Theme = {
   state03: '#314048',
   state04: '#d06a77',
   state05: '#1c1f27',
+  state06: '#A5A9B4',
 };
 
 const Phd: Theme = {
@@ -391,6 +431,7 @@ const Phd: Theme = {
   state03: '#112243',
   state04: '#00c8fa',
   state05: '#061229',
+  state06: '#d8dbe2',
 };
 
 const Tomorrow: Theme = {
@@ -415,6 +456,7 @@ const Tomorrow: Theme = {
   state03: '#e0e0e0',
   state04: '#eab700',
   state05: '#1d1f21',
+  state06: '#222222',
 };
 
 const TomorrowNight: Theme = {
@@ -439,6 +481,7 @@ const TomorrowNight: Theme = {
   state03: '#373b41',
   state04: '#f0c674',
   state05: '#1d1f21',
+  state06: '#e5e8e6',
 };
 
 module.exports = {
@@ -449,6 +492,7 @@ module.exports = {
   Dracula,
   Eighties,
   FirefoxDark,
+  FirefoxFirebug,
   FirefoxLight,
   Flat,
   GruvboxDark,

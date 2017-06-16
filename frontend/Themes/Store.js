@@ -10,33 +10,112 @@
  */
 'use strict';
 
-const LOCAL_STORAGE_VERSIONED_KEY = 'themeName';
+const {deserialize, serialize} = require('./Serializer');
+const Themes = require('./Themes');
+const {CUSTOM_THEME_NAME} = require('./constants');
 
-function get(): ?string {
-  let themeName;
+const LOCAL_STORAGE_CUSTOM_THEME_KEY = 'customTheme';
+const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
 
-  try {
-    themeName = localStorage.getItem(LOCAL_STORAGE_VERSIONED_KEY);
-  } catch (error) {
-    console.error('Could not read saved theme.', error);
+import type {Theme} from '../types';
+
+class Store {
+  customTheme: Theme;
+  defaultThemeName: string;
+  theme: Theme;
+  themeName: string;
+  themes: { [key: string]: Theme };
+
+  constructor(defaultThemeName: ?string) {
+    this.themes = Themes;
+
+    // Load previous custom theme from localStorage.
+    // If there isn't one in local storage, start by cloning the default theme.
+    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
+    if (customTheme) {
+      this.customTheme = deserialize(customTheme);
+    }
+
+    this.setDefaultTheme(defaultThemeName);
   }
 
-  return themeName || null;
+  setDefaultTheme(defaultThemeName: ?string) {
+    // Don't accept an invalid themeName as a default.
+    this.defaultThemeName = getSafeThemeName(defaultThemeName);
+
+    // Don't restore an invalid themeName.
+    // This guards against themes being removed or renamed.
+    const themeName = getSafeThemeName(
+      getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY),
+      this.defaultThemeName,
+    );
+
+    // The user's active theme is either their custom one,
+    // Or one of the built-in sets (based on the default).
+    this.theme = themeName === CUSTOM_THEME_NAME ? this.customTheme : Themes[themeName];
+    this.themeName = themeName;
+  }
+
+  update(themeName: ?string) {
+    if (themeName === CUSTOM_THEME_NAME) {
+      this.theme = this.customTheme;
+      this.themeName = CUSTOM_THEME_NAME;
+    } else {
+      // Only apply a valid theme.
+      const safeThemeKey = getSafeThemeName(themeName, this.defaultThemeName);
+
+      this.theme = this.themes[safeThemeKey];
+      this.themeName = safeThemeKey;
+    }
+
+    // But allow users to restore "default" mode by selecting an empty theme.
+    setInLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+  }
+
+  saveCustomTheme(theme: Theme) {
+    this.customTheme = theme;
+    this.theme = theme;
+
+    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
+  }
 }
 
-function set(themeName: ?string): boolean {
+function getFromLocalStorage(key: string): any {
+  let value;
   try {
-    localStorage.setItem(LOCAL_STORAGE_VERSIONED_KEY, themeName || '');
+    value = localStorage.getItem(key);
+  } catch (error) {
+    console.error('Could not read from localStorage.', error);
+  }
+  return value || null;
+}
 
+function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
+  if (themeName === CUSTOM_THEME_NAME) {
+    return CUSTOM_THEME_NAME;
+  } else if (
+    themeName &&
+    Themes.hasOwnProperty(themeName)
+  ) {
+    return themeName;
+  } else if (
+    fallbackThemeName &&
+    Themes.hasOwnProperty(fallbackThemeName)
+  ) {
+    return fallbackThemeName;
+  } else {
+    return 'ChromeDefault';
+  }
+}
+
+function setInLocalStorage(key: string, value: any): boolean {
+  try {
+    localStorage.setItem(key, value);
     return true;
   } catch (error) {
-    console.error('Could not save theme.', error);
+    console.error('Could not write to localStorage.', error);
   }
-
   return false;
 }
 
-module.exports = {
-  get: get,
-  set: set,
-};
+module.exports = Store;

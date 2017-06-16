@@ -101,7 +101,7 @@ function guessEditor() {
     return [process.env.EDITOR];
   }
 
-  return null;
+  return [];
 }
 
 var _childProcess = null;

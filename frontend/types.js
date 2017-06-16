@@ -13,7 +13,7 @@
 var {Record} = require('immutable');
 
 export type Dir = 'up' | 'down' | 'left' | 'right';
-export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom';
+export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom' | 'selectTop';
 
 export type ElementID = string;
 
@@ -119,4 +119,5 @@ export type Theme = {
   state02: string; // Focused Foreground
   state04: string; // Search Background
   state05: string; // Search Foreground
+  state06: string; // Interactive Hover
 };

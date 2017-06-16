@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var Input = require('./Input');
 
 import type {DOMEvent, DOMNode} from './types';
 
@@ -56,9 +57,9 @@ class BlurInput extends React.Component {
 
   render() {
     return (
-      <input
+      <Input
         value={this.state.text}
-        ref={i => this.node = i}
+        innerRef={i => this.node = i}
         onChange={e => this.setState({text: e.target.value})}
         onBlur={this.done.bind(this)}
         onKeyDown={e => this.onKeyDown(e)}

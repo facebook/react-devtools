@@ -41,6 +41,11 @@ class ContextMenu extends React.Component {
     },
   };
 
+  state = {
+    elementHeight: 0,
+    windowHeight: 0,
+  };
+
   handleBackdropClick: () => void;
 
   constructor(props) {
@@ -58,16 +63,39 @@ class ContextMenu extends React.Component {
     this.props.hideContextMenu();
   }
 
+  _setRef = element => {
+    if (!element) {
+      return;
+    }
+
+    const elementHeight = element.querySelector('ul').clientHeight;
+    const windowHeight = window.innerHeight;
+
+    if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
+      return;
+    }
+
+    this.setState({
+      elementHeight: elementHeight,
+      windowHeight: windowHeight,
+    });
+  };
+
   render() {
     const {theme} = this.context;
     const {items, open, pos} = this.props;
+    const {elementHeight, windowHeight} = this.state;
+
+    if (pos && (pos.y + elementHeight) > windowHeight) {
+      pos.y -= elementHeight;
+    }
 
     if (!open) {
       return <div style={styles.hidden} />;
     }
 
     return (
-      <div style={styles.backdrop} onClick={this.handleBackdropClick}>
+      <div style={styles.backdrop} onClick={this.handleBackdropClick} ref={this._setRef}>
         <ul style={containerStyle(pos.x, pos.y, theme)}>
           {!items.length && (
             <li style={emptyStyle(theme)}>No actions</li>
@@ -114,7 +142,7 @@ var Wrapped = decorate({
 
     return {
       open: true,
-      pos: {x, y},
+      pos: { x, y },
       hideContextMenu: () => store.hideContextMenu(),
       items,
     };
@@ -157,9 +185,9 @@ var styles = {
     right: 0,
     top: 0,
     bottom: 0,
-    zIndex: 0,
+    zIndex: 1,
   },
-  
+
   highlightHoverItem: {
     padding: '0.25rem 0.5rem',
     cursor: 'default',

@@ -38,14 +38,13 @@ DetailPaneSection.contextTypes = {
 
 const sectionStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base01}`,
-  padding: '0.5rem',
+  padding: '0.25rem',
   flexShrink: 0,
 });
 
 var styles = {
   title: {
     display: 'inline-block',
-    marginBottom: '0.5rem',
     marginRight: '0.25rem',
   },
 };

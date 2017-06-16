@@ -31,8 +31,12 @@ function getInvertedWeak(hex: string): string {
   return hexToRgba(hex, 0.65);
 }
 
-function getRgb(hex: string): RGB {
+function getRgb(hex: string = ''): RGB {
   hex = hex.replace('#', '');
+
+  if (hex.length === 3) {
+    hex = hex.charAt(0) + hex.charAt(0) + hex.charAt(1) + hex.charAt(1) + hex.charAt(2) + hex.charAt(2);
+  }
 
   const r = parseInt(hex.substring(0, 2), 16);
   const g = parseInt(hex.substring(2, 4), 16);

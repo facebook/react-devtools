@@ -31,7 +31,7 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
 
   if (dir === 'left') {
     if (!collapsed && hasChildren) {
-      return 'collapse';
+      return bottom ? 'selectTop' : 'collapse';
     }
     return 'parent';
   }
@@ -42,7 +42,7 @@ module.exports = function(dir: Dir, bottom: boolean, collapsed: boolean, hasChil
     }
     if (hasChildren) {
       if (bottom) {
-        return 'lastChild';
+        return null;
       } else {
         return 'firstChild';
       }

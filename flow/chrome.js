@@ -73,9 +73,9 @@ declare var chrome: {
     },
     onMessage: {
       addListener: (fn: (req: Object, sender: {
+        url: string,
         tab: {
           id: number,
-          url: string,
         },
       }) => void) => void,
     },
