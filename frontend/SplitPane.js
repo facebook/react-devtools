@@ -127,8 +127,8 @@ const draggerStyle = (isVertical: boolean) => ({
 
 const rightStyle = (isVertical: boolean, width: number, height: number) => ({
   ...containerStyle(isVertical),
-  width: isVertical ? '100%' : width,
-  height: isVertical ? height : '100%',
+  width: isVertical ? null : width,
+  height: isVertical ? height : null,
   flex: 'initial',
   minHeight: 120,
   minWidth: 150,
@@ -144,6 +144,7 @@ const styles = {
     minWidth: '50%',
     minHeight: '50%',
     flex: 1,
+    overflow: 'hidden',
   },
 };
 

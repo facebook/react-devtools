@@ -10,10 +10,13 @@
  */
 'use strict';
 
+const {copy} = require('clipboard-js');
 const decorate = require('../../decorate');
 const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
+const Hoverable = require('../../Hoverable');
+const Icons = require('../../Icons');
 const Input = require('../../Input');
 const {monospace, sansSerif} = require('../Fonts');
 const Preview = require('../Preview');
@@ -23,6 +26,8 @@ const {deserialize, serialize} = require('../Serializer');
 const {CUSTOM_THEME_NAME} = require('../constants');
 
 import type {DOMEvent, Theme} from '../../types';
+
+const THEME_SITE_URL = 'https://react-devtools.now.sh?theme=';
 
 // The editor itself should use a known safe theme,
 // In case a user messes up a custom theme and renders it unusable.
@@ -97,7 +102,7 @@ class Editor extends React.Component {
               />
             ))}
           </div>
-          <div style={styles.previewWrapper}>
+          <div style={previewWrapperStyle(this._customTheme)}>
             <Preview
               key={updateCounter}
               theme={this._customTheme}
@@ -117,15 +122,12 @@ class Editor extends React.Component {
           </div>
 
           <div style={styles.importExportRow}>
-            <SvgIcon path="
-              M18,16.08C17.24,16.08 16.56,16.38 16.04,16.85L8.91,12.7C8.96,12.47 9,12.24 9,12C9,
-              11.76 8.96,11.53 8.91,11.3L15.96,7.19C16.5,7.69 17.21,8 18,8A3,3 0 0,0 21,5A3,
-              3 0 0,0 18,2A3,3 0 0,0 15,5C15,5.24 15.04,5.47 15.09,5.7L8.04,9.81C7.5,9.31 6.79,
-              9 6,9A3,3 0 0,0 3,12A3,3 0 0,0 6,15C6.79,15 7.5,14.69 8.04,14.19L15.16,18.34C15.11,
-              18.55 15.08,18.77 15.08,19C15.08,20.61 16.39,21.91 18,21.91C19.61,21.91 20.92,
-              20.61 20.92,19A2.92,2.92 0 0,0 18,16.08Z
-            "/>
-
+            <CopyThemeButton
+              onClick={this._copyTheme}
+              title="Copy theme to clipboard"
+              theme={safeTheme}
+            />
+            <SvgIcon path={Icons.SHARE} />
             <label style={styles.shareLabel}>Import/export:</label>
             <Input
               onChange={this._onShareChange}
@@ -139,6 +141,12 @@ class Editor extends React.Component {
       </div>
     );
   }
+
+  _copyTheme = () => {
+    const serializedTheme = encodeURI(serialize(this._customTheme));
+
+    copy(THEME_SITE_URL + serializedTheme);
+  };
 
   _onShareChange = (event: DOMEvent) => {
     this._customTheme = deserialize(event.target.value, this.props.theme);
@@ -190,6 +198,21 @@ const WrappedEditor = decorate({
   },
 }, Editor);
 
+const CopyThemeButton = Hoverable(
+  ({ isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+    <button
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={buttonStyle(isHovered, theme)}
+      title="Copy theme to clipboard"
+    >
+      <SvgIcon path={Icons.COPY} />
+      <label style={styles.copyLabel}>Copy</label>
+    </button>
+  )
+);
+
 const editorStyle = (theme: Theme) => ({
   display: 'flex',
   flexDirection: 'column',
@@ -214,6 +237,15 @@ const groupStyle = (theme: Theme) => ({
   borderRadius: '0.25rem',
 });
 
+const previewWrapperStyle = (theme: Theme) => ({
+  display: 'inline-flex',
+  flex: '1 0 auto',
+  marginLeft: '0.5rem',
+  alignItems: 'stretch',
+  borderRadius: '0.25rem',
+  border: `1px solid ${theme.base03}`,
+});
+
 const shareInput = (theme: Theme) => ({
   flex: '0 1 15rem',
   padding: '0.25rem',
@@ -222,6 +254,18 @@ const shareInput = (theme: Theme) => ({
   fontFamily: monospace.family,
   fontSize: monospace.sizes.normal,
   color: 'inherit',
+});
+
+const buttonStyle = (isHovered: boolean, theme: Theme) => ({
+  flex: '0 0 auto',
+  display: 'flex',
+  alignItems: 'center',
+  padding: '0.25rem',
+  marginLeft: '0.25rem',
+  height: '1.5rem',
+  background: 'none',
+  border: 'none',
+  color: isHovered ? theme.state06 : 'inherit',
 });
 
 const styles = {
@@ -241,6 +285,10 @@ const styles = {
     flex: '1 0 auto',
     marginTop: '0.5rem',
   },
+  copyLabel: {
+    flex: '0 0 auto',
+    margin: '0px 0.25rem',
+  },
   middleRow: {
     display: 'flex',
     flexDirection: 'row',
@@ -250,12 +298,6 @@ const styles = {
   column: {
     display: 'flex',
     flexDirection: 'column',
-  },
-  previewWrapper: {
-    display: 'flex',
-    flex: '1 0 auto',
-    marginLeft: '0.5rem',
-    alignItems: 'stretch',
   },
   importExportRow: {
     display: 'flex',
