@@ -17,6 +17,7 @@ type Props = {
 
 type State = {
   isHovered: boolean,
+  isPressed: boolean,
 };
 
 const Hoverable = (Component: any) => {
@@ -24,20 +25,28 @@ const Hoverable = (Component: any) => {
     props: Props;
     state: State = {
       isHovered: false,
+      isPressed: false,
     };
 
     render() {
-      const {isHovered} = this.state;
+      const {isHovered, isPressed} = this.state;
 
       return (
         <Component
           {...this.props}
           isHovered={isHovered}
+          isPressed={isPressed}
+          onMouseDown={this._onMouseDown}
           onMouseEnter={this._onMouseEnter}
           onMouseLeave={this._onMouseLeave}
+          onMouseUp={this._onMouseUp}
         />
       );
     }
+
+    _onMouseDown: Function = (event: SyntheticEvent): void => {
+      this.setState({ isPressed: true });
+    };
 
     _onMouseEnter: Function = (event: SyntheticEvent): void => {
       this.setState({ isHovered: true });
@@ -45,6 +54,10 @@ const Hoverable = (Component: any) => {
 
     _onMouseLeave: Function = (event: SyntheticEvent): void => {
       this.setState({ isHovered: false });
+    };
+
+    _onMouseUp: Function = (event: SyntheticEvent): void => {
+      this.setState({ isPressed: false });
     };
   }
 

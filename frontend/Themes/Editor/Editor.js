@@ -199,12 +199,14 @@ const WrappedEditor = decorate({
 }, Editor);
 
 const CopyThemeButton = Hoverable(
-  ({ isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+  ({ isHovered, isPressed, onClick, onMouseDown, onMouseEnter, onMouseLeave, onMouseUp, theme }) => (
     <button
       onClick={onClick}
+      onMouseDown={onMouseDown}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={buttonStyle(isHovered, theme)}
+      onMouseUp={onMouseUp}
+      style={copyThemeButtonStyle(isHovered, isPressed, theme)}
       title="Copy theme to clipboard"
     >
       <SvgIcon path={Icons.COPY} />
@@ -256,14 +258,14 @@ const shareInput = (theme: Theme) => ({
   color: 'inherit',
 });
 
-const buttonStyle = (isHovered: boolean, theme: Theme) => ({
+const copyThemeButtonStyle = (isHovered: boolean, isPressed: boolean, theme: Theme) => ({
   flex: '0 0 auto',
   display: 'flex',
   alignItems: 'center',
   padding: '0.25rem',
-  marginLeft: '0.25rem',
+  margin: '0 0.25rem',
   height: '1.5rem',
-  background: 'none',
+  background: isPressed ? theme.state01 : 'none',
   border: 'none',
   color: isHovered ? theme.state06 : 'inherit',
 });
@@ -287,7 +289,7 @@ const styles = {
   },
   copyLabel: {
     flex: '0 0 auto',
-    margin: '0px 0.25rem',
+    marginLeft: '0.25rem',
   },
   middleRow: {
     display: 'flex',
