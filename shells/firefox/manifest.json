@@ -1,10 +1,15 @@
 {
   "manifest_version": 2,
   "name": "React Developer Tools",
-  "description": "Adds React debugging tools to the Chrome Developer Tools.",
+  "description": "Adds React debugging tools to the Firefox Developer Tools.",
   "version": "2.3.3",
 
-  "minimum_chrome_version": "43",
+  "applications": {
+    "gecko": {
+      "id": "extension@react.devtools",
+      "strict_min_version": "54.0"
+    }
+  },
 
   "icons": {
     "16": "icons/16-production.png",

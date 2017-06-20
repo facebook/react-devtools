@@ -17,12 +17,36 @@ var inject = require('./inject');
 
 import type {Props} from '../../../frontend/Panel';
 
-// chrome.devtools.panels added in Chrome 18.
-// chrome.devtools.panels.themeName added in Chrome 54.
-const browserName = 'Chrome';
-const themeName = (chrome.devtools.panels : any).themeName === 'dark'
-  ? 'ChromeDark'
-  : 'ChromeDefault';
+const IS_CHROME = navigator.userAgent.indexOf('Firefox') < 0;
+
+let browserName;
+let themeName;
+
+if (IS_CHROME) {
+  browserName = 'Chrome';
+
+  // chrome.devtools.panels added in Chrome 18.
+  // chrome.devtools.panels.themeName added in Chrome 54.
+  themeName = chrome.devtools.panels.themeName === 'dark'
+    ? 'ChromeDark'
+    : 'ChromeDefault';
+} else {
+  browserName = 'Firefox';
+  themeName = 'FirefoxLight';
+
+  // chrome.devtools.panels.themeName added in Firefox 55.
+  // https://developer.mozilla.org/en-US/Add-ons/WebExtensions/API/devtools.panels/themeName
+  if (chrome.devtools && chrome.devtools.panels) {
+    switch (chrome.devtools.panels.themeName) {
+      case 'dark':
+        themeName = 'FirefoxDark';
+        break;
+      case 'firebug':
+        themeName = 'FirefoxFirebug';
+        break;
+    }
+  }
+}
 
 var config: Props = {
   alreadyFoundReact: false,

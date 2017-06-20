@@ -31,6 +31,7 @@ declare var chrome: {
           addListener: (cb: (window: Object) => void) => void,
         }
       }) => void) => void,
+      themeName: ?string,
     },
   },
   tabs: {
