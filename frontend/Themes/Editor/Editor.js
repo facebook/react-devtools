@@ -27,7 +27,7 @@ const {CUSTOM_THEME_NAME} = require('../constants');
 
 import type {DOMEvent, Theme} from '../../types';
 
-const THEME_SITE_URL = 'https://react-devtools.now.sh?theme=';
+const THEME_SITE_URL = 'http://facebook.github.io/react-devtools/?theme=';
 
 // The editor itself should use a known safe theme,
 // In case a user messes up a custom theme and renders it unusable.
