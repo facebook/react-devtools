@@ -33,11 +33,9 @@ function updateTheme(updatedTheme) {
 
 function parseTheme() {
   const match = location.href.match(/theme=(.+)/);
-  if (!match) {
-    throw Error('Missing or invalid theme specified');
-  }
-
-  const serializedTheme = decodeURI(match[1]);
+  const serializedTheme = match
+    ? decodeURI(match[1])
+    : '';
 
   theme = deserialize(serializedTheme, Themes.ChromeDefault);
 }

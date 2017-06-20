@@ -85,11 +85,7 @@
 
 	function parseTheme() {
 	  var match = location.href.match(/theme=(.+)/);
-	  if (!match) {
-	    throw Error('Missing or invalid theme specified');
-	  }
-
-	  var serializedTheme = decodeURI(match[1]);
+	  var serializedTheme = match ? decodeURI(match[1]) : '';
 
 	  theme = deserialize(serializedTheme, Themes.ChromeDefault);
 	}
