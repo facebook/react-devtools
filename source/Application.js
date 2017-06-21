@@ -68,11 +68,9 @@ class Application extends React.Component {
         <div style={staticStyles.label}>
           Paste this text into React DevTools to import the theme:
         </div>
-        <textarea
-          onChange={noop}
-          style={staticStyles.textArea}
-          value={serialize(theme)}
-        />
+        <div style={staticStyles.themeText}>
+          {serialize(theme)}
+        </div>
       </div>
     );
   }
@@ -95,8 +93,6 @@ Application.propTypes = {
   theme: React.PropTypes.object,
   updateTheme: React.PropTypes.func,
 };
-
-const noop = () => {};
 
 const applicationStyle = (theme: Theme) => ({
   height: '100%',
@@ -127,11 +123,12 @@ const staticStyles = {
     marginTop: '1rem',
     marginBottom: '0.25rem',
   },
-  textArea: {
-    width: '100%',
-    height: '5.5rem',
+  themeText: {
+    padding: '0.25rem',
+    backgroundColor: '#ffe',
     border: '1px solid #ddd',
     borderRadius: '0.25rem',
+    wordWrap: 'break-word',
   },
 };
 

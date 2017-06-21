@@ -21944,11 +21944,11 @@
 	          { style: staticStyles.label },
 	          'Paste this text into React DevTools to import the theme:'
 	        ),
-	        React.createElement('textarea', {
-	          onChange: noop,
-	          style: staticStyles.textArea,
-	          value: serialize(theme)
-	        })
+	        React.createElement(
+	          'div',
+	          { style: staticStyles.themeText },
+	          serialize(theme)
+	        )
 	      );
 	    }
 	  }, {
@@ -21976,8 +21976,6 @@
 	  theme: React.PropTypes.object,
 	  updateTheme: React.PropTypes.func
 	};
-
-	var noop = function noop() {};
 
 	var applicationStyle = function applicationStyle(theme) {
 	  return {
@@ -22012,11 +22010,12 @@
 	    marginTop: '1rem',
 	    marginBottom: '0.25rem'
 	  },
-	  textArea: {
-	    width: '100%',
-	    height: '5.5rem',
+	  themeText: {
+	    padding: '0.25rem',
+	    backgroundColor: '#ffe',
 	    border: '1px solid #ddd',
-	    borderRadius: '0.25rem'
+	    borderRadius: '0.25rem',
+	    wordWrap: 'break-word'
 	  }
 	};
 
