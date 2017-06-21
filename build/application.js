@@ -85,9 +85,8 @@
 
 	function parseTheme() {
 	  var match = location.href.match(/theme=(.+)/);
-	  var serializedTheme = match ? decodeURI(match[1]) : '';
 
-	  theme = deserialize(serializedTheme, Themes.ChromeDefault);
+	  theme = match ? deserialize(decodeURI(match[1]), Themes.ChromeDefault) : Themes.ChromeDefault;
 	}
 
 	function renderApplication() {
@@ -21906,14 +21905,13 @@
 	        React.createElement(
 	          'div',
 	          { style: staticStyles.header },
-	          React.createElement(
-	            'strong',
-	            {
-	              contentEditable: true,
-	              onInput: this._onInput
+	          React.createElement('strong', {
+	            contentEditable: true,
+	            dangerouslySetInnerHTML: {
+	              __html: theme.displayName
 	            },
-	            theme.displayName
-	          ),
+	            onInput: this._onInput
+	          }),
 	          ' theme for ',
 	          React.createElement(
 	            'a',
@@ -21971,6 +21969,7 @@
 	}(React.Component);
 
 	Application.childContextTypes = {
+	  store: React.PropTypes.object,
 	  theme: React.PropTypes.object
 	};
 	Application.propTypes = {

@@ -33,11 +33,10 @@ function updateTheme(updatedTheme) {
 
 function parseTheme() {
   const match = location.href.match(/theme=(.+)/);
-  const serializedTheme = match
-    ? decodeURI(match[1])
-    : '';
-
-  theme = deserialize(serializedTheme, Themes.ChromeDefault);
+  
+  theme = match
+    ? deserialize(decodeURI(match[1]), Themes.ChromeDefault)
+    : Themes.ChromeDefault;
 }
 
 function renderApplication() {

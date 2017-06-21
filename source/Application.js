@@ -47,10 +47,11 @@ class Application extends React.Component {
         <div style={staticStyles.header}>
           <strong
             contentEditable={true}
+            dangerouslySetInnerHTML={{
+              __html: theme.displayName,
+            }}
             onInput={this._onInput}
-          >
-            {theme.displayName}
-          </strong> theme for <a href="https://github.com/facebook/react-devtools">React DevTools</a>
+          /> theme for <a href="https://github.com/facebook/react-devtools">React DevTools</a>
         </div>
         <div style={staticStyles.label}>
           Theme preview:
@@ -87,6 +88,7 @@ class Application extends React.Component {
 }
 
 Application.childContextTypes = {
+  store: React.PropTypes.object,
   theme: React.PropTypes.object,
 };
 Application.propTypes = {
