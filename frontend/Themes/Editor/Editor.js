@@ -22,10 +22,12 @@ const {monospace, sansSerif} = require('../Fonts');
 const Preview = require('../Preview');
 const SvgIcon = require('../../SvgIcon');
 const Themes = require('../Themes');
+const TimerSafe = require('../../TimerSafe');
 const {deserialize, serialize} = require('../Serializer');
 const {CUSTOM_THEME_NAME} = require('../constants');
 
 import type {DOMEvent, Theme} from '../../types';
+import type {SetTimeout} from '../../TimerSafe';
 
 const THEME_SITE_URL = 'http://facebook.github.io/react-devtools/?theme=';
 
@@ -49,11 +51,13 @@ class Editor extends React.Component {
     defaultThemeName: string,
     hide: () => {},
     saveTheme: (theme: Theme) => {},
+    setTimeout: SetTimeout,
     theme: Theme,
   };
 
   state: {
     isResetEnabled: boolean,
+    showCopyConfirmation: boolean,
     updateCounter: number,
   };
 
@@ -62,6 +66,7 @@ class Editor extends React.Component {
 
     this.state = {
       isResetEnabled: false,
+      showCopyConfirmation: false,
       updateCounter: 0,
     };
 
@@ -79,7 +84,7 @@ class Editor extends React.Component {
 
   render() {
     const {hide} = this.props;
-    const {isResetEnabled, updateCounter} = this.state;
+    const {isResetEnabled, showCopyConfirmation, updateCounter} = this.state;
 
     return (
       <div
@@ -124,6 +129,7 @@ class Editor extends React.Component {
           <div style={styles.importExportRow}>
             <CopyThemeButton
               onClick={this._copyTheme}
+              showCopyConfirmation={showCopyConfirmation}
               title="Copy theme to clipboard"
               theme={safeTheme}
             />
@@ -146,6 +152,17 @@ class Editor extends React.Component {
     const serializedTheme = encodeURI(serialize(this._customTheme));
 
     copy(THEME_SITE_URL + serializedTheme);
+
+    // Give (temporary) UI confirmation that the URL has been copied.
+    this.setState(
+      {showCopyConfirmation: true},
+      () => {
+        this.props.setTimeout(
+          () => this.setState({showCopyConfirmation: false}),
+          2500,
+        );
+      },
+    );
   };
 
   _onShareChange = (event: DOMEvent) => {
@@ -196,10 +213,10 @@ const WrappedEditor = decorate({
       saveTheme: (theme: Theme) => store.saveCustomTheme(theme),
     };
   },
-}, Editor);
+}, TimerSafe(Editor));
 
 const CopyThemeButton = Hoverable(
-  ({ isHovered, isPressed, onClick, onMouseDown, onMouseEnter, onMouseLeave, onMouseUp, theme }) => (
+  ({ isHovered, isPressed, onClick, onMouseDown, onMouseEnter, onMouseLeave, onMouseUp, showCopyConfirmation, theme }) => (
     <button
       onClick={onClick}
       onMouseDown={onMouseDown}
@@ -209,8 +226,10 @@ const CopyThemeButton = Hoverable(
       style={copyThemeButtonStyle(isHovered, isPressed, theme)}
       title="Copy theme to clipboard"
     >
-      <SvgIcon path={Icons.COPY} />
-      <label style={styles.copyLabel}>Copy</label>
+      <SvgIcon path={showCopyConfirmation ? Icons.CHECK : Icons.COPY} />
+      <label style={styles.copyLabel}>
+        {showCopyConfirmation ? 'Copied' : 'Copy'}
+      </label>
     </button>
   )
 );
