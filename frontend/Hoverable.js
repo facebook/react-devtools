@@ -53,7 +53,7 @@ const Hoverable = (Component: any) => {
     };
 
     _onMouseLeave: Function = (event: SyntheticEvent): void => {
-      this.setState({ isHovered: false });
+      this.setState({ isHovered: false, isPressed: false });
     };
 
     _onMouseUp: Function = (event: SyntheticEvent): void => {

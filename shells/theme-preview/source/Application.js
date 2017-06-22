@@ -47,10 +47,11 @@ class Application extends React.Component {
         <div style={staticStyles.header}>
           <strong
             contentEditable={true}
+            dangerouslySetInnerHTML={{
+              __html: theme.displayName,
+            }}
             onInput={this._onInput}
-          >
-            {theme.displayName}
-          </strong> theme for <a href="https://github.com/facebook/react-devtools">React DevTools</a>
+          /> theme for <a href="https://github.com/facebook/react-devtools">React DevTools</a>
         </div>
         <div style={staticStyles.label}>
           Theme preview:
@@ -67,11 +68,9 @@ class Application extends React.Component {
         <div style={staticStyles.label}>
           Paste this text into React DevTools to import the theme:
         </div>
-        <textarea
-          onChange={noop}
-          style={staticStyles.textArea}
-          value={serialize(theme)}
-        />
+        <div style={staticStyles.themeText}>
+          {serialize(theme)}
+        </div>
       </div>
     );
   }
@@ -87,14 +86,13 @@ class Application extends React.Component {
 }
 
 Application.childContextTypes = {
+  store: React.PropTypes.object,
   theme: React.PropTypes.object,
 };
 Application.propTypes = {
   theme: React.PropTypes.object,
   updateTheme: React.PropTypes.func,
 };
-
-const noop = () => {};
 
 const applicationStyle = (theme: Theme) => ({
   height: '100%',
@@ -125,11 +123,12 @@ const staticStyles = {
     marginTop: '1rem',
     marginBottom: '0.25rem',
   },
-  textArea: {
-    width: '100%',
-    height: '5.5rem',
+  themeText: {
+    padding: '0.25rem',
+    backgroundColor: '#ffe',
     border: '1px solid #ddd',
     borderRadius: '0.25rem',
+    wordWrap: 'break-word',
   },
 };
 
