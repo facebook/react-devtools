@@ -62,7 +62,7 @@ If you inspect a React element on the page using the regular **Elements** tab, t
 
 You can right-click any React element in the **React** tab, and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
 
-#### Displaying Element Souce
+#### Displaying Element Source
 
 You may include the [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source)  Babel plugin to see the source file and line number of React elements. This information appears in the bottom of the right panel when available. Don't forget to disable it in production! (Tip: if you use [Create React App](https://github.com/facebookincubator/create-react-app) it is already enabled in development.)
 
