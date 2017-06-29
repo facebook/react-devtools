@@ -13,6 +13,8 @@
 /* global chrome */
 var ports = {};
 
+var IS_FIREFOX = navigator.userAgent.indexOf('Firefox') >= 0;
+
 chrome.runtime.onConnect.addListener(function(port) {
   var tab = null;
   var name = null;
@@ -86,11 +88,15 @@ function setIconAndPopup(reactBuildType, tabId) {
 
 // Listen to URL changes on the active tab and reset the DevTools icon.
 // This prevents non-disabled icons from sticking in Firefox.
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (tab.active && changeInfo.status === 'loading') {
-    setIconAndPopup('disabled', tabId);
-  }
-});
+// Don't listen to this event in Chrome though.
+// It fires more frequently, often after onMessage() has been called.
+if (IS_FIREFOX) {
+  chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (tab.active && changeInfo.status === 'loading') {
+      setIconAndPopup('disabled', tabId);
+    }
+  });
+}
 
 chrome.runtime.onMessage.addListener((req, sender) => {
   // This is sent from the hook content script.
