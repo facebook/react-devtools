@@ -68,6 +68,30 @@ function doublePipe(one, two) {
   two.onDisconnect.addListener(shutdown);
 }
 
+function setIconAndPopup(reactBuildType, tabId) {
+  chrome.browserAction.setIcon({
+    tabId: tabId,
+    path: {
+      '16': 'icons/16-' + reactBuildType + '.png',
+      '32': 'icons/32-' + reactBuildType + '.png',
+      '48': 'icons/48-' + reactBuildType + '.png',
+      '128': 'icons/128-' + reactBuildType + '.png',
+    },
+  });
+  chrome.browserAction.setPopup({
+    tabId: tabId,
+    popup: 'popups/' + reactBuildType + '.html',
+  });
+}
+
+// Listen to URL changes on the active tab and reset the DevTools icon.
+// This prevents non-disabled icons from sticking in Firefox.
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+  if (tab.active && changeInfo.status === 'loading') {
+    setIconAndPopup('disabled', tabId);
+  }
+});
+
 chrome.runtime.onMessage.addListener((req, sender) => {
   // This is sent from the hook content script.
   // It tells us a renderer has attached.
@@ -85,18 +109,7 @@ chrome.runtime.onMessage.addListener((req, sender) => {
       // version of React in React docs, but not in any other case.
       reactBuildType = 'production';
     }
-    chrome.browserAction.setIcon({
-      tabId: sender.tab.id,
-      path: {
-        '16': 'icons/16-' + reactBuildType + '.png',
-        '32': 'icons/32-' + reactBuildType + '.png',
-        '48': 'icons/48-' + reactBuildType + '.png',
-        '128': 'icons/128-' + reactBuildType + '.png',
-      },
-    });
-    chrome.browserAction.setPopup({
-      tabId: sender.tab.id,
-      popup: 'popups/' + reactBuildType + '.html',
-    });
+
+    setIconAndPopup(reactBuildType, sender.tab.id);
   }
 });
