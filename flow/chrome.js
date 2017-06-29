@@ -36,6 +36,9 @@ declare var chrome: {
   },
   tabs: {
     executeScript: (tabId: number, options: Object, fn: () => void) => void,
+    onUpdated: {
+      addListener: (fn: (tabId: number, changeInfo: Object, tab: Object) => void) => void,
+    },
     query: (options: Object, fn: (tabArray: Array<Object>) => void) => void,
   },
   browserAction: {

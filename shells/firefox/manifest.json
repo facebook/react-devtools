@@ -26,7 +26,7 @@
       "128": "icons/128-disabled.png"
     },
 
-    "default_popup": "popups/not-detected.html"
+    "default_popup": "popups/disabled.html"
   },
 
   "devtools_page": "main.html",
