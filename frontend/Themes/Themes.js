@@ -81,6 +81,7 @@ const ApathyLight: Theme = {
 
 const AtomDark: Theme = {
   displayName: 'Atom (dark)',
+  hidden: true,
   base00: '#1d1f21',
   base01: '#292c2f',
   base02: '#2e2e2e',
@@ -106,6 +107,7 @@ const AtomDark: Theme = {
 
 const AtomLight: Theme = {
   displayName: 'Atom (light)',
+  hidden: true,
   base00: '#ffffff',
   base01: '#f4f4f4',
   base02: '#eeeeee',
