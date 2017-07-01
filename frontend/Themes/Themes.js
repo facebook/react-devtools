@@ -459,33 +459,8 @@ const OceanDark: Theme = {
   state06: '#A5A9B4',
 };
 
-const OneLightUi: Theme = {
-  displayName: 'One Light UI',
-  base00: '#fafafa',
-  base01: '#eaeaeb',
-  base02: '#eeeeee',
-  base03: '#dbdbdc',
-  base04: '#8e8e90',
-  base05: '#3e4048',
-  special00: '#c0831e',
-  special01: '#a42ea2',
-  special02: '#68ab68',
-  special03: '#447bef',
-  special04: '#e2574e',
-  special05: '#424242',
-  special06: '#976715',
-  special07: '#424242',
-  state00: '#447bef',
-  state01: '#f0f0f1',
-  state02: '#ffffff',
-  state03: '#f0f0f1',
-  state04: '#447bef',
-  state05: '#ffffff',
-  state06: '#1c2026',
-};
-
-const OneDarkUi: Theme = {
-  displayName: 'One Dark UI',
+const OneDark: Theme = {
+  displayName: 'One (dark)',
   base00: '#282c34',
   base01: '#21252b',
   base02: '#568af2',
@@ -507,6 +482,31 @@ const OneDarkUi: Theme = {
   state04: '#4d78cc',
   state05: '#ffffff',
   state06: '#ffffff',
+};
+
+const OneLight: Theme = {
+  displayName: 'One (light)',
+  base00: '#fafafa',
+  base01: '#eaeaeb',
+  base02: '#eeeeee',
+  base03: '#dbdbdc',
+  base04: '#8e8e90',
+  base05: '#3e4048',
+  special00: '#c0831e',
+  special01: '#a42ea2',
+  special02: '#68ab68',
+  special03: '#447bef',
+  special04: '#e2574e',
+  special05: '#424242',
+  special06: '#976715',
+  special07: '#424242',
+  state00: '#447bef',
+  state01: '#f0f0f1',
+  state02: '#ffffff',
+  state03: '#f0f0f1',
+  state04: '#447bef',
+  state05: '#ffffff',
+  state06: '#1c2026',
 };
 
 const Phd: Theme = {
@@ -602,8 +602,8 @@ module.exports = {
   Materia,
   MaterialDark,
   OceanDark,
-  OneDarkUi,
-  OneLightUi,
+  OneDark,
+  OneLight,
   Phd,
   Tomorrow,
   TomorrowNight,
