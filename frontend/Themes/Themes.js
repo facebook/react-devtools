@@ -79,6 +79,56 @@ const ApathyLight: Theme = {
   state06: '#000000',
 };
 
+const AtomDark: Theme = {
+  displayName: 'Atom (dark)',
+  base00: '#1d1f21',
+  base01: '#292c2f',
+  base02: '#2e2e2e',
+  base03: '#303030',
+  base04: '#868989',
+  base05: '#c1c4c2',
+  special00: '#fffeba',
+  special01: '#f574f3',
+  special02: '#aafd6a',
+  special03: '#93c294',
+  special04: '#fed2aa',
+  special05: '#93c294',
+  special06: '#c5c5fb',
+  special07: '#98ccfc',
+  state00: '#4483c2',
+  state01: '#444444',
+  state02: '#ffffff',
+  state03: '#444444',
+  state04: '#4483c2',
+  state05: '#ffffff',
+  state06: '#e3e6e4',
+};
+
+const AtomLight: Theme = {
+  displayName: 'Atom (light)',
+  base00: '#ffffff',
+  base01: '#f4f4f4',
+  base02: '#eeeeee',
+  base03: '#555555',
+  base04: '#999989',
+  base05: '#222222',
+  special00: '#11807f',
+  special01: '#db1847',
+  special02: '#db1847',
+  special03: '#11807f',
+  special04: '#97040c',
+  special05: '#616b9f',
+  special06: '#455686',
+  special07: '#11807f',
+  state00: '#b0c4d9',
+  state01: '#fffed8',
+  state02: '#222222',
+  state03: '#fffed8',
+  state04: '#6da6e7',
+  state05: '#ffffff',
+  state06: '#000000',
+};
+
 const ChromeDark: Theme = {
   displayName: 'Chrome (dark)',
   hidden: true,
@@ -409,8 +459,8 @@ const OceanDark: Theme = {
   state06: '#A5A9B4',
 };
 
-const OneDarkUi: Theme = {
-  displayName: 'One Dark UI',
+const OneDark: Theme = {
+  displayName: 'One (dark)',
   base00: '#282c34',
   base01: '#21252b',
   base02: '#568af2',
@@ -432,6 +482,31 @@ const OneDarkUi: Theme = {
   state04: '#4d78cc',
   state05: '#ffffff',
   state06: '#ffffff',
+};
+
+const OneLight: Theme = {
+  displayName: 'One (light)',
+  base00: '#fafafa',
+  base01: '#eaeaeb',
+  base02: '#eeeeee',
+  base03: '#dbdbdc',
+  base04: '#8e8e90',
+  base05: '#3e4048',
+  special00: '#c0831e',
+  special01: '#a42ea2',
+  special02: '#68ab68',
+  special03: '#447bef',
+  special04: '#e2574e',
+  special05: '#424242',
+  special06: '#976715',
+  special07: '#424242',
+  state00: '#447bef',
+  state01: '#f0f0f1',
+  state02: '#ffffff',
+  state03: '#f0f0f1',
+  state04: '#447bef',
+  state05: '#ffffff',
+  state06: '#1c2026',
 };
 
 const Phd: Theme = {
@@ -512,6 +587,8 @@ const TomorrowNight: Theme = {
 module.exports = {
   ApathyDark,
   ApathyLight,
+  AtomDark,
+  AtomLight,
   ChromeDark,
   ChromeDefault,
   Dracula,
@@ -525,7 +602,8 @@ module.exports = {
   Materia,
   MaterialDark,
   OceanDark,
-  OneDarkUi,
+  OneDark,
+  OneLight,
   Phd,
   Tomorrow,
   TomorrowNight,
