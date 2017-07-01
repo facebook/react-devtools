@@ -409,6 +409,31 @@ const OceanDark: Theme = {
   state06: '#A5A9B4',
 };
 
+const OneDarkUi: Theme = {
+  displayName: 'One Dark UI',
+  base00: '#282c34',
+  base01: '#21252b',
+  base02: '#568af2',
+  base03: '#3b4048',
+  base04: '#3e454f',
+  base05: '#abb2bf',
+  special00: '#e5c07b',
+  special01: '#abb2bf',
+  special02: '#98c379',
+  special03: '#9da5b4',
+  special04: '#e06c75',
+  special05: '#6b717e',
+  special06: '#d19a66',
+  special07: '#abb2bf',
+  state00: '#4d78cc',
+  state01: '#3e4450',
+  state02: '#ffffff',
+  state03: '#2c323c',
+  state04: '#4d78cc',
+  state05: '#ffffff',
+  state06: '#ffffff',
+};
+
 const Phd: Theme = {
   displayName: 'Phd',
   base00: '#061229',
@@ -500,6 +525,7 @@ module.exports = {
   Materia,
   MaterialDark,
   OceanDark,
+  OneDarkUi,
   Phd,
   Tomorrow,
   TomorrowNight,
