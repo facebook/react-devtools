@@ -33,9 +33,12 @@ app.on('ready', function() {
     // as the argument to DevTools.
     'window.devtools.setProjectRoots(' + JSON.stringify(projectRoots) + ')'
   );
-  mainWindow.webContents.executeJavaScript(
-    'window.devtools.setDefaultThemeName(' + JSON.stringify(defaultThemeName) + ')'
-  );
+
+  if (defaultThemeName) {
+    mainWindow.webContents.executeJavaScript(
+      'window.devtools.setDefaultThemeName(' + JSON.stringify(defaultThemeName) + ')'
+    );
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {
