@@ -219,7 +219,7 @@ var WrappedPropState = decorate({
         store.showContextMenu('attr', e, store.selected, node, val, path, name);
       },
       onEvalGetter(path) {
-        store.evalGetter(store.selected, path.slice(1));
+        store.evalGetter(store.selected, path);
       },
       inspect: store.inspect.bind(store, store.selected),
     };

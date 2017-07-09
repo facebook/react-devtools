@@ -346,8 +346,7 @@ class Agent extends EventEmitter {
     if (!data) {
       return;
     }
-    var obj = data.props;
-    var value = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
+    var value = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, data);
     this.emit('sendGetterValue', {id, path, value});
   }
 

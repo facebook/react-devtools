@@ -401,15 +401,17 @@ class Store extends EventEmitter {
   }
 
   setProps(id: ElementID, path: Array<string>, value: any) {
-    this._frozenPaths = this._frozenPaths.deleteIn([id, ...path.slice(0, path.length-1)]);
+    this._frozenPaths = this._frozenPaths.deleteIn([id, 'props', ...path.slice(0, path.length-1)]);
     this._bridge.send('setProps', {id, path, value});
   }
 
   setState(id: ElementID, path: Array<string>, value: any) {
+    this._frozenPaths = this._frozenPaths.deleteIn([id, 'state', ...path.slice(0, path.length-1)]);
     this._bridge.send('setState', {id, path, value});
   }
 
   setContext(id: ElementID, path: Array<string>, value: any) {
+    this._frozenPaths = this._frozenPaths.deleteIn([id, 'context', ...path.slice(0, path.length-1)]);
     this._bridge.send('setContext', {id, path, value});
   }
 
@@ -552,7 +554,7 @@ class Store extends EventEmitter {
   }
 
   isPathFrozen(path: Array<string>) {
-    return this._frozenPaths.getIn( [this.selected, ...path.slice(1, path.length)]) === true;
+    return this._frozenPaths.getIn( [this.selected, ...path]) === true;
   }
 
   changeTraceUpdates(state: ControlState) {
@@ -716,12 +718,12 @@ class Store extends EventEmitter {
 
   _setGetterValue(data: DataType) {
     var node = this._nodes.get(data.id);
-    var props = node.get('props');
+    var obj = node.get(data.path[0]);
     var last = data.path.length - 1;
-    var propObj = data.path.slice(0, last).reduce((obj_, attr) => obj_ ? obj_[attr] : null, props);
+    var propObj = data.path.slice(1, last).reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
     propObj[data.path[last]] = data.value;
-    var newProps = assign({}, props);
-    this._nodes = this._nodes.setIn([data.id, 'props'], newProps);
+    var newProps = assign({}, obj);
+    this._nodes = this._nodes.setIn([data.id, data.path[0]], newProps);
     this._frozenPaths = this._frozenPaths.setIn([data.id, ...data.path], true );
     this.emit(data.id);
   }
