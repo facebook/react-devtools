@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 /**
  * Copyright 2004-present Facebook. All Rights Reserved.
  */
@@ -16,7 +18,10 @@ const main = async () => {
   );
 
   console.log(chalk.green('\nThe Chrome extension has been built!'));
-  console.log(chalk.green('You can test it by following the steps below:'));
+  console.log(chalk.green('You can test this build by running:'));
+  console.log(chalk.gray('\n# From the react-devtools root directory:'));
+  console.log('npm run test:chrome');
+  console.log(chalk.green('\nYou can also test by following the steps below:'));
   console.log(chalk.gray('\n# Open the following URL in Chrome:'));
   console.log('chrome://extensions/');
   console.log(chalk.gray('\n# Click "Load unpacked extension" and browse to:'));

@@ -44,6 +44,8 @@
     "lint": "eslint .",
     "postinstall": "lerna bootstrap",
     "test": "node --harmony ./node_modules/.bin/jest",
+    "test:chrome": "node ./shells/chrome/test",
+    "test:firefox": "node ./shells/firefox/test",
     "typecheck": "flow check"
   },
   "jest": {
@@ -63,6 +65,8 @@
     ]
   },
   "devDependencies": {
+    "chrome-launch": "^1.1.4",
+    "firefox-profile": "^1.0.2",
     "lerna": "2.0.0-beta.36"
   }
 }
