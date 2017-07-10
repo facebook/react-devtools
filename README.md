@@ -35,7 +35,7 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 - Arrow keys or hjkl for navigation
 - Right click a component to show in elements pane, scroll into view, show
   source, etc.
-- A red collapser means the component has state/context
+- Differently-colored collapser means the component has state/context
 
 ![](/images/devtools-tree-view.png)
 
