@@ -213,6 +213,12 @@ class Store extends EventEmitter {
     copy(name);
   }
 
+  copyNodeProps(props: Object): void {
+    const cloned = Object.assign({}, props);
+    delete cloned.children;
+    copy(JSON.stringify(cloned, null, 2));
+  }
+
   setSelectedTab(name: string): void {
     if (this.selectedTab === name) {
       return;
