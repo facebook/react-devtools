@@ -1,6 +1,7 @@
 [ignore]
 .*/react/node_modules/.*
 .*/electron/node_modules/.*
+.*node_modules/archiver-utils
 .*node_modules/babel.*
 .*node_modules/browserify-zlib/.*
 .*node_modules/classnames.*
