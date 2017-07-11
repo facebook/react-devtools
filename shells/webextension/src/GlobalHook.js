@@ -18,6 +18,8 @@
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
 var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
 
+var lastDetectionResult;
+
 // We want to detect when a renderer attaches, and notify the "background
 // page" (which is shared between tabs and can highlight the React icon).
 // Currently we are in "content script" context, so we can't listen
@@ -26,11 +28,23 @@ var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
 // And when this happens, we'll send a message to the "background page".
 window.addEventListener('message', function(evt) {
   if (evt.source === window && evt.data && evt.data.source === 'react-devtools-detector') {
-    chrome.runtime.sendMessage({
+    lastDetectionResult = {
       hasDetectedReact: true,
       reactBuildType: evt.data.reactBuildType,
-    });
+    };
+    chrome.runtime.sendMessage(lastDetectionResult);
   }
+});
+
+// NOTE: Firefox WebExtensions content scripts are still alive and not re-injected
+// while navigating the history to a document that has not been destroyed yet,
+// replay the last detection result if the content script is active and the
+// document has been hidden and shown again.
+window.addEventListener('pageshow', function(evt) {
+  if (!lastDetectionResult || evt.target !== window.document) {
+    return;
+  }
+  chrome.runtime.sendMessage(lastDetectionResult);
 });
 
 var detectReact = `
