@@ -25,7 +25,7 @@ function stripFunctions(props: Object) {
   }
 }
 
-function serializeProps(props: Object): string {
+function serializePropsForCopy(props: Object): string {
   const cloned = Object.assign({}, props);
 
   // Don't try to copy 'children'; the data is probably not meaningful.
@@ -37,4 +37,4 @@ function serializeProps(props: Object): string {
   return JSON.stringify(cloned, null, 2);
 }
 
-module.exports = serializeProps;
+module.exports = serializePropsForCopy;

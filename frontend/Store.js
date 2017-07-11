@@ -16,7 +16,7 @@ var assign = require('object-assign');
 var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
-var serializeProps = require('../utils/serializeProps');
+var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
@@ -215,7 +215,7 @@ class Store extends EventEmitter {
   }
 
   copyNodeProps(props: Object): void {
-    copy(serializeProps(props));
+    copy(serializePropsForCopy(props));
   }
 
   setSelectedTab(name: string): void {
