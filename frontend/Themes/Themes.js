@@ -386,6 +386,31 @@ const GruvboxLight: Theme = {
   state06: '#000000',
 };
 
+const Halflife: Theme = {
+  displayName: 'Halflife',
+  base00: '#222222',
+  base01: '#f3f3f3',
+  base02: '#888888',
+  base03: '#282828',
+  base04: '#888888',
+  base05: '#7d8991',
+  special00: '#fc913a',
+  special01: '#f9d423',
+  special02: '#f9d423',
+  special03: '#cccccc',
+  special04: '#f9d423',
+  special05: '#3b3a32',
+  special06: '#cccccc',
+  special07: '#7d8991',
+  state00: '#f85931',
+  state01: '#dadada',
+  state02: '#ffffff',
+  state03: '#282828',
+  state04: '#ffe792',
+  state05: '#000000',
+  state06: '#222222',
+};
+
 const Materia: Theme = {
   displayName: 'Materia',
   base00: '#263238',
@@ -601,6 +626,7 @@ module.exports = {
   Flat,
   GruvboxDark,
   GruvboxLight,
+  Halflife,
   Materia,
   MaterialDark,
   OceanDark,
