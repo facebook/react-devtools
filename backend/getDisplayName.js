@@ -18,7 +18,23 @@ function getDisplayName(type: Function): string {
     return cachedDisplayNames.get(type);
   }
 
-  let displayName = type.displayName || type.name || 'Unknown';
+  let displayName = type.displayName || type.name;
+
+  // The displayName property might not be a string.
+  // If it's a custom function, attempt to use its return value.
+  // github.com/facebook/react-devtools/issues/803
+  if (typeof displayName === 'function') {
+    try {
+      displayName = displayName();
+    } catch (error) {}
+  }
+
+  // If we haven't got a display name (or we have an invalid one)
+  // Fall back to a safe value, 'Unknown'.
+  if (!displayName || typeof displayName !== 'string') {
+    displayName = 'Unknown';
+  }
+
   // Facebook-specific hack to turn "Image [from Image.react]" into just "Image".
   // We need displayName with module name for error reports but it clutters the DevTools.
   const match = displayName.match(FB_MODULE_RE);
