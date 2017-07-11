@@ -626,6 +626,7 @@ module.exports = {
   Flat,
   GruvboxDark,
   GruvboxLight,
+  Halflife,
   Materia,
   MaterialDark,
   OceanDark,
