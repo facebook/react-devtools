@@ -34,7 +34,11 @@ function serializePropsForCopy(props: Object): string {
   // Convert functions to '[function]'
   stripFunctions(cloned);
 
-  return JSON.stringify(cloned, null, 2);
+  try {
+    return JSON.stringify(cloned, null, 2);
+  } catch (error) {
+    return '';
+  }
 }
 
 module.exports = serializePropsForCopy;
