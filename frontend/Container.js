@@ -148,6 +148,20 @@ var DEFAULT_MENU_ITEMS = {
         action: () => store.copyNodeName(node.get('name')),
       });
     }
+    const props = node.get('props');
+    if (props) {
+      const numKeys = Object.keys(props)
+        .filter(key => key !== 'children')
+        .length;
+
+      if (numKeys > 0) {
+        items.push({
+          key: 'copyNodeProps',
+          title: 'Copy element props',
+          action: () => store.copyNodeProps(props),
+        });
+      }
+    }
     return items;
   },
   attr: (id, node, val, path, name, store) => {
