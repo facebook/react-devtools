@@ -393,7 +393,7 @@ const Halflife: Theme = {
   base02: '#888888',
   base03: '#282828',
   base04: '#888888',
-  base05: '#7d8991',
+  base05: '#aaaaaa',
   special00: '#fc913a',
   special01: '#f9d423',
   special02: '#f9d423',
