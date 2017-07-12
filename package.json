@@ -40,12 +40,14 @@
     "build:extension": "npm run build:extension:chrome && npm run build:extension:firefox",
     "build:extension:chrome": "node ./shells/chrome/build",
     "build:extension:firefox": "node ./shells/firefox/build",
+    "build:standalone": "cd packages/react-devtools-core && npm run build",
     "deploy": "cd ./shells/theme-preview && ./build.sh && gh-pages -d .",
     "lint": "eslint .",
     "postinstall": "lerna bootstrap",
     "test": "node --harmony ./node_modules/.bin/jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
+    "test:standalone": "cd packages/react-devtools && npm start",
     "typecheck": "flow check"
   },
   "jest": {
