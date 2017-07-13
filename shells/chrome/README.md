@@ -2,11 +2,11 @@
 
 The source code for this extension has moved to `shells/webextension`.
 
-Modify the source code there and then rebuild this extension by running `node build.js` in this directory.
+Modify the source code there and then rebuild this extension by running `yarn run build:extension:chrome`.
 
 ## Testing in Chrome
 
 You can test a local build of the web extension like so:
 
- 1. Build the extension: `node build`
+ 1. Build the extension: `yarn run build:extension:chrome`
  1. Follow the on-screen instructions.
