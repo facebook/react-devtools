@@ -173,6 +173,14 @@ function walkRoots(roots, onMount, onRoot, isPre013) {
 }
 
 function walkNode(internalInstance, onMount, isPre013) {
+  if (internalInstance === null) {
+    // When a parent has children that include strings and a 'null' value
+    // the 'internalInstance' can be 'null' here, which leads to problems.
+    // So we ignore that node.
+    // Note that this is not an issue in React v16.0+; this path never gets hit
+    // in that case.
+    return;
+  }
   var data = isPre013 ? getData012(internalInstance) : getData(internalInstance);
   if (data.children && Array.isArray(data.children)) {
     data.children.forEach(child => walkNode(child, onMount, isPre013));
