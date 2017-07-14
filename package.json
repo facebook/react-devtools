@@ -44,7 +44,6 @@
     "deploy": "cd ./shells/theme-preview && ./build.sh && gh-pages -d .",
     "lint": "eslint .",
     "postinstall": "lerna bootstrap",
-    "start:firefox": "web-ext run -s shells/firefox/build/unpacked",
     "test": "node --harmony ./node_modules/.bin/jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
