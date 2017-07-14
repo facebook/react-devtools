@@ -109,6 +109,7 @@ export type Theme = {
   special05: string; // Special Text (eg breadcrumbs)
   special06: string; // XML Attributes
   special07: string; // Host Components
+  special08: string; // Higher Order Components
 
   /**
    * These colors are used for selection, hover, and filtering state.

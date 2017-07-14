@@ -28,6 +28,7 @@ const Syntax = {
   special05: 'Special Text',
   special06: 'XML Attributes',
   special07: 'Host Components',
+  special08: 'Higher Order',
 };
 
 const Selection = {

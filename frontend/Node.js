@@ -204,6 +204,9 @@ class Node extends React.Component {
     const sharedHeadBracketStyle = bracketStyle(inverted && !isBottomTagSelected, theme);
     const sharedTailBracketStyle = bracketStyle(inverted && isBottomTagSelected, theme);
 
+    let name = node.get('name') + '';
+    const isHigherOrderComponent = !!name.match(/[A-Za-z]+\({1}[A-Za-z]+\){1}/g);
+
     const sharedHeadStyle = headStyle({
       depth,
       isBottomTagHovered,
@@ -260,8 +263,6 @@ class Node extends React.Component {
 
     var isCustom = nodeType === 'Composite';
 
-    let name = node.get('name') + '';
-
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
     if (searchRegExp) {
@@ -284,7 +285,7 @@ class Node extends React.Component {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, isHigherOrderComponent, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -322,7 +323,7 @@ class Node extends React.Component {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
+    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, isHigherOrderComponent, theme);
     const closeTagBracketStyle = collapsed ? sharedHeadBracketStyle : sharedTailBracketStyle;
     const closeTag = (
       <span>
@@ -346,7 +347,7 @@ class Node extends React.Component {
         <span style={arrowStyle(collapsed, hasState, headInverted, theme)}/>
       </span>;
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, theme);
+    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, isHigherOrderComponent, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
@@ -502,10 +503,13 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
+const jsxTagStyle = (inverted: boolean, isCustom: boolean, isHigherOrderComponent: boolean, theme: Theme) => {
   let color;
+
   if (inverted) {
     color = theme.state02;
+  } else if (isHigherOrderComponent) {
+    color = theme.special08;
   } else if (isCustom) {
     color = theme.special00;
   } else {
