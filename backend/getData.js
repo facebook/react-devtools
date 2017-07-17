@@ -10,6 +10,7 @@
  */
 'use strict';
 
+var React = require('React');
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
@@ -52,9 +53,17 @@ function getData(internalInstance: Object): DataType {
     children = childrenList(internalInstance._renderedChildren);
   } else if (internalInstance._currentElement && internalInstance._currentElement.props) {
     // This is a native node without rendered children -- meaning the children
-    // prop is just a string or (in the case of the <option>) a list of
-    // strings & numbers.
-    children = internalInstance._currentElement.props.children;
+    // prop is the unfiltered list of children.
+    // This may include 'null' or even other invalid values, so we need to
+    // filter it the same way that ReactDOM does.
+    const children = [];
+    React.Children.forEach(internalInstance._currentElement.props.children,
+      (child) => {
+        if (typeof child === 'string' || typeof child === 'number') {
+          children.push(child);
+        }
+      },
+    );
   }
 
   if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
