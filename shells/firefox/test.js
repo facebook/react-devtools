@@ -32,7 +32,7 @@ const main = async () => {
   const trimmedPath = path.replace(' ', '\\ ');
 
   await exec(
-    `web-ext run --start-url=${START_URL} --firefox-profile=${trimmedPath} --keep-profile-changes --browser-console`,
+    `web-ext run --start-url=${START_URL} --firefox-profile=${trimmedPath} --browser-console`,
     {cwd: EXTENSION_PATH}
   );
 };
