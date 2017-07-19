@@ -13,6 +13,7 @@ const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdate
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 const React = require('react');
 const ReactDOM = require('react-dom');
+const PropTypes = require('prop-types');
 const {sansSerif} = require('./Themes/Fonts');
 const SearchUtils = require('./SearchUtils');
 const SvgIcon = require('./SvgIcon');
@@ -156,8 +157,8 @@ class SettingsPane extends React.Component {
 }
 
 SettingsPane.contextTypes = {
-  showInspectButton: React.PropTypes.bool.isRequired,
-  theme: React.PropTypes.object.isRequired,
+  showInspectButton: PropTypes.bool.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 SettingsPane.propTypes = {
   searchText: PropTypes.string,

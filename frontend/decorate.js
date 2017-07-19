@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 
 type Options = {
   /** A function determining whether the component should rerender when the
@@ -126,7 +127,7 @@ module.exports = function(options: Options, Component: any): any {
   }
 
   Wrapper.contextTypes = {
-    [storeKey]: React.PropTypes.object,
+    [storeKey]: PropTypes.object,
   };
 
   Wrapper.displayName = 'Wrapper(' + Component.name + ')';

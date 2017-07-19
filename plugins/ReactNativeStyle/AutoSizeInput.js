@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 var {monospace} = require('../../frontend/Themes/Fonts');
 var Input = require('../../frontend/Input');
 
@@ -157,7 +158,7 @@ class AutoSizeInput extends React.Component {
 }
 
 AutoSizeInput.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const inputStyle = (text: ?string) => ({

@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
@@ -114,7 +115,7 @@ class ContextMenu extends React.Component {
 }
 
 ContextMenu.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 var Wrapped = decorate({

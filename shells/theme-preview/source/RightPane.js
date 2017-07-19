@@ -12,6 +12,7 @@
 
 const Immutable = require('immutable');
 const React = require('react');
+const PropTypes = require('prop-types');
 
 const PropState = require('../../../frontend/PropState');
 
@@ -34,7 +35,7 @@ class RightPane extends React.Component {
 }
 
 RightPane.childContextTypes = {
-  onChange: React.PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 const fauxNode = Immutable.Map({
