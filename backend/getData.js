@@ -10,7 +10,6 @@
  */
 'use strict';
 
-var React = require('React');
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
@@ -56,14 +55,48 @@ function getData(internalInstance: Object): DataType {
     // prop is the unfiltered list of children.
     // This may include 'null' or even other invalid values, so we need to
     // filter it the same way that ReactDOM does.
-    const children = [];
-    React.Children.forEach(internalInstance._currentElement.props.children,
-      (child) => {
+    // We do a simplified filtering for valid children, instead of using
+    // `React.Children` so that we don't pull in the whole React library.
+    const REACT_ELEMENT_TYPE =
+      (
+        typeof Symbol === 'function'
+        && Symbol.for
+        && Symbol.for('react.element')
+      )
+      || 0xeac7;
+    let unfilteredChildren = internalInstance._currentElement.props.children;
+    const childrenType = typeof unfilteredChildren;
+    if (unfilteredChildren === null || childrenType === 'undefined') {
+      // only one child and it's invalid
+      unfilteredChildren = [];
+    } else if (childrenType === 'boolean'
+       || childrenType === 'string'
+       || childrenType === 'number'
+       || (childrenType === 'object' && unfilteredChildren.$$typeof === REACT_ELEMENT_TYPE)) {
+      // only one child, so let's wrap it in an array
+      unfilteredChildren = [unfilteredChildren];
+    }
+    var filteredChildren = [];
+    function gatherValidChildren(childrenArray) {
+      childrenArray.forEach((child, i) => {
         if (typeof child === 'string' || typeof child === 'number') {
-          children.push(child);
+          filteredChildren.push(child);
+        } else if (Array.isArray(child)) {
+          gatherValidChildren(child);
         }
-      },
-    );
+        // ignore 'null' or invalid children
+      });
+    }
+    gatherValidChildren(unfilteredChildren);
+    if (filteredChildren.length <= 1) {
+      // children must be an array of nodes or a string or undefined
+      // can't be an empty array
+      children = filteredChildren.length
+        ? String(filteredChildren[0])
+        : undefined;
+    } else {
+      children = filteredChildren;
+    }
   }
 
   if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
