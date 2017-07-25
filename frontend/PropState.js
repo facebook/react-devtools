@@ -102,6 +102,7 @@ class PropState extends React.Component {
 
     var key = this.props.node.get('key');
     var ref = this.props.node.get('ref');
+    var reactTag = this.props.node.get('reactTag');
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
@@ -115,6 +116,15 @@ class PropState extends React.Component {
             key={this.props.id + '-key'}>
             <PropVal
               val={key}
+            />
+          </DetailPaneSection>
+        }
+        {reactTag != null &&
+          <DetailPaneSection
+            title="React Tag"
+            key={this.props.id + '-react-tag'}>
+            <PropVal
+              val={reactTag}
             />
           </DetailPaneSection>
         }

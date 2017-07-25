@@ -21,6 +21,10 @@ function nodeMatchesText(node: Map, needle: string, key: string, store: Store): 
   if (node.get('nodeType') === 'Native' && wrapper && wrapper.get('nodeType') === 'NativeWrapper') {
     return false;
   }
+  var reactTag = node.get('reactTag');
+  if (reactTag != null && reactTag.toString().indexOf(needle) === 0) {
+    return true;
+  }
   var useRegex = SearchUtils.shouldSearchUseRegex(needle);
   if (name) {
     if (node.get('nodeType') !== 'Wrapper') {
