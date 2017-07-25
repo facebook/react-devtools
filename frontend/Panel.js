@@ -222,7 +222,7 @@ class Panel extends React.Component {
 
       this._themeStore = new ThemeStore(this.state.themeName);
       this._store = new Store(this._bridge, this._themeStore);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -303,7 +303,7 @@ class Panel extends React.Component {
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure, theme));
+      extraPanes.push(panelRNStyle(this._store, this._bridge, this._store.capabilities.rnStyleMeasure, theme));
     }
     return (
       <Container
@@ -365,20 +365,15 @@ Panel.childContextTypes = {
   themes: React.PropTypes.object.isRequired,
 };
 
-var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
-  var props = node.get('props');
-  if (!props || !props.style) {
-    return (
-      <div key="rnstyle" style={containerStyle(theme)}>
-        <strong>No style</strong>
-      </div>
-    );
-  }
+var panelRNStyle = (store, bridge, supportsMeasure, theme) => (node, id) => {
   return (
-    <div key="rnstyle" style={containerStyle(theme)}>
-      <strong>React Native Style Editor</strong>
-      <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
-    </div>
+    <NativeStyler
+      key="rnstyle"
+      id={id}
+      parentId={store.getParent(id)}
+      bridge={bridge}
+      supportsMeasure={supportsMeasure}
+    />
   );
 };
 
