@@ -377,12 +377,6 @@ var panelRNStyle = (store, bridge, supportsMeasure, theme) => (node, id) => {
   );
 };
 
-const containerStyle = (theme: Theme) => ({
-  borderTop: `1px solid ${theme.base01}`,
-  padding: '0.25rem',
-  marginBottom: '0.25rem',
-  flexShrink: 0,
-});
 const loadingStyle = (theme: Theme) => ({
   fontFamily: sansSerif.family,
   fontSize: sansSerif.sizes.large,

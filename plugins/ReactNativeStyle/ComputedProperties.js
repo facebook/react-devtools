@@ -35,7 +35,7 @@ function resolveFlexBasis(style: Object): CssValue {
   } else if (style.flex != null) {
     return {
       value: style.flex > 0 ? 0 : 'auto',
-      source: 'flex'
+      source: 'flex',
     };
   } else {
     return { value: 'auto', source: 'default' };
@@ -48,7 +48,7 @@ function resolveFlexGrow(style: Object): CssValue {
   } else if (style.flex != null) {
     return {
       value: style.flex > 0 ? style.flex : 0,
-      source: 'flex'
+      source: 'flex',
     };
   } else {
     return { value: 0, source: 'default' };
@@ -61,7 +61,7 @@ function resolveFlexShrink(style: Object): CssValue {
   } else if (style.flex != null) {
     return {
       value: style.flex < 0 ? -style.flex : 0,
-      source: 'flex'
+      source: 'flex',
     };
   } else {
     return { value: 0, source: 'default' };

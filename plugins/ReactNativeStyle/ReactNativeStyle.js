@@ -67,7 +67,7 @@ class NativeStyler extends React.Component {
     this.state = {
       style: null,
       measuredLayout: null,
-      parentStyle: getDefaultParentStyle(props)
+      parentStyle: getDefaultParentStyle(props),
     };
   }
 
@@ -100,7 +100,7 @@ class NativeStyler extends React.Component {
     }
     this.setState({
       style: null,
-      parentStyle: getDefaultParentStyle(nextProps)
+      parentStyle: getDefaultParentStyle(nextProps),
     });
     this.props.bridge.send('rn-style:get', nextProps.id);
 
@@ -122,7 +122,7 @@ class NativeStyler extends React.Component {
     var {style, measuredLayout} = result;
     this.setState({
       style: style || {},
-      measuredLayout
+      measuredLayout,
     });
   }
 
@@ -163,7 +163,7 @@ class NativeStyler extends React.Component {
           parentStyle={parentStyle}
           width={this.state.measuredLayout.width}
           height={this.state.measuredLayout.height}
-        />
+        />,
       ];
     } else {
       body = (
