@@ -13,6 +13,7 @@
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
+var traverseAllChildrenImpl = require('./traverseAllChildrenImpl');
 
 /**
  * Convert a react internal instance to a sanitized data object.
@@ -55,39 +56,22 @@ function getData(internalInstance: Object): DataType {
     // prop is the unfiltered list of children.
     // This may include 'null' or even other invalid values, so we need to
     // filter it the same way that ReactDOM does.
-    // We do a simplified filtering for valid children, instead of using
-    // `React.Children` so that we don't pull in the whole React library.
-    const REACT_ELEMENT_TYPE =
-      (
-        typeof Symbol === 'function'
-        && Symbol.for
-        && Symbol.for('react.element')
-      )
-      || 0xeac7;
+    // Instead of pulling in the whole React library, we just copied over the
+    // 'traverseAllChildrenImpl' method.
+    // https://github.com/facebook/react/blob/240b84ed8e1db715d759afaae85033718a0b24e1/src/isomorphic/children/ReactChildren.js#L112-L158
     let unfilteredChildren = internalInstance._currentElement.props.children;
-    const childrenType = typeof unfilteredChildren;
-    if (unfilteredChildren === null || childrenType === 'undefined') {
-      // only one child and it's invalid
-      unfilteredChildren = [];
-    } else if (childrenType === 'boolean'
-       || childrenType === 'string'
-       || childrenType === 'number'
-       || (childrenType === 'object' && unfilteredChildren.$$typeof === REACT_ELEMENT_TYPE)) {
-      // only one child, so let's wrap it in an array
-      unfilteredChildren = [unfilteredChildren];
-    }
     var filteredChildren = [];
-    function gatherValidChildren(childrenArray) {
-      childrenArray.forEach((child, i) => {
-        if (typeof child === 'string' || typeof child === 'number') {
+    traverseAllChildrenImpl(
+      unfilteredChildren,
+      '', // nameSoFar
+      (_traverseContext, child) => {
+        const childType = typeof child;
+        if (childType === 'string' || childType === 'number') {
           filteredChildren.push(child);
-        } else if (Array.isArray(child)) {
-          gatherValidChildren(child);
         }
-        // ignore 'null' or invalid children
-      });
-    }
-    gatherValidChildren(unfilteredChildren);
+      },
+      // traverseContext
+    );
     if (filteredChildren.length <= 1) {
       // children must be an array of nodes or a string or undefined
       // can't be an empty array
