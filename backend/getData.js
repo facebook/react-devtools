@@ -59,7 +59,7 @@ function getData(internalInstance: Object): DataType {
     // Instead of pulling in the whole React library, we just copied over the
     // 'traverseAllChildrenImpl' method.
     // https://github.com/facebook/react/blob/240b84ed8e1db715d759afaae85033718a0b24e1/src/isomorphic/children/ReactChildren.js#L112-L158
-    let unfilteredChildren = internalInstance._currentElement.props.children;
+    const unfilteredChildren = internalInstance._currentElement.props.children;
     var filteredChildren = [];
     traverseAllChildrenImpl(
       unfilteredChildren,

@@ -80,11 +80,11 @@ function getComponentKey(component, index) {
  * @return {!number} The number of children in this subtree.
  */
 function traverseAllChildrenImpl(
-  children,
-  nameSoFar,
-  callback,
-  traverseContext,
-) {
+  children: any,
+  nameSoFar: string,
+  callback: Function,
+  traverseContext: any
+): number {
   var type = typeof children;
 
   if (type === 'undefined' || type === 'boolean') {
