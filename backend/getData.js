@@ -13,6 +13,7 @@
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
+var traverseAllChildrenImpl = require('./traverseAllChildrenImpl');
 
 /**
  * Convert a react internal instance to a sanitized data object.
@@ -52,9 +53,34 @@ function getData(internalInstance: Object): DataType {
     children = childrenList(internalInstance._renderedChildren);
   } else if (internalInstance._currentElement && internalInstance._currentElement.props) {
     // This is a native node without rendered children -- meaning the children
-    // prop is just a string or (in the case of the <option>) a list of
-    // strings & numbers.
-    children = internalInstance._currentElement.props.children;
+    // prop is the unfiltered list of children.
+    // This may include 'null' or even other invalid values, so we need to
+    // filter it the same way that ReactDOM does.
+    // Instead of pulling in the whole React library, we just copied over the
+    // 'traverseAllChildrenImpl' method.
+    // https://github.com/facebook/react/blob/240b84ed8e1db715d759afaae85033718a0b24e1/src/isomorphic/children/ReactChildren.js#L112-L158
+    const unfilteredChildren = internalInstance._currentElement.props.children;
+    var filteredChildren = [];
+    traverseAllChildrenImpl(
+      unfilteredChildren,
+      '', // nameSoFar
+      (_traverseContext, child) => {
+        const childType = typeof child;
+        if (childType === 'string' || childType === 'number') {
+          filteredChildren.push(child);
+        }
+      },
+      // traverseContext
+    );
+    if (filteredChildren.length <= 1) {
+      // children must be an array of nodes or a string or undefined
+      // can't be an empty array
+      children = filteredChildren.length
+        ? String(filteredChildren[0])
+        : undefined;
+    } else {
+      children = filteredChildren;
+    }
   }
 
   if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
