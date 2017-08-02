@@ -17,7 +17,6 @@ const PropTypes = require('prop-types');
 const {sansSerif} = require('./Themes/Fonts');
 const SearchUtils = require('./SearchUtils');
 const SvgIcon = require('./SvgIcon');
-const {PropTypes} = React;
 const Icons = require('./Icons');
 const Input = require('./Input');
 const Hoverable = require('./Hoverable');
