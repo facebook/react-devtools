@@ -141,6 +141,44 @@ function installGlobalHook(window: Object) {
     }
     return 'production';
   }
+  function isReactDOM(renderer) {
+    try {
+      var toString = Function.prototype.toString;
+      if (typeof renderer.version === 'string') {
+        // React DOM Fiber (16+)
+        return true;
+      }
+      if (renderer.Mount && renderer.Mount._renderNewRootComponent) {
+        // React DOM Stack like renderer
+        var renderRootCode = toString.call(
+          renderer.Mount._renderNewRootComponent
+        );
+
+        // Check for React DOM 15.*
+        if (
+          renderRootCode.indexOf('ensureScrollValueMonitoring') !== -1 &&
+          renderRootCode.indexOf('37') !== -1
+        ) {
+          return true;
+        }
+        // Check for React DOM Stack 0.13.*/0.14.*
+        if (renderRootCode.indexOf('_registerComponent') !== -1) {
+          return true;
+        }
+        // It's something we aren't aware of => not ReactDOM
+        return false;
+      }
+    } catch (err) {
+      // TODO: Mirrors error handling of detectDuplicatedReact()
+    }
+    return false;
+  }
+  function detectDuplicatedReact(renderers) {
+    //  Detect if we have more than one ReactDOM instance
+    return (
+      Object.keys(renderers).filter(key => isReactDOM(renderers[key])).length > 1
+    );
+  }
   const hook = ({
     // Shared between Stack and Fiber:
     _renderers: {},
@@ -148,7 +186,13 @@ function installGlobalHook(window: Object) {
     inject: function(renderer) {
       var id = Math.random().toString(16).slice(2);
       hook._renderers[id] = renderer;
-      var reactBuildType = detectReactBuildType(renderer);
+      var duplicatedReact = detectDuplicatedReact(hook._renderers);
+      // FIXME: Do we need to report buildType of smth other than ReactDOM?
+      // Currently we overwrite buildType with each injected renderer's type
+      var reactBuildType = duplicatedReact
+        ? 'duplicated'
+        : detectReactBuildType(renderer);
+
       hook.emit('renderer', {id, renderer, reactBuildType});
       return id;
     },
