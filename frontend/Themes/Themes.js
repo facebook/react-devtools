@@ -411,8 +411,8 @@ const Halflife: Theme = {
   state06: '#222222',
 };
 
-const Materia: Theme = {
-  displayName: 'Materia',
+const Material: Theme = {
+  displayName: 'Material',
   base00: '#263238',
   base01: '#2C393F',
   base02: '#37474F',
@@ -627,7 +627,7 @@ module.exports = {
   GruvboxDark,
   GruvboxLight,
   Halflife,
-  Materia,
+  Material,
   MaterialDark,
   OceanDark,
   OneDark,
