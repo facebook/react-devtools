@@ -142,6 +142,10 @@ function installGlobalHook(window: Object) {
     return 'production';
   }
   function isReactDOM(renderer) {
+    if (renderer.id === 'react-dom') {
+      return true;
+    }
+    // Try to detect old versions without id injected
     try {
       var toString = Function.prototype.toString;
       if (typeof renderer.version === 'string') {
@@ -154,29 +158,29 @@ function installGlobalHook(window: Object) {
           renderer.Mount._renderNewRootComponent
         );
 
-        // Check for React DOM 15.*
+        // React DOM 15.*
         if (
           renderRootCode.indexOf('ensureScrollValueMonitoring') !== -1 &&
           renderRootCode.indexOf('37') !== -1
         ) {
           return true;
         }
-        // Check for React DOM Stack 0.13.*/0.14.*
+        // React DOM Stack 0.13.*/0.14.*
         if (renderRootCode.indexOf('_registerComponent') !== -1) {
           return true;
         }
-        // It's something we aren't aware of => not ReactDOM
+        // Something we're not aware of => not ReactDOM
         return false;
       }
     } catch (err) {
-      // TODO: Mirrors error handling of detectDuplicatedReact()
+      // TODO: Mirrors error handling of detectReactBuildType()
     }
     return false;
   }
   function detectDuplicatedReact(renderers) {
     //  Detect if we have more than one ReactDOM instance
     return (
-      Object.keys(renderers).filter(key => isReactDOM(renderers[key])).length > 1
+      Object.keys(renderers).filter(id => isReactDOM(renderers[id])).length > 1
     );
   }
   const hook = ({
@@ -186,10 +190,10 @@ function installGlobalHook(window: Object) {
     inject: function(renderer) {
       var id = Math.random().toString(16).slice(2);
       hook._renderers[id] = renderer;
-      var duplicatedReact = detectDuplicatedReact(hook._renderers);
-      // FIXME: Do we need to report buildType of smth other than ReactDOM?
+      var isReactDuplicated = detectDuplicatedReact(hook._renderers);
+
       // Currently we overwrite buildType with each injected renderer's type
-      var reactBuildType = duplicatedReact
+      var reactBuildType = isReactDuplicated
         ? 'duplicated'
         : detectReactBuildType(renderer);
 
