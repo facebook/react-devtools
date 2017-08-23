@@ -518,6 +518,8 @@ const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
 };
 
 const tagTextStyle = (inverted: boolean, theme: Theme) => ({
+  cursor: 'text',
+  userSelect: 'text',
   flex: 1,
   whiteSpace: 'nowrap',
   color: inverted ? getInvertedWeak(theme.state02) : theme.special06,
