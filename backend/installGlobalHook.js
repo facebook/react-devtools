@@ -141,16 +141,16 @@ function installGlobalHook(window: Object) {
     }
     return 'production';
   }
-  function isReactDOM(renderer) {
-    if (renderer.id === 'react-dom') {
-      return true;
+  function detectRendererName(renderer) {
+    if (renderer.rendererPackageName) {
+      return renderer.rendererPackageName;
     }
     // Try to detect old versions without id injected
     try {
       var toString = Function.prototype.toString;
       if (typeof renderer.version === 'string') {
         // React DOM Fiber (16+)
-        return true;
+        return 'react-dom';
       }
       if (renderer.Mount && renderer.Mount._renderNewRootComponent) {
         // React DOM Stack like renderer
@@ -163,25 +163,32 @@ function installGlobalHook(window: Object) {
           renderRootCode.indexOf('ensureScrollValueMonitoring') !== -1 &&
           renderRootCode.indexOf('37') !== -1
         ) {
-          return true;
+          return 'react-dom';
         }
         // React DOM Stack 0.13.*/0.14.*
         if (renderRootCode.indexOf('_registerComponent') !== -1) {
-          return true;
+          return 'react-dom';
         }
         // Something we're not aware of => not ReactDOM
-        return false;
+        return 'unknown';
       }
     } catch (err) {
       // TODO: Mirrors error handling of detectReactBuildType()
     }
-    return false;
+    return 'unknown';
   }
-  function detectDuplicatedReact(renderers) {
+  function detectDuplicatedRenderers(renderers) {
     //  Detect if we have more than one ReactDOM instance
-    return (
-      Object.keys(renderers).filter(id => isReactDOM(renderers[id])).length > 1
-    );
+    var renderersMap = {};
+
+    Object.keys(renderers).forEach(id => {
+      const name = detectRendererName(renderers[id]);
+
+      if (name !== 'unknown') {
+        renderersMap[name] = renderersMap[name] ? renderersMap[name] + 1 : 1;
+      }
+    });
+    return Object.keys(renderersMap).map(key => renderersMap[key]).some(rendererCount => rendererCount > 1);
   }
   const hook = ({
     // Shared between Stack and Fiber:
@@ -190,7 +197,7 @@ function installGlobalHook(window: Object) {
     inject: function(renderer) {
       var id = Math.random().toString(16).slice(2);
       hook._renderers[id] = renderer;
-      var isReactDuplicated = detectDuplicatedReact(hook._renderers);
+      var isReactDuplicated = detectDuplicatedRenderers(hook._renderers);
 
       // Currently we overwrite buildType with each injected renderer's type
       var reactBuildType = isReactDuplicated
