@@ -28,7 +28,7 @@ function getDataIDsInternal(obj, collector) {
     if (name === 'id' && typeof obj[name] === 'string') {
       collector.push(obj[name]);
     } else if (typeof obj[name] === 'object') {
-      getDataIDs(obj[name], collector);
+      getDataIDs(obj[name]);
     }
   }
 }
@@ -177,7 +177,8 @@ class Store extends EventEmitter {
       } else {
         base = this.queries.get(id).get(path[0]);
       }
-      var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
+      // $FlowFixMe typecheck this
+      var inspected: Object = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
       if (inspected) {
         assign(inspected, value);
         inspected[consts.inspected] = true;

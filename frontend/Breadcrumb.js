@@ -18,11 +18,20 @@ var {sansSerif} = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
 
-class Breadcrumb extends React.Component {
-  context: {theme: Theme};
-  state: {hovered: ?string};
+type Props = {
+  hover(?string, boolean): void,
+  select(?string): void,
+  path: Array<{id: ?string, node: Map<string, string>}>,
+  selected: ?string,
+};
+type State = {
+  hovered: ?string,
+};
 
-  constructor(props) {
+class Breadcrumb extends React.Component<Props, State> {
+  context: {theme: Theme};
+
+  constructor(props: Props) {
     super(props);
     this.state = { hovered: null };
   }
@@ -57,7 +66,7 @@ class Breadcrumb extends React.Component {
               onMouseOut={() => this.handleCrumbMouseOut(id)}
               onClick={isSelected ? null : () => this.props.select(id)}
             >
-              {node.get('name') || '"' + node.get('text') + '"'}
+              {node.get('name') || '"' + (node.get('text') || '<empty>') + '"'}
             </li>
           );
         })}

@@ -22,7 +22,7 @@ import type {Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
-class TreeView extends React.Component {
+class TreeView extends React.Component<*> {
   node: ?HTMLElement;
 
   getChildContext() {

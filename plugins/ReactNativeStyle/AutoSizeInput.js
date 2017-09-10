@@ -25,12 +25,12 @@ type State = {
   inputWidth: number;
 };
 
-class AutoSizeInput extends React.Component {
+class AutoSizeInput extends React.Component<Props, State> {
   props: Props;
   defaultProps: DefaultProps;
   state: State;
-  input: HTMLInputElement;
-  sizer: HTMLDivElement;
+  input: ?HTMLInputElement;
+  sizer: ?HTMLDivElement;
 
   constructor(props: Object) {
     super(props);
@@ -44,6 +44,7 @@ class AutoSizeInput extends React.Component {
     this.copyInputStyles();
     this.updateInputWidth();
     if (this.props.isNew) {
+      if (!this.input) return;
       this.input.focus();
     }
   }
@@ -65,6 +66,8 @@ class AutoSizeInput extends React.Component {
       return;
     }
     const sizerNode = this.sizer;
+    if (!sizerNode) return;
+
     sizerNode.style.fontSize = inputStyle.fontSize;
     sizerNode.style.fontFamily = inputStyle.fontFamily;
     sizerNode.style.fontWeight = inputStyle.fontWeight;
@@ -101,6 +104,8 @@ class AutoSizeInput extends React.Component {
 
   onFocus() {
     const input = this.input;
+    if (!input) return;
+
     input.selectionStart = 0;
     input.selectionEnd = input.value.length;
     input.style.color = '#333';
@@ -111,6 +116,8 @@ class AutoSizeInput extends React.Component {
 
   done() {
     const input = this.input;
+    if (!input) return;
+
     input.style.color = this.getColor();
     input.style.boxShadow = 'none';
     input.style.border = 'none';

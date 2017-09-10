@@ -16,7 +16,12 @@ var {getInvertedMid} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
-class Props extends React.Component {
+type PropsType = {
+  props: Object,
+  inverted: boolean,
+};
+
+class Props extends React.Component<PropsType> {
   context: {
     theme: Theme,
   };

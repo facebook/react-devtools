@@ -22,8 +22,23 @@ var decorate = require('./decorate');
 var invariant = require('./invariant');
 
 import type {Theme} from './types';
+import type {Inspect, ShowMenu} from './DataView/DataView';
+import type {ExtraPane} from './Container';
 
-class PropState extends React.Component {
+type Props = {
+  id: string,
+  node: Map<any, any>,
+  canEditTextContent: boolean,
+  onChange: (any, any) => void,
+  onViewElementSource: (any, any) => void,
+  onChangeText: (text: string) => any,
+  showMenu: ShowMenu,
+  inspect: Inspect,
+  // TODO: typecheck plugins' extra panes
+  extraPanes: Array<Function>,
+};
+
+class PropState extends React.Component<Props> {
   context: {
     onChange: () => void,
     theme: Theme,
@@ -63,7 +78,7 @@ class PropState extends React.Component {
     );
   }
 
-  render(): React.Element<*> {
+  render() {
     var theme = this.context.theme;
 
     if (!this.props.node) {

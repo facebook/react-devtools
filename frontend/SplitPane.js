@@ -43,10 +43,8 @@ type DOMOffsetElement = {
   offsetTop: number
 }
 
-class SplitPane extends React.Component {
+class SplitPane extends React.Component<Props, State> {
   context: Context;
-  props: Props;
-  state: State;
 
   constructor(props: Props) {
     super(props);

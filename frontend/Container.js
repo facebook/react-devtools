@@ -21,9 +21,11 @@ var TabbedPane = require('./TabbedPane');
 import type MenuItem from './ContextMenu';
 import type {Theme} from './types';
 
+export type ExtraPane = (node: Object) => React.Element<*>;
+
 type Props = {
-  reload: () => void,
-  extraPanes: Array<(node: Object) => React.Element<*>>,
+  reload?: () => void,
+  extraPanes: Array<ExtraPane>,
   extraTabs: ?{[key: string]: () => React.Element<*>},
   menuItems: {
     tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
@@ -52,9 +54,7 @@ function shouldUseVerticalLayout(window) {
   return window.innerWidth < IS_VERTICAL_BREAKPOINT;
 }
 
-class Container extends React.Component {
-  props: Props;
-  state: State;
+class Container extends React.Component<Props, State> {
   resizeTimeout: ?number;
 
   constructor(props: Props) {

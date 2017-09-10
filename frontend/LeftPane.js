@@ -17,13 +17,16 @@ var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
 var {PropTypes} = React;
 
+type Props = {
+  reload?: () => void,
+};
+
 type State = {
   focused: boolean,
 };
 
-class LeftPane extends React.Component {
+class LeftPane extends React.Component<Props, State> {
   input: ?HTMLElement;
-  state: State;
 
   render() {
     return (

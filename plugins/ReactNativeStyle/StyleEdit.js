@@ -33,11 +33,9 @@ type State = {
   newValue: string|number,
 };
 
-class StyleEdit extends React.Component {
+class StyleEdit extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);

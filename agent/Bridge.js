@@ -421,7 +421,7 @@ class Bridge {
         val = iterVal;
       }
 
-      Object.getOwnPropertyNames(val).forEach(name => {
+      Object.getOwnPropertyNames(val).forEach((name: string) => {
         if (name === '__proto__') {
           protod = true;
         }

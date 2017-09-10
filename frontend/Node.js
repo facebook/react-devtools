@@ -40,7 +40,7 @@ type StateType = {
   isWindowFocused: boolean,
 };
 
-class Node extends React.Component {
+class Node extends React.Component<PropsType, StateType> {
   _head: ?HTMLElement;
   _tail: ?HTMLElement;
   _ownerWindow: any;
@@ -48,10 +48,6 @@ class Node extends React.Component {
   context: {
     scrollTo: (node: HTMLElement) => void,
     theme: Theme,
-  };
-  props: PropsType;
-  state: StateType = {
-    isWindowFocused: true,
   };
 
   shouldComponentUpdate(nextProps: PropsType, nextState: StateType) {
@@ -162,7 +158,7 @@ class Node extends React.Component {
     const {theme} = this.context;
     const {
       depth,
-      hovered, 
+      hovered,
       isBottomTagHovered,
       isBottomTagSelected,
       node,
@@ -270,9 +266,11 @@ class Node extends React.Component {
       const pieces = [
         <span key={0}>{unmatched.shift()}</span>,
       ];
-      while (unmatched.length > 0) {
+      while (unmatched.length > 0 && matched) {
         pieces.push(
-          <span key={pieces.length} style={highlightStyle(theme)}>{matched.shift()}</span>
+          <span key={pieces.length} style={highlightStyle(theme)}>
+            {matched.shift()}
+          </span>
         );
         pieces.push(
           <span key={pieces.length}>{unmatched.shift()}</span>

@@ -14,7 +14,7 @@ var React = require('react');
 
 import type {Theme} from '../types';
 
-class DetailPaneSection extends React.Component {
+class DetailPaneSection extends React.Component<*> {
   context: {
     theme: Theme,
   };

@@ -18,14 +18,15 @@ var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 
-class StoreTab extends React.Component {
+type Props = {
+  data: Map,
+  inspect: (path: Array<string>, cb: () => void) => void,
+  storeData: Object
+};
+
+class StoreTab extends React.Component<Props> {
   context: {
     theme: Theme,
-  };
-  props: {
-    data: Map,
-    inspect: (path: Array<string>, cb: () => void) => void,
-    storeData: Object
   };
   render() {
     if (!this.props.storeData) {

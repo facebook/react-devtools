@@ -24,7 +24,7 @@ type BoxMeasurements = {
 
 type BoxProps = BoxMeasurements & {
   title: string,
-  children?: React.Element<*>,
+  children?: React.Element<any>,
   theme: Theme,
 };
 
@@ -44,17 +44,18 @@ var Box = (props: BoxProps) => {
   );
 };
 
-class BoxInspector extends React.Component {
+type BoxInspectorProps = {
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  margin: BoxMeasurements,
+  padding: BoxMeasurements,
+};
+
+class BoxInspector extends React.Component<BoxInspectorProps> {
   context: {
     theme: Theme,
-  };
-  props: {
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-    margin: BoxMeasurements,
-    padding: BoxMeasurements,
   };
 
   render() {

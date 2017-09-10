@@ -55,10 +55,9 @@ type State = {};
  */
 module.exports = function(options: Options, Component: any): any {
   var storeKey: string = options.store || 'store';
-  class Wrapper extends React.Component {
+  class Wrapper extends React.Component<any, State> {
     _listeners: Array<string>;
     _update: () => void;
-    state: State;
 
     constructor(props) {
       super(props);

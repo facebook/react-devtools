@@ -19,24 +19,27 @@ var Simple = require('./Simple');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
-type Inspect = (path: Array<string>, cb: () => void) => void;
-type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
+export type Inspect = (path: Array<string>, cb: () => void) => void;
+export type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
 type DataViewProps = {
-  data: Object,
+  data: any,
   path: Array<string>,
   inspect: Inspect,
   showMenu: ShowMenu,
   startOpen?: boolean,
   noSort?: boolean,
-  readOnly?: boolean,
+  readOnly: boolean,
 };
 
-class DataView extends React.Component {
+class DataView extends React.Component<DataViewProps> {
   context: {
     theme: Theme,
   };
-  props: DataViewProps;
+
+  static defaultProps = {
+    readOnly: false,
+  };
 
   renderSparseArrayHole(count: number, key: string) {
     const {theme} = this.context;
@@ -139,23 +142,25 @@ DataView.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-class DataItem extends React.Component {
+type DataItemProps = {
+  path: Array<string>,
+  inspect: Inspect,
+  showMenu: ShowMenu,
+  startOpen?: boolean,
+  noSort?: boolean,
+  readOnly?: boolean,
+  name: string,
+  value: any,
+};
+
+type DataItemState = {open: boolean, loading: boolean};
+
+class DataItem extends React.Component<DataItemProps, DataItemState> {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
     theme: Theme,
   };
-  props: {
-    path: Array<string>,
-    inspect: Inspect,
-    showMenu: ShowMenu,
-    startOpen?: boolean,
-    noSort?: boolean,
-    readOnly?: boolean,
-    name: string,
-    value: any,
-  };
   defaultProps: {};
-  state: {open: boolean, loading: boolean};
 
   constructor(props) {
     super(props);

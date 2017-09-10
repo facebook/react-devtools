@@ -517,10 +517,12 @@ class Store extends EventEmitter {
   }
 
   inspect(id: ElementID, path: Array<string>, cb: () => void) {
-    invariant(path[0] === 'props' || path[0] === 'state' || path[0] === 'context',
-              'Inspected path must be one of props, state, or context');
+    invariant(
+      path[0] === 'props' || path[0] === 'state' || path[0] === 'context',
+      'Inspected path must be one of props, state, or context'
+    );
     this._bridge.inspect(id, path, value => {
-      var base = this.get(id).get(path[0]);
+      var base: Object = this.get(id).get(path[0]);
       var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
       if (inspected) {
         assign(inspected, value);

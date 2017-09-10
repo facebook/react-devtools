@@ -28,11 +28,9 @@ type State = {
   hover: boolean,
 };
 
-class HighlightHover extends React.Component {
+class HighlightHover extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: {};
-  state: State;
 
   constructor(props: Object) {
     super(props);

@@ -25,7 +25,7 @@ type State = {
 };
 
 
-class BlurInput extends React.Component {
+class BlurInput extends React.Component<Props, State> {
   props: Props;
   defaultProps: DefaultProps;
   state: State;

@@ -18,7 +18,17 @@ const Preview = require('./Themes/Preview');
 
 import type {Theme} from './types';
 
-class PreferencesPanel extends React.Component {
+type Props = {
+  changeTheme: (themeName: string) => void,
+  hide: () => void,
+  open: bool,
+};
+
+type State = {
+  previewMode: bool,
+};
+
+class PreferencesPanel extends React.Component<Props, State> {
   _selectRef: any;
 
   context: {
@@ -26,14 +36,6 @@ class PreferencesPanel extends React.Component {
     theme: Theme,
     themeName: string,
     themes: { [key: string]: Theme },
-  };
-  props: {
-    changeTheme: (themeName: string) => void,
-    hide: () => void,
-    open: bool,
-  };
-  state: {
-    previewMode: bool,
   };
 
   constructor(props, context) {

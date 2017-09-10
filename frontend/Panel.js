@@ -64,7 +64,7 @@ type State = {
   themeName: ?string,
 };
 
-class Panel extends React.Component {
+class Panel extends React.Component<Props, State> {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
   _checkTimeout: ?number;
@@ -75,9 +75,7 @@ class Panel extends React.Component {
   // TODO: typecheck plugin interface
   plugins: Array<any>;
 
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -212,7 +210,7 @@ class Panel extends React.Component {
       this._bridge = new Bridge(wall);
 
       this._store = new Store(this._bridge, this.state.themeName);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),

@@ -14,16 +14,17 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 import type {DOMEvent} from './types';
 
-class Draggable extends React.Component {
-  _onMove: (evt: DOMEvent) => void;
-  _onUp: (evt: DOMEvent) => void;
-  props: {
-    children?: mixed,
-    onMove: (x: number, y: number) => void,
-    onStart: () => void,
-    onStop: () => void,
-    style: Object,
-  };
+type Props = {
+  children?: any,
+  onMove: (x: number, y: number) => void,
+  onStart: () => void,
+  onStop: () => void,
+  style: Object,
+};
+
+class Draggable extends React.Component<Props> {
+  _onMove: MouseEventHandler;
+  _onUp: MouseEventHandler;
 
   componentDidMount() {
     this._onMove = this.onMove.bind(this);
@@ -41,12 +42,12 @@ class Draggable extends React.Component {
     }
   }
 
-  onMove(evt: DOMEvent) {
+  onMove(evt: MouseEvent) {
     evt.preventDefault();
     this.props.onMove(evt.pageX, evt.pageY);
   }
 
-  onUp(evt: DOMEvent) {
+  onUp(evt: MouseEvent) {
     evt.preventDefault();
     const domNode = ReactDOM.findDOMNode(this);
     if (domNode) {

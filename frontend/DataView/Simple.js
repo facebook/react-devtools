@@ -18,18 +18,25 @@ var {monospace} = require('../Themes/Fonts');
 
 import type {Theme, DOMEvent, DOMNode} from '../types';
 
+type Props = {
+  path: Array<any>,
+  data: any,
+  readOnly: boolean,
+};
 type State = {
   editing: boolean,
   text: string,
 };
 
-class Simple extends React.Component {
+class Simple extends React.Component<Props, State> {
+  static defaultProps = {
+    readOnly: false,
+  };
   context: {
     onChange: (path: Array<any>, value: any) => void,
     theme: Theme,
   };
-  state: State;
-  input: DOMNode;
+  input: ?DOMNode;
 
   constructor(props: Object) {
     super(props);
@@ -92,6 +99,8 @@ class Simple extends React.Component {
 
   selectAll() {
     const input = this.input;
+    if (!input) return;
+
     input.selectionStart = 0;
     input.selectionEnd = input.value.length;
   }
