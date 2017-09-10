@@ -23,7 +23,6 @@ var invariant = require('./invariant');
 
 import type {Theme} from './types';
 import type {Inspect, ShowMenu} from './DataView/DataView';
-import type {ExtraPane} from './Container';
 
 type Props = {
   id: string,

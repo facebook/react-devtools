@@ -19,8 +19,8 @@ var React = require('react');
 var decorate = require('./decorate');
 
 type Props = {
-  hover(?string, boolean): void,
-  select(?string): void,
+  hover: (?string, boolean) => void,
+  select: (?string) => void,
   path: Array<{id: ?string, node: Map<string, string>}>,
   selected: ?string,
 };

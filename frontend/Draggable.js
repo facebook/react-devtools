@@ -23,8 +23,8 @@ type Props = {
 };
 
 class Draggable extends React.Component<Props> {
-  _onMove: MouseEventHandler;
-  _onUp: MouseEventHandler;
+  _onMove: (event: MouseEvent) => mixed;
+  _onUp: (event: MouseEvent) => mixed;
 
   componentDidMount() {
     this._onMove = this.onMove.bind(this);

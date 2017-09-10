@@ -44,7 +44,9 @@ class AutoSizeInput extends React.Component<Props, State> {
     this.copyInputStyles();
     this.updateInputWidth();
     if (this.props.isNew) {
-      if (!this.input) return;
+      if (!this.input) {
+        return;
+      }
       this.input.focus();
     }
   }
@@ -66,7 +68,9 @@ class AutoSizeInput extends React.Component<Props, State> {
       return;
     }
     const sizerNode = this.sizer;
-    if (!sizerNode) return;
+    if (!sizerNode) {
+      return;
+    }
 
     sizerNode.style.fontSize = inputStyle.fontSize;
     sizerNode.style.fontFamily = inputStyle.fontFamily;
@@ -104,7 +108,9 @@ class AutoSizeInput extends React.Component<Props, State> {
 
   onFocus() {
     const input = this.input;
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
     input.selectionStart = 0;
     input.selectionEnd = input.value.length;
@@ -116,7 +122,9 @@ class AutoSizeInput extends React.Component<Props, State> {
 
   done() {
     const input = this.input;
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
     input.style.color = this.getColor();
     input.style.boxShadow = 'none';

@@ -99,7 +99,9 @@ class Simple extends React.Component<Props, State> {
 
   selectAll() {
     const input = this.input;
-    if (!input) return;
+    if (!input) {
+      return;
+    }
 
     input.selectionStart = 0;
     input.selectionEnd = input.value.length;

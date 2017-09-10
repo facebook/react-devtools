@@ -10,8 +10,6 @@
  */
 'use strict';
 
-import type {OrderedMap} from 'immutable';
-
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
