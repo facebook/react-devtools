@@ -627,6 +627,7 @@ class Store extends EventEmitter {
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Composite') {
       map = map.set('collapsed', true);
+      map = map.set('dimmed', /^RCT/.test(data.name));
     }
     this._nodes = this._nodes.set(data.id, map);
     if (data.children && data.children.forEach) {

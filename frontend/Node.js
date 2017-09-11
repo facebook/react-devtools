@@ -199,6 +199,7 @@ class Node extends React.Component {
     }
 
     const collapsed = node.get('collapsed');
+    const dimmed = node.get('dimmed');
     const inverted = selected && isWindowFocused;
 
     const sharedHeadBracketStyle = bracketStyle(inverted && !isBottomTagSelected, theme);
@@ -209,6 +210,7 @@ class Node extends React.Component {
       isBottomTagHovered,
       isBottomTagSelected,
       isCollapsed: collapsed,
+      isDimmed: dimmed,
       isHovered: hovered,
       isSelected: selected,
       isWindowFocused,
@@ -473,6 +475,7 @@ const headStyle = ({
   isBottomTagHovered,
   isBottomTagSelected,
   isCollapsed,
+  isDimmed,
   isHovered,
   isSelected,
   isWindowFocused,
@@ -489,6 +492,7 @@ const headStyle = ({
 
   const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
   const color = isInverted ? theme.state02 : undefined;
+  const opacity = isDimmed ? 0.25 : 1;
 
   return {
     cursor: 'default',
@@ -499,6 +503,7 @@ const headStyle = ({
     paddingRight,
     backgroundColor,
     color,
+    opacity,
   };
 };
 
