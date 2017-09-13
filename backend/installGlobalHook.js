@@ -42,14 +42,26 @@ function installGlobalHook(window: Object) {
 
         // By now we know that it's envified--but what if it's not minified?
         // This can be bad too, as it means DEV code is still there.
+        const testMinification = renderer.testMinification;
 
-        // FIXME: this is fragile!
-        // We should replace this check with check on a specially passed
-        // function. This also doesn't detect lack of dead code elimination
-        // (although this is not a problem since flat bundles).
-        if (findFiberCode.indexOf('getClosestInstanceFromNode') !== -1) {
+
+        // DEV mode check
+        if (testMinification() === 42) {
+          // __DEV__ block not removed. Do we warn in console?
+        }
+
+        // dead code elimination check
+        const testMinificationStr = toString.call(testMinification);
+        if (testMinification.indexOf('42') === -1) {
+          // literal 42 present. Warn?
+        }
+
+        if (testMinificationStr.indexOf('testMinification') === -1) {
+          return 'minified';
+        } else {
           return 'unminified';
         }
+
 
         // We're good.
         return 'production';
