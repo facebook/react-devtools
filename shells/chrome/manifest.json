@@ -4,7 +4,7 @@
   "description": "Adds React debugging tools to the Chrome Developer Tools.",
   "version": "2.5.0",
 
-  "minimum_chrome_version": "43",
+  "minimum_chrome_version": "49",
 
   "icons": {
     "16": "icons/16-production.png",
