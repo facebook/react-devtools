@@ -147,6 +147,17 @@ function installGlobalHook(window: Object) {
         if (code.indexOf('^_^') > -1) {
           // Remember to report during next injection.
           hasDetectedBadDCE = true;
+          // Bonus: throw an exception hoping that it gets picked up by
+          // a reporting system. Not synchronously so that it doesn't break the
+          // calling code.
+          setTimeout(function() {
+            throw new Error(
+              'React is running in production mode, but dead code ' +
+                'elimination has not been applied. Read how to correctly ' +
+                'configure React for production: ' +
+                'https://fburl.com/react-perf-use-the-production-build'
+            );
+          });
         }
       } catch (err) { }
     },
