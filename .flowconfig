@@ -10,6 +10,8 @@
 .*node_modules/node-libs-browser.*
 .*node_modules/webpack.*
 .*node_modules/fbjs/flow.*
+.*node_modules/react-addons-create-fragment/node_modules.*
+.*node_modules/react-dom.*
 
 [libs]
 flow
