@@ -155,7 +155,7 @@ function installGlobalHook(window: Object) {
               'React is running in production mode, but dead code ' +
                 'elimination has not been applied. Read how to correctly ' +
                 'configure React for production: ' +
-                'https://fburl.com/react-perf-use-the-production-build'
+                'https://fb.me/react-perf-use-the-production-build'
             );
           });
         }
