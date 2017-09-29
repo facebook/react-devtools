@@ -90,14 +90,9 @@ Or you could develop with a local HTTP server [like `serve`](https://www.npmjs.c
 
 ### Does "Highlight Updates" trace renders?
 
-Yes, but it's also tracing if a component *may* render.
-In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
-![](https://facebook.github.io/react/img/docs/should-component-update.png)
+With React 15 and earlier, "Highlight Updates" had false positives and highlighted more components than were actually re-rendering.
 
-Here "Highlight Updates" will draw a border around every node but C4 and C5.
-Why does it trace components that don't actually update? (via shouldComponentUpdate() -> false) 
-This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
-The higher the rate of updates happening per second the more the color changes from blue to red.
+Since React 16, it correctly highlights only components that were re-rendered.
 
 ## Contributing
 
