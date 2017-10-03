@@ -10,6 +10,17 @@
  */
 'use strict';
 
+type CompositeUpdater = {
+  setInProps: ?(path: Array<string>, value: any) => void,
+  setInState: ?(path: Array<string>, value: any) => void,
+  setInContext: ?(path: Array<string>, value: any) => void,
+  forceUpdate: ?() => void,
+};
+
+type NativeUpdater = {
+  setNativeProps: ?(nativeProps: {[key: string]: any}) => void,
+};
+
 export type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Portal' | 'Empty',
   type: ?(string | AnyFn),
@@ -22,13 +33,7 @@ export type DataType = {
   context: ?Object,
   children: ?(string | Array<OpaqueNodeHandle>),
   text: ?string,
-  updater: ?{
-    setInProps: ?(path: Array<string>, value: any) => void,
-    setInState: ?(path: Array<string>, value: any) => void,
-    setInContext: ?(path: Array<string>, value: any) => void,
-    // setState: ?(newState: any) => void,
-    forceUpdate: ?() => void,
-  },
+  updater: ?(CompositeUpdater | NativeUpdater),
   publicInstance: ?Object,
 };
 
@@ -43,10 +48,18 @@ type DOMNode = {};
 
 export type AnyFn = (...args: Array<any>) => any;
 
+type BundleType =
+  // PROD
+  | 0
+  // DEV
+  | 1;
+
 export type ReactRenderer = {
   // Fiber
   findHostInstanceByFiber: (fiber: Object) => ?NativeType,
   findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
+  version: string,
+  bundleType: BundleType,
 
   // Stack
   Reconciler: {

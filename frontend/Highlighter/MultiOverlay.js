@@ -11,6 +11,7 @@
 'use strict';
 
 var assign = require('object-assign');
+
 import type {DOMNode} from '../types';
 
 class MultiOverlay {

@@ -1,20 +1,12 @@
-# The Firefox addon
-This shell lets you use react devtools as a firefox devtools extension.
+# The Firefox extension
 
-{{screenshot}}
+The source code for this extension has moved to `shells/webextension`.
 
-## Installation
+Modify the source code there and then rebuild this extension by running `node build` from this directory or `yarn run build:extension:firefox` from the root directory.
 
-- `npm install -g jpm`
-- `npm install` in the repo root folder
-- `./build.sh`
+## Testing in Firefox
 
-This will produce an `xpi` file. You can load it in Firefox via Addons > gear icon > Debug Addons > Load Temporary Addon.
+ 1. Build the extension: `node build`
+ 1. Follow the on-screen instructions.
 
-## Hacking
-
-The files in `main` are *not* transpiled by webkit/babel, but are run in firefox
-extension context. Still, you have some es6 things like string template
-literals, object literal shorthand, and object destructuring, and let/const.
-
-Everything else is transpiled.
+You can test upcoming releases of Firefox by downloading the Beta or Nightly build from the [Firefox releases](https://www.mozilla.org/en-US/firefox/channel/desktop/) page and then following the on-screen instructions after building.

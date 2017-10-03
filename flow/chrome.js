@@ -31,10 +31,14 @@ declare var chrome: {
           addListener: (cb: (window: Object) => void) => void,
         }
       }) => void) => void,
+      themeName: ?string,
     },
   },
   tabs: {
     executeScript: (tabId: number, options: Object, fn: () => void) => void,
+    onUpdated: {
+      addListener: (fn: (tabId: number, changeInfo: Object, tab: Object) => void) => void,
+    },
     query: (options: Object, fn: (tabArray: Array<Object>) => void) => void,
   },
   browserAction: {
@@ -66,12 +70,14 @@ declare var chrome: {
         sender: {
           tab: {
             id: number,
+            url: string,
           },
         },
       }) => void) => void,
     },
     onMessage: {
       addListener: (fn: (req: Object, sender: {
+        url: string,
         tab: {
           id: number,
         },

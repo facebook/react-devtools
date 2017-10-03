@@ -13,11 +13,11 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 
-var assign = require('object-assign');
+var Input = require('../Input');
 var flash = require('../flash');
-var valueStyles = require('../value-styles');
+var {monospace} = require('../Themes/Fonts');
 
-import type {DOMEvent, DOMNode} from '../types';
+import type {Theme, DOMEvent, DOMNode} from '../types';
 
 type State = {
   editing: boolean,
@@ -25,6 +25,10 @@ type State = {
 };
 
 class Simple extends React.Component {
+  context: {
+    onChange: (path: Array<any>, value: any) => void,
+    theme: Theme,
+  };
   state: State;
   input: DOMNode;
 
@@ -98,49 +102,39 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
-      flash(ReactDOM.findDOMNode(this), 'rgba(0, 255, 0, 1)', 'transparent', 1);
+      flash(ReactDOM.findDOMNode(this), this.context.theme.state04, 'transparent', 1);
     }
   }
 
   render() {
-    if (this.state.editing) {
+    const {theme} = this.context;
+    const {readOnly} = this.props;
+    const {editing, text} = this.state;
+
+    if (editing) {
       return (
-        <input
+        <Input
           autoFocus={true}
-          ref={i => this.input = i}
-          style={styles.input}
+          innerRef={i => this.input = i}
+          style={inputStyle(theme)}
           onChange={e => this.onChange(e)}
           onBlur={() => this.onSubmit(false)}
           onKeyDown={this.onKeyDown.bind(this)}
-          value={this.state.text}
+          value={text}
         />
       );
     }
 
-    var data = this.props.data;
-    var type = typeof data;
-    var style = styles.simple;
-    var typeStyle;
-    if (type === 'boolean') {
-      typeStyle = valueStyles.bool;
-    } else if (!this.props.data) {
-      typeStyle = valueStyles.empty;
-    } else if (type === 'string') {
-      typeStyle = valueStyles.string;
-      if (data.length > 200) {
-        data = data.slice(0, 200) + '…';
-      }
-    } else if (type === 'number') {
-      typeStyle = valueStyles.number;
+    let {data} = this.props;
+    if (typeof data === 'string' && data.length > 200) {
+      data = data.slice(0, 200) + '…';
     }
-    style = assign({}, style, typeStyle);
-    if (!this.props.readOnly) {
-      assign(style, styles.editable);
-    }
+
     return (
       <div
         onClick={this.startEditing.bind(this)}
-        style={style}>
+        style={simpleStyle(readOnly, theme)}
+      >
         {valueToText(data)}
       </div>
     );
@@ -155,33 +149,29 @@ Simple.propTypes = {
 
 Simple.contextTypes = {
   onChange: React.PropTypes.func,
+  theme: React.PropTypes.object.isRequired,
 };
 
-var styles = {
-  simple: {
-    display: 'flex',
-    flex: 1,
-    whiteSpace: 'pre-wrap',
-  },
+const inputStyle = (theme: Theme) => ({
+  flex: 1,
+  minWidth: 50,
+  boxSizing: 'border-box',
+  border: 'none',
+  padding: 0,
+  outline: 'none',
+  boxShadow: `0 0 3px ${theme.base02}`,
+  fontFamily: monospace.family,
+  fontSize: 'inherit',
+});
 
-  editable: {
-    cursor: 'pointer',
-  },
+const simpleStyle = (readOnly: boolean, theme: Theme) => ({
+  display: 'flex',
+  flex: 1,
+  whiteSpace: 'pre-wrap',
+  cursor: readOnly ? 'default' : 'pointer',
+});
 
-  input: {
-    flex: 1,
-    minWidth: 50,
-    boxSizing: 'border-box',
-    border: 'none',
-    padding: 0,
-    outline: 'none',
-    boxShadow: '0 0 3px #ccc',
-    fontFamily: 'monospace',
-    fontSize: 'inherit',
-  },
-};
-
-var BAD_INPUT = Symbol('bad input');
+const BAD_INPUT = Symbol('bad input');
 
 function textToValue(txt) {
   if (!txt.length) {

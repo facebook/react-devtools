@@ -35,7 +35,7 @@ function getPropType(data: Object): string | null {
     if (data instanceof ArrayBuffer) {
       return 'array_buffer';
     }
-    if (data[Symbol.iterator] === 'function') {
+    if (typeof data[Symbol.iterator] === 'function') {
       return 'iterator';
     }
     if (Object.prototype.toString.call(data) === '[object Date]') {

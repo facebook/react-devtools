@@ -13,7 +13,12 @@
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 
+import type {Theme} from '../../frontend/types';
+
 class ElementPanel extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: {
     dataIDs: Array<{id: string, queries: Array<Map>}>,
     jumpToData: (id: string) => void,
@@ -24,13 +29,14 @@ class ElementPanel extends React.Component {
     if (!this.props.dataIDs.length) {
       return <span/>;
     }
+    const {theme} = this.context;
     return (
       <div>
         Relay Nodes
         <ul style={styles.dataIDs}>
         {this.props.dataIDs.map(({id, queries}) => (
-          <li style={styles.dataNode}>
-            <div style={styles.dataID} onClick={() => this.props.jumpToData(id)}>
+          <li style={dataNodeStyle(theme)}>
+            <div style={dataIDStyle(theme)} onClick={() => this.props.jumpToData(id)}>
               ID: {id}
             </div>
             <ul style={styles.queries}>
@@ -44,7 +50,7 @@ class ElementPanel extends React.Component {
                   {query.get('name')}
                 </li>
               ))}
-              {!queries.length && <li style={styles.noQueries}>No Queries</li>}
+              {!queries.length && <li style={noQueriesStyle(theme)}>No Queries</li>}
             </ul>
           </li>
         ))}
@@ -54,11 +60,27 @@ class ElementPanel extends React.Component {
   }
 }
 
+ElementPanel.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const dataNodeStyle = (theme: Theme) => ({
+  marginBottom: 5,
+  border: `1px solid ${theme.base02}`,
+});
+
+const dataIDStyle = (theme: Theme) => ({
+  cursor: 'pointer',
+  padding: '2px 4px',
+  backgroundColor: theme.base02,
+});
+
+const noQueriesStyle = (theme: Theme) => ({
+  color: theme.base03,
+  padding: '2px 4px',
+});
+
 var styles = {
-  dataNode: {
-    marginBottom: 5,
-    border: '1px solid #ccc',
-  },
   dataIDs: {
     listStyle: 'none',
     padding: 0,
@@ -69,17 +91,8 @@ var styles = {
     padding: 0,
     margin: 0,
   },
-  dataID: {
-    cursor: 'pointer',
-    padding: '2px 4px',
-    backgroundColor: '#ccc',
-  },
   queryID: {
     cursor: 'pointer',
-    padding: '2px 4px',
-  },
-  noQueries: {
-    color: '#999',
     padding: '2px 4px',
   },
 };

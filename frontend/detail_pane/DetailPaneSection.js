@@ -12,14 +12,18 @@
 
 var React = require('react');
 
+import type {Theme} from '../types';
+
 class DetailPaneSection extends React.Component {
+  context: {
+    theme: Theme,
+  };
+
   render(): React.Element {
-    var {
-      children,
-      hint,
-    } = this.props;
+    const {theme} = this.context;
+    const {children, hint} = this.props;
     return (
-      <div style={styles.section}>
+      <div style={sectionStyle(theme)}>
         <strong style={styles.title}>{this.props.title}</strong>
         {hint}
         {children}
@@ -28,15 +32,20 @@ class DetailPaneSection extends React.Component {
   }
 }
 
+DetailPaneSection.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const sectionStyle = (theme: Theme) => ({
+  borderTop: `1px solid ${theme.base01}`,
+  padding: '0.25rem',
+  flexShrink: 0,
+});
+
 var styles = {
-  section: {
-    borderTop: '1px solid #eee',
-    padding: 5,
-    marginBottom: 5,
-    flexShrink: 0,
-  },
   title: {
-    marginRight: 7,
+    display: 'inline-block',
+    marginRight: '0.25rem',
   },
 };
 

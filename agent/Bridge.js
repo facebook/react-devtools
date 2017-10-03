@@ -16,11 +16,19 @@ var dehydrate = require('./dehydrate');
 var getIn = require('./getIn');
 var performanceNow = require('fbjs/lib/performanceNow');
 
+// Use the polyfill if the function is not native implementation
+function getWindowFunction(name, polyfill): Function {
+  if (String(window[name]).indexOf('[native code]') === -1) {
+    return polyfill;
+  }
+  return window[name];
+}
+
 // Custom polyfill that runs the queue with a backoff.
 // If you change it, make sure it behaves reasonably well in Firefox.
 var lastRunTimeMS = 5;
-var cancelIdleCallback = window.cancelIdleCallback || clearTimeout;
-var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
+var cancelIdleCallback = getWindowFunction('cancelIdleCallback', clearTimeout);
+var requestIdleCallback = getWindowFunction('requestIdleCallback', function(cb, options) {
   // Magic numbers determined by tweaking in Firefox.
   // There is no special meaning to them.
   var delayMS = 3000 * lastRunTimeMS;
@@ -39,7 +47,7 @@ var requestIdleCallback = window.requestIdleCallback || function(cb, options) {
     var endTime = performanceNow();
     lastRunTimeMS = (endTime - startTime) / 1000;
   }, delayMS);
-};
+});
 
 type AnyFn = (...x: any) => any;
 export type Wall = {

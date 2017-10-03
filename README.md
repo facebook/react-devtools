@@ -35,8 +35,7 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 - Arrow keys or hjkl for navigation
 - Right click a component to show in elements pane, scroll into view, show
   source, etc.
-- Use the search bar to find components by name
-- A red collapser means the component has state/context
+- Differently-colored collapser means the component has state/context
 
 ![](/images/devtools-tree-view.png)
 
@@ -46,6 +45,12 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 - Updates are highlighted
 
 ![](/images/devtools-side-pane.gif)
+
+### Search Bar
+
+- Use the search bar to find components by name
+
+![](/images/devtools-search-new.gif)
 
 ### Handy Tips
 
@@ -57,7 +62,7 @@ If you inspect a React element on the page using the regular **Elements** tab, t
 
 You can right-click any React element in the **React** tab, and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
 
-#### Displaying Element Souce
+#### Displaying Element Source
 
 You may include the [transform-react-jsx-source](https://github.com/babel/babel/tree/master/packages/babel-plugin-transform-react-jsx-source)  Babel plugin to see the source file and line number of React elements. This information appears in the bottom of the right panel when available. Don't forget to disable it in production! (Tip: if you use [Create React App](https://github.com/facebookincubator/create-react-app) it is already enabled in development.)
 
@@ -73,6 +78,8 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 
 ![Allow access to file URLs](http://i.imgur.com/Yt1rmUp.png)
 
+Or you could develop with a local HTTP server [like `serve`](https://www.npmjs.com/package/serve).
+
 **The React tab won't show up if the site doesn't use React**, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization. You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
 
 **If your app is inside of CodePen**, make sure you are registered. Then press Fork (if it's not your pen), and then choose Change View > Debug. The Debug view is inspectable with DevTools because it doesn't use an iframe.
@@ -83,14 +90,9 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 
 ### Does "Highlight Updates" trace renders?
 
-Yes, but it's also tracing if a component *may* render.
-In order to fully understand what counts as an "update", you need to understand how [shouldComponentUpdate](https://facebook.github.io/react/docs/advanced-performance.html#shouldcomponentupdate-in-action) works.
-![](https://facebook.github.io/react/img/docs/should-component-update.png)
+With React 15 and earlier, "Highlight Updates" had false positives and highlighted more components than were actually re-rendering.
 
-Here "Highlight Updates" will draw a border around every node but C4 and C5.
-Why does it trace components that don't actually update? (via shouldComponentUpdate() -> false) 
-This is a limitation of the system used to track updates, and will hopefully change in the future. It doesn't, however, trace the children of components that opt out, as there's no possibility of them updating.
-The higher the rate of updates happening per second the more the color changes from blue to red.
+Since React 16, it correctly highlights only components that were re-rendered.
 
 ## Contributing
 

@@ -18,18 +18,26 @@ var invariant = require('./invariant');
 var assign = require('object-assign');
 
 var Bridge = require('../agent/Bridge');
+var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
+var Themes = require('./Themes/Themes');
+var ThemeStore = require('./Themes/Store');
 
 var consts = require('../agent/consts');
 
+import type {Theme} from './types';
 import type {DOMEvent} from './types';
 import type {Wall} from '../agent/Bridge';
 
 export type Props = {
   alreadyFoundReact: boolean,
+  browserName?: string,
+  showInspectButton?: boolean,
+  showHiddenThemes?: boolean,
+  themeName?: string,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
-
+  preferencesPanelShown?: boolean,
 
   // if alreadyFoundReact, then these don’t need to be passed
   checkForReact?: (cb: (isReact: boolean) => void) => void,
@@ -55,6 +63,9 @@ type DefaultProps = {};
 type State = {
   loading: boolean,
   isReact: boolean,
+  preferencesPanelShown: boolean,
+  themeKey: number,
+  themeName: ?string,
 };
 
 class Panel extends React.Component {
@@ -64,6 +75,7 @@ class Panel extends React.Component {
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
+  _themeStore: ThemeStore;
   _unsub: ?() => void;
   // TODO: typecheck plugin interface
   plugins: Array<any>;
@@ -74,7 +86,13 @@ class Panel extends React.Component {
 
   constructor(props: Props) {
     super(props);
-    this.state = {loading: true, isReact: this.props.alreadyFoundReact};
+    this.state = {
+      loading: true,
+      preferencesPanelShown: false,
+      isReact: props.alreadyFoundReact,
+      themeKey: 0,
+      themeName: props.themeName,
+    };
     this._unMounted = false;
     window.panel = this;
     this.plugins = [];
@@ -82,7 +100,14 @@ class Panel extends React.Component {
 
   getChildContext(): Object {
     return {
+      browserName: this.props.browserName || '',
+      defaultThemeName: this._themeStore && this._themeStore.defaultThemeName || '',
+      showHiddenThemes: !!this.props.showHiddenThemes,
+      showInspectButton: this.props.showInspectButton !== false,
       store: this._store,
+      theme: this._themeStore && this._themeStore.theme || Themes.ChromeDefault,
+      themeName: this._themeStore && this._themeStore.themeName || '',
+      themes: this._themeStore && this._themeStore.themes || {},
     };
   }
 
@@ -195,7 +220,9 @@ class Panel extends React.Component {
 
       this._bridge = new Bridge(wall);
 
-      this._store = new Store(this._bridge);
+      this._themeStore = new ThemeStore(this.state.themeName);
+      this._store = new Store(this._bridge, this._themeStore);
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -205,8 +232,24 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {
-        this.setState({loading: false});
+        this.setState({
+          loading: false,
+          themeName: this._themeStore.themeName,
+        });
         this.getNewSelection();
+      });
+      this._store.on('preferencesPanelShown', () => {
+        this.setState({
+          preferencesPanelShown: this._store.preferencesPanelShown,
+        });
+      });
+      this._store.on('theme', () => {
+        // Force a deep re-render when theme changes.
+        // Use an incrementor so changes to Custom theme also update.
+        this.setState(state => ({
+          themeKey: state.themeKey + 1,
+          themeName: this._themeStore.theme.displayName,
+        }));
       });
     });
   }
@@ -238,6 +281,7 @@ class Panel extends React.Component {
   }
 
   render() {
+    var theme = this._store ? this._themeStore.theme : Themes.ChromeDefault;
     var showFileUrlWarningMessage = false;
     if (navigator.userAgent.indexOf('Chrome') > -1) {
       // Chrome requires access to 'file URLs' permission for devtools loaded over file://
@@ -249,30 +293,31 @@ class Panel extends React.Component {
       // properly doing so probably requires refactoring how we load the panel
       // and communicate with the bridge.
       return (
-        <div style={styles.loading}>
+        <div style={loadingStyle(theme)}>
           <h2>Connecting to React…</h2>
         </div>
       );
     }
     if (!this.state.isReact) {
       return (
-        <div style={styles.loading}>
-          <h2>React was not detected on this page.</h2>
-          {showFileUrlWarningMessage &&
-            <div style={styles.troubleshootingHint}>
-              If this seems wrong, follow the <a href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up" target="_blank">troubleshooting instructions</a>.
+        <div style={loadingStyle(theme)}>
+            <h2>React was not detected on this page.</h2>
+            {showFileUrlWarningMessage &&
+            <div>
+                If this seems wrong, follow the <a href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up" target="_blank">troubleshooting instructions</a>.
             </div>
-          }
+            }
         </div>
       );
     }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
-      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure));
+      extraPanes.push(panelRNStyle(this._bridge, this._store.capabilities.rnStyleMeasure, theme));
     }
     return (
       <Container
+        key={this.state.themeKey /* Force deep re-render when theme changes */}
         reload={this.props.reload && this.reload.bind(this)}
         menuItems={{
           attr: (id, node, val, path) => {
@@ -309,44 +354,60 @@ class Panel extends React.Component {
         }}
         extraPanes={extraPanes}
         extraTabs={extraTabs}
+        preferencesPanelShown={this.state.preferencesPanelShown}
+        theme={theme}
+        onViewElementSource={
+          this.props.showElementSource ? this.viewElementSource.bind(this) : null
+        }
       />
     );
   }
 }
 
 Panel.childContextTypes = {
+  browserName: React.PropTypes.string.isRequired,
+  defaultThemeName: React.PropTypes.string.isRequired,
+  showHiddenThemes: React.PropTypes.bool.isRequired,
+  showInspectButton: React.PropTypes.bool.isRequired,
   store: React.PropTypes.object,
+  theme: React.PropTypes.object.isRequired,
+  themeName: React.PropTypes.string.isRequired,
+  themes: React.PropTypes.object.isRequired,
 };
 
-var panelRNStyle = (bridge, supportsMeasure) => (node, id) => {
+var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
   var props = node.get('props');
   if (!props || !props.style) {
-    return <strong key="rnstyle">No style</strong>;
+    return (
+      <div key="rnstyle" style={containerStyle(theme)}>
+        <strong>No style</strong>
+      </div>
+    );
   }
   return (
-    <div key="rnstyle">
-      <h3>React Native Style Editor</h3>
+    <div key="rnstyle" style={containerStyle(theme)}>
+      <strong>React Native Style Editor</strong>
       <NativeStyler id={id} bridge={bridge} supportsMeasure={supportsMeasure} />
     </div>
   );
 };
 
-var styles = {
-  chromePane: {
-    display: 'flex',
-  },
-  stretch: {
-    flex: 1,
-  },
-  loading: {
-    textAlign: 'center',
-    color: '#888',
-    padding: 30,
-    flex: 1,
-  },
-  troubleshootingHint: {
-    fontSize: 14,
-  },
-};
+const containerStyle = (theme: Theme) => ({
+  borderTop: `1px solid ${theme.base01}`,
+  padding: '0.25rem',
+  marginBottom: '0.25rem',
+  flexShrink: 0,
+});
+const loadingStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
+  textAlign: 'center',
+  padding: 30,
+  flex: 1,
+
+  // This color is hard-coded to match app.html and standalone.js
+  // Without it, the loading headers change colors and look weird
+  color: '#aaa',
+});
 
 module.exports = Panel;

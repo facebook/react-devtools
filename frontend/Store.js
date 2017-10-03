@@ -13,13 +13,16 @@
 var {EventEmitter} = require('events');
 var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
+var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
 var consts = require('../agent/consts');
+var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
+var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
-import type {ControlState, DOMEvent, ElementID} from './types';
+import type {ControlState, DOMEvent, ElementID, Theme} from './types';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -29,8 +32,6 @@ type ContextMenu = {
   y: number,
   args: Array<any>,
 };
-
-const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
 
 /**
  * This is the main frontend [fluxy?] Store, responsible for taking care of
@@ -64,6 +65,7 @@ const DEFAULT_PLACEHOLDER = 'Search (text or /regex/)';
  * - hideContextMenu
  * - selectFirstSearchResult
  * - toggleCollapse
+ * - toggleAllChildrenNodes
  * - setProps/State/Context
  * - makeGlobal(id, path)
  * - setHover(id, isHovered, isBottomTag)
@@ -88,19 +90,21 @@ class Store extends EventEmitter {
   _eventTimer: ?number;
 
   // Public state
+  isInspectEnabled: boolean;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
   isBottomTagSelected: boolean;
-  placeholderText: string;
+  preferencesPanelShown: boolean;
   refreshSearch: boolean;
   roots: List;
   searchRoots: ?List;
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
@@ -109,14 +113,16 @@ class Store extends EventEmitter {
     rnStyleMeasure?: boolean,
   };
 
-  constructor(bridge: Bridge) {
+  constructor(bridge: Bridge, themeStore: ThemeStore) {
     super();
+
     this._nodes = new Map();
     this._parents = new Map();
     this._nodesByName = new Map();
     this._bridge = bridge;
 
     // Public state
+    this.isInspectEnabled = false;
     this.roots = new List();
     this.contextMenu = null;
     this.searchRoots = null;
@@ -130,8 +136,8 @@ class Store extends EventEmitter {
     this.capabilities = {};
     this.traceupdatesState = null;
     this.colorizerState = null;
-    this.placeholderText = DEFAULT_PLACEHOLDER;
     this.refreshSearch = false;
+    this.themeStore = themeStore;
 
     // for debugging
     window.store = this;
@@ -154,7 +160,18 @@ class Store extends EventEmitter {
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
-    this._bridge.on('select', ({id, quiet}) => {
+    this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
+    this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
+      // Backtrack if we want to skip leaf nodes
+      while (offsetFromLeaf > 0) {
+        offsetFromLeaf--;
+        var pid = this._parents.get(id);
+        if (pid) {
+          id = pid;
+        } else {
+          break;
+        }
+      }
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
@@ -191,6 +208,14 @@ class Store extends EventEmitter {
   // Public actions
   scrollToNode(id: ElementID): void {
     this._bridge.send('scrollToNode', id);
+  }
+
+  copyNodeName(name: string): void {
+    copy(name);
+  }
+
+  copyNodeProps(props: Object): void {
+    copy(serializePropsForCopy(props));
   }
 
   setSelectedTab(name: string): void {
@@ -320,6 +345,31 @@ class Store extends EventEmitter {
     this.emit('contextMenu');
   }
 
+  changeTheme(themeName: ?string) {
+    this.themeStore.update(themeName);
+    this.emit('theme');
+  }
+
+  changeDefaultTheme(defaultThemeName: ?string) {
+    this.themeStore.setDefaultTheme(defaultThemeName);
+    this.emit('theme');
+  }
+
+  saveCustomTheme(theme: Theme) {
+    this.themeStore.saveCustomTheme(theme);
+    this.emit('theme');
+  }
+
+  showPreferencesPanel() {
+    this.preferencesPanelShown = true;
+    this.emit('preferencesPanelShown');
+  }
+
+  hidePreferencesPanel() {
+    this.preferencesPanelShown = false;
+    this.emit('preferencesPanelShown');
+  }
+
   selectFirstSearchResult() {
     if (this.searchRoots) {
       this.select(this.searchRoots.get(0), true);
@@ -341,6 +391,14 @@ class Store extends EventEmitter {
   toggleCollapse(id: ElementID) {
     this._nodes = this._nodes.updateIn([id, 'collapsed'], c => !c);
     this.emit(id);
+  }
+
+  toggleAllChildrenNodes(value: boolean) {
+    var id = this.selected;
+    if (!id) {
+      return;
+    }
+    this._toggleDeepChildren(id, value);
   }
 
   setProps(id: ElementID, path: Array<string>, value: any) {
@@ -436,22 +494,37 @@ class Store extends EventEmitter {
     return this._parents.get(id);
   }
 
-  skipWrapper(id: ElementID, up?: boolean): ?ElementID {
+  skipWrapper(id: ElementID, up?: boolean, end?: boolean): ?ElementID {
     if (!id) {
       return undefined;
     }
-    var node = this.get(id);
-    var nodeType = node.get('nodeType');
-    if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
-      return id;
+    while (true) {
+      var node = this.get(id);
+      var nodeType = node.get('nodeType');
+
+      if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
+        return id;
+      }
+      if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
+        return id;
+      }
+      if (up) {
+        var parentId = this._parents.get(id);
+        if (!parentId) {
+          // Don't show the Stack root wrapper in breadcrumbs
+          return undefined;
+        }
+        id = parentId;
+      } else {
+        var children = node.get('children');
+        if (children.length === 0) {
+          return undefined;
+        }
+        var index = end ? children.length - 1 : 0;
+        var childId = children[index];
+        id = childId;
+      }
     }
-    if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
-      return id;
-    }
-    if (up) {
-      return this._parents.get(id);
-    }
-    return node.get('children')[0];
   }
 
   off(evt: string, fn: ListenerFunction): void {
@@ -481,7 +554,6 @@ class Store extends EventEmitter {
 
   changeColorizer(state: ControlState) {
     this.colorizerState = state;
-    this.emit('placeholderchange');
     this.emit('colorizerchange');
     this._bridge.send('colorizerchange', state.toJS());
     if (this.colorizerState && this.colorizerState.enabled) {
@@ -489,6 +561,12 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
+  }
+
+  setInspectEnabled(isInspectEnabled: boolean) {
+    this.isInspectEnabled = isInspectEnabled;
+    this.emit('isInspectEnabled');
+    this._bridge.send('setInspectEnabled', isInspectEnabled);
   }
 
   // Private stuff
@@ -527,6 +605,21 @@ class Store extends EventEmitter {
         return;
       }
       pid = this._parents.get(pid);
+    }
+  }
+
+  _toggleDeepChildren(id: ElementID, value: boolean) {
+    var node = this._nodes.get(id);
+    if (!node) {
+      return;
+    }
+    if (node.get('collapsed') !== value) {
+      this._nodes = this._nodes.setIn([id, 'collapsed'], value);
+      this.emit(id);
+    }
+    var children = node.get('children');
+    if (children && children.forEach) {
+      children.forEach(cid => this._toggleDeepChildren(cid, value));
     }
   }
 

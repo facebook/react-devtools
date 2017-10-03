@@ -10,12 +10,12 @@
  */
 'use strict';
 
-import type {DOMEvent} from '../types';
+import type {Theme, DOMEvent} from '../types';
 
+var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
 var Simple = require('./Simple');
 
-var assign = require('object-assign');
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
 
@@ -33,13 +33,18 @@ type DataViewProps = {
 };
 
 class DataView extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: DataViewProps;
 
   renderSparseArrayHole(count: number, key: string) {
+    const {theme} = this.context;
+
     return (
       <li key={key}>
         <div style={styles.head}>
-          <div style={assign({}, styles.name, styles.sparseArrayFiller)}>
+          <div style={sparseArrayHoleStyle(theme)}>
             undefined × {count}
           </div>
         </div>
@@ -62,9 +67,10 @@ class DataView extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
     var data = this.props.data;
     if (!data) {
-      return <div style={styles.missing}>null</div>;
+      return <div style={missingStyle(theme)}>null</div>;
     }
 
     var isArray = Array.isArray(data);
@@ -103,7 +109,7 @@ class DataView extends React.Component {
 
     if (!elements.length) {
       return (
-        <div style={styles.empty}>
+        <div style={emptyStyle(theme)}>
           {isArray ? 'Empty array' : 'Empty object'}
         </div>
       );
@@ -129,7 +135,15 @@ class DataView extends React.Component {
   }
 }
 
+DataView.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 class DataItem extends React.Component {
+  context: {
+    onChange: (path: Array<string>, checked: boolean) => void,
+    theme: Theme,
+  };
   props: {
     path: Array<string>,
     inspect: Inspect,
@@ -186,6 +200,7 @@ class DataItem extends React.Component {
   }
 
   render() {
+    const {theme} = this.context;
     var data = this.props.value;
     var otype = typeof data;
     var complex = true;
@@ -200,7 +215,7 @@ class DataItem extends React.Component {
       );
       complex = false;
     } else {
-      preview = previewComplex(data);
+      preview = previewComplex(data, theme);
     }
 
     var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
@@ -213,8 +228,8 @@ class DataItem extends React.Component {
           onClick={this.toggleOpen.bind(this)}
           style={styles.opener}>
           {open ?
-            <span style={styles.expandedArrow} /> :
-            <span style={styles.collapsedArrow} />}
+            <span style={expandedArrowStyle(theme)} /> :
+            <span style={collapsedArrowStyle(theme)} />}
         </div>
       );
     } else if (otype === 'boolean' && !this.props.readOnly) {
@@ -255,7 +270,7 @@ class DataItem extends React.Component {
         <div style={styles.head}>
           {opener}
           <div
-            style={assign({}, styles.name, complex && styles.complexName)}
+            style={nameStyle(complex, theme)}
             onClick={inspectable && this.toggleOpen.bind(this)}
           >
             {name}:
@@ -266,7 +281,7 @@ class DataItem extends React.Component {
                 this.props.showMenu(e, this.props.value, this.props.path, name);
               }
             }}
-            style={styles.preview}
+            style={previewStyle(theme)}
           >
             {preview}
           </div>
@@ -279,6 +294,7 @@ class DataItem extends React.Component {
 
 DataItem.contextTypes = {
   onChange: React.PropTypes.func,
+  theme: React.PropTypes.object.isRequired,
 };
 
 function alphanumericSort(a: string, b: string): number {
@@ -291,34 +307,76 @@ function alphanumericSort(a: string, b: string): number {
   return (a < b) ? -1 : 1;
 }
 
+const nameStyle = (isComplex: boolean, theme: Theme) => ({
+  cursor: isComplex ? 'pointer' : 'default',
+  color: theme.special03,
+  margin: '2px 3px',
+});
+
+const previewStyle = (theme: Theme) => ({
+  display: 'flex',
+  margin: '2px 3px',
+  whiteSpace: 'pre',
+  wordBreak: 'break-word',
+  flex: 1,
+  color: theme.special01,
+});
+
+const emptyStyle = (theme: Theme) => ({
+  marginLeft: '0.75rem',
+  padding: '0 5px',
+  color: theme.base04,
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
+  fontStyle: 'italic',
+});
+
+const missingStyle = (theme: Theme) => ({
+  fontSize: sansSerif.sizes.normal,
+  fontWeight: 'bold',
+  marginLeft: '0.75rem',
+  padding: '2px 5px',
+  color: theme.base03,
+});
+
+const collapsedArrowStyle = (theme: Theme) => ({
+  borderColor: `transparent transparent transparent ${theme.base03}`,
+  borderStyle: 'solid',
+  borderWidth: '4px 0 4px 7px',
+  display: 'inline-block',
+  marginLeft: 1,
+  verticalAlign: 'top',
+});
+
+const expandedArrowStyle = (theme: Theme) => ({
+  borderColor: `${theme.base03} transparent transparent transparent`,
+  borderStyle: 'solid',
+  borderWidth: '7px 4px 0 4px',
+  display: 'inline-block',
+  marginTop: 1,
+  verticalAlign: 'top',
+});
+
+const sparseArrayHoleStyle = (theme: Theme) => ({
+  fontStyle: 'italic',
+  color: theme.base03,
+  margin: '2px 3px',
+});
+
 var styles = {
   container: {
     listStyle: 'none',
     margin: 0,
     padding: 0,
-    marginLeft: 10,
+    marginLeft: '0.75rem',
   },
 
   children: {
   },
 
-  empty: {
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#aaa',
-  },
-
-  missing: {
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 10,
-    padding: '2px 5px',
-    color: '#888',
-  },
-
   opener: {
     cursor: 'pointer',
-    marginLeft: -8,
+    marginLeft: -10,
     paddingRight: 3,
     position: 'absolute',
     top: 4,
@@ -330,48 +388,9 @@ var styles = {
     top: -1,
   },
 
-  collapsedArrow: {
-    borderColor: 'transparent transparent transparent rgb(110, 110, 110)',
-    borderStyle: 'solid',
-    borderWidth: '4px 0 4px 7px',
-    display: 'inline-block',
-    marginLeft: 1,
-    verticalAlign: 'top',
-  },
-
-  expandedArrow: {
-    borderColor: 'rgb(110, 110, 110) transparent transparent transparent',
-    borderStyle: 'solid',
-    borderWidth: '7px 4px 0 4px',
-    display: 'inline-block',
-    marginTop: 1,
-    verticalAlign: 'top',
-  },
-
   head: {
     display: 'flex',
     position: 'relative',
-  },
-
-  name: {
-    color: '#666',
-    margin: '2px 3px',
-  },
-
-  sparseArrayFiller: {
-    fontStyle: 'italic',
-  },
-
-  complexName: {
-    cursor: 'pointer',
-  },
-
-  preview: {
-    display: 'flex',
-    margin: '2px 3px',
-    whiteSpace: 'pre',
-    wordBreak: 'break-word',
-    flex: 1,
   },
 
   value: {

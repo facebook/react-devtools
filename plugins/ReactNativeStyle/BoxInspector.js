@@ -11,6 +11,9 @@
 'use strict';
 
 var React = require('react');
+var {sansSerif} = require('../../frontend/Themes/Fonts');
+
+import type {Theme} from '../../frontend/types';
 
 type BoxMeasurements = {
   top: number,
@@ -22,27 +25,29 @@ type BoxMeasurements = {
 type BoxProps = BoxMeasurements & {
   title: string,
   children: React$Element,
+  theme: Theme,
 };
 
 var Box = (props: BoxProps) => {
-  var {title, children, top, left, right, bottom} = props;
+  var {title, children, top, left, right, bottom, theme} = props;
   return (
-    <div style={styles.box}>
+    <div style={boxStyle(theme)}>
+      <span style={labelStyle(theme)}>{title}</span>
+      <div style={styles.boxText}>{+top.toFixed(3)}</div>
       <div style={styles.row}>
-        <span style={styles.label}>{title}</span>
-        <span style={styles.boxText}>{top}</span>
-      </div>
-      <div style={styles.row}>
-        <span style={styles.boxText}>{left}</span>
+        <span style={styles.boxText}>{+left.toFixed(3)}</span>
         {children}
-        <span style={styles.boxText}>{right}</span>
+        <span style={styles.boxText}>{+right.toFixed(3)}</span>
       </div>
-      <div style={styles.boxText}>{bottom}</div>
+      <div style={styles.boxText}>{+bottom.toFixed(3)}</div>
     </div>
   );
 };
 
 class BoxInspector extends React.Component {
+  context: {
+    theme: Theme,
+  };
   props: {
     left: number,
     top: number,
@@ -53,16 +58,17 @@ class BoxInspector extends React.Component {
   };
 
   render() {
+    const {theme} = this.context;
     const {left, top, width, height, margin, padding} = this.props;
     return (
-      <Box title="margin" {...margin}>
-        <Box title="padding" {...padding}>
+      <Box theme={theme} title="margin" {...margin}>
+        <Box theme={theme} title="padding" {...padding}>
           <div style={styles.measureLayout}>
-            <span style={styles.innerText}>
-              ({left}, {top})
+            <span style={positionTextStyle(theme)}>
+              ({+left.toFixed(3)}, {+top.toFixed(3)})
             </span>
-            <span style={styles.innerText}>
-              {width} &times; {height}
+            <span style={dimenTextStyle(theme)}>
+              {+width.toFixed(3)} &times; {+height.toFixed(3)}
             </span>
           </div>
         </Box>
@@ -71,31 +77,46 @@ class BoxInspector extends React.Component {
   }
 }
 
+BoxInspector.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const labelStyle = (theme: Theme) => ({
+  flex: 1,
+  color: theme.special03,
+});
+
+const positionTextStyle = (theme: Theme) => ({
+  color: theme.base03,
+  fontSize: sansSerif.sizes.normal,
+  textAlign: 'center',
+});
+
+const dimenTextStyle = (theme: Theme) => ({
+  color: theme.special02,
+  textAlign: 'center',
+});
+
+const boxStyle = (theme: Theme) => ({
+  position: 'relative',
+  padding: 8,
+  margin: 8,
+  width: 184,
+  border: `1px dashed ${theme.base05}`,
+  alignItems: 'center',
+  alignSelf: 'center',
+});
+
 var styles = {
   row: {
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'space-between',
   },
-  label: {
-    flex: 1,
-    color: 'rgb(255,100,0)',
-  },
   measureLayout: {
     display: 'flex',
     flexDirection: 'column',
     margin: 4,
-  },
-  innerText: {
-    color: 'blue',
-    textAlign: 'center',
-  },
-  box: {
-    padding: 8,
-    margin: 8,
-    width: 200,
-    border: '1px solid grey',
-    alignItems: 'center',
   },
   boxText: {
     textAlign: 'center',

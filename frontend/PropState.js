@@ -14,14 +14,21 @@ var BlurInput = require('./BlurInput');
 var DataView = require('./DataView/DataView');
 var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
+var {sansSerif} = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
 
+import type {Theme} from './types';
 
 class PropState extends React.Component {
+  context: {
+    onChange: () => void,
+    theme: Theme,
+  };
+
   getChildContext() {
     return {
       onChange: (path, val) => {
@@ -31,14 +38,25 @@ class PropState extends React.Component {
   }
 
   renderSource(): ?React.Element {
-    var source = this.props.node.get('source');
+    const {theme} = this.context;
+    const {id, node, onViewElementSource} = this.props;
+    const source = node.get('source');
     if (!source) {
       return null;
     }
+
+    let onClick;
+    if (onViewElementSource) {
+      onClick = () => onViewElementSource(id, source);
+    }
+
     return (
-      <div style={styles.source}>
+      <div
+        style={sourceStyle(!!onViewElementSource, theme)}
+        onClick={onClick}
+      >
         {source.fileName}
-        <span style={styles.sourcePos}>
+        <span style={sourcePosStyle(theme)}>
           :{source.lineNumber}
         </span>
       </div>
@@ -46,9 +64,10 @@ class PropState extends React.Component {
   }
 
   render(): React.Element {
+    var theme = this.context.theme;
+
     if (!this.props.node) {
-      // TODO(jared): style this
-      return <span style={styles.noSelection}>No selection</span>;
+      return <span style={emptyStyle(theme)}>No selection</span>;
     }
 
     var nodeType = this.props.node.get('nodeType');
@@ -64,9 +83,9 @@ class PropState extends React.Component {
           </DetailPane>
         );
       }
-      return <DetailPane header="Text Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Text Node"><span style={noPropsStateStyle(theme)}>No props/state.</span></DetailPane>;
     } else if (nodeType === 'Empty') {
-      return <DetailPane header="Empty Node"><span style={styles.noPropsState}>No props/state.</span></DetailPane>;
+      return <DetailPane header="Empty Node"><span style={noPropsStateStyle(theme)}>No props/state.</span></DetailPane>;
     }
 
     var editTextContent = null;
@@ -86,12 +105,10 @@ class PropState extends React.Component {
     var state = this.props.node.get('state');
     var context = this.props.node.get('context');
     var propsReadOnly = !this.props.node.get('canUpdate');
-    var hasDollarR = nodeType === 'Composite' || nodeType === 'Native';
 
     return (
       <DetailPane
-        header={'<' + this.props.node.get('name') + '>'}
-        hint={hasDollarR ? '($r in the console)' : null}>
+        theme={theme}>
         {key &&
           <DetailPaneSection
             title="Key"
@@ -153,6 +170,10 @@ class PropState extends React.Component {
   }
 }
 
+PropState.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
 PropState.childContextTypes = {
   onChange: React.PropTypes.func,
 };
@@ -190,29 +211,32 @@ var WrappedPropState = decorate({
   },
 }, PropState);
 
-var styles = {
-  source: {
-    padding: '5px 10px',
-    color: 'blue',
-    overflow: 'auto',
-    overflowWrap: 'break-word',
-  },
+const emptyStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.large,
+  fontStyle: 'italic',
+  margin: 'auto',
+  color: theme.base04,
+});
 
-  sourcePos: {
-    color: '#777',
-  },
+const sourceStyle = (hasViewElementSource: boolean, theme: Theme) => ({
+  padding: '0.25rem 0.5rem',
+  color: theme.base05,
+  overflowWrap: 'break-word',
+  cursor: hasViewElementSource ? 'pointer' : 'default',
+});
 
-  noSelection: {
-    fontFamily: 'sans-serif',
-    margin: 'auto',
-    color: 'rgba(0,0,0,0.4)',
-  },
+const sourcePosStyle = (theme: Theme) => ({
+  color: theme.base03,
+});
 
-  noPropsState: {
-    fontWeight: 'bold',
-    padding: '5px',
-    borderTop: '1px solid rgba(0,0,0,0.1)',
-  },
-};
+const noPropsStateStyle = (theme: Theme) => ({
+  fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
+  color: theme.base03,
+  textAlign: 'center',
+  fontStyle: 'italic',
+  padding: '0.5rem',
+});
 
 module.exports = WrappedPropState;

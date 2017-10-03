@@ -81,6 +81,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     case HostComponent:
       nodeType = 'Native';
       name = fiber.type;
+
+      // TODO (bvaughn) we plan to remove this prefix anyway.
+      // We can cut this special case out when it's gone.
+      name = name.replace('topsecret-', '');
+
       publicInstance = fiber.stateNode;
       props = fiber.memoizedProps;
       if (
@@ -90,6 +95,14 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         children = props.children.toString();
       } else {
         children = [];
+      }
+      if (typeof fiber.stateNode.setNativeProps === 'function') {
+        // For editing styles in RN
+        updater = {
+          setNativeProps(nativeProps) {
+            fiber.stateNode.setNativeProps(nativeProps);
+          },
+        };
       }
       break;
     case HostText:
@@ -134,7 +147,14 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
 }
 
 function setInProps(fiber, path: Array<string | number>, value: any) {
-  fiber.pendingProps = copyWithSet(fiber.memoizedProps, path, value);
+  const inst = fiber.stateNode;
+  fiber.pendingProps = copyWithSet(inst.props, path, value);
+  if (fiber.alternate) {
+    // We don't know which fiber is the current one because DevTools may bail out of getDataFiber() call,
+    // and so the data object may refer to another version of the fiber. Therefore we update pendingProps
+    // on both. I hope that this is safe.
+    fiber.alternate.pendingProps = fiber.pendingProps;
+  }
   fiber.stateNode.forceUpdate();
 }
 

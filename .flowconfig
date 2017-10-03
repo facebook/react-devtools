@@ -1,15 +1,18 @@
 [ignore]
 .*/react/node_modules/.*
 .*/electron/node_modules/.*
+.*node_modules/archiver-utils
 .*node_modules/babel.*
 .*node_modules/browserify-zlib/.*
 .*node_modules/classnames.*
+.*node_modules/gh-pages/.*
 .*node_modules/invariant/.*
 .*node_modules/json-loader.*
 .*node_modules/json5.*
 .*node_modules/node-libs-browser.*
 .*node_modules/webpack.*
 .*node_modules/fbjs/flow.*
+.*node_modules/web-ext.*
 
 [libs]
 flow

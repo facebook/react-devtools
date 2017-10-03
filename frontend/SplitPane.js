@@ -14,7 +14,11 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 var Draggable = require('./Draggable');
 
-var assign = require('object-assign');
+import type {Theme} from './types';
+
+type Context = {
+  theme: Theme,
+};
 
 type Props = {
   style?: {[key: string]: any},
@@ -32,6 +36,7 @@ type State = {
 };
 
 class SplitPane extends React.Component {
+  context: Context;
   props: Props;
   state: State;
 
@@ -47,57 +52,44 @@ class SplitPane extends React.Component {
   componentDidMount() {
     var node = ReactDOM.findDOMNode(this);
 
+    const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
+
     this.setState({
-      width: Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3)),
+      width: Math.min(250, width),
       height: Math.floor(node.offsetHeight * 0.3),
     });
   }
 
   onMove(x: number, y: number) {
-    var node = ReactDOM.findDOMNode(this);
+    var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
     this.setState(prevState => ({
       width: this.props.isVertical ?
         prevState.width :
-        Math.floor(node.offsetLeft + node.offsetWidth - x),
+        Math.floor(rect.left + rect.width - x),
       height: !this.props.isVertical ?
         prevState.height :
-        Math.floor(node.offsetTop + node.offsetHeight - y),
+        Math.floor(rect.top + rect.height - y),
     }));
   }
 
   render() {
-    var containerStyles = this.props.isVertical ?
-      styles.containerVertical : styles.containerHorizontal;
-    var draggerStyles = assign({}, styles.dragger,
-      this.props.isVertical ?
-        styles.draggerVertical :
-        styles.draggerHorizontal
-    );
-    var draggerInnerStyles = assign({}, styles.draggerInner,
-      this.props.isVertical ?
-        styles.draggerInnerVertical :
-        styles.draggerInnerHorizontal
-    );
-    var rightStyles = assign({}, containerStyles, {
-      width: this.props.isVertical ? '100%' : this.state.width,
-      height: this.props.isVertical ? this.state.height : '100%',
-      flex: 'initial',
-      minHeight: 120,
-      minWidth: 150,
-    });
+    const {theme} = this.context;
+    const {isVertical} = this.props;
+    const {height, width} = this.state;
+
     return (
-      <div style={containerStyles}>
+      <div style={containerStyle(isVertical)}>
         <div style={styles.leftPane}>
           {this.props.left()}
         </div>
-        <div style={rightStyles}>
+        <div style={rightStyle(isVertical, width, height)}>
           <Draggable
-            style={draggerStyles}
+            style={draggerStyle(isVertical)}
             onStart={() => this.setState({moving: true})}
             onMove={(x, y) => this.onMove(x, y)}
             onStop={() => this.setState({moving: false})}>
-            <div style={draggerInnerStyles} />
+            <div style={draggerInnerStyle(isVertical, theme)} />
           </Draggable>
           <div style={styles.rightPane}>
             {this.props.right()}
@@ -108,62 +100,51 @@ class SplitPane extends React.Component {
   }
 }
 
-var styles = {
-  containerHorizontal: {
-    display: 'flex',
-    minWidth: 0,
-    flex: 1,
-  },
+SplitPane.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
 
-  containerVertical: {
-    display: 'flex',
-    minWidth: 0,
-    flex: 1,
-    flexDirection: 'column',
-  },
+const containerStyle = (isVertical: boolean) => ({
+  display: 'flex',
+  minWidth: 0,
+  flex: 1,
+  flexDirection: isVertical ? 'column' : 'row',
+});
 
-  dragger: {
-    position: 'relative',
-    zIndex: 1,
-  },
+const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
+  height: isVertical ? '1px' : '100%',
+  width: isVertical ? '100%' : '1px',
+  backgroundColor: theme.base04,
+});
 
-  draggerHorizontal: {
-    padding: '0px 3px',
-    margin: '0px -3px',
-    cursor: 'ew-resize',
-  },
+const draggerStyle = (isVertical: boolean) => ({
+  position: 'relative',
+  zIndex: 1,
+  padding: isVertical ? '0.25rem 0' : '0 0.25rem',
+  margin: isVertical ? '-0.25rem 0' : '0 -0.25rem',
+  cursor: isVertical ? 'ns-resize' : 'ew-resize',
+});
 
-  draggerVertical: {
-    padding: '3px 0px',
-    margin: '-3px 0px',
-    cursor: 'ns-resize',
-  },
+const rightStyle = (isVertical: boolean, width: number, height: number) => ({
+  ...containerStyle(isVertical),
+  width: isVertical ? null : width,
+  height: isVertical ? height : null,
+  flex: 'initial',
+  minHeight: 120,
+  minWidth: 150,
+});
 
-  draggerInner: {
-    backgroundColor: 'rgb(163, 163, 163)',
-  },
-
-  draggerInnerHorizontal: {
-    height: '100%',
-    width: '1px',
-  },
-
-  draggerInnerVertical: {
-    height: '1px',
-    width: '100%',
-  },
-
+const styles = {
   rightPane: {
     display: 'flex',
     width: '100%',
-    padding: 4,
   },
-
   leftPane: {
     display: 'flex',
     minWidth: '50%',
     minHeight: '50%',
     flex: 1,
+    overflow: 'hidden',
   },
 };
 

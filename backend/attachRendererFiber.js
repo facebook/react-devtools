@@ -17,6 +17,9 @@ var {
   HostRoot,
 } = require('./ReactTypeOfWork');
 
+// Inlined from ReactTypeOfSideEffect
+var PerformedWork = 1;
+
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   // This is a slightly annoying indirection.
   // It is currently necessary because DevTools wants
@@ -39,6 +42,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function hasDataChanged(prevFiber, nextFiber) {
     if (prevFiber.tag === ClassComponent) {
+      // Skip if the class performed no work (shouldComponentUpdate bailout).
+      // eslint-disable-next-line no-bitwise
+      if ((nextFiber.effectTag & PerformedWork) !== PerformedWork) {
+        return false;
+      }
+
       // Only classes have context.
       if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
         return true;

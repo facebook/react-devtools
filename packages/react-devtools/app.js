@@ -13,6 +13,9 @@ var BrowserWindow = require('electron').BrowserWindow;  // Module to create nati
 var path = require('path');
 
 var mainWindow = null;
+var argv = require('minimist')(process.argv.slice(2));
+var projectRoots = argv._;
+var defaultThemeName = argv.theme;
 
 app.on('window-all-closed', function() {
   app.quit();
@@ -24,6 +27,18 @@ app.on('ready', function() {
 
   // and load the index.html of the app.
   mainWindow.loadURL('file://' + __dirname + '/app.html'); // eslint-disable-line no-path-concat
+  mainWindow.webContents.executeJavaScript(
+    // We use this so that RN can keep relative JSX __source filenames
+    // but "click to open in editor" still works. js1 passes project roots
+    // as the argument to DevTools.
+    'window.devtools.setProjectRoots(' + JSON.stringify(projectRoots) + ')'
+  );
+
+  if (defaultThemeName) {
+    mainWindow.webContents.executeJavaScript(
+      'window.devtools.setDefaultThemeName(' + JSON.stringify(defaultThemeName) + ')'
+    );
+  }
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function() {

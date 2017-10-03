@@ -15,6 +15,8 @@ var resolveBoxStyle = require('./resolveBoxStyle');
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+var styleOverridesByHostComponentId = {};
+
 module.exports = function setupRNStyle(
   bridge: Bridge,
   agent: Agent,
@@ -56,7 +58,12 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
     bridge.send('rn-style:measure', {});
     return;
   }
-  const style = resolveRNStyle(node.props.style);
+
+  let style = resolveRNStyle(node.props.style);
+  // If it's a host component we edited before, amend styles.
+  if (styleOverridesByHostComponentId[id]) {
+    style = Object.assign({}, style, styleOverridesByHostComponentId[id]);
+  }
 
   var instance = node.publicInstance;
   if (!instance || !instance.measure) {
@@ -65,6 +72,12 @@ function measureStyle(agent, bridge, resolveRNStyle, id) {
   }
 
   instance.measure((x, y, width, height, left, top) => {
+    // RN Android sometimes returns undefined here. Don't send measurements in this case.
+    // https://github.com/jhen0409/react-native-debugger/issues/84#issuecomment-304611817
+    if (typeof x !== 'number') {
+      bridge.send('rn-style:measure', {style});
+      return;
+    }
     var margin = (style && resolveBoxStyle('margin', style)) || blank;
     var padding = (style && resolveBoxStyle('padding', style)) || blank;
     bridge.send('rn-style:measure', {
@@ -93,41 +106,59 @@ function shallowClone(obj) {
 
 function renameStyle(agent, id, oldName, newName, val) {
   var data = agent.elementData.get(id);
-  var newStyle = {[newName]: val};
-  if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.internalInstancesById.get(id);
-    if (el && el.setNativeProps) {
-      el.setNativeProps({ style: newStyle });
+  var newStyle = newName
+    ? {[oldName]: undefined, [newName]: val}
+    : {[oldName]: undefined};
+
+  if (data && data.updater && data.updater.setInProps) {
+    // First attempt: use setInProps().
+    // We do this for composite components, and it works relatively well.
+    var style = data && data.props && data.props.style;
+    var customStyle;
+    if (Array.isArray(style)) {
+      var lastLength = style.length - 1;
+      if (typeof style[lastLength] === 'object' && !Array.isArray(style[lastLength])) {
+        customStyle = shallowClone(style[lastLength]);
+        delete customStyle[oldName];
+        if (newName) {
+          customStyle[newName] = val;
+        } else {
+          customStyle[oldName] = undefined;
+        }
+        // $FlowFixMe we know that updater is not null here
+        data.updater.setInProps(['style', lastLength], customStyle);
+      } else {
+        style = style.concat([newStyle]);
+        // $FlowFixMe we know that updater is not null here
+        data.updater.setInProps(['style'], style);
+      }
     } else {
-      console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
+      if (typeof style === 'object') {
+        customStyle = shallowClone(style);
+        delete customStyle[oldName];
+        if (newName) {
+          customStyle[newName] = val;
+        } else {
+          customStyle[oldName] = undefined;
+        }
+        // $FlowFixMe we know that updater is not null here
+        data.updater.setInProps(['style'], customStyle);
+      } else {
+        style = [style, newStyle];
+        data.updater.setInProps(['style'], style);
+      }
     }
-    return;
-  }
-  var style = data && data.props && data.props.style;
-  var customStyle;
-  if (Array.isArray(style)) {
-    if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-      customStyle = shallowClone(style[style.length - 1]);
-      delete customStyle[oldName];
-      customStyle[newName] = val;
-      // $FlowFixMe we know that updater is not null here
-      data.updater.setInProps(['style', style.length - 1], customStyle);
+  } else if (data && data.updater && data.updater.setNativeProps) {
+    // Fallback: use setNativeProps(). We're dealing with a host component.
+    // Remember to "correct" resolved styles when we read them next time.
+    if (!styleOverridesByHostComponentId[id]) {
+      styleOverridesByHostComponentId[id] = newStyle;
     } else {
-      style = style.concat([newStyle]);
-      // $FlowFixMe we know that updater is not null here
-      data.updater.setInProps(['style'], style);
+      Object.assign(styleOverridesByHostComponentId[id], newStyle);
     }
+    data.updater.setNativeProps({ style: newStyle });
   } else {
-    if (typeof style === 'object') {
-      customStyle = shallowClone(style);
-      delete customStyle[oldName];
-      customStyle[newName] = val;
-      // $FlowFixMe we know that updater is not null here
-      data.updater.setInProps(['style'], customStyle);
-    } else {
-      style = [style, newStyle];
-      data.updater.setInProps(['style'], style);
-    }
+    return;
   }
   agent.emit('hideHighlight');
 }
@@ -135,28 +166,36 @@ function renameStyle(agent, id, oldName, newName, val) {
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
-  if (!data || !data.updater || !data.updater.setInProps) {
-    var el = agent.internalInstancesById.get(id);
-    if (el && el.setNativeProps) {
-      el.setNativeProps({ style: newStyle });
+
+  if (data && data.updater && data.updater.setInProps) {
+    // First attempt: use setInProps().
+    // We do this for composite components, and it works relatively well.
+    var style = data.props && data.props.style;
+    if (Array.isArray(style)) {
+      var lastLength = style.length - 1;
+      if (typeof style[lastLength] === 'object' && !Array.isArray(style[lastLength])) {
+        // $FlowFixMe we know that updater is not null here
+        data.updater.setInProps(['style', lastLength, attr], val);
+      } else {
+        style = style.concat([newStyle]);
+        // $FlowFixMe we know that updater is not null here
+        data.updater.setInProps(['style'], style);
+      }
     } else {
-      console.error('Unable to set style for this element... (no forceUpdate or setNativeProps)');
-    }
-    return;
-  }
-  var style = data.props && data.props.style;
-  if (Array.isArray(style)) {
-    if (typeof style[style.length - 1] === 'object' && !Array.isArray(style[style.length - 1])) {
-      // $FlowFixMe we know that updater is not null here
-      data.updater.setInProps(['style', style.length - 1, attr], val);
-    } else {
-      style = style.concat([newStyle]);
-      // $FlowFixMe we know that updater is not null here
+      style = [style, newStyle];
       data.updater.setInProps(['style'], style);
     }
+  } else if (data && data.updater && data.updater.setNativeProps) {
+    // Fallback: use setNativeProps(). We're dealing with a host component.
+    // Remember to "correct" resolved styles when we read them next time.
+    if (!styleOverridesByHostComponentId[id]) {
+      styleOverridesByHostComponentId[id] = newStyle;
+    } else {
+      Object.assign(styleOverridesByHostComponentId[id], newStyle);
+    }
+    data.updater.setNativeProps({ style: newStyle });
   } else {
-    style = [style, newStyle];
-    data.updater.setInProps(['style'], style);
+    return;
   }
   agent.emit('hideHighlight');
 }

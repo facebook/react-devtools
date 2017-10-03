@@ -13,6 +13,7 @@
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
+var traverseAllChildrenImpl = require('./traverseAllChildrenImpl');
 
 /**
  * Convert a react internal instance to a sanitized data object.
@@ -52,9 +53,34 @@ function getData(internalInstance: Object): DataType {
     children = childrenList(internalInstance._renderedChildren);
   } else if (internalInstance._currentElement && internalInstance._currentElement.props) {
     // This is a native node without rendered children -- meaning the children
-    // prop is just a string or (in the case of the <option>) a list of
-    // strings & numbers.
-    children = internalInstance._currentElement.props.children;
+    // prop is the unfiltered list of children.
+    // This may include 'null' or even other invalid values, so we need to
+    // filter it the same way that ReactDOM does.
+    // Instead of pulling in the whole React library, we just copied over the
+    // 'traverseAllChildrenImpl' method.
+    // https://github.com/facebook/react/blob/240b84ed8e1db715d759afaae85033718a0b24e1/src/isomorphic/children/ReactChildren.js#L112-L158
+    const unfilteredChildren = internalInstance._currentElement.props.children;
+    var filteredChildren = [];
+    traverseAllChildrenImpl(
+      unfilteredChildren,
+      '', // nameSoFar
+      (_traverseContext, child) => {
+        const childType = typeof child;
+        if (childType === 'string' || childType === 'number') {
+          filteredChildren.push(child);
+        }
+      },
+      // traverseContext
+    );
+    if (filteredChildren.length <= 1) {
+      // children must be an array of nodes or a string or undefined
+      // can't be an empty array
+      children = filteredChildren.length
+        ? String(filteredChildren[0])
+        : undefined;
+    } else {
+      children = filteredChildren;
+    }
   }
 
   if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
@@ -71,8 +97,11 @@ function getData(internalInstance: Object): DataType {
     ref = internalInstance._currentElement.ref;
     if (typeof type === 'string') {
       name = type;
-      if (typeof internalInstance.getPublicInstance === 'function') {
-        publicInstance = internalInstance.getPublicInstance();
+      if (internalInstance._nativeNode != null) {
+        publicInstance = internalInstance._nativeNode;
+      }
+      if (internalInstance._hostNode != null) {
+        publicInstance = internalInstance._hostNode;
       }
     } else if (typeof type === 'function') {
       nodeType = 'Composite';
@@ -105,7 +134,9 @@ function getData(internalInstance: Object): DataType {
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: inst.forceUpdate && setInContext.bind(null, inst),
     };
-    publicInstance = inst;
+    if (typeof type === 'function') {
+      publicInstance = inst;
+    }
 
     // TODO: React ART currently falls in this bucket, but this doesn't
     // actually make sense and we should clean this up after stabilizing our
@@ -113,6 +144,15 @@ function getData(internalInstance: Object): DataType {
     if (inst._renderedChildren) {
       children = childrenList(inst._renderedChildren);
     }
+  }
+
+  if (typeof internalInstance.setNativeProps === 'function') {
+    // For editing styles in RN
+    updater = {
+      setNativeProps(nativeProps) {
+        internalInstance.setNativeProps(nativeProps);
+      },
+    };
   }
 
   return {

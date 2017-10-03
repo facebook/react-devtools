@@ -11,8 +11,13 @@
 'use strict';
 
 var React = require('react');
-var BlurInput = require('./BlurInput');
+var AutoSizeInput = require('./AutoSizeInput');
 
+import type {Theme} from '../../frontend/types';
+
+type Context = {
+  theme: Theme,
+};
 
 type Props = {
   style: Object,
@@ -23,18 +28,20 @@ type Props = {
 type DefaultProps = {};
 
 type State = {
+  showNew: boolean,
   newAttr: string,
   newValue: string|number,
 };
 
 class StyleEdit extends React.Component {
+  context: Context;
   props: Props;
   defaultProps: DefaultProps;
   state: State;
 
   constructor(props: Props) {
     super(props);
-    this.state = {newAttr: '', newValue: ''};
+    this.state = {showNew: false, newAttr: '', newValue: ''};
   }
 
   onChange(name: string, val: string | number) {
@@ -42,52 +49,95 @@ class StyleEdit extends React.Component {
     this.props.onChange(name, num == val ? num : val);
   }
 
-  onNew(val: string | number) {
+  onNewSubmit(val: string | number) {
     this.onChange(this.state.newAttr, val);
-    this.setState({newAttr: '', newValue: ''});
+    this.setState({showNew: false, newAttr: '', newValue: ''});
+  }
+
+  onNewAttr(attr: string | number) {
+    if (attr === '') {
+      this.setState({showNew: false});
+    } else {
+      this.setState({newAttr: '' + attr});
+    }
+  }
+
+  onListClick(e: Event) {
+    if (e.target instanceof Element) {
+      if (e.target.tagName === 'INPUT') {
+        return;
+      }
+    }
+    this.setState({showNew: true});
   }
 
   render() {
     var attrs = Object.keys(this.props.style);
     return (
-      <ul style={styles.container}>
+      <ul style={styles.list} onClick={e => this.onListClick(e)}>
+        <span style={tagStyle(this.context.theme)}>style</span>
+        <span>{' {'}</span>
         {attrs.map(name => (
-          <li key={'style-' + name} style={styles.attr}>
-            <BlurInput
+          <li key={'style-' + name} style={styles.listItem} onClick={blockClick}>
+            <AutoSizeInput
+              type="attr"
               value={name}
               onChange={newName => this.props.onRename(name, '' + newName, this.props.style[name])}
             />
-            :
-            <BlurInput
+            <span style={styles.colon}>:</span>
+            <AutoSizeInput
               value={this.props.style[name]}
               onChange={val => this.onChange(name, val)}
             />
+            <span style={styles.colon}>;</span>
           </li>
         ))}
-        <li style={styles.attr}>
-          <BlurInput
-            value={this.state.newAttr}
-            onChange={newAttr => this.setState({newAttr: '' + newAttr})}
-          />
-          :
-          {this.state.newAttr && <BlurInput
-            value={''}
-            onChange={val => this.onNew(val)}
-          />}
-        </li>
+        {this.state.showNew &&
+          <li style={styles.listItem}>
+            <AutoSizeInput
+              isNew={true}
+              type="attr"
+              value={this.state.newAttr}
+              onChange={newAttr => this.onNewAttr(newAttr)}
+            />
+            <span style={styles.colon}>:</span>
+            <AutoSizeInput
+              value={''}
+              onChange={val => this.onNewSubmit(val)}
+            />
+            <span style={styles.colon}>;</span>
+          </li>}
+        <span>{'}'}</span>
       </ul>
     );
   }
 }
 
-var styles = {
-  container: {
+StyleEdit.contextTypes = {
+  theme: React.PropTypes.object.isRequired,
+};
+
+const blockClick = event => event.stopPropagation();
+
+const tagStyle = (theme: Theme) => ({
+  color: theme.base04,
+});
+
+const styles = {
+  list: {
     listStyle: 'none',
     padding: 0,
-    margin: 0,
+    margin: '5px 0px',
+    cursor: 'text',
   },
-  attr: {
-    padding: 2,
+  colon: {
+    margin: '-3px',
+  },
+  listItem: {
+    margin: 0,
+    display: 'flex',
+    alignItems: 'center',
+    cursor: 'default',
   },
 };
 
