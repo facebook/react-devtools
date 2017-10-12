@@ -198,22 +198,20 @@ class HoverHighlight extends React.Component {
   }
 }
 
-class Filter extends React.Component {
-  render() {
-    var options = ['All', 'Completed', 'Remaining'];
-    return (
-      <div style={styles.filter}>
-        {options.map(text => (
-          <button
-            key={text}
-            style={assign({}, styles.filterButton, text === this.props.filter && styles.filterButtonActive)}
-            onClick={this.props.onFilter.bind(null, text)}
-          >{text}</button>
-        ))}
-        {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
-      </div>
-    );
-  }
+function Filter(props) {
+  var options = ['All', 'Completed', 'Remaining'];
+  return (
+    <div style={styles.filter}>
+      {options.map(text => (
+        <button
+          key={text}
+          style={assign({}, styles.filterButton, text === props.filter && styles.filterButtonActive)}
+          onClick={props.onFilter.bind(null, text)}
+        >{text}</button>
+      ))}
+      {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
+    </div>
+  );
 }
 
 var styles = {
