@@ -129,9 +129,9 @@ function getData(internalInstance: Object): DataType {
     var inst = internalInstance._instance;
 
     // A forceUpdate for stateless (functional) components.
-    var forceUpdate = inst.forceUpdate || function(cb) {
+    var forceUpdate = inst.forceUpdate || (inst.updater && inst.updater.enqueueForceUpdate && function(cb) {
       inst.updater.enqueueForceUpdate(this, cb, 'forceUpdate');
-    };
+    });
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
       forceUpdate: forceUpdate && forceUpdate.bind(inst),
