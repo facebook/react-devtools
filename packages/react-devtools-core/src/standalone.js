@@ -111,7 +111,10 @@ function initialize(socket) {
 var restartTimeout = null;
 function startServer(port = 8097) {
   var httpServer = require('http').createServer();
-  var server = new ws.Server({server: httpServer});
+  var server = new ws.Server({
+    server: httpServer,
+    perMessageDeflate: true,
+  });
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
