@@ -127,12 +127,17 @@ function getData(internalInstance: Object): DataType {
 
   if (internalInstance._instance) {
     var inst = internalInstance._instance;
+
+    // A forceUpdate for stateless (functional) components.
+    var forceUpdate = inst.forceUpdate || (inst.updater && inst.updater.enqueueForceUpdate && function(cb) {
+      inst.updater.enqueueForceUpdate(this, cb, 'forceUpdate');
+    });
     updater = {
       setState: inst.setState && inst.setState.bind(inst),
-      forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
-      setInProps: inst.forceUpdate && setInProps.bind(null, internalInstance),
+      forceUpdate: forceUpdate && forceUpdate.bind(inst),
+      setInProps: forceUpdate && setInProps.bind(null, internalInstance, forceUpdate),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
-      setInContext: inst.forceUpdate && setInContext.bind(null, inst),
+      setInContext: forceUpdate && setInContext.bind(null, inst, forceUpdate),
     };
     if (typeof type === 'function') {
       publicInstance = inst;
@@ -172,13 +177,13 @@ function getData(internalInstance: Object): DataType {
   };
 }
 
-function setInProps(internalInst, path: Array<string | number>, value: any) {
+function setInProps(internalInst, forceUpdate, path: Array<string | number>, value: any) {
   var element = internalInst._currentElement;
   internalInst._currentElement = {
     ...element,
     props: copyWithSet(element.props, path, value),
   };
-  internalInst._instance.forceUpdate();
+  forceUpdate.call(internalInst._instance);
 }
 
 function setInState(inst, path: Array<string | number>, value: any) {
@@ -186,9 +191,9 @@ function setInState(inst, path: Array<string | number>, value: any) {
   inst.forceUpdate();
 }
 
-function setInContext(inst, path: Array<string | number>, value: any) {
+function setInContext(inst, forceUpdate, path: Array<string | number>, value: any) {
   setIn(inst.context, path, value);
-  inst.forceUpdate();
+  forceUpdate.call(inst);
 }
 
 function setIn(obj: Object, path: Array<string | number>, value: any) {

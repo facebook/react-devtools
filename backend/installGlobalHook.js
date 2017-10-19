@@ -22,7 +22,6 @@ function installGlobalHook(window: Object) {
   }
   function detectReactBuildType(renderer) {
     try {
-      var toString = Function.prototype.toString;
       if (typeof renderer.version === 'string') {
         // React DOM Fiber (16+)
         if (renderer.bundleType > 0) {
@@ -31,29 +30,17 @@ function installGlobalHook(window: Object) {
           // but might add 2 (PROFILE) in the future.
           return 'development';
         }
-        // The above should cover envification, but we should still make sure
-        // that the bundle code has been uglified.
-        var findFiberCode = toString.call(renderer.findFiberByHostInstance);
-        // Filter out bad results (if that is even possible):
-        if (findFiberCode.indexOf('function') !== 0) {
-          // Hope for the best if we're not sure.
-          return 'production';
-        }
 
-        // By now we know that it's envified--but what if it's not minified?
-        // This can be bad too, as it means DEV code is still there.
-
-        // FIXME: this is fragile!
-        // We should replace this check with check on a specially passed
-        // function. This also doesn't detect lack of dead code elimination
-        // (although this is not a problem since flat bundles).
-        if (findFiberCode.indexOf('getClosestInstanceFromNode') !== -1) {
-          return 'unminified';
-        }
-
-        // We're good.
+        // React 16 uses flat bundles. If we report the bundle as production
+        // version, it means we also minified and envified it ourselves.
         return 'production';
+        // Note: There is still a risk that the CommonJS entry point has not
+        // been envified or uglified. In this case the user would have *both*
+        // development and production bundle, but only the prod one would run.
+        // This would be really bad. We have a separate check for this because
+        // it happens *outside* of the renderer injection. See `checkDCE` below.
       }
+      var toString = Function.prototype.toString;
       if (renderer.Mount && renderer.Mount._renderNewRootComponent) {
         // React DOM Stack
         var renderRootCode = toString.call(renderer.Mount._renderNewRootComponent);
@@ -141,6 +128,9 @@ function installGlobalHook(window: Object) {
     }
     return 'production';
   }
+
+  let hasDetectedBadDCE = false;
+
   function detectRendererName(renderer) {
     if (renderer.rendererPackageName) {
       return renderer.rendererPackageName;
@@ -194,16 +184,42 @@ function installGlobalHook(window: Object) {
     // Shared between Stack and Fiber:
     _renderers: {},
     helpers: {},
+    checkDCE: function(fn) {
+      // This runs for production versions of React.
+      // Needs to be super safe.
+      try {
+        var toString = Function.prototype.toString;
+        var code = toString.call(fn);
+        // This is a string embedded in the passed function under DEV-only
+        // condition. However the function executes only in PROD. Therefore,
+        // if we see it, dead code elimination did not work.
+        if (code.indexOf('^_^') > -1) {
+          // Remember to report during next injection.
+          hasDetectedBadDCE = true;
+          // Bonus: throw an exception hoping that it gets picked up by
+          // a reporting system. Not synchronously so that it doesn't break the
+          // calling code.
+          setTimeout(function() {
+            throw new Error(
+              'React is running in production mode, but dead code ' +
+                'elimination has not been applied. Read how to correctly ' +
+                'configure React for production: ' +
+                'https://fb.me/react-perf-use-the-production-build'
+            );
+          });
+        }
+      } catch (err) { }
+    },
     inject: function(renderer) {
       var id = Math.random().toString(16).slice(2);
       hook._renderers[id] = renderer;
       var isReactDuplicated = detectDuplicatedRenderers(hook._renderers);
 
       // Currently we overwrite buildType with each injected renderer's type
-      var reactBuildType = isReactDuplicated
-        ? 'duplicated'
-        : detectReactBuildType(renderer);
+      var duplicated = isReactDuplicated ? 'duplicated' : null;
+      var deadcode = hasDetectedBadDCE ? 'deadcode' : null;
 
+      var reactBuildType = duplicated || deadcode || detectReactBuildType(renderer);
       hook.emit('renderer', {id, renderer, reactBuildType});
       return id;
     },
