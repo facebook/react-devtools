@@ -2,7 +2,7 @@
 
 React Developer Tools lets you inspect the React component hierarchy, including component props and state.
 
-It exists both as a browser extension (for [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) and [Firefox](https://addons.mozilla.org/firefox/addon/react-devtools/)), and as a [standalone app](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools) (works with other environments including Safari, IE, and React Native).
+It exists both as a browser extension (for [Chrome](https://chrome.google.com/webstore/detail/react-developer-tools/fmkadmapgofadopljbjfkapdkoienihi) and [Firefox](https://addons.mozilla.org/firefox/addon/react-devtools/)) and as a [standalone app](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools) (works with other environments including Safari, IE and React Native).
 
 ![](/images/devtools-full.gif)
 
@@ -32,7 +32,7 @@ A quick way to bring up the DevTools is to right-click on the page and press Ins
 
 ### Tree View
 
-- Arrow keys or hjkl for navigation
+- Arrow keys or h,j,k,l(keyboard keys) for navigation
 - Right click a component to show in elements pane, scroll into view, show
   source, etc.
 - Differently-colored collapser means the component has state/context
@@ -60,7 +60,7 @@ If you inspect a React element on the page using the regular **Elements** tab, t
 
 #### Finding DOM Node by a Component
 
-You can right-click any React element in the **React** tab, and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
+You can right-click any React element in the **React** tab and choose "Find the DOM node". This will bring you to the corresponding DOM node in the **Elements** tab.
 
 #### Displaying Element Source
 
@@ -82,11 +82,11 @@ Or you could develop with a local HTTP server [like `serve`](https://www.npmjs.c
 
 **The React tab won't show up if the site doesn't use React**, or if React can't communicate with the devtools. When the page loads, the devtools sets a global named `__REACT_DEVTOOLS_GLOBAL_HOOK__`, then React communicates with that hook during initialization. You can test this on the [React website](http://facebook.github.io/react/) or by inspecting [Facebook](https://www.facebook.com/).
 
-**If your app is inside of CodePen**, make sure you are registered. Then press Fork (if it's not your pen), and then choose Change View > Debug. The Debug view is inspectable with DevTools because it doesn't use an iframe.
+**If your app is inside of CodePen**, make sure you are registered. Then press Fork (if it's not your pen) and then choose Change View > Debug. The Debug view is inspectable with DevTools because it doesn't use an iframe.
 
 **If your app is inside an iframe, a Chrome extension, React Native, or in another unusual environment**, try [the standalone version instead](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools). Chrome apps are currently not inspectable.
 
-**If you still have issues** please [report them](https://github.com/facebook/react-devtools/issues/new). Don't forget to specify your OS, browser version, extension version, and the exact instructions to reproduce the issue with a screenshot.
+**If you still have issues** please [report them](https://github.com/facebook/react-devtools/issues/new). Don't forget to specify your OS, browser version, extension version and the exact instructions to reproduce the issue with a screenshot.
 
 ### Does "Highlight Updates" trace renders?
 
@@ -113,10 +113,10 @@ please read the [Contributing document](CONTRIBUTING.md).
 What to do if the extension breaks.
 
 - check the error console of devtools. Part of React Devtools runs scripts in
-    the context of your page, and is vulnerable to misbehaving polyfills.
-- open devtools out into a new window, and then hit the shortcut to open
+    the context of your page and is vulnerable to misbehaving polyfills.
+- open devtools out into a new window and then hit the shortcut to open
     devtools again (cmd+option+j or ctrl+shift+j). This is the "debug
     devtools" debugger. Check the console there for errors.
-- open `chrome://extensions`, find react devtools, and click "background page"
+- open `chrome://extensions`, find react devtools and click "background page"
     under "Inspected views". You might find the errors there.
 
