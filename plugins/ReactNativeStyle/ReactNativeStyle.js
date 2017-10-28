@@ -11,8 +11,8 @@
 'use strict';
 
 var React = require('react');
-var StyleEdit = require('./StyleEdit');
 var BoxInspector = require('./BoxInspector');
+var DataViewWrapper = require('./DataViewWrapper');
 
 function shallowClone(obj) {
   var nobj = {};
@@ -114,10 +114,10 @@ class NativeStyler extends React.Component {
     return (
       <div style={styles.container}>
         {this.state.measuredLayout && <BoxInspector {...this.state.measuredLayout} />}
-        <StyleEdit
-          style={this.state.style}
+        <DataViewWrapper
           onRename={this._handleStyleRename.bind(this)}
           onChange={this._handleStyleChange.bind(this)}
+          style={this.state.style}
         />
       </div>
     );

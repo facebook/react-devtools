@@ -165,7 +165,14 @@ function renameStyle(agent, id, oldName, newName, val) {
 
 function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
-  var newStyle = {[attr]: val};
+  var newStyle;
+  try {
+    newStyle = {
+      [attr]: JSON.parse(val),
+    };
+  } catch (e) {
+    newStyle = {[attr]: val};
+  }
 
   if (data && data.updater && data.updater.setInProps) {
     // First attempt: use setInProps().
