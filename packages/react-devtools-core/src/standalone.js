@@ -71,7 +71,6 @@ function onError(e) {
 
 function initialize(socket) {
   var listeners = [];
-  var isLegacyRN = false;
   socket.onmessage = (evt) => {
     var data = JSON.parse(evt.data);
     listeners.forEach((fn) => fn(data));
