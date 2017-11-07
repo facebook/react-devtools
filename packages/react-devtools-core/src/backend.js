@@ -15,6 +15,7 @@ type ConnectOptions = {
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
   isAppActive?: () => boolean,
+  websocket?: ?WebSocket,
 };
 
 var Agent = require('../../../agent/Agent');
