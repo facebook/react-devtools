@@ -40,6 +40,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   var {
     host = 'localhost',
     port = 8097,
+    websocket,
     resolveRNStyle = null,
     isAppActive = () => true,
   } = options || {};
@@ -59,7 +60,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   var messageListeners = [];
   var closeListeners = [];
   var uri = 'ws://' + host + ':' + port;
-  var ws = new window.WebSocket(uri);
+  var ws = websocket ? websocket : new window.WebSocket(uri);
   ws.onclose = handleClose;
   ws.onerror = handleClose;
   ws.onmessage = handleMessage;

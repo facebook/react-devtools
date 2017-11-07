@@ -96,6 +96,25 @@ function initialize(socket) {
 }
 
 var restartTimeout = null;
+
+function connectToSocket(socket) {
+  socket.onerror = (err) => {
+    onDisconnected();
+    log.error('Error with websocket connection', err);
+  };
+  socket.onclose = () => {
+    onDisconnected();
+    log('Connection to RN closed');
+  };
+  initialize(socket);
+
+  return {
+    close: function() {
+      onDisconnected();
+    },
+  };
+}
+
 function startServer(port = 8097) {
   var httpServer = require('http').createServer();
   var server = new ws.Server({server: httpServer});
@@ -188,6 +207,7 @@ var DevtoolsUI = {
   },
 
   startServer,
+  connectToSocket,
 };
 
 module.exports = DevtoolsUI;

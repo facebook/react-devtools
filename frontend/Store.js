@@ -548,7 +548,7 @@ class Store extends EventEmitter {
   changeTraceUpdates(state: ControlState) {
     this.traceupdatesState = state;
     this.emit('traceupdatesstatechange');
-    invariant(state.toJS);
+    invariant(state.toJS, 'state.toJS should exist');
     this._bridge.send('traceupdatesstatechange', state.toJS());
   }
 
