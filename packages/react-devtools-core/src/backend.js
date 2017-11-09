@@ -61,6 +61,9 @@ function connectToDevTools(options: ?ConnectOptions) {
   var messageListeners = [];
   var closeListeners = [];
   var uri = 'ws://' + host + ':' + port;
+  // If existing websocket is passed, use it.
+  // This is necessary to support our custom integrations.
+  // See D6251744.
   var ws = websocket ? websocket : new window.WebSocket(uri);
   ws.onclose = handleClose;
   ws.onerror = handleClose;
