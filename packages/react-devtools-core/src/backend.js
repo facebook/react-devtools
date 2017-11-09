@@ -15,6 +15,7 @@ type ConnectOptions = {
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
   isAppActive?: () => boolean,
+  websocket?: ?WebSocket,
 };
 
 var Agent = require('../../../agent/Agent');
@@ -40,6 +41,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   var {
     host = 'localhost',
     port = 8097,
+    websocket,
     resolveRNStyle = null,
     isAppActive = () => true,
   } = options || {};
@@ -59,7 +61,10 @@ function connectToDevTools(options: ?ConnectOptions) {
   var messageListeners = [];
   var closeListeners = [];
   var uri = 'ws://' + host + ':' + port;
-  var ws = new window.WebSocket(uri);
+  // If existing websocket is passed, use it.
+  // This is necessary to support our custom integrations.
+  // See D6251744.
+  var ws = websocket ? websocket : new window.WebSocket(uri);
   ws.onclose = handleClose;
   ws.onerror = handleClose;
   ws.onmessage = handleMessage;
@@ -89,14 +94,6 @@ function connectToDevTools(options: ?ConnectOptions) {
 
   function handleMessage(evt) {
     var data;
-    // <hack>
-    // This branch can be dropped when we don't care about supporting
-    // Nuclide Inspector versions before https://github.com/facebook/nuclide/pull/1021.
-    // Inspector used to send this message but it is unnecessary now.
-    if (evt.data.indexOf('eval:') === 0) {
-      return;
-    }
-    // </hack>
     try {
       data = JSON.parse(evt.data);
     } catch (e) {
