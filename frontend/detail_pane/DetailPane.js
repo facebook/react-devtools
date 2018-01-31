@@ -13,10 +13,12 @@
 var {monospace} = require('../Themes/Fonts');
 var React = require('react');
 
-// $FlowFixMe From the upgrade to Flow 64
-class DetailPane extends React.Component {
-  // $FlowFixMe From the upgrade to Flow 64
-  render(): React.Element {
+type Props = {
+  children: React.Node,
+}
+
+class DetailPane extends React.Component<Props> {
+  render() {
     return (
       <div style={styles.container}>
         {this.props.children}
