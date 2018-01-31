@@ -15,6 +15,7 @@ import type {Theme, DOMEvent} from '../types';
 var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
 var Simple = require('./Simple');
+var nullthrows = require('nullthrows').default;
 
 var consts = require('../../agent/consts');
 var previewComplex = require('./previewComplex');
@@ -23,7 +24,7 @@ type Inspect = (path: Array<string>, cb: () => void) => void;
 type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
 type DataViewProps = {
-  data: Object,
+  data: ?Object,
   path: Array<string>,
   inspect: Inspect,
   showMenu: ShowMenu,
@@ -32,12 +33,10 @@ type DataViewProps = {
   readOnly?: boolean,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class DataView extends React.Component {
+class DataView extends React.Component<DataViewProps> {
   context: {
     theme: Theme,
   };
-  props: DataViewProps;
 
   renderSparseArrayHole(count: number, key: string) {
     const {theme} = this.context;
@@ -54,6 +53,7 @@ class DataView extends React.Component {
   }
 
   renderItem(name: string, key: string) {
+    const data = nullthrows(this.props.data);
     return (
       <DataItem
         key={key}
@@ -63,7 +63,7 @@ class DataView extends React.Component {
         inspect={this.props.inspect}
         showMenu={this.props.showMenu}
         readOnly={this.props.readOnly}
-        value={this.props.data[name]} />
+        value={data[name]} />
     );
   }
 
@@ -127,7 +127,7 @@ class DataView extends React.Component {
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
-            value={this.props.data[consts.proto]}
+            value={data[consts.proto]}
           />}
 
         {elements}
@@ -140,24 +140,28 @@ DataView.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class DataItem extends React.Component {
+type Props = {
+  path: Array<string>,
+  inspect: Inspect,
+  showMenu: ShowMenu,
+  startOpen?: boolean,
+  noSort?: boolean,
+  readOnly?: boolean,
+  name: string,
+  value: any,
+};
+
+type State = {
+  open: boolean,
+  loading: boolean,
+}
+
+class DataItem extends React.Component<Props, State> {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
     theme: Theme,
   };
-  props: {
-    path: Array<string>,
-    inspect: Inspect,
-    showMenu: ShowMenu,
-    startOpen?: boolean,
-    noSort?: boolean,
-    readOnly?: boolean,
-    name: string,
-    value: any,
-  };
   defaultProps: {};
-  state: {open: boolean, loading: boolean};
 
   constructor(props) {
     super(props);
@@ -177,10 +181,8 @@ class DataItem extends React.Component {
   }
 
   inspect() {
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({loading: true, open: true});
     this.props.inspect(this.props.path, () => {
-      // $FlowFixMe From the upgrade to Flow 64
       this.setState({loading: false});
     });
   }
@@ -194,7 +196,6 @@ class DataItem extends React.Component {
       return;
     }
 
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       open: !this.state.open,
     });

@@ -13,6 +13,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Draggable = require('./Draggable');
+var nullthrows = require('nullthrows').default;
 
 import type {Theme} from './types';
 
@@ -22,10 +23,8 @@ type Context = {
 
 type Props = {
   style?: {[key: string]: any},
-  // $FlowFixMe From the upgrade to Flow 64
-  left: () => React$Element,
-  // $FlowFixMe From the upgrade to Flow 64
-  right: () => React$Element,
+  left: () => React.Node,
+  right: () => React.Node,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,
@@ -37,11 +36,8 @@ type State = {
   height: number,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class SplitPane extends React.Component {
+class SplitPane extends React.Component<Props, State> {
   context: Context;
-  props: Props;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -53,31 +49,26 @@ class SplitPane extends React.Component {
   }
 
   componentDidMount() {
-    var node = ReactDOM.findDOMNode(this);
+    // $FlowFixMe use a ref on the root
+    var node: HTMLDivElement = nullthrows(ReactDOM.findDOMNode(this));
 
-    // $FlowFixMe From the upgrade to Flow 64
     const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
 
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       width: Math.min(250, width),
-      // $FlowFixMe From the upgrade to Flow 64
       height: Math.floor(node.offsetHeight * 0.3),
     });
   }
 
   onMove(x: number, y: number) {
-    // $FlowFixMe From the upgrade to Flow 64
+    // $FlowFixMe use a ref on the root
     var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState(prevState => ({
       width: this.props.isVertical ?
-        // $FlowFixMe From the upgrade to Flow 64
         prevState.width :
         Math.floor(rect.left + rect.width - x),
       height: !this.props.isVertical ?
-        // $FlowFixMe From the upgrade to Flow 64
         prevState.height :
         Math.floor(rect.top + rect.height - y),
     }));
@@ -96,10 +87,8 @@ class SplitPane extends React.Component {
         <div style={rightStyle(isVertical, width, height)}>
           <Draggable
             style={draggerStyle(isVertical)}
-            // $FlowFixMe From the upgrade to Flow 64
             onStart={() => this.setState({moving: true})}
             onMove={(x, y) => this.onMove(x, y)}
-            // $FlowFixMe From the upgrade to Flow 64
             onStop={() => this.setState({moving: false})}>
             <div style={draggerInnerStyle(isVertical, theme)} />
           </Draggable>

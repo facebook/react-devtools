@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var nullthrows = require('nullthrows').default;
 var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
@@ -24,22 +25,26 @@ export type MenuItem = {
   action: () => void
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class ContextMenu extends React.Component {
+type Props = {
+  open: boolean,
+  hideContextMenu: () => void,
+  items: Array<MenuItem>,
+  pos: {
+    x: number,
+    y: number,
+  },
+};
+
+type State = {
+  elementHeight: number,
+  windowHeight: number,
+};
+
+class ContextMenu extends React.Component<Props, State> {
   _clickout: (evt: Object) => void;
 
   context: {
     theme: Theme,
-  };
-
-  props: {
-    open: boolean,
-    hideContextMenu: () => void,
-    items: Array<MenuItem>,
-    pos: {
-      x: number,
-      y: number,
-    },
   };
 
   state = {
@@ -69,16 +74,13 @@ class ContextMenu extends React.Component {
       return;
     }
 
-    // $FlowFixMe From the upgrade to Flow 64
-    const elementHeight = element.querySelector('ul').clientHeight;
+    const elementHeight = nullthrows(element.querySelector('ul')).clientHeight;
     const windowHeight = window.innerHeight;
 
-    // $FlowFixMe From the upgrade to Flow 64
     if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
       return;
     }
 
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       elementHeight: elementHeight,
       windowHeight: windowHeight,
@@ -88,7 +90,6 @@ class ContextMenu extends React.Component {
   render() {
     const {theme} = this.context;
     const {items, open, pos} = this.props;
-    // $FlowFixMe From the upgrade to Flow 64
     const {elementHeight, windowHeight} = this.state;
 
     if (pos && (pos.y + elementHeight) > windowHeight) {

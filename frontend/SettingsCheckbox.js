@@ -32,11 +32,8 @@ const StateRecord = immutable.Record({
   enabled: false,
 });
 
-// $FlowFixMe From the upgrade to Flow 64
-class SettingsCheckbox extends React.Component {
-  props: Props;
+class SettingsCheckbox extends React.Component<Props, State> {
   defaultProps: DefaultProps;
-  state: State;
 
   _defaultState: ControlState;
   _toggle: (b: boolean) => void;
