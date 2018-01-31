@@ -155,11 +155,9 @@ class Editor extends React.Component<Props, State> {
 
     // Give (temporary) UI confirmation that the URL has been copied.
     this.setState(
-      // $FlowFixMe From the upgrade to Flow 64
       {showCopyConfirmation: true},
       () => {
         this.props.setTimeout(
-          // $FlowFixMe From the upgrade to Flow 64
           () => this.setState({showCopyConfirmation: false}),
           2500,
         );
@@ -174,10 +172,8 @@ class Editor extends React.Component<Props, State> {
   };
 
   _udpatePreview = () => {
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState(state => ({
       isResetEnabled: this._serializedPropsTheme !== serialize(this._customTheme),
-      // $FlowFixMe From the upgrade to Flow 64
       updateCounter: state.updateCounter + 1,
     }));
   };

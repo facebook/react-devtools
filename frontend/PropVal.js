@@ -20,15 +20,15 @@ var flash = require('./flash');
 
 import type {Theme} from './types';
 
-// $FlowFixMe From the upgrade to Flow 64
-class PropVal extends React.Component {
+type Props = {
+  val: any,
+  nested?: boolean,
+  inverted?: boolean,
+};
+
+class PropVal extends React.Component<Props> {
   context: {
     theme: Theme,
-  };
-  props: {
-    val: any,
-    nested?: boolean,
-    inverted?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -38,7 +38,7 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
-    // $FlowFixMe From the upgrade to Flow 64
+    // $FlowFixMe
     flash(node, this.context.theme.state04, 'transparent', 1);
   }
 
@@ -124,14 +124,14 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
-      style = {    
-        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+      style = {
+        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
       };
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
-      style = {    
-        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+      style = {
+        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
       };
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
@@ -139,8 +139,8 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
   }
 
   if (nested) {
-    style = {    
-      color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+    style = {
+      color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
     };
     return <span style={style}>{'{…}'}</span>;
   }

@@ -21,8 +21,7 @@ type State = {
 };
 
 const Hoverable = (Component: any) => {
-  // $FlowFixMe From the upgrade to Flow 64
-  class HoverableImplementation extends React.Component<void, Props, State> {
+  class HoverableImplementation extends React.Component<Props, State> {
     props: Props;
     state: State = {
       isHovered: false,
@@ -45,27 +44,19 @@ const Hoverable = (Component: any) => {
       );
     }
 
-    // $FlowFixMe From the upgrade to Flow 64
-    _onMouseDown: Function = (event: SyntheticEvent): void => {
-      // $FlowFixMe From the upgrade to Flow 64
+    _onMouseDown: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isPressed: true });
     };
 
-    // $FlowFixMe From the upgrade to Flow 64
-    _onMouseEnter: Function = (event: SyntheticEvent): void => {
-      // $FlowFixMe From the upgrade to Flow 64
+    _onMouseEnter: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isHovered: true });
     };
 
-    // $FlowFixMe From the upgrade to Flow 64
-    _onMouseLeave: Function = (event: SyntheticEvent): void => {
-      // $FlowFixMe From the upgrade to Flow 64
+    _onMouseLeave: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isHovered: false, isPressed: false });
     };
 
-    // $FlowFixMe From the upgrade to Flow 64
-    _onMouseUp: Function = (event: SyntheticEvent): void => {
-      // $FlowFixMe From the upgrade to Flow 64
+    _onMouseUp: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isPressed: false });
     };
   }

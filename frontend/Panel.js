@@ -68,11 +68,12 @@ type State = {
   themeName: ?string,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class Panel extends React.Component {
+class Panel extends React.Component<Props, State> {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
-  _checkTimeout: ?number;
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  _checkTimeout: ?TimeoutID;
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
@@ -81,9 +82,7 @@ class Panel extends React.Component {
   // TODO: typecheck plugin interface
   plugins: Array<any>;
 
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -150,7 +149,6 @@ class Panel extends React.Component {
     }
     this.teardown();
     if (!this._unMounted) {
-      // $FlowFixMe From the upgrade to Flow 64
       this.setState({loading: true}, this.props.reload);
     }
   }
@@ -224,7 +222,7 @@ class Panel extends React.Component {
 
       this._themeStore = new ThemeStore(this.state.themeName);
       this._store = new Store(this._bridge, this._themeStore);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
@@ -234,7 +232,6 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {
-        // $FlowFixMe From the upgrade to Flow 64
         this.setState({
           loading: false,
           themeName: this._themeStore.themeName,
@@ -242,7 +239,6 @@ class Panel extends React.Component {
         this.getNewSelection();
       });
       this._store.on('preferencesPanelShown', () => {
-        // $FlowFixMe From the upgrade to Flow 64
         this.setState({
           preferencesPanelShown: this._store.preferencesPanelShown,
         });
@@ -250,9 +246,7 @@ class Panel extends React.Component {
       this._store.on('theme', () => {
         // Force a deep re-render when theme changes.
         // Use an incrementor so changes to Custom theme also update.
-        // $FlowFixMe From the upgrade to Flow 64
         this.setState(state => ({
-          // $FlowFixMe From the upgrade to Flow 64
           themeKey: state.themeKey + 1,
           themeName: this._themeStore.theme.displayName,
         }));
@@ -263,7 +257,6 @@ class Panel extends React.Component {
   componentDidUpdate() {
     if (!this.state.isReact) {
       if (!this._checkTimeout) {
-        // $FlowFixMe From the upgrade to Flow 64
         this._checkTimeout = setTimeout(() => {
           this._checkTimeout = null;
           this.lookForReact();
@@ -278,12 +271,10 @@ class Panel extends React.Component {
     }
     this.props.checkForReact(isReact => {
       if (isReact) {
-        // $FlowFixMe From the upgrade to Flow 64
         this.setState({isReact: true, loading: true});
         this.inject();
       } else {
         console.log('still looking...');
-        // $FlowFixMe From the upgrade to Flow 64
         this.setState({isReact: false, loading: false});
       }
     });

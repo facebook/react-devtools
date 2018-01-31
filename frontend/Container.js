@@ -22,11 +22,9 @@ import type MenuItem from './ContextMenu';
 import type {Theme} from './types';
 
 type Props = {
-  reload: () => void,
-  // $FlowFixMe From the upgrade to Flow 64
-  extraPanes: Array<(node: Object) => React$Element>,
-  // $FlowFixMe From the upgrade to Flow 64
-  extraTabs: ?{[key: string]: () => React$Element},
+  reload?: () => void,
+  extraPanes: Array<(node: Object) => React.Node>,
+  extraTabs: ?{[key: string]: () => React.Node},
   menuItems: {
     tree?: (id: string, node: Object, store: Object) => ?Array<MenuItem>,
     attr?: (
@@ -38,11 +36,10 @@ type Props = {
       store: Object
     ) => ?Array<MenuItem>,
   },
-  // $FlowFixMe From the upgrade to Flow 64
-  extraTabs: {[key: string]: () => React$Element},
+  extraTabs: {[key: string]: () => React.Node},
   preferencesPanelShown: boolean,
   theme: Theme,
-  onViewElementSource: null | (id: string, node: ?Object) => void,
+  onViewElementSource: null | (id: string, node: Object) => void,
 };
 
 type State = {
@@ -55,11 +52,10 @@ function shouldUseVerticalLayout(window) {
   return window.innerWidth < IS_VERTICAL_BREAKPOINT;
 }
 
-// $FlowFixMe From the upgrade to Flow 64
-class Container extends React.Component {
-  props: Props;
-  state: State;
-  resizeTimeout: ?number;
+class Container extends React.Component<Props, State> {
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  resizeTimeout: ?TimeoutID;
 
   constructor(props: Props) {
     super(props);
@@ -71,7 +67,6 @@ class Container extends React.Component {
 
   componentDidMount() {
     window.addEventListener('resize', this.handleResize, false);
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       isVertical: shouldUseVerticalLayout(window),
     });
@@ -79,14 +74,14 @@ class Container extends React.Component {
 
   componentWillUnmount() {
     window.removeEventListener('resize', this.handleResize);
-    // $FlowFixMe From the upgrade to Flow 64
-    clearTimeout(this.resizeTimeout);
+    if (this.resizeTimeout != null) {
+      clearTimeout(this.resizeTimeout);
+    }
   }
 
   // $FlowFixMe future versions of Flow can infer this
   handleResize = (e: Event): void => {
     if (!this.resizeTimeout) {
-      // $FlowFixMe From the upgrade to Flow 64
       this.resizeTimeout = setTimeout(this.handleResizeTimeout, 50);
     }
   };
@@ -95,7 +90,6 @@ class Container extends React.Component {
   handleResizeTimeout = (): void => {
     this.resizeTimeout = null;
 
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       isVertical: shouldUseVerticalLayout(window),
     });
