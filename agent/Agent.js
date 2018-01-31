@@ -13,6 +13,7 @@
 var {EventEmitter} = require('events');
 
 var assign = require('object-assign');
+var nullthrows = require('nullthrows').default;
 var guid = require('../utils/guid');
 var getIn = require('./getIn');
 
@@ -313,8 +314,7 @@ class Agent extends EventEmitter {
 
   _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInProps) {
-      // $FlowFixMe From the upgrade to Flow 64
+    if (data && data.updater && typeof data.updater.setInProps === 'function') {
       data.updater.setInProps(path, value);
     } else {
       console.warn("trying to set props on a component that doesn't support it");
@@ -323,8 +323,7 @@ class Agent extends EventEmitter {
 
   _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInState) {
-      // $FlowFixMe From the upgrade to Flow 64
+    if (data && data.updater && typeof data.updater.setInState === 'function') {
       data.updater.setInState(path, value);
     } else {
       console.warn("trying to set state on a component that doesn't support it");
@@ -333,8 +332,8 @@ class Agent extends EventEmitter {
 
   _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInContext) {
-      // $FlowFixMe From the upgrade to Flow 64
+    if (data && data.updater && typeof data.updater.setInContext === 'function') {
+      // $FlowFixMe
       data.updater.setInContext(path, value);
     } else {
       console.warn("trying to set context on a component that doesn't support it");
@@ -363,13 +362,11 @@ class Agent extends EventEmitter {
     if (!this.idsByInternalInstances.has(internalInstance)) {
       this.idsByInternalInstances.set(internalInstance, guid());
       this.internalInstancesById.set(
-        // $FlowFixMe From the upgrade to Flow 64
-        this.idsByInternalInstances.get(internalInstance),
+        nullthrows(this.idsByInternalInstances.get(internalInstance)),
         internalInstance
       );
     }
-    // $FlowFixMe From the upgrade to Flow 64
-    return this.idsByInternalInstances.get(internalInstance);
+    return nullthrows(this.idsByInternalInstances.get(internalInstance));
   }
 
   addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
@@ -454,7 +451,7 @@ class Agent extends EventEmitter {
       if (!id) {
         return;
       }
-      
+
       this.highlight(id);
     }
   }
