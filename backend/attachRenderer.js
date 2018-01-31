@@ -62,11 +62,11 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     };
 
     extras.getReactElementFromNative = function(node) {
-      // $FlowFixMe From the upgrade to Flow 64
+      // $FlowFixMe
       var id = renderer.Mount.getID(node);
       while (node && node.parentNode && !id) {
         node = node.parentNode;
-        // $FlowFixMe From the upgrade to Flow 64
+        // $FlowFixMe
         id = renderer.Mount.getID(node);
       }
       return rootNodeIDMap.get(id);
@@ -114,8 +114,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       },
       unmountComponent() {
         hook.emit('unmount', {internalInstance: this, renderer: rid});
-        // $FlowFixMe From the upgrade to Flow 64
-        rootNodeIDMap.delete(this._rootNodeID, this);
+        rootNodeIDMap.delete(this._rootNodeID);
       },
     });
   } else if (renderer.Reconciler) {
@@ -133,8 +132,7 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
       },
       unmountComponent(internalInstance) {
         hook.emit('unmount', {internalInstance, renderer: rid});
-        // $FlowFixMe From the upgrade to Flow 64
-        rootNodeIDMap.delete(internalInstance._rootNodeID, internalInstance);
+        rootNodeIDMap.delete(internalInstance._rootNodeID);
       },
     });
   }
