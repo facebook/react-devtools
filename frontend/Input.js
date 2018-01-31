@@ -33,7 +33,9 @@ const Input = (props: Props, context: Context) => {
     style = {},
     theme,
     innerRef,
-    ...rest,
+    // A dangling comma here is now invalid js. TODO: update eslint
+    // eslint-disable-next-line comma-dangle
+    ...rest
   } = props;
 
   const chosenTheme = theme ? theme : context.theme;
