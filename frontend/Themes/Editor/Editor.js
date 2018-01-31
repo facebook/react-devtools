@@ -42,25 +42,24 @@ const colors = Object.assign({},
   ColorGroups.Syntax
 );
 
-// $FlowFixMe From the upgrade to Flow 64
-class Editor extends React.Component {
+type Props = {
+  changeTheme: (themeName: string) => void,
+  defaultThemeName: string,
+  hide: () => {},
+  saveTheme: (theme: Theme) => {},
+  setTimeout: SetTimeout,
+  theme: Theme,
+}
+
+type State = {
+  isResetEnabled: boolean,
+  showCopyConfirmation: boolean,
+  updateCounter: number,
+}
+
+class Editor extends React.Component<Props, State> {
   _customTheme: Theme;
   _serializedPropsTheme: string;
-
-  props: {
-    changeTheme: (themeName: string) => void,
-    defaultThemeName: string,
-    hide: () => {},
-    saveTheme: (theme: Theme) => {},
-    setTimeout: SetTimeout,
-    theme: Theme,
-  };
-
-  state: {
-    isResetEnabled: boolean,
-    showCopyConfirmation: boolean,
-    updateCounter: number,
-  };
 
   constructor(props, context) {
     super(props, context);
@@ -127,9 +126,7 @@ class Editor extends React.Component {
             </button>
           </div>
 
-          {/* $FlowFixMe From the upgrade to Flow 64 */}
           <div style={styles.importExportRow}>
-            {/* $FlowFixMe From the upgrade to Flow 64 */}
             <CopyThemeButton
               onClick={this._copyTheme}
               showCopyConfirmation={showCopyConfirmation}
