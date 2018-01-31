@@ -11,12 +11,12 @@
 'use strict';
 
 const FB_MODULE_RE = /^(.*) \[from (.*)\]$/;
-const cachedDisplayNames = new WeakMap();
+const cachedDisplayNames: WeakMap<Function, string> = new WeakMap();
 
 function getDisplayName(type: Function): string {
-  if (cachedDisplayNames.has(type)) {
-    // $FlowFixMe From the upgrade to Flow 64
-    return cachedDisplayNames.get(type);
+  const nameFromCache = cachedDisplayNames.get(type);
+  if (nameFromCache != null) {
+    return nameFromCache;
   }
 
   let displayName;
