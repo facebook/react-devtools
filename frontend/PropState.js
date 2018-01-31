@@ -23,6 +23,7 @@ var invariant = require('./invariant');
 
 import type {Theme} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class PropState extends React.Component {
   context: {
     onChange: () => void,
@@ -37,6 +38,7 @@ class PropState extends React.Component {
     };
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   renderSource(): ?React.Element {
     const {theme} = this.context;
     const {id, node, onViewElementSource} = this.props;
@@ -63,6 +65,7 @@ class PropState extends React.Component {
     );
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   render(): React.Element {
     var theme = this.context.theme;
 

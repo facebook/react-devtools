@@ -41,6 +41,7 @@ type StyleResult = {
   measuredLayout: ?Object;
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class NativeStyler extends React.Component {
   props: Props;
   defaultProps: DefaultProps;
@@ -59,6 +60,7 @@ class NativeStyler extends React.Component {
       this.props.bridge.send('rn-style:measure', this.props.id);
     } else {
       this.props.bridge.call('rn-style:get', this.props.id, style => {
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({style});
       });
     }
@@ -74,6 +76,7 @@ class NativeStyler extends React.Component {
     if (nextProps.id === this.props.id) {
       return;
     }
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({style: null});
     this.props.bridge.send('rn-style:get', nextProps.id);
 
@@ -81,6 +84,7 @@ class NativeStyler extends React.Component {
       this.props.bridge.send('rn-style:measure', nextProps.id);
     } else {
       this.props.bridge.call('rn-style:get', nextProps.id, style => {
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({style});
       });
     }
@@ -88,6 +92,7 @@ class NativeStyler extends React.Component {
 
   _styleGet(result: StyleResult) {
     var {style, measuredLayout} = result;
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({style, measuredLayout});
   }
 
@@ -96,6 +101,7 @@ class NativeStyler extends React.Component {
       this.state.style[attr] = val;
     }
     this.props.bridge.send('rn-style:set', {id: this.props.id, attr, val});
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({style: this.state.style});
   }
 
@@ -104,6 +110,7 @@ class NativeStyler extends React.Component {
     delete style[oldName];
     style[newName] = val;
     this.props.bridge.send('rn-style:rename', {id: this.props.id, oldName, newName, val});
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({style});
   }
 

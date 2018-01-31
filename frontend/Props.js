@@ -16,6 +16,7 @@ var {getInvertedMid} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class Props extends React.Component {
   context: {
     theme: Theme,

@@ -95,8 +95,10 @@ function connectToDevTools(options: ?ConnectOptions) {
   function handleMessage(evt) {
     var data;
     try {
+      // $FlowFixMe From the upgrade to Flow 64
       data = JSON.parse(evt.data);
     } catch (e) {
+      // $FlowFixMe From the upgrade to Flow 64
       console.error('failed to parse json: ' + evt.data);
       return;
     }

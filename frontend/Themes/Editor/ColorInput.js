@@ -40,6 +40,7 @@ type State = {
   targetPosition: Position,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class ColorInput extends React.Component {
   props: Props;
   state: State;
@@ -66,6 +67,7 @@ class ColorInput extends React.Component {
   componentWillReceiveProps(nextProps: Props) {
     const {customTheme, propertyName} = nextProps;
 
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       color: customTheme[propertyName],
     });
@@ -126,16 +128,20 @@ class ColorInput extends React.Component {
 
   _onClick: Function = (event): void => {
     const container = findDOMNode(this._containerRef);
+    // $FlowFixMe From the upgrade to Flow 64
     const targetPosition = findDOMNode(this._colorChipRef).getBoundingClientRect();
 
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       isColorPickerOpen: true,
+      // $FlowFixMe From the upgrade to Flow 64
       maxHeight: container.offsetHeight,
       targetPosition,
     });
   };
 
   _onClose: Function = (): void => {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       isColorPickerOpen: false,
     });
@@ -154,6 +160,7 @@ class ColorInput extends React.Component {
 
     customTheme[propertyName] = color;
 
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       color,
     });

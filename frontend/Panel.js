@@ -68,6 +68,7 @@ type State = {
   themeName: ?string,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class Panel extends React.Component {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
@@ -149,6 +150,7 @@ class Panel extends React.Component {
     }
     this.teardown();
     if (!this._unMounted) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({loading: true}, this.props.reload);
     }
   }
@@ -232,6 +234,7 @@ class Panel extends React.Component {
       window.addEventListener('keydown', this._keyListener);
 
       this._store.on('connected', () => {
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({
           loading: false,
           themeName: this._themeStore.themeName,
@@ -239,6 +242,7 @@ class Panel extends React.Component {
         this.getNewSelection();
       });
       this._store.on('preferencesPanelShown', () => {
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({
           preferencesPanelShown: this._store.preferencesPanelShown,
         });
@@ -246,7 +250,9 @@ class Panel extends React.Component {
       this._store.on('theme', () => {
         // Force a deep re-render when theme changes.
         // Use an incrementor so changes to Custom theme also update.
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState(state => ({
+          // $FlowFixMe From the upgrade to Flow 64
           themeKey: state.themeKey + 1,
           themeName: this._themeStore.theme.displayName,
         }));
@@ -257,6 +263,7 @@ class Panel extends React.Component {
   componentDidUpdate() {
     if (!this.state.isReact) {
       if (!this._checkTimeout) {
+        // $FlowFixMe From the upgrade to Flow 64
         this._checkTimeout = setTimeout(() => {
           this._checkTimeout = null;
           this.lookForReact();
@@ -271,10 +278,12 @@ class Panel extends React.Component {
     }
     this.props.checkForReact(isReact => {
       if (isReact) {
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({isReact: true, loading: true});
         this.inject();
       } else {
         console.log('still looking...');
+        // $FlowFixMe From the upgrade to Flow 64
         this.setState({isReact: false, loading: false});
       }
     });

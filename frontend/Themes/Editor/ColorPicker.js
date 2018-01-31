@@ -22,6 +22,7 @@ type Props = {
   updateColor: (color: string) => void,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class ColorPicker extends React.Component {
   props: Props;
 
@@ -50,6 +51,7 @@ class ColorPicker extends React.Component {
   };
 }
 
+// $FlowFixMe From the upgrade to Flow 64
 class CustomColorPicker extends React.Component {
   render() {
     return (

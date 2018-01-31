@@ -24,6 +24,7 @@ type State = {
   text: string,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class Simple extends React.Component {
   context: {
     onChange: (path: Array<any>, value: any) => void,
@@ -41,6 +42,7 @@ class Simple extends React.Component {
   }
 
   onChange(e: DOMEvent) {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       text: e.target.value,
     });
@@ -49,11 +51,13 @@ class Simple extends React.Component {
   onKeyDown(e: DOMEvent) {
     if (e.key === 'Enter') {
       this.onSubmit(true);
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         editing: false,
       });
     }
     if (e.key === 'Escape') {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         editing: false,
       });
@@ -62,6 +66,7 @@ class Simple extends React.Component {
 
   onSubmit(editing: boolean) {
     if (this.state.text === valueToText(this.props.data)) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         editing: editing,
       });
@@ -69,6 +74,7 @@ class Simple extends React.Component {
     }
     var value = textToValue(this.state.text);
     if (value === BAD_INPUT) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         text: valueToText(this.props.data),
         editing: editing,
@@ -76,6 +82,7 @@ class Simple extends React.Component {
       return;
     }
     this.context.onChange(this.props.path, value);
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       editing: editing,
     });
@@ -85,6 +92,7 @@ class Simple extends React.Component {
     if (this.props.readOnly) {
       return;
     }
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       editing: true,
       text: valueToText(this.props.data),
@@ -102,6 +110,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
+      // $FlowFixMe From the upgrade to Flow 64
       flash(ReactDOM.findDOMNode(this), this.context.theme.state04, 'transparent', 1);
     }
   }

@@ -16,11 +16,13 @@ var {sansSerif} = require('./Themes/Fonts');
 
 import type {Theme} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class TabbedPane extends React.Component {
   context: {
     theme: Theme,
   };
   props: {
+    // $FlowFixMe From the upgrade to Flow 64
     tabs: {[key: string]: () => React$Element},
     selected: string,
     setSelectedTab: (name: string) => void,

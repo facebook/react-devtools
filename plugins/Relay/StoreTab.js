@@ -18,6 +18,7 @@ var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 
+// $FlowFixMe From the upgrade to Flow 64
 class StoreTab extends React.Component {
   context: {
     theme: Theme,
@@ -38,6 +39,7 @@ class StoreTab extends React.Component {
       <div style={styles.container}>
         <h1>Default Store</h1>
         <DataView
+          // $FlowFixMe From the upgrade to Flow 64
           data={{nodes: this.props.storeData.nodes}}
           noSort={true}
           readOnly={true}

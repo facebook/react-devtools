@@ -15,6 +15,7 @@ const cachedDisplayNames = new WeakMap();
 
 function getDisplayName(type: Function): string {
   if (cachedDisplayNames.has(type)) {
+    // $FlowFixMe From the upgrade to Flow 64
     return cachedDisplayNames.get(type);
   }
 

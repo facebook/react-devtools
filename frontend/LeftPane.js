@@ -21,6 +21,7 @@ type State = {
   focused: boolean,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class LeftPane extends React.Component {
   input: ?HTMLElement;
   state: State;

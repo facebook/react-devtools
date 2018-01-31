@@ -81,6 +81,7 @@ class TraceUpdatesWebNodePresenter extends TraceUpdatesAbstractNodePresenter {
     this._canvas = null;
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   drawImpl(pool: Set): void {
     this._ensureCanvas();
     var canvas = this._canvas;

@@ -23,6 +23,7 @@ type Props = {
   theme: Theme,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class Preview extends React.Component {
   props: Props;
 

@@ -40,6 +40,7 @@ type StateType = {
   isWindowFocused: boolean,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class Node extends React.Component {
   _head: ?HTMLElement;
   _tail: ?HTMLElement;
@@ -116,6 +117,7 @@ class Node extends React.Component {
     win.addEventListener('blur', this._handleWindowBlur);
     // Make sure our initial state is right.
     if (this.props.selected) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         isWindowFocused: win.document.hasFocus(),
       });
@@ -142,11 +144,13 @@ class Node extends React.Component {
         return;
       }
       var doc = this._ownerWindow.document;
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({isWindowFocused: doc.hasFocus()});
     }, 50);
   };
 
   _handleWindowBlur = () => {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({isWindowFocused: false});
   };
 
@@ -272,6 +276,7 @@ class Node extends React.Component {
       ];
       while (unmatched.length > 0) {
         pieces.push(
+          // $FlowFixMe From the upgrade to Flow 64
           <span key={pieces.length} style={highlightStyle(theme)}>{matched.shift()}</span>
         );
         pieces.push(

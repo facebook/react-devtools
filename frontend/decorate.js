@@ -54,6 +54,7 @@ type State = {};
  */
 module.exports = function(options: Options, Component: any): any {
   var storeKey = options.store || 'store';
+  // $FlowFixMe From the upgrade to Flow 64
   class Wrapper extends React.Component {
     _listeners: Array<string>;
     _update: () => void;
@@ -125,6 +126,7 @@ module.exports = function(options: Options, Component: any): any {
     }
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   Wrapper.contextTypes = {
     [storeKey]: React.PropTypes.object,
   };

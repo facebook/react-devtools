@@ -21,6 +21,7 @@ import React from 'react';
 import decorate from '../../frontend/decorate';
 import tidyGraphQL from './tidyGraphQL';
 
+// $FlowFixMe From the upgrade to Flow 64
 class QueryViewer extends React.Component {
   props: {
     data: Map,
