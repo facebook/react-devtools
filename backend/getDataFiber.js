@@ -22,6 +22,12 @@ var {
   HostText,
   Fragment,
 } = require('./ReactTypeOfWork');
+var {
+  AsyncMode,
+  ContextConsumer,
+  ContextProvider,
+  StrictMode,
+} = require('./ReactSymbolStrings');
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
@@ -114,10 +120,40 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       children = [];
       break;
     default: // Coroutines and yields
-      nodeType = 'Native';
-      props = fiber.memoizedProps;
-      name = 'TODO_NOT_IMPLEMENTED_YET';
-      children = [];
+      const stringType = typeof type === 'object' && type !== null
+        ? type.$$typeof.toString()
+        : type.toString();
+
+      switch (stringType) {
+        case AsyncMode:
+          nodeType = 'Composite';
+          name = 'AsyncMode';
+          children = [];
+          break;
+        case ContextProvider:
+          nodeType = 'Composite';
+          props = fiber.memoizedProps;
+          name = 'Context.Provider';
+          children = [];
+          break;
+        case ContextConsumer:
+          nodeType = 'Composite';
+          props = fiber.memoizedProps;
+          name = 'Context.Consumer';
+          children = [];
+          break;
+        case StrictMode:
+          nodeType = 'Composite';
+          name = 'StrictMode';
+          children = [];
+          break;
+        default:
+          nodeType = 'Native';
+          props = fiber.memoizedProps;
+          name = `TODO_NOT_IMPLEMENTED_YET ${fiber.tag}`;
+          children = [];
+          break;
+      }
       break;
   }
 
