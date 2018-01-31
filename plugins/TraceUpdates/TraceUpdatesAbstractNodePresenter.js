@@ -84,6 +84,7 @@ class TraceUpdatesAbstractNodePresenter {
     }
 
     if (this._clearTimer) {
+      // $FlowFixMe From the upgrade to Flow 64
       clearTimeout(this._clearTimer);
       this._clearTimer = 0;
     }
@@ -132,7 +133,9 @@ class TraceUpdatesAbstractNodePresenter {
     this.drawImpl(this._pool);
 
     if (this._pool.size > 0) {
+      // $FlowFixMe From the upgrade to Flow 64
       clearTimeout(this._clearTimer);
+      // $FlowFixMe From the upgrade to Flow 64
       this._clearTimer = setTimeout(this._redraw, minExpiration - now);
     }
 

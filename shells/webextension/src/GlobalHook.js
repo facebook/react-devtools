@@ -73,5 +73,7 @@ var js = (
 // to <html> instead.
 var script = document.createElement('script');
 script.textContent = js;
+// $FlowFixMe From the upgrade to Flow 64
 document.documentElement.appendChild(script);
+// $FlowFixMe From the upgrade to Flow 64
 script.parentNode.removeChild(script);

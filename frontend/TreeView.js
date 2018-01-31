@@ -22,6 +22,7 @@ import type {Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
+// $FlowFixMe From the upgrade to Flow 64
 class TreeView extends React.Component {
   node: ?HTMLElement;
 

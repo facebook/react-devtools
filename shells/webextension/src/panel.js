@@ -142,9 +142,12 @@ var node = document.getElementById('container');
 function reload() {
   setTimeout(() => {
     ReactDOM.unmountComponentAtNode(node);
+    // $FlowFixMe From the upgrade to Flow 64
     node.innerHTML = '';
+    // $FlowFixMe From the upgrade to Flow 64
     ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
+// $FlowFixMe From the upgrade to Flow 64
 ReactDOM.render(<Panel {...config} />, node);

@@ -20,6 +20,7 @@ window.React = React;
 
 var Panel = require('../../frontend/Panel');
 
+// $FlowFixMe From the upgrade to Flow 64
 var target: Object = document.getElementById('target');
 
 var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
@@ -36,9 +37,12 @@ if (iframeSrc) {
 
 window.addEventListener('keydown', function(e) {
   if (e.altKey && e.keyCode === 68) { // Alt + D
+    // $FlowFixMe From the upgrade to Flow 64
     if (document.body.className === 'devtools-bottom') {
+      // $FlowFixMe From the upgrade to Flow 64
       document.body.className = 'devtools-right';
     } else {
+      // $FlowFixMe From the upgrade to Flow 64
       document.body.className = 'devtools-bottom';
     }
   }
@@ -90,5 +94,6 @@ var sources = appSrc.split('|');
 injectMany(sources, () => {
   var node = document.getElementById('container');
 
+  // $FlowFixMe From the upgrade to Flow 64
   ReactDOM.render(<Panel {...config} />, node);
 });

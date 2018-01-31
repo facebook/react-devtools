@@ -145,6 +145,7 @@ function renameStyle(agent, id, oldName, newName, val) {
         data.updater.setInProps(['style'], customStyle);
       } else {
         style = [style, newStyle];
+        // $FlowFixMe From the upgrade to Flow 64
         data.updater.setInProps(['style'], style);
       }
     }
@@ -156,6 +157,7 @@ function renameStyle(agent, id, oldName, newName, val) {
     } else {
       Object.assign(styleOverridesByHostComponentId[id], newStyle);
     }
+    // $FlowFixMe From the upgrade to Flow 64
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;
@@ -183,6 +185,7 @@ function setStyle(agent, id, attr, val) {
       }
     } else {
       style = [style, newStyle];
+      // $FlowFixMe From the upgrade to Flow 64
       data.updater.setInProps(['style'], style);
     }
   } else if (data && data.updater && data.updater.setNativeProps) {
@@ -193,6 +196,7 @@ function setStyle(agent, id, attr, val) {
     } else {
       Object.assign(styleOverridesByHostComponentId[id], newStyle);
     }
+    // $FlowFixMe From the upgrade to Flow 64
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;

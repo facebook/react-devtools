@@ -13,8 +13,10 @@
 var React = require('react');
 
 module.exports = function(name: string): Object {
+  // $FlowFixMe From the upgrade to Flow 64
   class Wrapper extends React.Component {
     props: {
+      // $FlowFixMe From the upgrade to Flow 64
       children: () => React$Element,
       store: Object,
     };

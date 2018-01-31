@@ -14,6 +14,7 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 import type {DOMEvent} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class Draggable extends React.Component {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
@@ -32,8 +33,11 @@ class Draggable extends React.Component {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
+    // $FlowFixMe From the upgrade to Flow 64
     var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    // $FlowFixMe From the upgrade to Flow 64
     doc.addEventListener('mousemove', this._onMove);
+    // $FlowFixMe From the upgrade to Flow 64
     doc.addEventListener('mouseup', this._onUp);
     this.props.onStart();
   }
@@ -45,14 +49,18 @@ class Draggable extends React.Component {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
+    // $FlowFixMe From the upgrade to Flow 64
     var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    // $FlowFixMe From the upgrade to Flow 64
     doc.removeEventListener('mousemove', this._onMove);
+    // $FlowFixMe From the upgrade to Flow 64
     doc.removeEventListener('mouseup', this._onUp);
     this.props.onStop();
   }
 
   render() {
     return (
+      // $FlowFixMe From the upgrade to Flow 64
       <div
         style={this.props.style}
         onMouseDown={this._startDragging.bind(this)}

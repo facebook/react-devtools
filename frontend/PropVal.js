@@ -20,6 +20,7 @@ var flash = require('./flash');
 
 import type {Theme} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class PropVal extends React.Component {
   context: {
     theme: Theme,
@@ -37,6 +38,7 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
+    // $FlowFixMe From the upgrade to Flow 64
     flash(node, this.context.theme.state04, 'transparent', 1);
   }
 

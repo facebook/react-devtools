@@ -86,6 +86,7 @@ function getData012(internalInstance: Object): DataType {
     publicInstance = internalInstance;
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   return {
     nodeType,
     type,

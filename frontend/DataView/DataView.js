@@ -32,6 +32,7 @@ type DataViewProps = {
   readOnly?: boolean,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class DataView extends React.Component {
   context: {
     theme: Theme,
@@ -139,6 +140,7 @@ DataView.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class DataItem extends React.Component {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
@@ -175,8 +177,10 @@ class DataItem extends React.Component {
   }
 
   inspect() {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({loading: true, open: true});
     this.props.inspect(this.props.path, () => {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({loading: false});
     });
   }
@@ -190,6 +194,7 @@ class DataItem extends React.Component {
       return;
     }
 
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       open: !this.state.open,
     });

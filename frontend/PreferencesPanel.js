@@ -22,6 +22,7 @@ const Hoverable = require('./Hoverable');
 
 import type {Theme} from './types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class PreferencesPanel extends React.Component {
   _selectRef: any;
 
@@ -85,6 +86,7 @@ class PreferencesPanel extends React.Component {
       content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
           <h4 style={styles.header}>Theme</h4>
+          {/* $FlowFixMe From the upgrade to Flow 64 */}
           <div style={styles.selectAndPreviewRow}>
             <select
               onChange={this._changeTheme}
@@ -99,6 +101,7 @@ class PreferencesPanel extends React.Component {
                 <option key={key} value={key}>{themes[key].displayName}</option>
               ))}
             </select>
+            {/* $FlowFixMe From the upgrade to Flow 64 */}
             <EditButton
               onClick={this._onEditCustomThemeClick}
               theme={theme}
@@ -136,6 +139,7 @@ class PreferencesPanel extends React.Component {
     const {editMode} = this.state;
 
     if (editMode) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         editMode: false,
       });
@@ -145,6 +149,7 @@ class PreferencesPanel extends React.Component {
   };
 
   _onEditCustomThemeClick = () => {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       editMode: true,
     });

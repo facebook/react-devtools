@@ -14,11 +14,13 @@ var React = require('react');
 
 import type {Theme} from '../types';
 
+// $FlowFixMe From the upgrade to Flow 64
 class DetailPaneSection extends React.Component {
   context: {
     theme: Theme,
   };
 
+  // $FlowFixMe From the upgrade to Flow 64
   render(): React.Element {
     const {theme} = this.context;
     const {children, hint} = this.props;

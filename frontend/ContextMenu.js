@@ -24,6 +24,7 @@ export type MenuItem = {
   action: () => void
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class ContextMenu extends React.Component {
   _clickout: (evt: Object) => void;
 
@@ -68,13 +69,16 @@ class ContextMenu extends React.Component {
       return;
     }
 
+    // $FlowFixMe From the upgrade to Flow 64
     const elementHeight = element.querySelector('ul').clientHeight;
     const windowHeight = window.innerHeight;
 
+    // $FlowFixMe From the upgrade to Flow 64
     if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
       return;
     }
 
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({
       elementHeight: elementHeight,
       windowHeight: windowHeight,
@@ -84,6 +88,7 @@ class ContextMenu extends React.Component {
   render() {
     const {theme} = this.context;
     const {items, open, pos} = this.props;
+    // $FlowFixMe From the upgrade to Flow 64
     const {elementHeight, windowHeight} = this.state;
 
     if (pos && (pos.y + elementHeight) > windowHeight) {

@@ -17,6 +17,7 @@ var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 var Query = require('./Query');
 
+// $FlowFixMe From the upgrade to Flow 64
 class QueryList extends React.Component {
   props: {
     queries: OrderedMap,

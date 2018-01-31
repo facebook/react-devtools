@@ -177,6 +177,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     }
   }
 
+  // $FlowFixMe From the upgrade to Flow 64
   return {
     nodeType,
     type,

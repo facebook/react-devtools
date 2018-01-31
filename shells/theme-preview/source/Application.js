@@ -24,6 +24,7 @@ type Props = {
   theme: Theme,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class Application extends React.Component {
   _onInput: (event: Event) => void;
 

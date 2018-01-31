@@ -31,6 +31,7 @@ type State = {
   inputWidth: number;
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class AutoSizeInput extends React.Component {
   context: Context;
   props: Props;
@@ -61,6 +62,7 @@ class AutoSizeInput extends React.Component {
   }
 
   componentWillReceiveProps(nextProps: Object) {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({text: '' + nextProps.value});
   }
 
@@ -86,6 +88,7 @@ class AutoSizeInput extends React.Component {
     }
     const width = this.sizer.scrollWidth + 1;
     if (width !== this.state.inputWidth) {
+      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         inputWidth: width,
       });
@@ -145,11 +148,13 @@ class AutoSizeInput extends React.Component {
           innerRef={i => this.input = i}
           value={this.state.text}
           style={style}
+          // $FlowFixMe From the upgrade to Flow 64
           onChange={e => this.setState({text: e.target.value})}
           onFocus={() => this.onFocus()}
           onBlur={() => this.done()}
           onKeyDown={e => this.onKeyDown(e)}
         />
+        {/* $FlowFixMe From the upgrade to Flow 64 */}
         <div ref={el => this.sizer = el} style={styles.sizer}>{this.state.text}</div>
       </div>
     );

@@ -28,6 +28,7 @@ type State = {
   hover: boolean,
 };
 
+// $FlowFixMe From the upgrade to Flow 64
 class HighlightHover extends React.Component {
   context: Context;
   props: Props;
@@ -44,7 +45,9 @@ class HighlightHover extends React.Component {
 
     return (
       <div
+        // $FlowFixMe From the upgrade to Flow 64
         onMouseOver={() => !this.state.hover && this.setState({hover: true})}
+        // $FlowFixMe From the upgrade to Flow 64
         onMouseOut={() => this.state.hover && this.setState({hover: false})}
         style={assign({}, this.props.style, {
           backgroundColor: this.state.hover ? theme.base02 : 'transparent',

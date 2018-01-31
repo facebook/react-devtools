@@ -18,6 +18,7 @@ var {sansSerif} = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
 
+// $FlowFixMe From the upgrade to Flow 64
 class Breadcrumb extends React.Component {
   context: {theme: Theme};
   state: {hovered: ?string};
@@ -28,11 +29,13 @@ class Breadcrumb extends React.Component {
   }
 
   handleCrumbMouseOver(id) {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({ hovered: id });
     this.props.hover(id, true);
   }
 
   handleCrumbMouseOut(id) {
+    // $FlowFixMe From the upgrade to Flow 64
     this.setState({ hovered: null });
     this.props.hover(id, false);
   }

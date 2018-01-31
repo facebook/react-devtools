@@ -45,6 +45,7 @@ function renderApplication() {
       theme={theme}
       updateTheme={updateTheme}
     />,
+    // $FlowFixMe From the upgrade to Flow 64
     document.getElementById('application')
   );
 }
