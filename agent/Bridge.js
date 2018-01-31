@@ -148,11 +148,9 @@ type PayloadType = {
  */
 class Bridge {
   _buffer: Array<{evt: string, data: any}>;
-  // $FlowFixMe From the upgrade to Flow 64
-  _cbs: Map;
+  _cbs: Map<number, Function>;
   _cid: number;
-  // $FlowFixMe From the upgrade to Flow 64
-  _inspectables: Map;
+  _inspectables: Map<string, Object>;
   _listeners: {[key: string]: Array<(data: any) => void>};
   _flushHandle: ?number;
   _wall: Wall;
@@ -438,7 +436,7 @@ class Bridge {
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
-        // $FlowFixMe From the upgrade to Flow 64
+        // $FlowIgnore This is intentional
         result[name] = dehydrate(val[name], cleaned, [name]);
       });
 
