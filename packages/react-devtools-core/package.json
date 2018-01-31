@@ -18,8 +18,8 @@
     "backend:watch": "cross-env NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.backend.js --watch",
     "standalone": "cross-env NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.standalone.js",
     "standalone:watch": "cross-env NODE_ENV=production ../../node_modules/.bin/webpack --config webpack.standalone.js --watch",
-    "build": "npm run backend && npm run standalone",
-    "prepublish": "npm run build"
+    "build": "yarn run backend && yarn run standalone",
+    "prepublish": "yarn run build"
   },
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
