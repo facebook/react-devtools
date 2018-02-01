@@ -15,16 +15,15 @@ var decorate = require('../../frontend/decorate');
 
 import type {Theme} from '../../frontend/types';
 
-// $FlowFixMe From the upgrade to Flow 64
-class ElementPanel extends React.Component {
+type Props = {
+  dataIDs: Array<{id: string, queries: Array<Map<string, string>>}>,
+  jumpToData: (id: string) => void,
+  jumpToQuery: (queryID: string) => void,
+};
+
+class ElementPanel extends React.Component<Props> {
   context: {
     theme: Theme,
-  };
-  props: {
-    // $FlowFixMe From the upgrade to Flow 64
-    dataIDs: Array<{id: string, queries: Array<Map>}>,
-    jumpToData: (id: string) => void,
-    jumpToQuery: (queryID: string) => void,
   };
 
   render() {

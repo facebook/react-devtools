@@ -28,8 +28,7 @@ function getDataIDsInternal(obj, collector) {
     if (name === 'id' && typeof obj[name] === 'string') {
       collector.push(obj[name]);
     } else if (typeof obj[name] === 'object') {
-      // $FlowFixMe From the upgrade to Flow 64
-      getDataIDs(obj[name], collector);
+      getDataIDs(obj[name]);
     }
   }
 }
@@ -178,11 +177,10 @@ class Store extends EventEmitter {
       } else {
         base = this.queries.get(id).get(path[0]);
       }
-      // $FlowFixMe From the upgrade to Flow 64
-      var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
+      // $FlowFixMe
+      var inspected: ?{[string]: boolean} = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
       if (inspected) {
         assign(inspected, value);
-        // $FlowFixMe From the upgrade to Flow 64
         inspected[consts.inspected] = true;
       }
       cb();

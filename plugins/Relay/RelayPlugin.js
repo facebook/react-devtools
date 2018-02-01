@@ -45,8 +45,7 @@ class RelayPlugin {
     }, 1000);
   }
 
-  // $FlowFixMe From the upgrade to Flow 64
-  panes(): Array<(node: Object, id: string) => React$Element> {
+  panes(): Array<(node: Object, id: string) => React$Element<any>> {
     if (!this.hasRelay) {
       return [];
     }
@@ -62,8 +61,7 @@ class RelayPlugin {
   teardown() {
   }
 
-  // $FlowFixMe From the upgrade to Flow 64
-  tabs(): ?{[key: string]: () => React$Element} {
+  tabs(): ?{[key: string]: () => React$Element<any>} {
     if (!this.hasRelay) {
       return null;
     }
