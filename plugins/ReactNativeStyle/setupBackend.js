@@ -110,7 +110,7 @@ function renameStyle(agent, id, oldName, newName, val) {
     ? {[oldName]: undefined, [newName]: val}
     : {[oldName]: undefined};
 
-  if (data && data.updater && data.updater.setInProps) {
+  if (data && data.updater && typeof data.updater.setInProps === 'function') {
     // First attempt: use setInProps().
     // We do this for composite components, and it works relatively well.
     var style = data && data.props && data.props.style;
@@ -145,11 +145,10 @@ function renameStyle(agent, id, oldName, newName, val) {
         data.updater.setInProps(['style'], customStyle);
       } else {
         style = [style, newStyle];
-        // $FlowFixMe From the upgrade to Flow 64
         data.updater.setInProps(['style'], style);
       }
     }
-  } else if (data && data.updater && data.updater.setNativeProps) {
+  } else if (data && data.updater && typeof data.updater.setNativeProps === 'function') {
     // Fallback: use setNativeProps(). We're dealing with a host component.
     // Remember to "correct" resolved styles when we read them next time.
     if (!styleOverridesByHostComponentId[id]) {
@@ -157,7 +156,6 @@ function renameStyle(agent, id, oldName, newName, val) {
     } else {
       Object.assign(styleOverridesByHostComponentId[id], newStyle);
     }
-    // $FlowFixMe From the upgrade to Flow 64
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;
@@ -169,7 +167,7 @@ function setStyle(agent, id, attr, val) {
   var data = agent.elementData.get(id);
   var newStyle = {[attr]: val};
 
-  if (data && data.updater && data.updater.setInProps) {
+  if (data && data.updater && typeof data.updater.setInProps === 'function') {
     // First attempt: use setInProps().
     // We do this for composite components, and it works relatively well.
     var style = data.props && data.props.style;
@@ -185,10 +183,9 @@ function setStyle(agent, id, attr, val) {
       }
     } else {
       style = [style, newStyle];
-      // $FlowFixMe From the upgrade to Flow 64
       data.updater.setInProps(['style'], style);
     }
-  } else if (data && data.updater && data.updater.setNativeProps) {
+  } else if (data && data.updater && typeof data.updater.setNativeProps === 'function') {
     // Fallback: use setNativeProps(). We're dealing with a host component.
     // Remember to "correct" resolved styles when we read them next time.
     if (!styleOverridesByHostComponentId[id]) {
@@ -196,7 +193,6 @@ function setStyle(agent, id, attr, val) {
     } else {
       Object.assign(styleOverridesByHostComponentId[id], newStyle);
     }
-    // $FlowFixMe From the upgrade to Flow 64
     data.updater.setNativeProps({ style: newStyle });
   } else {
     return;

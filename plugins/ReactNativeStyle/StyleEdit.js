@@ -33,12 +33,9 @@ type State = {
   newValue: string|number,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class StyleEdit extends React.Component {
+class StyleEdit extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -47,22 +44,18 @@ class StyleEdit extends React.Component {
 
   onChange(name: string, val: string | number) {
     var num = Number(val);
-    // $FlowFixMe From the upgrade to Flow 64
-    this.props.onChange(name, num == val ? num : val);
+    this.props.onChange(name, num === Number(val) ? num : val);
   }
 
   onNewSubmit(val: string | number) {
     this.onChange(this.state.newAttr, val);
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({showNew: false, newAttr: '', newValue: ''});
   }
 
   onNewAttr(attr: string | number) {
     if (attr === '') {
-      // $FlowFixMe From the upgrade to Flow 64
       this.setState({showNew: false});
     } else {
-      // $FlowFixMe From the upgrade to Flow 64
       this.setState({newAttr: '' + attr});
     }
   }
@@ -73,7 +66,6 @@ class StyleEdit extends React.Component {
         return;
       }
     }
-    // $FlowFixMe From the upgrade to Flow 64
     this.setState({showNew: true});
   }
 

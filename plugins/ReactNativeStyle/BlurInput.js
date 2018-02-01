@@ -24,20 +24,16 @@ type State = {
   text: string;
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class BlurInput extends React.Component {
-  props: Props;
+class BlurInput extends React.Component<Props, State> {
   defaultProps: DefaultProps;
-  state: State;
   node: ?DOMNode;
 
-  constructor(props: Object) {
+  constructor(props: Props) {
     super(props);
     this.state = {text: '' + this.props.value};
   }
 
-  componentWillReceiveProps(nextProps: Object) {
-    // $FlowFixMe From the upgrade to Flow 64
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({text: '' + nextProps.value});
   }
 
@@ -67,7 +63,6 @@ class BlurInput extends React.Component {
       <Input
         value={this.state.text}
         innerRef={i => this.node = i}
-        // $FlowFixMe From the upgrade to Flow 64
         onChange={e => this.setState({text: e.target.value})}
         onBlur={this.done.bind(this)}
         onKeyDown={e => this.onKeyDown(e)}

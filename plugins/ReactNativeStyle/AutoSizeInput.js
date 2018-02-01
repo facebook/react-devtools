@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var nullthrows = require('nullthrows').default;
 var {monospace} = require('../../frontend/Themes/Fonts');
 var Input = require('../../frontend/Input');
 
@@ -31,14 +32,11 @@ type State = {
   inputWidth: number;
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class AutoSizeInput extends React.Component {
+class AutoSizeInput extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
   input: HTMLInputElement;
-  sizer: HTMLDivElement;
+  sizer: ?HTMLDivElement;
 
   constructor(props: Props, context: Context) {
     super(props, context);
@@ -57,12 +55,11 @@ class AutoSizeInput extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps: Object, prevState: Object) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     this.updateInputWidth();
   }
 
-  componentWillReceiveProps(nextProps: Object) {
-    // $FlowFixMe From the upgrade to Flow 64
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({text: '' + nextProps.value});
   }
 
@@ -74,7 +71,7 @@ class AutoSizeInput extends React.Component {
     if (!inputStyle) {
       return;
     }
-    const sizerNode = this.sizer;
+    const sizerNode = nullthrows(this.sizer);
     sizerNode.style.fontSize = inputStyle.fontSize;
     sizerNode.style.fontFamily = inputStyle.fontFamily;
     sizerNode.style.fontWeight = inputStyle.fontWeight;
@@ -88,7 +85,6 @@ class AutoSizeInput extends React.Component {
     }
     const width = this.sizer.scrollWidth + 1;
     if (width !== this.state.inputWidth) {
-      // $FlowFixMe From the upgrade to Flow 64
       this.setState({
         inputWidth: width,
       });
@@ -148,13 +144,11 @@ class AutoSizeInput extends React.Component {
           innerRef={i => this.input = i}
           value={this.state.text}
           style={style}
-          // $FlowFixMe From the upgrade to Flow 64
           onChange={e => this.setState({text: e.target.value})}
           onFocus={() => this.onFocus()}
           onBlur={() => this.done()}
           onKeyDown={e => this.onKeyDown(e)}
         />
-        {/* $FlowFixMe From the upgrade to Flow 64 */}
         <div ref={el => this.sizer = el} style={styles.sizer}>{this.state.text}</div>
       </div>
     );
