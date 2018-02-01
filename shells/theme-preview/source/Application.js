@@ -22,10 +22,10 @@ import type {Theme} from '../../../frontend/types';
 
 type Props = {
   theme: Theme,
+  updateTheme: (Theme) => void,
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class Application extends React.Component {
+class Application extends React.Component<Props> {
   _onInput: (event: Event) => void;
 
   constructor(props: Props, context: any) {
