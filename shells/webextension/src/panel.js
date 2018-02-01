@@ -136,18 +136,16 @@ var config: Props = {
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var nullthrows = require('nullthrows').default;
 
-var node = document.getElementById('container');
+var node = nullthrows(document.getElementById('container'));
 
 function reload() {
   setTimeout(() => {
     ReactDOM.unmountComponentAtNode(node);
-    // $FlowFixMe From the upgrade to Flow 64
     node.innerHTML = '';
-    // $FlowFixMe From the upgrade to Flow 64
     ReactDOM.render(<Panel {...config} />, node);
   }, 100);
 }
 
-// $FlowFixMe From the upgrade to Flow 64
 ReactDOM.render(<Panel {...config} />, node);

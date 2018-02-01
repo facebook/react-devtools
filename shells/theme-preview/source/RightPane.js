@@ -15,8 +15,9 @@ const React = require('react');
 
 const PropState = require('../../../frontend/PropState');
 
-// $FlowFixMe From the upgrade to Flow 64
-class RightPane extends React.Component {
+type Props = {};
+
+class RightPane extends React.Component<Props> {
   getChildContext() {
     return {
       onChange: noop,

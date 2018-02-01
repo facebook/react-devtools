@@ -17,6 +17,7 @@
 
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
 var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
+var nullthrows = require('nullthrows').default;
 
 var lastDetectionResult;
 
@@ -73,7 +74,5 @@ var js = (
 // to <html> instead.
 var script = document.createElement('script');
 script.textContent = js;
-// $FlowFixMe From the upgrade to Flow 64
-document.documentElement.appendChild(script);
-// $FlowFixMe From the upgrade to Flow 64
-script.parentNode.removeChild(script);
+nullthrows(document.documentElement).appendChild(script);
+nullthrows(script.parentNode).removeChild(script);

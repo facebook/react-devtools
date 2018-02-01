@@ -27,14 +27,11 @@ type Context = {
 const LeftPane = (_: any, {theme}: Context) => (
   <div style={staticStyles.container}>
     <div style={menuRowStyle(theme)}>
-      {/* $FlowFixMe From the upgrade to Flow 64 */}
       <div style={staticStyles.iconsColumn}>
-        {/* $FlowFixMe From the upgrade to Flow 64 */}
         <ExampleIconButton
           path={Icons.INSPECT}
           theme={theme}
         />
-        {/* $FlowFixMe From the upgrade to Flow 64 */}
         <ExampleIconButton
           path={Icons.SETTINGS}
           theme={theme}

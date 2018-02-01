@@ -12,6 +12,8 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var invariant = require('assert');
+var nullthrows = require('nullthrows').default;
 
 var installGlobalHook = require('../../backend/installGlobalHook');
 var installRelayHook = require('../../plugins/Relay/installRelayHook');
@@ -20,8 +22,8 @@ window.React = React;
 
 var Panel = require('../../frontend/Panel');
 
-// $FlowFixMe From the upgrade to Flow 64
-var target: Object = document.getElementById('target');
+var target = document.getElementById('target');
+invariant(target instanceof HTMLIFrameElement);
 
 var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
 var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
@@ -36,14 +38,12 @@ if (iframeSrc) {
 }
 
 window.addEventListener('keydown', function(e) {
+  const body = nullthrows(document.body);
   if (e.altKey && e.keyCode === 68) { // Alt + D
-    // $FlowFixMe From the upgrade to Flow 64
-    if (document.body.className === 'devtools-bottom') {
-      // $FlowFixMe From the upgrade to Flow 64
-      document.body.className = 'devtools-right';
+    if (body.className === 'devtools-bottom') {
+      body.className = 'devtools-right';
     } else {
-      // $FlowFixMe From the upgrade to Flow 64
-      document.body.className = 'devtools-bottom';
+      body.className = 'devtools-bottom';
     }
   }
 });
@@ -75,10 +75,11 @@ function inject(src, done) {
     done();
     return;
   }
+  invariant(target instanceof HTMLIFrameElement);
   var script = target.contentDocument.createElement('script');
   script.src = src;
   script.onload = done;
-  target.contentDocument.body.appendChild(script);
+  nullthrows(target.contentDocument.body).appendChild(script);
 }
 
 function injectMany(sources, done) {
@@ -92,8 +93,7 @@ function injectMany(sources, done) {
 var sources = appSrc.split('|');
 
 injectMany(sources, () => {
-  var node = document.getElementById('container');
+  var node = nullthrows(document.getElementById('container'));
 
-  // $FlowFixMe From the upgrade to Flow 64
   ReactDOM.render(<Panel {...config} />, node);
 });
