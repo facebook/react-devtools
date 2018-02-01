@@ -24,8 +24,7 @@ type BoxMeasurements = {
 
 type BoxProps = BoxMeasurements & {
   title: string,
-  // $FlowFixMe From the upgrade to Flow 64
-  children: React$Element,
+  children: React.Node,
   theme: Theme,
 };
 
@@ -45,18 +44,18 @@ var Box = (props: BoxProps) => {
   );
 };
 
-// $FlowFixMe From the upgrade to Flow 64
-class BoxInspector extends React.Component {
+type BoxInspectorProps = {
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  margin: BoxMeasurements,
+  padding: BoxMeasurements,
+}
+
+class BoxInspector extends React.Component<BoxInspectorProps> {
   context: {
     theme: Theme,
-  };
-  props: {
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-    margin: BoxMeasurements,
-    padding: BoxMeasurements,
   };
 
   render() {
