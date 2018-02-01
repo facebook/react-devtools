@@ -17,11 +17,11 @@ var QueryList = require('./QueryList');
 var QueryViewer = require('./QueryViewer');
 var SplitPane = require('../../frontend/SplitPane');
 
-// $FlowFixMe From the upgrade to Flow 64
-class QueriesTab extends React.Component {
-  props: {
-    isSplit: boolean,
-  };
+type Props = {
+  isSplit: boolean,
+};
+
+class QueriesTab extends React.Component<Props> {
   render() {
     var contents;
     if (!this.props.isSplit) {

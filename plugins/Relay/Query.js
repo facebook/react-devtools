@@ -16,15 +16,15 @@ import type {Map} from 'immutable';
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 var React = require('react');
 
-// $FlowFixMe From the upgrade to Flow 64
-class Query extends React.Component {
+type Props = {
+  data: Map,
+  oddRow: boolean,
+  onSelect: () => void,
+}
+
+class Query extends React.Component<Props> {
   theme: {
     theme: Theme,
-  };
-  props: {
-    data: Map,
-    oddRow: boolean,
-    onSelect: () => void,
   };
   render() {
     var theme = this.context.theme;
@@ -44,8 +44,7 @@ class Query extends React.Component {
     return (
       <tr onClick={this.props.onSelect} style={containerStyle}>
         <td style={tdFirstStyle(theme)}>
-          {/* $FlowFixMe From the upgrade to Flow 64 */}
-          <span style={statusStyle(status, theme)} title={status} />
+          <span style={statusStyle(status)} title={status} />
         </td>
         <td style={tdNameStyle(theme)}>
           {data.get('name')}
