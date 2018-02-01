@@ -11,6 +11,8 @@
 
 'use strict';
 
+import type {Measurement, MetaData} from './TraceUpdatesTypes';
+
 const TraceUpdatesAbstractNodePresenter = require('./TraceUpdatesAbstractNodePresenter');
 
 const OUTLINE_COLOR = '#f0f0f0';
@@ -81,8 +83,7 @@ class TraceUpdatesWebNodePresenter extends TraceUpdatesAbstractNodePresenter {
     this._canvas = null;
   }
 
-  // $FlowFixMe From the upgrade to Flow 64
-  drawImpl(pool: Set): void {
+  drawImpl(pool: Map<Measurement, MetaData>): void {
     this._ensureCanvas();
     var canvas = this._canvas;
     var ctx = canvas.getContext('2d');
