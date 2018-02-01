@@ -39,15 +39,11 @@ class TraceUpdatesBackendManager {
     var useDOM = agent.capabilities.dom;
 
     this._measurer = useDOM ?
-      // $FlowFixMe From the upgrade to Flow 64
       new TraceUpdatesWebNodeMeasurer() :
-      // $FlowFixMe From the upgrade to Flow 64
       new TraceUpdatesAbstractNodeMeasurer();
 
     this._presenter = useDOM ?
-      // $FlowFixMe From the upgrade to Flow 64
       new TraceUpdatesWebNodePresenter() :
-      // $FlowFixMe From the upgrade to Flow 64
       new TraceUpdatesAbstractNodePresenter();
 
     this._isActive = false;

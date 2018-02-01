@@ -39,16 +39,14 @@ class TraceUpdatesWebNodeMeasurer extends TraceUpdatesAbstractNodeMeasurer {
     var rect = node.getBoundingClientRect();
     var scrollX = Math.max(
       document.body ? document.body.scrollLeft : 0,
-      // $FlowFixMe From the upgrade to Flow 64
-      document.documentElement.scrollLeft,
+      document.documentElement ? document.documentElement.scrollLeft : 0,
       window.pageXOffset || 0,
       window.scrollX || 0,
     );
 
     var scrollY = Math.max(
       document.body ? document.body.scrollTop : 0,
-      // $FlowFixMe From the upgrade to Flow 64
-      document.documentElement.scrollTop,
+      document.documentElement ? document.documentElement.scrollTop : 0,
       window.pageYOffset || 0,
       window.scrollY || 0,
     );
