@@ -9,7 +9,6 @@
  */
 'use strict';
 
-jest.dontMock('../dehydrate');
 var dehydrate = require('../dehydrate');
 
 describe('dehydrate', () => {

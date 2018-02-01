@@ -3,7 +3,7 @@
     "adm-zip": "^0.4.7",
     "babel-core": "6.3.21",
     "babel-eslint": "6.0.4",
-    "babel-jest": "6.0.1",
+    "babel-jest": "22.1.0",
     "babel-loader": "6.2.0",
     "babel-preset-es2015": "6.3.13",
     "babel-preset-react": "6.3.13",
@@ -21,7 +21,7 @@
     "fs-extra": "^3.0.1",
     "gh-pages": "^1.0.0",
     "immutable": "3.7.6",
-    "jest-cli": "0.9.0-fb2",
+    "jest": "22.1.4",
     "json-loader": "0.5.4",
     "log-update": "^2.0.0",
     "node-libs-browser": "0.5.3",
@@ -45,24 +45,13 @@
     "deploy": "cd ./shells/theme-preview && ./build.sh && gh-pages -d .",
     "lint": "eslint .",
     "postinstall": "lerna bootstrap",
-    "test": "node --harmony ./node_modules/.bin/jest",
+    "test": "jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
     "test:standalone": "cd packages/react-devtools && npm start",
     "typecheck": "flow check"
   },
   "jest": {
-    "scriptPreprocessor": "<rootDir>/node_modules/babel-jest",
-    "testFileExtensions": [
-      "es6",
-      "js"
-    ],
-    "testRunner": "<rootDir>/node_modules/jest-cli/src/testRunners/jasmine/jasmine2.js",
-    "moduleFileExtensions": [
-      "js",
-      "json",
-      "es6"
-    ],
     "modulePathIgnorePatterns": [
       "<rootDir>/shells"
     ]

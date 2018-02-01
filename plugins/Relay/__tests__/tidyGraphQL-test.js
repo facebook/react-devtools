@@ -9,7 +9,6 @@
  */
 'use strict';
 
-jest.dontMock('../tidyGraphQL');
 var tidyGraphQL = require('../tidyGraphQL');
 
 describe('tidyGraphQL', () => {
