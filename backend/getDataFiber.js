@@ -23,11 +23,15 @@ var {
   Fragment,
 } = require('./ReactTypeOfWork');
 var {
-  AsyncMode,
-  ContextConsumer,
-  ContextProvider,
-  StrictMode,
-} = require('./ReactSymbolStrings');
+  ASYNC_MODE_NUMBER,
+  ASYNC_MODE_SYMBOL_STRING,
+  CONTEXT_CONSUMER_NUMBER,
+  CONTEXT_CONSUMER_SYMBOL_STRING,
+  CONTEXT_PROVIDER_NUMBER,
+  CONTEXT_PROVIDER_SYMBOL_STRING,
+  STRICT_MODE_NUMBER,
+  STRICT_MODE_SYMBOL_STRING,
+} = require('./ReactSymbols');
 
 // TODO: we might want to change the data structure
 // once we no longer suppport Stack versions of `getData`.
@@ -120,29 +124,36 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       children = [];
       break;
     default: // Coroutines and yields
-      const stringType = typeof type === 'object' && type !== null
-        ? type.$$typeof.toString()
-        : type.toString();
+      const symbolOrNumber = typeof type === 'object' && type !== null
+        ? type.$$typeof
+        : type;
+      const switchValue = typeof symbolOrNumber === 'symbol'
+        ? symbolOrNumber.toString()
+        : symbolOrNumber;
 
-      switch (stringType) {
-        case AsyncMode:
+      switch (switchValue) {
+        case ASYNC_MODE_NUMBER:
+        case ASYNC_MODE_SYMBOL_STRING:
           nodeType = 'Composite';
           name = 'AsyncMode';
           children = [];
           break;
-        case ContextProvider:
+        case CONTEXT_PROVIDER_NUMBER:
+        case CONTEXT_PROVIDER_SYMBOL_STRING:
           nodeType = 'Composite';
           props = fiber.memoizedProps;
           name = 'Context.Provider';
           children = [];
           break;
-        case ContextConsumer:
+        case CONTEXT_CONSUMER_NUMBER:
+        case CONTEXT_CONSUMER_SYMBOL_STRING:
           nodeType = 'Composite';
           props = fiber.memoizedProps;
           name = 'Context.Consumer';
           children = [];
           break;
-        case StrictMode:
+        case STRICT_MODE_NUMBER:
+        case STRICT_MODE_SYMBOL_STRING:
           nodeType = 'Composite';
           name = 'StrictMode';
           children = [];

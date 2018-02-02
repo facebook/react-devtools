@@ -13,8 +13,12 @@
 // Based on the React repo.
 
 module.exports = {
-  AsyncMode: 'Symbol(react.async_mode)',
-  ContextConsumer: 'Symbol(react.context)',
-  ContextProvider: 'Symbol(react.provider)',
-  StrictMode: 'Symbol(react.strict_mode)',
+  ASYNC_MODE_NUMBER: 0xeacf,
+  ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
+  CONTEXT_CONSUMER_NUMBER: 0xeace,
+  CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
+  CONTEXT_PROVIDER_NUMBER: 0xeacd,
+  CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
+  STRICT_MODE_NUMBER: 0xeacc,
+  STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
 };
