@@ -161,7 +161,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         default:
           nodeType = 'Native';
           props = fiber.memoizedProps;
-          name = `TODO_NOT_IMPLEMENTED_YET ${fiber.tag}`;
+          name = 'TODO_NOT_IMPLEMENTED_YET';
           children = [];
           break;
       }
