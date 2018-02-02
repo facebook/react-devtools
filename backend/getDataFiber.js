@@ -127,6 +127,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       const symbolOrNumber = typeof type === 'object' && type !== null
         ? type.$$typeof
         : type;
+      // $FlowFixMe facebook/flow/issues/2362
       const switchValue = typeof symbolOrNumber === 'symbol'
         ? symbolOrNumber.toString()
         : symbolOrNumber;
