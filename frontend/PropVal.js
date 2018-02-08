@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 var ReactDOM = require('react-dom');
 
 var consts = require('../agent/consts');
@@ -46,7 +47,7 @@ class PropVal extends React.Component {
 }
 
 PropVal.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {

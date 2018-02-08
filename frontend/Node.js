@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 
 var decorate = require('./decorate');
 var Props = require('./Props');
@@ -406,8 +407,8 @@ class Node extends React.Component {
 }
 
 Node.contextTypes = {
-  scrollTo: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  scrollTo: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 var WrappedNode = decorate({

@@ -14,6 +14,7 @@ import type {Theme, DOMEvent} from '../types';
 
 var {sansSerif} = require('../Themes/Fonts');
 var React = require('react');
+var PropTypes = require('prop-types');
 var Simple = require('./Simple');
 
 var consts = require('../../agent/consts');
@@ -136,7 +137,7 @@ class DataView extends React.Component {
 }
 
 DataView.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 class DataItem extends React.Component {
@@ -293,8 +294,8 @@ class DataItem extends React.Component {
 }
 
 DataItem.contextTypes = {
-  onChange: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 function alphanumericSort(a: string, b: string): number {

@@ -11,6 +11,7 @@
 'use strict';
 
 const React = require('react');
+const PropTypes = require('prop-types');
 
 const LeftPane = require('./LeftPane');
 const {sansSerif} = require('../../../frontend/Themes/Fonts');
@@ -86,12 +87,12 @@ class Application extends React.Component {
 }
 
 Application.childContextTypes = {
-  store: React.PropTypes.object,
-  theme: React.PropTypes.object,
+  store: PropTypes.object,
+  theme: PropTypes.object,
 };
 Application.propTypes = {
-  theme: React.PropTypes.object,
-  updateTheme: React.PropTypes.func,
+  theme: PropTypes.object,
+  updateTheme: PropTypes.func,
 };
 
 const applicationStyle = (theme: Theme) => ({

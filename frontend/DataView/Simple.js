@@ -12,6 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var PropTypes = require('prop-types');
 
 var Input = require('../Input');
 var flash = require('../flash');
@@ -142,14 +143,14 @@ class Simple extends React.Component {
 }
 
 Simple.propTypes = {
-  data: React.PropTypes.any,
-  path: React.PropTypes.array,
-  readOnly: React.PropTypes.bool,
+  data: PropTypes.any,
+  path: PropTypes.array,
+  readOnly: PropTypes.bool,
 };
 
 Simple.contextTypes = {
-  onChange: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 const inputStyle = (theme: Theme) => ({

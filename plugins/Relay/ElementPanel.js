@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 var decorate = require('../../frontend/decorate');
 
 import type {Theme} from '../../frontend/types';
@@ -61,7 +62,7 @@ class ElementPanel extends React.Component {
 }
 
 ElementPanel.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const dataNodeStyle = (theme: Theme) => ({

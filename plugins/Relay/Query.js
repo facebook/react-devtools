@@ -15,6 +15,7 @@ import type {Map} from 'immutable';
 
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 var React = require('react');
+var PropTypes = require('prop-types');
 
 class Query extends React.Component {
   theme: {
@@ -60,7 +61,7 @@ class Query extends React.Component {
 }
 
 Query.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const baseContainer = {
