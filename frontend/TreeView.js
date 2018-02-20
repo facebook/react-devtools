@@ -84,41 +84,32 @@ class TreeView extends React.Component {
       ? SearchUtils.searchTextToRegExp(searchText)
       : null;
 
+    var nodeMapFunc = id => (
+      <Node
+      depth={0} 
+      id={id}
+      key={id}
+      searchRegExp={searchRegExp}
+      />
+    );
+
+    var nodes = this.props.roots.map(nodeMapFunc).toJS();
+    var breadCrumb = <Breadcrumb />;
+
     if (this.props.searching && this.props.roots.count() > MAX_SEARCH_ROOTS) {
-      return (
-        <div style={styles.container}>
-          <div ref={n => this.node = n} style={styles.scroll}>
-            <div style={styles.scrollContents}>
-              {this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(id => (
-                <Node
-                  depth={0}
-                  id={id}
-                  key={id}
-                  searchRegExp={searchRegExp}
-                />
-              )).toJS()}
-              <span>Some results not shown. Narrow your search criteria to find them</span>
-            </div>
-          </div>
-        </div>
-      );
+      nodes = this.props.roots.slice(0, MAX_SEARCH_ROOTS).map(nodeMapFunc).toJS();
+      nodes.push(<span>Some results not shown. Narrow your search criteria to find them</span>);
+      breadCrumb = null;
     }
 
     return (
       <div style={styles.container}>
         <div ref={n => this.node = n} style={styles.scroll}>
           <div style={styles.scrollContents}>
-            {this.props.roots.map(id => (
-              <Node
-                depth={0}
-                id={id}
-                key={id}
-                searchRegExp={searchRegExp}
-              />
-            )).toJS()}
+            {nodes}
           </div>
         </div>
-        <Breadcrumb />
+        {breadCrumb}
       </div>
     );
   }
