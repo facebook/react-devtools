@@ -90,7 +90,7 @@ class TraceUpdatesAbstractNodePresenter implements Presenter {
 
     if (this._clearTimer) {
       clearTimeout(this._clearTimer);
-      this._clearTimer = undefined;
+      this._clearTimer = null;
     }
 
     this._pool = this._pool.clear();
