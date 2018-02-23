@@ -13,6 +13,7 @@
 var React = require('react');
 var ReactDOM = require('react-dom');
 var Draggable = require('./Draggable');
+var nullthrows = require('nullthrows').default;
 
 import type {Theme} from './types';
 
@@ -22,8 +23,8 @@ type Context = {
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React$Element,
-  right: () => React$Element,
+  left: () => React.Node,
+  right: () => React.Node,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,
@@ -35,10 +36,8 @@ type State = {
   height: number,
 };
 
-class SplitPane extends React.Component {
+class SplitPane extends React.Component<Props, State> {
   context: Context;
-  props: Props;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -50,7 +49,8 @@ class SplitPane extends React.Component {
   }
 
   componentDidMount() {
-    var node = ReactDOM.findDOMNode(this);
+    // $FlowFixMe use a ref on the root
+    var node: HTMLDivElement = nullthrows(ReactDOM.findDOMNode(this));
 
     const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
 
@@ -61,6 +61,7 @@ class SplitPane extends React.Component {
   }
 
   onMove(x: number, y: number) {
+    // $FlowFixMe use a ref on the root
     var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
     this.setState(prevState => ({

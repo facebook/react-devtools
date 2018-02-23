@@ -18,9 +18,21 @@ var {sansSerif} = require('./Themes/Fonts');
 var React = require('react');
 var decorate = require('./decorate');
 
-class Breadcrumb extends React.Component {
+type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
+
+type Props = {
+  hover: (string, boolean) => void;
+  selected: string,
+  path: BreadcrumbPath,
+  select: string => ElementID,
+}
+
+type State ={
+  hovered: ?string
+}
+
+class Breadcrumb extends React.Component<Props, State> {
   context: {theme: Theme};
-  state: {hovered: ?string};
 
   constructor(props) {
     super(props);
@@ -103,7 +115,7 @@ const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
   };
 };
 
-function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
+function getBreadcrumbPath(store: Store): BreadcrumbPath {
   var path = [];
   var current = store.breadcrumbHead;
   while (current) {

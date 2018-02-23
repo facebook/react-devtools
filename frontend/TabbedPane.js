@@ -16,14 +16,15 @@ var {sansSerif} = require('./Themes/Fonts');
 
 import type {Theme} from './types';
 
-class TabbedPane extends React.Component {
+type Props = {
+  tabs: {[key: string]: () => React.Node},
+  selected: string,
+  setSelectedTab: (name: string) => void,
+};
+
+class TabbedPane extends React.Component<Props> {
   context: {
     theme: Theme,
-  };
-  props: {
-    tabs: {[key: string]: () => React$Element},
-    selected: string,
-    setSelectedTab: (name: string) => void,
   };
 
   render() {

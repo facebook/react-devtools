@@ -15,6 +15,8 @@ const requestAnimationFrame = require('fbjs/lib/requestAnimationFrame');
 
 import type {
   Measurement,
+  MetaData as MetaDataType,
+  Presenter,
 } from './TraceUpdatesTypes';
 
 // How long the measurement should be presented for.
@@ -22,24 +24,26 @@ const DURATION = 250;
 
 const {Record, Map} = immutable;
 
-const MetaData = Record({
+const MetaData: MetaDataType = Record({
   expiration: 0,
   hit: 0,
 });
 
-class TraceUpdatesAbstractNodePresenter {
-  _clearTimer: number;
+class TraceUpdatesAbstractNodePresenter implements Presenter {
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  _clearTimer: ?TimeoutID;
   _draw: () => void;
   _drawing: boolean;
   _enabled: boolean;
-  _pool: Map<Measurement, MetaData>;
+  _pool: Map<Measurement, MetaDataType>;
   _redraw: () => void;
 
   constructor() {
     this._pool = new Map();
     this._drawing = false;
-    this._clearTimer = 0;
     this._enabled = false;
+    this._clearTimer = null;
 
     this._draw = this._draw.bind(this);
     this._redraw = this._redraw.bind(this);
@@ -53,6 +57,7 @@ class TraceUpdatesAbstractNodePresenter {
     if (this._pool.has(measurement)) {
       data = this._pool.get(measurement);
     } else {
+      // $FlowIssue
       data = new MetaData();
     }
 
@@ -85,7 +90,7 @@ class TraceUpdatesAbstractNodePresenter {
 
     if (this._clearTimer) {
       clearTimeout(this._clearTimer);
-      this._clearTimer = 0;
+      this._clearTimer = null;
     }
 
     this._pool = this._pool.clear();
@@ -93,7 +98,7 @@ class TraceUpdatesAbstractNodePresenter {
     this.clearImpl();
   }
 
-  drawImpl(measurements: Map<Measurement, MetaData>): void {
+  drawImpl(measurements: Map<Measurement, MetaDataType>): void {
     // sub-class should implement this.
   }
 
@@ -102,7 +107,7 @@ class TraceUpdatesAbstractNodePresenter {
   }
 
   _redraw(): void {
-    this._clearTimer = 0;
+    this._clearTimer = null;
     if (!this._drawing && this._pool.size > 0) {
       this._drawing = true;
       this._draw();
@@ -131,7 +136,7 @@ class TraceUpdatesAbstractNodePresenter {
 
     this.drawImpl(this._pool);
 
-    if (this._pool.size > 0) {
+    if (this._pool.size > 0 && this._clearTimer != null) {
       clearTimeout(this._clearTimer);
       this._clearTimer = setTimeout(this._redraw, minExpiration - now);
     }

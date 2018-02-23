@@ -12,6 +12,7 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
+const nullthrows = require('nullthrows').default;
 
 const Application = require('./source/Application');
 const {deserialize, serialize} = require('../../frontend/Themes/Serializer');
@@ -33,7 +34,7 @@ function updateTheme(updatedTheme) {
 
 function parseTheme() {
   const match = location.href.match(/theme=(.+)/);
-  
+
   theme = match
     ? deserialize(decodeURI(match[1]), Themes.ChromeDefault)
     : Themes.ChromeDefault;
@@ -45,7 +46,7 @@ function renderApplication() {
       theme={theme}
       updateTheme={updateTheme}
     />,
-    document.getElementById('application')
+    nullthrows(document.getElementById('application'))
   );
 }
 

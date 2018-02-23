@@ -12,12 +12,12 @@
 
 var React = require('react');
 
+type Props = {
+  children: () => React.Node,
+  store: Object,
+};
 module.exports = function(name: string): Object {
-  class Wrapper extends React.Component {
-    props: {
-      children: () => React$Element,
-      store: Object,
-    };
+  class Wrapper extends React.Component<Props> {
     getChildContext() {
       return {[name]: this.props.store};
     }

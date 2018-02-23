@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var nullthrows = require('nullthrows').default;
 
 var decorate = require('./decorate');
 var Props = require('./Props');
@@ -40,7 +41,7 @@ type StateType = {
   isWindowFocused: boolean,
 };
 
-class Node extends React.Component {
+class Node extends React.Component<PropsType, StateType> {
   _head: ?HTMLElement;
   _tail: ?HTMLElement;
   _ownerWindow: any;
@@ -272,7 +273,7 @@ class Node extends React.Component {
       ];
       while (unmatched.length > 0) {
         pieces.push(
-          <span key={pieces.length} style={highlightStyle(theme)}>{matched.shift()}</span>
+          <span key={pieces.length} style={highlightStyle(theme)}>{nullthrows(matched).shift()}</span>
         );
         pieces.push(
           <span key={pieces.length}>{unmatched.shift()}</span>

@@ -21,11 +21,12 @@ import React from 'react';
 import decorate from '../../frontend/decorate';
 import tidyGraphQL from './tidyGraphQL';
 
-class QueryViewer extends React.Component {
-  props: {
-    data: Map,
-    inspect: (path: Array<string>, cb: () => void) => void,
-  };
+type Props = {
+  data: Map,
+  inspect: (path: Array<string>, cb: () => void) => void,
+}
+
+class QueryViewer extends React.Component<Props> {
   render() {
     var data = this.props.data;
     var status = data.get('status');

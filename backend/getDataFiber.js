@@ -177,6 +177,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     }
   }
 
+  // $FlowFixMe
   return {
     nodeType,
     type,

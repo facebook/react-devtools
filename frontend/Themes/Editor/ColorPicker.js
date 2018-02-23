@@ -16,15 +16,13 @@ const {Hue, Saturation} = require('react-color/lib/components/common');
 
 import type {Theme} from '../../types';
 
-type Props = {
+type ColorPickerProps = {
   color: string,
   theme: Theme,
   updateColor: (color: string) => void,
 };
 
-class ColorPicker extends React.Component {
-  props: Props;
-
+class ColorPicker extends React.Component<ColorPickerProps> {
   _ref: any;
 
   render() {
@@ -50,7 +48,12 @@ class ColorPicker extends React.Component {
   };
 }
 
-class CustomColorPicker extends React.Component {
+type CustomColorPickerProps = {
+  color: string,
+  theme: Theme,
+  onChange: (color: any) => void,
+};
+class CustomColorPicker extends React.Component<CustomColorPickerProps> {
   render() {
     return (
       <div style={customColorPicker(this.props.theme)}>

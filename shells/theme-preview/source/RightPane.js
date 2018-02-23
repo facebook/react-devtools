@@ -15,7 +15,9 @@ const React = require('react');
 
 const PropState = require('../../../frontend/PropState');
 
-class RightPane extends React.Component {
+type Props = {};
+
+class RightPane extends React.Component<Props> {
   getChildContext() {
     return {
       onChange: noop,

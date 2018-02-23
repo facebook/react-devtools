@@ -14,12 +14,18 @@ var React = require('react');
 
 import type {Theme} from '../types';
 
-class DetailPaneSection extends React.Component {
+type Props = {
+  title: string,
+  hint?: React.Node,
+  children: React.Node,
+}
+
+class DetailPaneSection extends React.Component<Props> {
   context: {
     theme: Theme,
   };
 
-  render(): React.Element {
+  render() {
     const {theme} = this.context;
     const {children, hint} = this.props;
     return (

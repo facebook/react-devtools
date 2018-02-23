@@ -16,7 +16,7 @@ export type ClearTimeout = (id: any) => void;
 export type SetTimeout = (callback: () => void, delay: number) => any;
 
 const TimerSafe = (Component: any) => {
-  class TimerSafeImplementation extends React.Component<void, any, any> {
+  class TimerSafeImplementation extends React.Component<any, any> {
     _timeoutIds: {[key: any]: boolean} = {};
 
     componentWillUnmount() {

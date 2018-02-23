@@ -23,9 +23,7 @@ type Props = {
   theme: Theme,
 };
 
-class Preview extends React.Component {
-  props: Props;
-
+class Preview extends React.Component<Props> {
   getChildContext() {
     return {
       scrollTo: () => {},

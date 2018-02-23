@@ -22,9 +22,10 @@ import type {Theme} from '../../../frontend/types';
 
 type Props = {
   theme: Theme,
+  updateTheme: (Theme) => void,
 };
 
-class Application extends React.Component {
+class Application extends React.Component<Props> {
   _onInput: (event: Event) => void;
 
   constructor(props: Props, context: any) {

@@ -26,7 +26,7 @@ type Props = {
   // TODO: typecheck bridge interface
   bridge: any;
   id: any;
-  supportsMeasure: boolean;
+  supportsMeasure: ?boolean;
 };
 
 type DefaultProps = {};
@@ -41,10 +41,8 @@ type StyleResult = {
   measuredLayout: ?Object;
 };
 
-class NativeStyler extends React.Component {
-  props: Props;
+class NativeStyler extends React.Component<Props, State> {
   defaultProps: DefaultProps;
-  state: State;
   _styleGet: (result: StyleResult) => void;
 
   constructor(props: Object) {

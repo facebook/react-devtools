@@ -13,8 +13,12 @@
 var {monospace} = require('../Themes/Fonts');
 var React = require('react');
 
-class DetailPane extends React.Component {
-  render(): React.Element {
+type Props = {
+  children: React.Node,
+}
+
+class DetailPane extends React.Component<Props> {
+  render() {
     return (
       <div style={styles.container}>
         {this.props.children}

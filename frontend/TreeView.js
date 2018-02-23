@@ -18,11 +18,19 @@ var SearchUtils = require('./SearchUtils');
 var decorate = require('./decorate');
 var {monospace, sansSerif} = require('./Themes/Fonts');
 
+import type {List} from 'immutable';
 import type {Theme} from './types';
 
 var MAX_SEARCH_ROOTS = 200;
 
-class TreeView extends React.Component {
+type Props = {
+  reload?: () => void,
+  roots: List,
+  searching: boolean,
+  searchText: string,
+}
+
+class TreeView extends React.Component<Props> {
   node: ?HTMLElement;
 
   getChildContext() {

@@ -16,11 +16,17 @@ var {getInvertedMid} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
-class Props extends React.Component {
+type PropsProps = {
+  props: any,
+  inverted: boolean,
+}
+
+class Props extends React.Component<PropsProps> {
   context: {
     theme: Theme,
   };
-  shouldComponentUpdate(nextProps: Object): boolean {
+
+  shouldComponentUpdate(nextProps: PropsProps): boolean {
     return nextProps.props !== this.props.props || nextProps.inverted !== this.props.inverted;
   }
 

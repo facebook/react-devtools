@@ -27,13 +27,23 @@ export type Measurement = {
   width: number,
 };
 
+export type MetaData = {
+  expiration: number,
+  hit: number,
+}
+
 export type onMeasureNode = (m: Measurement) => void;
 
-export type Measurer = {
-  request:(n: Node, c: onMeasureNode) => string,
-};
 
-export type Presenter = {
-  present: (m: Measurement) => void,
-  setEnabled: (b: boolean) => void,
-};
+// eslint shouldn't error on type positions. TODO: update eslint
+// eslint-disable-next-line no-undef
+export interface Measurer {
+  +request:(n: Node, c: onMeasureNode) => string,
+}
+
+// eslint shouldn't error on type positions. TODO: update eslint
+// eslint-disable-next-line no-undef
+export interface Presenter {
+  +present: (m: Measurement) => void,
+  +setEnabled: (b: boolean) => void,
+}

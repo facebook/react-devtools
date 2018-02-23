@@ -19,17 +19,22 @@ var {monospace} = require('../Themes/Fonts');
 
 import type {Theme, DOMEvent, DOMNode} from '../types';
 
+type Props = {
+  data: any,
+  path: Array<string>,
+  readOnly: ?boolean,
+}
+
 type State = {
   editing: boolean,
   text: string,
 };
 
-class Simple extends React.Component {
+class Simple extends React.Component<Props, State> {
   context: {
     onChange: (path: Array<any>, value: any) => void,
     theme: Theme,
   };
-  state: State;
   input: DOMNode;
 
   constructor(props: Object) {
@@ -102,6 +107,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
+      // $FlowFixMe replace with root ref
       flash(ReactDOM.findDOMNode(this), this.context.theme.state04, 'transparent', 1);
     }
   }
@@ -164,7 +170,7 @@ const inputStyle = (theme: Theme) => ({
   fontSize: 'inherit',
 });
 
-const simpleStyle = (readOnly: boolean, theme: Theme) => ({
+const simpleStyle = (readOnly: ?boolean, theme: Theme) => ({
   display: 'flex',
   flex: 1,
   whiteSpace: 'pre-wrap',

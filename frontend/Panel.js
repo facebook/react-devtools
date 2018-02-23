@@ -68,10 +68,12 @@ type State = {
   themeName: ?string,
 };
 
-class Panel extends React.Component {
+class Panel extends React.Component<Props, State> {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
-  _checkTimeout: ?number;
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  _checkTimeout: ?TimeoutID;
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
@@ -80,9 +82,7 @@ class Panel extends React.Component {
   // TODO: typecheck plugin interface
   plugins: Array<any>;
 
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -222,7 +222,7 @@ class Panel extends React.Component {
 
       this._themeStore = new ThemeStore(this.state.themeName);
       this._store = new Store(this._bridge, this._themeStore);
-      
+
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),

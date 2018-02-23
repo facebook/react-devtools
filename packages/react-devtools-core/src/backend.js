@@ -23,6 +23,7 @@ var Bridge = require('../../../agent/Bridge');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
+var invariant = require('assert');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupRelay = require('../../../plugins/Relay/backend');
 
@@ -95,9 +96,10 @@ function connectToDevTools(options: ?ConnectOptions) {
   function handleMessage(evt) {
     var data;
     try {
+      invariant(typeof evt.data === 'string');
       data = JSON.parse(evt.data);
     } catch (e) {
-      console.error('failed to parse json: ' + evt.data);
+      console.error('failed to parse json: ' + String(evt.data));
       return;
     }
     messageListeners.forEach(fn => {

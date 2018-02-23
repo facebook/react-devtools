@@ -21,7 +21,7 @@ type State = {
 };
 
 const Hoverable = (Component: any) => {
-  class HoverableImplementation extends React.Component<void, Props, State> {
+  class HoverableImplementation extends React.Component<Props, State> {
     props: Props;
     state: State = {
       isHovered: false,
@@ -44,19 +44,19 @@ const Hoverable = (Component: any) => {
       );
     }
 
-    _onMouseDown: Function = (event: SyntheticEvent): void => {
+    _onMouseDown: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isPressed: true });
     };
 
-    _onMouseEnter: Function = (event: SyntheticEvent): void => {
+    _onMouseEnter: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isHovered: true });
     };
 
-    _onMouseLeave: Function = (event: SyntheticEvent): void => {
+    _onMouseLeave: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isHovered: false, isPressed: false });
     };
 
-    _onMouseUp: Function = (event: SyntheticEvent): void => {
+    _onMouseUp: Function = (event: SyntheticMouseEvent<>): void => {
       this.setState({ isPressed: false });
     };
   }

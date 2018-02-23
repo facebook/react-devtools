@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var nullthrows = require('nullthrows').default;
 var {monospace} = require('../../frontend/Themes/Fonts');
 var Input = require('../../frontend/Input');
 
@@ -31,13 +32,11 @@ type State = {
   inputWidth: number;
 };
 
-class AutoSizeInput extends React.Component {
+class AutoSizeInput extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
   input: HTMLInputElement;
-  sizer: HTMLDivElement;
+  sizer: ?HTMLDivElement;
 
   constructor(props: Props, context: Context) {
     super(props, context);
@@ -56,11 +55,11 @@ class AutoSizeInput extends React.Component {
     }
   }
 
-  componentDidUpdate(prevProps: Object, prevState: Object) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     this.updateInputWidth();
   }
 
-  componentWillReceiveProps(nextProps: Object) {
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({text: '' + nextProps.value});
   }
 
@@ -72,7 +71,7 @@ class AutoSizeInput extends React.Component {
     if (!inputStyle) {
       return;
     }
-    const sizerNode = this.sizer;
+    const sizerNode = nullthrows(this.sizer);
     sizerNode.style.fontSize = inputStyle.fontSize;
     sizerNode.style.fontFamily = inputStyle.fontFamily;
     sizerNode.style.fontWeight = inputStyle.fontWeight;

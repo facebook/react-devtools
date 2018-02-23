@@ -14,16 +14,17 @@ var React = require('react');
 var ReactDOM = require('react-dom');
 import type {DOMEvent} from './types';
 
-class Draggable extends React.Component {
+type Props = {
+  children?: React.Node,
+  onMove: (x: number, y: number) => void,
+  onStart: () => void,
+  onStop: () => void,
+  style: Object,
+};
+
+class Draggable extends React.Component<Props> {
   _onMove: (evt: DOMEvent) => void;
   _onUp: (evt: DOMEvent) => void;
-  props: {
-    children?: mixed,
-    onMove: (x: number, y: number) => void,
-    onStart: () => void,
-    onStop: () => void,
-    style: Object,
-  };
 
   componentDidMount() {
     this._onMove = this.onMove.bind(this);
@@ -32,8 +33,11 @@ class Draggable extends React.Component {
 
   _startDragging(evt: DOMEvent) {
     evt.preventDefault();
+    // $FlowFixMe use root ref
     var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    // $FlowFixMe
     doc.addEventListener('mousemove', this._onMove);
+    // $FlowFixMe
     doc.addEventListener('mouseup', this._onUp);
     this.props.onStart();
   }
@@ -45,8 +49,11 @@ class Draggable extends React.Component {
 
   onUp(evt: DOMEvent) {
     evt.preventDefault();
+    // $FlowFixMe use root ref
     var doc = ReactDOM.findDOMNode(this).ownerDocument;
+    // $FlowFixMe
     doc.removeEventListener('mousemove', this._onMove);
+    // $FlowFixMe
     doc.removeEventListener('mouseup', this._onUp);
     this.props.onStop();
   }

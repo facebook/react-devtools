@@ -54,7 +54,7 @@ type State = {};
  */
 module.exports = function(options: Options, Component: any): any {
   var storeKey = options.store || 'store';
-  class Wrapper extends React.Component {
+  class Wrapper extends React.Component<*, State> {
     _listeners: Array<string>;
     _update: () => void;
     state: State;
@@ -126,6 +126,7 @@ module.exports = function(options: Options, Component: any): any {
   }
 
   Wrapper.contextTypes = {
+    // $FlowFixMe
     [storeKey]: React.PropTypes.object,
   };
 

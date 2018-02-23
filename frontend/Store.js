@@ -87,7 +87,9 @@ class Store extends EventEmitter {
   _parents: Map;
   _nodesByName: Map;
   _eventQueue: Array<string>;
-  _eventTimer: ?number;
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  _eventTimer: ?TimeoutID;
 
   // Public state
   isInspectEnabled: boolean;
@@ -536,7 +538,8 @@ class Store extends EventEmitter {
               'Inspected path must be one of props, state, or context');
     this._bridge.inspect(id, path, value => {
       var base = this.get(id).get(path[0]);
-      var inspected = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
+      // $FlowFixMe
+      var inspected: ?{[string]: boolean} = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
       if (inspected) {
         assign(inspected, value);
         inspected[consts.inspected] = true;

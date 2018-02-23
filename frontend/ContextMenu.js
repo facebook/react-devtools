@@ -11,6 +11,7 @@
 'use strict';
 
 var React = require('react');
+var nullthrows = require('nullthrows').default;
 var {sansSerif} = require('./Themes/Fonts');
 var HighlightHover = require('./HighlightHover');
 
@@ -24,21 +25,26 @@ export type MenuItem = {
   action: () => void
 };
 
-class ContextMenu extends React.Component {
+type Props = {
+  open: boolean,
+  hideContextMenu: () => void,
+  items: Array<MenuItem>,
+  pos: {
+    x: number,
+    y: number,
+  },
+};
+
+type State = {
+  elementHeight: number,
+  windowHeight: number,
+};
+
+class ContextMenu extends React.Component<Props, State> {
   _clickout: (evt: Object) => void;
 
   context: {
     theme: Theme,
-  };
-
-  props: {
-    open: boolean,
-    hideContextMenu: () => void,
-    items: Array<MenuItem>,
-    pos: {
-      x: number,
-      y: number,
-    },
   };
 
   state = {
@@ -68,7 +74,7 @@ class ContextMenu extends React.Component {
       return;
     }
 
-    const elementHeight = element.querySelector('ul').clientHeight;
+    const elementHeight = nullthrows(element.querySelector('ul')).clientHeight;
     const windowHeight = window.innerHeight;
 
     if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {

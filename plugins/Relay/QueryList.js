@@ -17,13 +17,13 @@ var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 var Query = require('./Query');
 
-class QueryList extends React.Component {
-  props: {
-    queries: OrderedMap,
-    selectQuery: (id: string) => void,
-    selectedQuery: ?string,
-  };
+type Props = {
+  queries: OrderedMap,
+  selectQuery: (id: string) => void,
+  selectedQuery: ?string,
+};
 
+class QueryList extends React.Component<Props> {
   render() {
     if (!this.props.queries.count()) {
       return <div style={styles.empty}>No Relay Queries logged</div>;

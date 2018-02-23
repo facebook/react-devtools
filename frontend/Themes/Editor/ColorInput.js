@@ -11,8 +11,8 @@
 'use strict';
 
 const React = require('react');
-const {findDOMNode} = require('react-dom');
 const Portal = require('react-portal');
+const nullthrows = require('nullthrows').default;
 const ColorPicker = require('./ColorPicker');
 const Input = require('../../Input');
 const {monospace} = require('../Fonts');
@@ -40,12 +40,12 @@ type State = {
   targetPosition: Position,
 };
 
-class ColorInput extends React.Component {
+class ColorInput extends React.Component<Props, State> {
   props: Props;
   state: State;
 
-  _colorChipRef: any;
-  _containerRef: any;
+  _colorChipRef: ?HTMLDivElement;
+  _containerRef: ?HTMLDivElement;
 
   constructor(props: Props, context: any) {
     super(props, context);
@@ -125,8 +125,10 @@ class ColorInput extends React.Component {
   };
 
   _onClick: Function = (event): void => {
-    const container = findDOMNode(this._containerRef);
-    const targetPosition = findDOMNode(this._colorChipRef).getBoundingClientRect();
+    const container = nullthrows(this._containerRef);
+    const targetPosition = nullthrows(
+      this._colorChipRef,
+    ).getBoundingClientRect();
 
     this.setState({
       isColorPickerOpen: true,
@@ -141,11 +143,11 @@ class ColorInput extends React.Component {
     });
   };
 
-  _setColorChipRef: Function = (ref: any): void => {
+  _setColorChipRef = (ref: ?HTMLDivElement): void => {
     this._colorChipRef = ref;
   };
 
-  _setContainerRef: Function = (ref: any): void => {
+  _setContainerRef = (ref: ?HTMLDivElement): void => {
     this._containerRef = ref;
   };
 
