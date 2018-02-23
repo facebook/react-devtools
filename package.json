@@ -37,18 +37,21 @@
   },
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
+  "private": true,
+  "workspaces": [
+    "packages/*"
+  ],
   "scripts": {
-    "build:extension": "npm run build:extension:chrome && npm run build:extension:firefox",
+    "build:extension": "yarn run build:extension:chrome && yarn run build:extension:firefox",
     "build:extension:chrome": "node ./shells/chrome/build",
     "build:extension:firefox": "node ./shells/firefox/build",
-    "build:standalone": "cd packages/react-devtools-core && npm run build",
+    "build:standalone": "cd packages/react-devtools-core && yarn run build",
     "deploy": "cd ./shells/theme-preview && ./build.sh && gh-pages -d .",
     "lint": "eslint .",
-    "postinstall": "lerna bootstrap",
     "test": "jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
-    "test:standalone": "cd packages/react-devtools && npm start",
+    "test:standalone": "cd packages/react-devtools && yarn start",
     "typecheck": "flow check"
   },
   "jest": {
@@ -59,7 +62,7 @@
   "devDependencies": {
     "chrome-launch": "^1.1.4",
     "firefox-profile": "^1.0.2",
-    "lerna": "2.0.0-beta.36",
+    "lerna": "^2.8.0",
     "web-ext": "^1.10.1"
   }
 }
