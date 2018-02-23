@@ -9,7 +9,6 @@
  */
 'use strict';
 
-jest.dontMock('../copyWithSet');
 var copyWithSet = require('../copyWithSet');
 
 describe('copyWithSet', function() {

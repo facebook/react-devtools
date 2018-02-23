@@ -3,7 +3,7 @@ install:
   - npm install
 language: node_js
 node_js:
-  - '4'
+  - '8'
 script:
   - npm run lint
   - flow check

@@ -9,7 +9,6 @@
  */
 'use strict';
 
-jest.dontMock('../Agent');
 var Agent = require('../Agent');
 
 describe('Agent', () => {
