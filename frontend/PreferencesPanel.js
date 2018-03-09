@@ -27,9 +27,11 @@ import type {Theme} from './types';
 
 type Props = {
   changeTheme: (themeName: string) => void,
+  changeHideSymbol: (enabled: boolean) => void,
   hasCustomTheme: boolean,
   hide: () => void,
   open: bool,
+  hideSymbol: bool,
 };
 
 type State = {
@@ -44,7 +46,7 @@ class PreferencesPanel extends React.Component<Props, State> {
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
-    themes: { [key: string]: Theme },
+    themes: { [key: string]: Theme }
   };
 
   constructor(props, context) {
@@ -69,7 +71,7 @@ class PreferencesPanel extends React.Component<Props, State> {
 
   render() {
     const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
-    const {hasCustomTheme, hide, open} = this.props;
+    const {hasCustomTheme, hide, open, hideSymbol} = this.props;
     const {editMode} = this.state;
 
     if (!open) {
@@ -118,6 +120,16 @@ class PreferencesPanel extends React.Component<Props, State> {
               <EditIcon />
             </EditButton>
           </div>
+          <div>
+            <label>
+              <input
+                type="checkbox"
+                checked={hideSymbol}
+                onChange={this._changeHideSymbol}
+              />
+              Hide components with truthy <code>Symbol.for('react.devtools.hide')</code> property
+            </label>
+          </div>
           <div style={styles.buttonBar}>
             <button
               onClick={hide}
@@ -142,6 +154,12 @@ class PreferencesPanel extends React.Component<Props, State> {
 
     changeTheme(event.target.value);
   };
+
+  _changeHideSymbol = (event) => {
+    const {changeHideSymbol} = this.props;
+
+    changeHideSymbol(event.target.checked);
+  }
 
   _hide = () => {
     const {hide} = this.props;
@@ -208,14 +226,16 @@ const blockClick = event => event.stopPropagation();
 
 const WrappedPreferencesPanel = decorate({
   listeners() {
-    return ['preferencesPanelShown'];
+    return ['preferencesPanelShown', 'hideSymbol'];
   },
   props(store, props) {
     return {
       changeTheme: themeName => store.changeTheme(themeName),
+      changeHideSymbol: enabled => store.changeHideSymbol(enabled),
       hasCustomTheme: !!store.themeStore.customTheme,
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
+      hideSymbol: store.hideSymbol,
     };
   },
 }, PreferencesPanel);

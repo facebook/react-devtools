@@ -153,6 +153,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var nodeType = null;
     var name = null;
     var text = null;
+    var hideSymbol = null;
 
     // Profiler data
     var actualDuration = null;
@@ -176,11 +177,15 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         publicInstance = fiber.stateNode;
         props = fiber.memoizedProps;
         state = fiber.memoizedState;
+        hideSymbol = typeof Symbol === 'function' && fiber.type[Symbol.for('react.devtools.hide')];
         if (publicInstance != null) {
           context = publicInstance.context;
           if (context && Object.keys(context).length === 0) {
             context = null;
           }
+        }
+        if (name === 'HigherOrderComponent') {
+          console.log('fiber backend', fiber);
         }
         const inst = publicInstance;
         if (inst) {
@@ -360,6 +365,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       actualDuration,
       actualStartTime,
       treeBaseDuration,
+
+      hideSymbol,
     };
   }
 

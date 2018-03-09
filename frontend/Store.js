@@ -108,6 +108,7 @@ class Store extends EventEmitter {
   selectedTab: string;
   selected: ?ElementID;
   themeStore: ThemeStore;
+  hideSymbol: boolean;
   breadcrumbHead: ?ElementID;
   snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
@@ -142,6 +143,7 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.refreshSearch = false;
     this.themeStore = themeStore;
+    this.hideSymbol = true;
 
     // for debugging
     window.store = this;
@@ -378,6 +380,11 @@ class Store extends EventEmitter {
     this.emit('theme');
   }
 
+  changeHideSymbol(enabled: boolean) {
+    this.hideSymbol = enabled;
+    this.emit('hideSymbol');
+  }
+
   showPreferencesPanel() {
     this.preferencesPanelShown = true;
     this.emit('preferencesPanelShown');
@@ -520,7 +527,7 @@ class Store extends EventEmitter {
       var node = this.get(id);
       var nodeType = node.get('nodeType');
 
-      if (nodeType !== 'Wrapper' && nodeType !== 'Native') {
+      if (nodeType !== 'Wrapper' && nodeType !== 'Native' && !(nodeType === 'Composite' && this.hideSymbol && node.get('hideSymbol'))) {
         return id;
       }
       if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
