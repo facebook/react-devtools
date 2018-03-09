@@ -165,8 +165,10 @@ function getData(internalInstance: Object): DataType {
     };
   }
 
-  const hideSymbol = nodeType === 'Composite' && typeof Symbol === 'function' && type[Symbol.for('react.devtools.hide')];
-
+  const hideSymbol = nodeType === 'Composite' &&
+    typeof Symbol === 'function' &&
+    typeof type === 'function' &&
+    type[Symbol.for('react.devtools.hide')];
 
   // $FlowFixMe
   return {
