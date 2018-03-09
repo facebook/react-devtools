@@ -43,7 +43,7 @@ class PreferencesPanel extends React.Component<Props, State> {
     showHiddenThemes: boolean,
     theme: Theme,
     themeName: string,
-    themes: { [key: string]: Theme }
+    themes: { [key: string]: Theme },
   };
 
   constructor(props, context) {
