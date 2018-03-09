@@ -49,6 +49,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var nodeType = null;
   var name = null;
   var text = null;
+  var hideSymbol = null;
 
   switch (fiber.tag) {
     case FunctionalComponent:
@@ -58,11 +59,15 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       publicInstance = fiber.stateNode;
       props = fiber.memoizedProps;
       state = fiber.memoizedState;
+      hideSymbol = typeof Symbol === 'function' && fiber.type[Symbol.for('react.devtools.hide')];
       if (publicInstance != null) {
         context = publicInstance.context;
         if (context && Object.keys(context).length === 0) {
           context = null;
         }
+      }
+      if (name === 'HigherOrderComponent') {
+        console.log('fiber backend', fiber);
       }
       const inst = publicInstance;
       if (inst) {
@@ -192,6 +197,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     text,
     updater,
     publicInstance,
+    hideSymbol,
   };
 }
 

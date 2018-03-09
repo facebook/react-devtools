@@ -444,6 +444,9 @@ function wrapWithHoc(Component) {
       return <div><Component /></div>;
     }
   }
+  if (typeof Symbol === 'function') {
+    HigherOrderComponent[Symbol.for('react.devtools.hide')] = true;
+  }
 
   return HigherOrderComponent;
 }

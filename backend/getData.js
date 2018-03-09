@@ -160,6 +160,9 @@ function getData(internalInstance: Object): DataType {
     };
   }
 
+  const hideSymbol = nodeType === 'Composite' && typeof Symbol === 'function' && type[Symbol.for('react.devtools.hide')];
+
+
   // $FlowFixMe
   return {
     nodeType,
@@ -175,6 +178,7 @@ function getData(internalInstance: Object): DataType {
     text,
     updater,
     publicInstance,
+    hideSymbol,
   };
 }
 

@@ -29,6 +29,7 @@ type PropsType = {
   isBottomTagSelected: boolean,
   searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
+  hideSymbol: boolean,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
   onContextMenu: () => void,
@@ -185,7 +186,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     let children = node.get('children');
 
-    if (node.get('nodeType') === 'Wrapper') {
+    if (node.get('nodeType') === 'Wrapper' || (this.props.hideSymbol && node.get('hideSymbol'))) {
       return (
         <span>
           {children.map(child =>
@@ -413,7 +414,7 @@ Node.contextTypes = {
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id];
+    return [props.id, 'hideSymbol'];
   },
   props(store, props) {
     var node = store.get(props.id);
@@ -430,6 +431,7 @@ var WrappedNode = decorate({
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
       searchRegExp: props.searchRegExp,
+      hideSymbol: store.hideSymbol,
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
