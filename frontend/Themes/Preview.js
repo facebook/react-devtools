@@ -40,7 +40,7 @@ class Preview extends React.Component<Props> {
           depth={0}
           node={
             Map({
-              children: ['grandparent'],
+              children: ['strictMode'],
               name: 'div',
             })
           }
@@ -71,6 +71,13 @@ const childNode = Map({
   ref: fauxRef,
 });
 
+const strictModeNode = Map({
+  id: 'strictMode',
+  children: ['grandparent'],
+  name: 'StrictMode',
+  nodeType: 'Special',
+});
+
 const grandparentNode = Map({
   id: 'grandparent',
   children: ['parent'],
@@ -97,6 +104,7 @@ const nodes = {
   child: childNode,
   grandparent: grandparentNode,
   parent: parentNode,
+  strictMode: strictModeNode,
 };
 
 const noop = () => {};
