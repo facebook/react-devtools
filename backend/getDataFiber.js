@@ -143,14 +143,14 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
           break;
         case CONTEXT_PROVIDER_NUMBER:
         case CONTEXT_PROVIDER_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           props = fiber.memoizedProps;
           name = 'Context.Provider';
           children = [];
           break;
         case CONTEXT_CONSUMER_NUMBER:
         case CONTEXT_CONSUMER_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           props = fiber.memoizedProps;
           name = 'Context.Consumer';
           children = [];
