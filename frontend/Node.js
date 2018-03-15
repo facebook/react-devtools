@@ -259,8 +259,6 @@ class Node extends React.Component<PropsType, StateType> {
       );
     }
 
-    var isCustom = nodeType === 'Composite';
-
     let name = node.get('name') + '';
 
     // If the user's filtering then highlight search terms in the tag name.
