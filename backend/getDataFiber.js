@@ -163,9 +163,9 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
           break;
         case FORWARD_REF_NUMBER:
         case FORWARD_REF_SYMBOL_STRING:
-          const functionName = getDisplayName(fiber.type.render, 'anonymous');
+          const functionName = getDisplayName(fiber.type.render, '');
           nodeType = 'Special';
-          name = `ForwardRef(${functionName})`;
+          name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
           children = [];
           break;
         default:
