@@ -57,7 +57,7 @@ class Breadcrumb extends React.Component<Props, State> {
           const isSelected = id === this.props.selected;
           const style = itemStyle(
             isSelected,
-            node.get('nodeType') === 'Composite',
+            node.get('nodeType'),
             theme,
           );
 
@@ -94,11 +94,13 @@ const containerStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base03}`,
 });
 
-const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
+const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {
   let color;
   if (isSelected) {
     color = theme.state02;
-  } else if (isComposite) {
+  } else if (nodeType === 'Special') {
+    color = theme.special01;
+  } else if (nodeType === 'Composite') {
     color = theme.special05;
   }
 

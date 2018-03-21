@@ -29,6 +29,8 @@ var {
   CONTEXT_CONSUMER_SYMBOL_STRING,
   CONTEXT_PROVIDER_NUMBER,
   CONTEXT_PROVIDER_SYMBOL_STRING,
+  FORWARD_REF_NUMBER,
+  FORWARD_REF_SYMBOL_STRING,
   STRICT_MODE_NUMBER,
   STRICT_MODE_SYMBOL_STRING,
 } = require('./ReactSymbols');
@@ -135,28 +137,35 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
       switch (switchValue) {
         case ASYNC_MODE_NUMBER:
         case ASYNC_MODE_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           name = 'AsyncMode';
           children = [];
           break;
         case CONTEXT_PROVIDER_NUMBER:
         case CONTEXT_PROVIDER_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           props = fiber.memoizedProps;
           name = 'Context.Provider';
           children = [];
           break;
         case CONTEXT_CONSUMER_NUMBER:
         case CONTEXT_CONSUMER_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           props = fiber.memoizedProps;
           name = 'Context.Consumer';
           children = [];
           break;
         case STRICT_MODE_NUMBER:
         case STRICT_MODE_SYMBOL_STRING:
-          nodeType = 'Composite';
+          nodeType = 'Special';
           name = 'StrictMode';
+          children = [];
+          break;
+        case FORWARD_REF_NUMBER:
+        case FORWARD_REF_SYMBOL_STRING:
+          const functionName = getDisplayName(fiber.type.render, '');
+          nodeType = 'Special';
+          name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
           children = [];
           break;
         default:

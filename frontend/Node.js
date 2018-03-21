@@ -259,8 +259,6 @@ class Node extends React.Component<PropsType, StateType> {
       );
     }
 
-    var isCustom = nodeType === 'Composite';
-
     let name = node.get('name') + '';
 
     // If the user's filtering then highlight search terms in the tag name.
@@ -285,7 +283,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle(inverted, isCustom, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle(inverted, nodeType, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -323,7 +321,7 @@ class Node extends React.Component<PropsType, StateType> {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), isCustom, theme);
+    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), nodeType, theme);
     const closeTagBracketStyle = collapsed ? sharedHeadBracketStyle : sharedTailBracketStyle;
     const closeTag = (
       <span>
@@ -347,7 +345,7 @@ class Node extends React.Component<PropsType, StateType> {
         <span style={arrowStyle(collapsed, hasState, headInverted, theme)}/>
       </span>;
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, isCustom, theme);
+    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, nodeType, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         {collapser}
@@ -503,11 +501,13 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, isCustom: boolean, theme: Theme) => {
+const jsxTagStyle = (inverted: boolean, nodeType: string, theme: Theme) => {
   let color;
   if (inverted) {
     color = theme.state02;
-  } else if (isCustom) {
+  } else if (nodeType === 'Special') {
+    color = theme.special01;
+  } else if (nodeType === 'Composite') {
     color = theme.special00;
   } else {
     color = theme.special07;
