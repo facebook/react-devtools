@@ -152,6 +152,8 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         case CONTEXT_CONSUMER_SYMBOL_STRING:
           nodeType = 'Special';
           props = fiber.memoizedProps;
+          // TODO: TraceUpdatesBackendManager currently depends on this.
+          // If you change .name, figure out a more resilient way to detect it.
           name = 'Context.Consumer';
           children = [];
           break;
