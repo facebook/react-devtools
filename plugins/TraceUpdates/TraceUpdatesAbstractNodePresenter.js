@@ -136,8 +136,10 @@ class TraceUpdatesAbstractNodePresenter implements Presenter {
 
     this.drawImpl(this._pool);
 
-    if (this._pool.size > 0 && this._clearTimer != null) {
-      clearTimeout(this._clearTimer);
+    if (this._pool.size > 0) {
+      if (this._clearTimer != null) {
+        clearTimeout(this._clearTimer);
+      }
       this._clearTimer = setTimeout(this._redraw, minExpiration - now);
     }
 
