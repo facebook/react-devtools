@@ -21,7 +21,7 @@ const STATIC_FILES = [
   'panel.html',
 ];
 
-const relativePath = path => relative(__dirname, path);
+const relativePath = path => relative(process.cwd(), path);
 
 const logPromise = async (promise, text, completedLabel = '') => {
   const {frames, interval} = dots;
