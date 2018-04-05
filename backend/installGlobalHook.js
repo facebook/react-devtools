@@ -232,6 +232,8 @@ function installGlobalHook(window: Object) {
   });
   Object.defineProperty(window, '__REACT_DEVTOOLS_GLOBAL_HOOK__', {
     value: (hook : Hook),
+    configurable: true,
+    writable: true
   });
 }
 
