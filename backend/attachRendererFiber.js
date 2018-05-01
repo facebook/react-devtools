@@ -17,7 +17,6 @@ var {
   FunctionalComponent,
   ContextConsumer,
   HostRoot,
-  ForwardRef,
 } = require('./ReactTypeOfWork');
 
 // Inlined from ReactTypeOfSideEffect
@@ -48,7 +47,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case ClassComponent:
       case FunctionalComponent:
       case ContextConsumer:
-      case ForwardRef:
         // For types that execute user code, we check PerformedWork effect.
         // We don't reflect bailouts (either referential or sCU) in DevTools.
         // eslint-disable-next-line no-bitwise
