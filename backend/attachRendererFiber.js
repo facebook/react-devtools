@@ -14,8 +14,10 @@ import type {Hook, ReactRenderer, Helpers} from './types';
 var getDataFiber = require('./getDataFiber');
 var {
   ClassComponent,
+  FunctionalComponent,
   ContextConsumer,
   HostRoot,
+  ForwardRef,
 } = require('./ReactTypeOfWork');
 
 // Inlined from ReactTypeOfSideEffect
@@ -42,35 +44,25 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function hasDataChanged(prevFiber, nextFiber) {
-    if (prevFiber.tag === ClassComponent) {
-      // Skip if the class performed no work (shouldComponentUpdate bailout).
-      // eslint-disable-next-line no-bitwise
-      if ((nextFiber.effectTag & PerformedWork) !== PerformedWork) {
-        return false;
-      }
-
-      // Only classes have context.
-      if (prevFiber.stateNode.context !== nextFiber.stateNode.context) {
-        return true;
-      }
-      // Force updating won't update state or props.
-      if (nextFiber.updateQueue != null && nextFiber.updateQueue.hasForceUpdate) {
-        return true;
-      }
+    switch (nextFiber.tag) {
+      case ClassComponent:
+      case FunctionalComponent:
+      case ContextConsumer:
+      case ForwardRef:
+        // For types that execute user code, we check PerformedWork effect.
+        // We don't reflect bailouts (either referential or sCU) in DevTools.
+        return (nextFiber.effectTag & PerformedWork) === PerformedWork;
+        // Note: ContextConsumer only gets PerformedWork effect in 16.3.3+
+        // so it won't get highlighted with React 16.3.0 to 16.3.2.
+      default:
+        // For host components and other types, we compare inputs
+        // to determine whether something is an update.
+        return (
+          prevFiber.memoizedProps !== nextFiber.memoizedProps ||
+          prevFiber.memoizedState !== nextFiber.memoizedState ||
+          prevFiber.ref !== nextFiber.ref
+        );
     }
-    // Always treat context consumers as changed.
-    // This ensures we don't skip highlighting their updates.
-    if (prevFiber.tag === ContextConsumer) {
-      return true;
-    }
-    // Compare the fields that would result in observable changes in DevTools.
-    // We don't compare type, tag, index, and key, because these are known to match.
-    return (
-      prevFiber.memoizedProps !== nextFiber.memoizedProps ||
-      prevFiber.memoizedState !== nextFiber.memoizedState ||
-      prevFiber.ref !== nextFiber.ref ||
-      prevFiber._debugSource !== nextFiber._debugSource
-    );
   }
 
   let pendingEvents = [];
