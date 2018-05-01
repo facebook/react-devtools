@@ -51,6 +51,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case ForwardRef:
         // For types that execute user code, we check PerformedWork effect.
         // We don't reflect bailouts (either referential or sCU) in DevTools.
+        // eslint-disable-next-line no-bitwise
         return (nextFiber.effectTag & PerformedWork) === PerformedWork;
         // Note: ContextConsumer only gets PerformedWork effect in 16.3.3+
         // so it won't get highlighted with React 16.3.0 to 16.3.2.
