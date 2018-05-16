@@ -23,4 +23,6 @@ module.exports = {
   FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
   STRICT_MODE_NUMBER: 0xeacc,
   STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
+  TIMEOUT_NUMBER: 0xead1,
+  TIMEOUT_SYMBOL_STRING: 'Symbol(react.timeout)',
 };
