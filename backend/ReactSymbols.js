@@ -21,6 +21,8 @@ module.exports = {
   CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
   FORWARD_REF_NUMBER: 0xead0,
   FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
+  PROFILER_NUMBER: 0xead2,
+  PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
   STRICT_MODE_NUMBER: 0xeacc,
   STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
   TIMEOUT_NUMBER: 0xead1,
