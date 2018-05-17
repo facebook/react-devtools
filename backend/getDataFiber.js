@@ -31,6 +31,8 @@ var {
   CONTEXT_PROVIDER_SYMBOL_STRING,
   FORWARD_REF_NUMBER,
   FORWARD_REF_SYMBOL_STRING,
+  PROFILER_NUMBER,
+  PROFILER_SYMBOL_STRING,
   STRICT_MODE_NUMBER,
   STRICT_MODE_SYMBOL_STRING,
   TIMEOUT_NUMBER,
@@ -177,6 +179,13 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
           nodeType = 'Special';
           name = 'Timeout';
           props = fiber.memoizedProps;
+          children = [];
+          break;
+        case PROFILER_NUMBER:
+        case PROFILER_SYMBOL_STRING:
+          nodeType = 'Special';
+          props = fiber.memoizedProps;
+          name = 'Profiler';
           children = [];
           break;
         default:
