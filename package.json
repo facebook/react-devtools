@@ -38,11 +38,10 @@
   "license": "BSD-3-Clause",
   "repository": "facebook/react-devtools",
   "private": true,
-  "workspaces": [
-    "packages/*"
-  ],
+  "workspaces": ["packages/*"],
   "scripts": {
-    "build:extension": "yarn run build:extension:chrome && yarn run build:extension:firefox",
+    "build:extension":
+      "yarn run build:extension:chrome && yarn run build:extension:firefox",
     "build:extension:chrome": "node ./shells/chrome/build",
     "build:extension:firefox": "node ./shells/firefox/build",
     "build:standalone": "cd packages/react-devtools-core && yarn run build",
@@ -51,13 +50,12 @@
     "test": "jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
+    "test:plain": "cd ./shells/plain && ./build.sh --watch",
     "test:standalone": "cd packages/react-devtools && yarn start",
     "typecheck": "flow check"
   },
   "jest": {
-    "modulePathIgnorePatterns": [
-      "<rootDir>/shells"
-    ]
+    "modulePathIgnorePatterns": ["<rootDir>/shells"]
   },
   "devDependencies": {
     "chrome-launch": "^1.1.4",
