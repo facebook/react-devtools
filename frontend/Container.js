@@ -160,7 +160,7 @@ var DEFAULT_MENU_ITEMS = {
         items.push({
           key: 'copyNodeProps',
           title: 'Copy element props',
-          action: () => store.copyNodeProps(props),
+          action: () => store.copyNodeProps(id, props),
         });
       }
     }

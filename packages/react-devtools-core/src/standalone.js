@@ -29,6 +29,7 @@ var panel = null;
 var config = {
   reload,
   alreadyFoundReact: true,
+  shellType: 'standalone',
   showInspectButton: false,
   showHiddenThemes: true,
   inject(done) {

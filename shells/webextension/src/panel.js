@@ -53,6 +53,7 @@ var config: Props = {
   browserName,
   checkForReact,
   reload,
+  shellType: 'webextension',
   themeName,
   reloadSubscribe(reloadFn) {
     chrome.devtools.network.onNavigated.addListener(reloadFn);

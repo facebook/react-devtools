@@ -43,7 +43,8 @@
   "permissions": [
     "file:///*",
     "http://*/*",
-    "https://*/*"
+    "https://*/*",
+    "clipboardWrite"
   ],
 
   "content_scripts": [

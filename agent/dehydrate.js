@@ -102,7 +102,10 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       };
 
     case 'string':
-      return data.length <= 500 ? data : data.slice(0, 500) + '...';
+      // first level string means sending string as payload like:
+      // bridge.emit('event', 'my important string data') - let's don't cut it
+      // or we lose some data
+      return level === 0 ? data : data.length <= 500 ? data : data.slice(0, 500) + '...';
 
     // We have to do this assignment b/c Flow doesn't think "symbol" is
     // something typeof would return. Error 'unexpected predicate "symbol"'

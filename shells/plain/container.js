@@ -50,6 +50,7 @@ window.addEventListener('keydown', function(e) {
 
 var config = {
   alreadyFoundReact: true,
+  shellType: 'plain',
   showHiddenThemes: true,
   inject(done) {
     inject(devtoolsSrc, () => {

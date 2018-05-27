@@ -113,6 +113,7 @@ class Store extends EventEmitter {
     scroll?: boolean,
     rnStyle?: boolean,
     rnStyleMeasure?: boolean,
+    clipboard?: boolean,
   };
 
   constructor(bridge: Bridge, themeStore: ThemeStore) {
@@ -162,6 +163,7 @@ class Store extends EventEmitter {
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
+    this._bridge.on('sendPropsForCopy', value => this._sendPropsForCopy(value));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
     this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
       // Backtrack if we want to skip leaf nodes
@@ -216,8 +218,19 @@ class Store extends EventEmitter {
     copy(name);
   }
 
-  copyNodeProps(props: Object): void {
-    copy(serializePropsForCopy(props));
+  copyNodeProps(id: ElementID, props: Object): void {
+    // to get all props we need to ask them from backend, as we don't have nested ones
+    // But if do it - we can't write to clipboard after we get callback,
+    // if we are in plain shell.
+    // But we can write to clipboard in extension or standalone shells,
+    // lerarn more https://developer.mozilla.org/ru/Add-ons/WebExtensions/Interact_with_the_clipboard
+    if (this.capabilities.clipboard) {
+      // as all component props as string from backend
+      this._bridge.send('getPropsForCopy', id);
+    } else {
+      // this will copy first level props we already have in frontend
+      copy(serializePropsForCopy(props));
+    }
   }
 
   setSelectedTab(name: string): void {
@@ -704,6 +717,10 @@ class Store extends EventEmitter {
     if (node) {
       this._nodesByName = this._nodesByName.set(node.get('name'), this._nodesByName.get(node.get('name')).delete(id));
     }
+  }
+
+  _sendPropsForCopy(props: string) {
+    copy(props);
   }
 }
 

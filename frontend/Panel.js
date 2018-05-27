@@ -35,6 +35,7 @@ export type Props = {
   browserName?: string,
   showInspectButton?: boolean,
   showHiddenThemes?: boolean,
+  shellType?: 'plain' | 'webextension' | 'standalone',
   themeName?: string,
   inject: (done: (wall: Wall, onDisconnect?: () => void) => void) => void,
   preferencesPanelShown?: boolean,
@@ -222,6 +223,10 @@ class Panel extends React.Component<Props, State> {
 
       this._themeStore = new ThemeStore(this.state.themeName);
       this._store = new Store(this._bridge, this._themeStore);
+
+      if (this.props.shellType === 'webextension' || this.props.shellType == 'standalone') {
+        this._store.capabilities.clipboard = true;
+      }
 
       var refresh = () => this.forceUpdate();
       this.plugins = [
