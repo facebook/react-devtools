@@ -13,10 +13,21 @@
 
 type Agent = any;
 
+type Snapshot = {
+  actualDuration: number,
+  actualStartTime: number,
+  baseTime: number,
+  commitTime: number,
+  name: string,
+};
+
+type Snapshots = {[commitTime: number]: Array<Snapshot>};
+
 class ProfilerManager {
   _agent: Agent;
   _commitTime: number = 0;
   _isRecording: boolean = false;
+  _snapshots: Snapshots = {};
 
   constructor(agent: Agent) {
     this._agent = agent;
@@ -33,6 +44,10 @@ class ProfilerManager {
     // DevTools only needs it to group all of the profile timings,
     // And to place them at a certain point in time in the replay view.
     this._commitTime = performance.now();
+
+    if (this._isRecording) {
+      this._snapshots[this._commitTime] = [];
+    }
   };
 
   _onMountOrUpdate = (data: any) => {
@@ -40,14 +55,20 @@ class ProfilerManager {
       return;
     }
 
-    // TODO If we're in profiling mode, loop through events and take snapsot.
-  }
+    this._snapshots[this._commitTime].push({
+      actualDuration: data.profilerData.actualDuration,
+      actualStartTime: data.profilerData.actualStartTime,
+      baseTime: data.profilerData.baseTime,
+      commitTime: this._commitTime, // TODO This is redundant. Maybe ditch it?
+      name: data.name,
+    });
+  };
 
   _onIsRecording = isRecording => {
     this._isRecording = isRecording;
-
     if (!isRecording) {
-      // TODO: Dump previous data if we
+      console.log(this._snapshots); // TODO Debugging only; remove this.
+      this._snapshots = {};
     }
   };
 }
