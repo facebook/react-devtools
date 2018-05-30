@@ -57,6 +57,9 @@ class ProfilerManager {
       return;
     }
 
+    // TODO (bvaughn) Do I need to capture hierarchical information as well?
+    // So the resulting flame graph can mirror the tree structure somehow?
+    // Or do we want to always sort by most expensive to least expensive?
     this._snapshots[this._commitTime].push({
       actualDuration: data.profilerData.actualDuration,
       actualStartTime: data.profilerData.actualStartTime,
@@ -66,31 +69,41 @@ class ProfilerManager {
     });
   };
 
+  // Deeply enables ProfileMode.
+  // Newly inserted Fibers will inherit the mode,
+  // But existing Fibers need to be explicitly activated.
+  _enableProfileMode = fiber => {
+    // eslint-disable-next-line no-bitwise
+    if (fiber.mode & ProfileMode) {
+      // Bailout if profiling is already enabled for the subtree.
+      return;
+    }
+
+    fiber.mode |= ProfileMode; // eslint-disable-line no-bitwise
+    if (fiber.alternate !== null) {
+      fiber.alternate.mode |= ProfileMode; // eslint-disable-line no-bitwise
+    }
+
+    if (fiber.child !== null) {
+      this._enableProfileMode(fiber.child);
+    }
+    if (fiber.sibling !== null) {
+      this._enableProfileMode(fiber.sibling);
+    }
+  };
+
   _onIsRecording = isRecording => {
     this._isRecording = isRecording;
 
-    // Flip ProfilerMode on or off for each root.
+    // Flip ProfilerMode on or off for each tree.
     // This instructs React to collect profiling data for the tree.
-    this._agent.roots.forEach(id => {
-      const root = this._agent.internalInstancesById.get(id);
-
-      // TODO (bvaughn) This check is flimsy.
-      if (root.name === 'Profiler') {
-        return;
-      }
-      
-      if (isRecording) {
-        root.mode |= ProfileMode; // eslint-disable-line no-bitwise
-        if (root.alternate !== null) {
-          root.alternate.mode |= ProfileMode; // eslint-disable-line no-bitwise
-        }
-      } else {
-        root.mode &= ~ProfileMode; // eslint-disable-line no-bitwise
-        if (root.alternate !== null) {
-          root.alternate.mode &= ~ProfileMode; // eslint-disable-line no-bitwise
-        }
-      }
-    });
+    // Once profiling is enabled, we just leave it one (for simplicity).
+    // This way we don't risk turning it off for <Profiler> Fibers.
+    if (isRecording) {
+      this._agent.roots.forEach(id => {
+        this._enableProfileMode(this._agent.internalInstancesById.get(id));
+      });
+    }
 
     // Dump snapshot data if we are done profiling.
     if (!isRecording) {
