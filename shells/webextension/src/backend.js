@@ -17,6 +17,7 @@ var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupHighlighter = require('../../../frontend/Highlighter/setup');
+var setupProfiler = require('../../../plugins/Profiler/backend');
 var setupRelay = require('../../../plugins/Relay/backend');
 
 window.addEventListener('message', welcome);
@@ -69,6 +70,7 @@ function setup(hook) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
 
+  setupProfiler(bridge, agent, hook);
   setupRelay(bridge, agent, hook);
 
   agent.on('shutdown', () => {

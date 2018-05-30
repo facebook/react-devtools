@@ -20,6 +20,7 @@ var assign = require('object-assign');
 var Bridge = require('../agent/Bridge');
 var {sansSerif} = require('./Themes/Fonts');
 var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
+var ProfilerPlugin = require('../plugins/Profiler/ProfilerPlugin');
 var RelayPlugin = require('../plugins/Relay/RelayPlugin');
 var Themes = require('./Themes/Themes');
 var ThemeStore = require('./Themes/Store');
@@ -226,7 +227,9 @@ class Panel extends React.Component<Props, State> {
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
+        new ProfilerPlugin(this._store, this._bridge, refresh),
       ];
+
       this._keyListener = keyboardNav(this._store, window);
 
       window.addEventListener('keydown', this._keyListener);

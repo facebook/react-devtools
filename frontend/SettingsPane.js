@@ -119,17 +119,6 @@ class SettingsPane extends React.Component {
           />
         )}
 
-        {/*
-          TODO (bvaughn)
-          Only enable if ProfileMode exists and is supported.
-          Maybe we can determine this by looking for an "actualDuration" field on the root Fiber?
-        */}
-        <RecordMenuButton
-          isActive={this.props.isRecording}
-          onClick={this.props.toggleRecord}
-          theme={theme}
-        />
-
         <SettingsMenuButton
           onClick={this.props.showPreferencesPanel}
           theme={theme}
@@ -241,23 +230,6 @@ const SettingsMenuButton = Hoverable(
   )
 );
 
-const RecordMenuButton = Hoverable(
-  ({ isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={recordMenuButtonStyle(isActive, isHovered, theme)}
-      title={isActive
-        ? 'Stop recording'
-        : 'Record profiling information'
-      }
-    >
-      <SvgIcon path={Icons.RECORD} />
-    </button>
-  )
-);
-
 function SearchIcon({ theme }) {
   return (
     <SvgIcon
@@ -320,19 +292,6 @@ const searchIconStyle = (theme: Theme) => ({
   fill: theme.base02,
   lineHeight: '28px',
   fontSize: sansSerif.sizes.normal,
-});
-
-const recordMenuButtonStyle = (isActive: boolean, isHovered: boolean, theme: Theme) => ({
-  display: 'flex',
-  background: 'none',
-  border: 'none',
-  outline: 'none',
-  color: isActive
-    ? theme.special03
-    : isHovered ? theme.state06 : 'inherit',
-  filter: isActive
-    ? `drop-shadow( 0 0 2px ${theme.special03} )`
-    : 'none',
 });
 
 const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
