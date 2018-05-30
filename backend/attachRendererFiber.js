@@ -226,6 +226,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function handleCommitFiberRoot(root) {
     const current = root.current;
     const alternate = current.alternate;
+
     if (alternate) {
       // TODO: relying on this seems a bit fishy.
       const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;

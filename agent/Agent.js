@@ -161,6 +161,7 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('isRecording', isRecording => this.emit('isRecording', isRecording));
     bridge.on('setInspectEnabled', enabled => {
       this._inspectEnabled = enabled;
       this.emit('stopInspecting');
@@ -218,6 +219,7 @@ class Agent extends EventEmitter {
     });
     this.on('setSelection', data => bridge.send('select', data));
     this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
+    this.on('setIsRecording', data => bridge.send('setIsRecording', data));
   }
 
   scrollToNode(id: ElementID): void {
@@ -373,6 +375,11 @@ class Agent extends EventEmitter {
     var id = this.getId(internalInstance);
     this.roots.add(id);
     this.emit('root', id);
+  }
+
+  commitRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
+    var id = this.getId(internalInstance);
+    this.emit('commitRoot', id);
   }
 
   onMounted(renderer: RendererID, component: OpaqueNodeHandle, data: DataType) {

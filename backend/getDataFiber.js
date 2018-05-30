@@ -55,6 +55,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var nodeType = null;
   var name = null;
   var text = null;
+  var profilerData = null;
 
   switch (fiber.tag) {
     case FunctionalComponent:
@@ -206,6 +207,14 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     }
   }
 
+  if (fiber.actualDuration !== undefined) {
+    profilerData = {
+      actualDuration: fiber.actualDuration,
+      actualStartTime: fiber.actualStartTime,
+      baseTime: fiber.treeBaseTime,
+    };
+  }
+
   // $FlowFixMe
   return {
     nodeType,
@@ -214,6 +223,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     ref,
     source,
     name,
+    profilerData,
     props,
     state,
     context,

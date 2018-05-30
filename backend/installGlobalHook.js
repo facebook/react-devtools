@@ -215,6 +215,8 @@ function installGlobalHook(window: Object) {
       }
     },
     onCommitFiberRoot: function(rendererID, root) {
+      hook.emit('commitRoot', {rendererID, root});
+
       const mountedRoots = hook.getFiberRoots(rendererID);
       const current = root.current;
       const isKnownRoot = mountedRoots.has(root);

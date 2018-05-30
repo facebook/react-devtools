@@ -93,6 +93,7 @@ class Store extends EventEmitter {
 
   // Public state
   isInspectEnabled: boolean;
+  isRecording: boolean;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -125,6 +126,7 @@ class Store extends EventEmitter {
 
     // Public state
     this.isInspectEnabled = false;
+    this.isRecording = false;
     this.roots = new List();
     this.contextMenu = null;
     this.searchRoots = null;
@@ -163,6 +165,7 @@ class Store extends EventEmitter {
     this._bridge.on('update', (data) => this._updateComponent(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
+    this._bridge.on('setIsRecording', (data) => this.setIsRecording(data));
     this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
       // Backtrack if we want to skip leaf nodes
       while (offsetFromLeaf > 0) {
@@ -570,6 +573,12 @@ class Store extends EventEmitter {
     this.isInspectEnabled = isInspectEnabled;
     this.emit('isInspectEnabled');
     this._bridge.send('setInspectEnabled', isInspectEnabled);
+  }
+
+  setIsRecording(isRecording: boolean) {
+    this.isRecording = isRecording;
+    this.emit('isRecording');
+    this._bridge.send('isRecording', isRecording);
   }
 
   // Private stuff

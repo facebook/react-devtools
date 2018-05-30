@@ -11,6 +11,7 @@
 'use strict';
 
 var Agent = require('../../../agent/Agent');
+var ProfilerManager = require('../../../plugins/Profiler/ProfilerManager');
 var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../../agent/Bridge');
 var inject = require('../../../agent/inject');
@@ -79,5 +80,6 @@ function setup(hook) {
   });
 
   setupHighlighter(agent);
+  ProfilerManager.init(agent);
   TraceUpdatesBackendManager.init(agent);
 }

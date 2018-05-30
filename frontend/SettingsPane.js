@@ -119,6 +119,17 @@ class SettingsPane extends React.Component {
           />
         )}
 
+        {/*
+          TODO (bvaughn)
+          Only enable if ProfileMode exists and is supported.
+          Maybe we can determine this by looking for an "actualDuration" field on the root Fiber?
+        */}
+        <RecordMenuButton
+          isActive={this.props.isRecording}
+          onClick={this.props.toggleRecord}
+          theme={theme}
+        />
+
         <SettingsMenuButton
           onClick={this.props.showPreferencesPanel}
           theme={theme}
@@ -160,18 +171,23 @@ SettingsPane.contextTypes = {
   theme: React.PropTypes.object.isRequired,
 };
 SettingsPane.propTypes = {
+  isInspectEnabled: PropTypes.bool,
+  isRecording: PropTypes.bool,
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
+  toggleRecord: PropTypes.func,
   onChangeSearch: PropTypes.func,
+  toggleInspectEnabled: PropTypes.func,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'searchText'];
+    return ['isInspectEnabled', 'isRecording', 'searchText'];
   },
   props(store) {
     return {
       isInspectEnabled: store.isInspectEnabled,
+      isRecording: store.isRecording,
       onChangeSearch: text => store.changeSearch(text),
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
@@ -179,6 +195,7 @@ var Wrapped = decorate({
         store.showPreferencesPanel();
       },
       toggleInspectEnabled: () => store.setInspectEnabled(!store.isInspectEnabled),
+      toggleRecord: () => store.setIsRecording(!store.isRecording),
     };
   },
 }, SettingsPane);
@@ -220,6 +237,23 @@ const SettingsMenuButton = Hoverable(
       title="Customize React DevTools"
     >
       <SvgIcon path={Icons.SETTINGS} />
+    </button>
+  )
+);
+
+const RecordMenuButton = Hoverable(
+  ({ isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+    <button
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={recordMenuButtonStyle(isActive, isHovered, theme)}
+      title={isActive
+        ? 'Stop recording'
+        : 'Record profiling information'
+      }
+    >
+      <SvgIcon path={Icons.RECORD} />
     </button>
   )
 );
@@ -288,10 +322,24 @@ const searchIconStyle = (theme: Theme) => ({
   fontSize: sansSerif.sizes.normal,
 });
 
+const recordMenuButtonStyle = (isActive: boolean, isHovered: boolean, theme: Theme) => ({
+  display: 'flex',
+  background: 'none',
+  border: 'none',
+  outline: 'none',
+  color: isActive
+    ? theme.special03
+    : isHovered ? theme.state06 : 'inherit',
+  filter: isActive
+    ? `drop-shadow( 0 0 2px ${theme.special03} )`
+    : 'none',
+});
+
 const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
   display: 'flex',
   background: 'none',
   border: 'none',
+  outline: 'none',
   marginRight: '0.5rem',
   color: isHovered ? theme.state06 : 'inherit',
 });

@@ -21,8 +21,9 @@ module.exports = function(hook: Hook, agent: Agent) {
       agent.setReactInternals(id, helpers);
       helpers.walkTree(agent.onMounted.bind(agent, id), agent.addRoot.bind(agent, id));
     }),
-    hook.sub('root', ({renderer, internalInstance}) => agent.addRoot(renderer, internalInstance)),
+    hook.sub('commitRoot', ({rendererID, root}) => agent.commitRoot(rendererID, root)),
     hook.sub('mount', ({renderer, internalInstance, data}) => agent.onMounted(renderer, internalInstance, data)),
+    hook.sub('root', ({renderer, internalInstance}) => agent.addRoot(renderer, internalInstance)),
     hook.sub('update', ({renderer, internalInstance, data}) => agent.onUpdated(internalInstance, data)),
     hook.sub('unmount', ({renderer, internalInstance}) => agent.onUnmounted(internalInstance)),
   ];
