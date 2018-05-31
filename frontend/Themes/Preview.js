@@ -11,6 +11,7 @@
 'use strict';
 
 const React = require('react');
+const PropTypes = require('prop-types');
 const {Map} = require('immutable');
 
 const consts = require('../../agent/consts');
@@ -52,8 +53,8 @@ class Preview extends React.Component<Props> {
 }
 
 Preview.childContextTypes = {
-  scrollTo: React.PropTypes.func,
-  store: React.PropTypes.object,
+  scrollTo: PropTypes.func,
+  store: PropTypes.object,
 };
 
 const fauxRef = {

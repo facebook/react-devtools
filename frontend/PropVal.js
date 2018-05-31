@@ -12,6 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var PropTypes = require('prop-types');
 
 var consts = require('../agent/consts');
 var {getInvertedWeak} = require('./Themes/utils');
@@ -47,7 +48,7 @@ class PropVal extends React.Component<Props> {
 }
 
 PropVal.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {

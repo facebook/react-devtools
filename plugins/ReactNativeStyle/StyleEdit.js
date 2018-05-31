@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var AutoSizeInput = require('./AutoSizeInput');
 
@@ -112,7 +114,7 @@ class StyleEdit extends React.Component<Props, State> {
 }
 
 StyleEdit.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const blockClick = event => event.stopPropagation();

@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 
@@ -62,7 +64,7 @@ class ElementPanel extends React.Component<Props> {
 }
 
 ElementPanel.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const dataNodeStyle = (theme: Theme) => ({

@@ -13,6 +13,8 @@
 import type {Map} from 'immutable';
 import type {Theme} from '../../frontend/types';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var DataView = require('../../frontend/DataView/DataView');
 var decorate = require('../../frontend/decorate');
@@ -56,7 +58,7 @@ class StoreTab extends React.Component<Props> {
 }
 
 StoreTab.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const loadingStyle = (theme: Theme) => ({

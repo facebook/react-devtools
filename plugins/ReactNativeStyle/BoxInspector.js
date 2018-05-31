@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 
@@ -79,7 +81,7 @@ class BoxInspector extends React.Component<BoxInspectorProps> {
 }
 
 BoxInspector.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const labelStyle = (theme: Theme) => ({

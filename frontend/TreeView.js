@@ -13,6 +13,7 @@
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 var React = require('react');
+var PropTypes = require('prop-types');
 var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
@@ -133,11 +134,11 @@ class TreeView extends React.Component<Props> {
 }
 
 TreeView.childContextTypes = {
-  scrollTo: React.PropTypes.func,
+  scrollTo: PropTypes.func,
 };
 
 TreeView.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const noSearchResultsStyle = (theme: Theme) => ({

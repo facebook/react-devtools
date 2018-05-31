@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 const React = require('react');
 
 const ExampleIconButton = require('./ExampleIconButton');
@@ -58,7 +60,7 @@ const LeftPane = (_: any, {theme}: Context) => (
 );
 
 LeftPane.contextTypes = {
-  theme: React.PropTypes.object,
+  theme: PropTypes.object,
 };
 
 const noop = () => {};

@@ -13,9 +13,9 @@
 'use strict';
 
 var React = require('react');
+var PropTypes = require('prop-types');
 var SettingsPane = require('./SettingsPane');
 var TreeView = require('./TreeView');
-var {PropTypes} = React;
 
 type Props = {
   reload?: () => void,

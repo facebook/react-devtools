@@ -17,6 +17,7 @@ var DetailPaneSection = require('./detail_pane/DetailPaneSection');
 var {sansSerif} = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
 var React = require('react');
+var PropTypes = require('prop-types');
 
 var decorate = require('./decorate');
 var invariant = require('./invariant');
@@ -182,11 +183,11 @@ class PropState extends React.Component<Props> {
 }
 
 PropState.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 PropState.childContextTypes = {
-  onChange: React.PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 var WrappedPropState = decorate({

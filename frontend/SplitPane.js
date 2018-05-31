@@ -12,6 +12,7 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var PropTypes = require('prop-types');
 var Draggable = require('./Draggable');
 var nullthrows = require('nullthrows').default;
 
@@ -102,7 +103,7 @@ class SplitPane extends React.Component<Props, State> {
 }
 
 SplitPane.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const containerStyle = (isVertical: boolean) => ({

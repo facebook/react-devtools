@@ -12,6 +12,8 @@
 
 import type {Theme} from '../../frontend/types';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var decorate = require('../../frontend/decorate');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
@@ -26,7 +28,7 @@ type Props = {|
 
 class ProfilerTab extends React.Component<Props> {
   static contextTypes = {
-    theme: React.PropTypes.object.isRequired,
+    theme: PropTypes.object.isRequired,
   };
 
   render() {
