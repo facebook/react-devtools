@@ -10,6 +10,7 @@
  */
 'use strict';
 
+import type {Commit} from './ProfilerTypes';
 import type Bridge from '../../agent/Bridge';
 
 var {EventEmitter} = require('events');
@@ -31,11 +32,14 @@ class Store extends EventEmitter {
     // Noop
   }
 
-  setIsRecording(isRecording: boolean) {
-    console.log('[Profiler/Store] setIsRecording()', isRecording);
+  setIsRecording(isRecording: boolean): void {
     this.isRecording = isRecording;
     this.emit('isRecording', isRecording);
     this._mainStore.setIsRecording(isRecording);
+  }
+
+  storeCommit(commit: Commit): void {
+    // TODO Store
   }
 }
 

@@ -16,7 +16,7 @@ import type Store from '../../frontend/Store';
 var React = require('react');
 var provideStore = require('../../frontend/provideStore');
 
-var ProfilerStore = require('./Store');
+var ProfilerStore = require('./ProfilerStore');
 var ProfilerTab = require('./ProfilerTab');
 var StoreWrapper = provideStore('profilerStore');
 

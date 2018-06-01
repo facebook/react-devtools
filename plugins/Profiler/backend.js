@@ -17,14 +17,16 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   bridge.onCall('profiler:check', () => {
     let shouldEnable = false;
 
+    // Feature detection for profiling mode.
+    // The presence of an "actualDuration" field signifies:
+    // 1) This is a new enough version of React
+    // 2) This is a profiling capable bundle (e.g. DEV or PROFILING)
     agent.roots.forEach(id => {
       const root = agent.internalInstancesById.get(id);
       if ((root: any).hasOwnProperty('actualDuration')) {
         shouldEnable = true;
       }
     });
-
-    shouldEnable = true; // TODO (bvaughn) Remove this
 
     return shouldEnable;
   });

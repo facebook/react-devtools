@@ -186,7 +186,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         case PROFILER_SYMBOL_STRING:
           nodeType = 'Special';
           props = fiber.memoizedProps;
-          name = 'Profiler';
+          name = `Profiler(${fiber.memoizedProps.id})`;
           children = [];
           break;
         default:

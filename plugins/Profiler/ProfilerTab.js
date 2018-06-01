@@ -26,7 +26,7 @@ type Props = {|
   toggleIsRecording: Function,
 |};
 
-class ProfilerTab extends React.Component<Props> {
+class ProfilerTab extends React.Component<Props, void> {
   static contextTypes = {
     theme: PropTypes.object.isRequired,
   };
@@ -34,17 +34,52 @@ class ProfilerTab extends React.Component<Props> {
   render() {
     const { theme } = this.context;
     const { isRecording, toggleIsRecording } = this.props;
+
+    const profilingData = null; // TODO Read from Store/props
+
+    let content;
+    if (isRecording) {
+      content = (
+        <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
+      );
+    } else if (profilingData) {
+      // TODO
+    } else {
+      content = (
+        <InactiveNoData startRecording={toggleIsRecording} theme={theme} />
+      );
+    }
+
     return (
       <div style={styles.container}>
-        Click the record button <RecordButton
-          isActive={isRecording}
-          onClick={toggleIsRecording}
-          theme={theme}
-        /> to start a new recording.
+        {content}
       </div>
     );
   }
 }
+
+const InactiveNoData = ({startRecording, theme}) => (
+  <span style={styles.row}>
+    Click the record button <RecordButton
+      isActive={false}
+      onClick={startRecording}
+      theme={theme}
+    /> to start a new recording.
+  </span>
+);
+
+const RecordingInProgress = ({stopRecording, theme}) => (
+  <span style={styles.column}>
+    Recording profiling data...
+    <button
+      onClick={stopRecording}
+      style={stopRecordingButtonStyle(theme)}
+      title="Stop recording"
+    >
+      Stop
+    </button>
+  </span>
+);
 
 const RecordButton = Hoverable(
   ({ isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
@@ -72,19 +107,42 @@ var styles = {
     fontFamily: sansSerif.family,
     fontSize: sansSerif.sizes.normal,
   },
+  column: {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  row: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
 };
 
 const recordButtonStyle = (isActive: boolean, isHovered: boolean, theme: Theme) => ({
-  display: 'flex',
   background: 'none',
   border: 'none',
   outline: 'none',
+  cursor: 'pointer',
   color: isActive
     ? theme.special03
     : isHovered ? theme.state06 : 'inherit',
   filter: isActive
     ? `drop-shadow( 0 0 2px ${theme.special03} )`
     : 'none',
+});
+
+const stopRecordingButtonStyle = (theme: Theme) => ({
+  display: 'flex',
+  background: theme.state00,
+  border: 'none',
+  outline: 'none',
+  cursor: 'pointer',
+  color: theme.base00,
+  padding: '.5rem 0.75rem',
+  marginTop: '0.5rem',
 });
 
 module.exports = decorate({
