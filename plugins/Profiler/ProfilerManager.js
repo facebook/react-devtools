@@ -13,7 +13,7 @@
 
 type Agent = any;
 
-import type {Commit, FiberToProfilesMap, Profile, Snapshot} from './ProfilerTypes';
+import type {Commit, FiberIDToProfilesMap, Profile, Snapshot} from './ProfilerTypes';
 
 var {
   ASYNC_MODE_NUMBER,
@@ -42,7 +42,7 @@ class ProfilerManager {
   _agent: Agent;
   _commits: Array<Commit> = [];
   _commitTime: number = 0;
-  _fiberToProfilesMap: FiberToProfilesMap | null = null;
+  _fiberIDToProfilesMap: FiberIDToProfilesMap | null = null;
   _isRecording: boolean = false;
 
   constructor(agent: Agent) {
@@ -55,11 +55,10 @@ class ProfilerManager {
   }
 
   _storeCurrentCommit() {
-    if (this._fiberToProfilesMap !== null) {
+    if (this._fiberIDToProfilesMap !== null) {
       const mostRecentCommit = this._commits[this._commits.length - 1];
       const snapshot = this._createSnapshotTree(mostRecentCommit);
       // TODO (bvaughn) STORE: Save commit data in ProfilerStore.
-      //TODO_DEBUG_crawlTree(mostRecentCommit.root.current);
       TODO_DEBUBG_printSnapshot(snapshot);
     }
   }
@@ -88,13 +87,12 @@ class ProfilerManager {
   };
 
   _createSnapshotTree = (commit: Commit): Snapshot => {
-    const profile = this._getOrCreateProfile(commit.root.current.child, commit);
-    return this._populateSnapshotTree(profile.fiber, null, commit);
+    return this._populateSnapshotTree(commit.root.current.child, null, commit);
   };
 
   _getOrCreateProfile = (fiber: any, commit: Commit): Profile => {
-    // TODO (bvaughn) This feels fishy.
-    const profile = commit.fiberToProfilesMap.get(fiber) || commit.fiberToProfilesMap.get(fiber.alternate);
+    const id = this._agent.idsByInternalInstances.get(fiber) || this._agent.idsByInternalInstances.get(fiber.alternate);
+    const profile = commit.fiberToProfilesMap.get(id);
     if (profile) {
       return profile;
     } else {
@@ -103,7 +101,7 @@ class ProfilerManager {
         actualDuration: 0,
         baseTime: 0,
         commitTime: 0,
-        fiber,
+        fiberID: id,
         name: getDisplayName(fiber),
         startTime: 0,
       };
@@ -142,9 +140,9 @@ class ProfilerManager {
     // DevTools only needs it to group all of the profile timings,
     // And to place them at a certain point in time in the replay view.
     this._commitTime = performance.now();
-    this._fiberToProfilesMap = new Map();
+    this._fiberIDToProfilesMap = new Map();
     this._commits.push({
-      fiberToProfilesMap: this._fiberToProfilesMap,
+      fiberToProfilesMap: this._fiberIDToProfilesMap,
       root: this._agent.internalInstancesById.get(rootID),
     });
   };
@@ -154,13 +152,11 @@ class ProfilerManager {
       return;
     }
 
-    const fiber = this._agent.internalInstancesById.get(data.id);
-
-    ((this._fiberToProfilesMap: any): FiberToProfilesMap).set(fiber, {
+    ((this._fiberIDToProfilesMap: any): FiberIDToProfilesMap).set(data.id, {
       actualDuration: data.profilerData.actualDuration,
       baseTime: data.profilerData.baseTime,
       commitTime: this._commitTime,
-      fiber,
+      fiberID: data.id,
       name: data.name,
       startTime: data.profilerData.actualStartTime,
     });
@@ -184,7 +180,7 @@ class ProfilerManager {
     } else {
       this._storeCurrentCommit();
       this._commits = [];
-      this._fiberToProfilesMap = null;
+      this._fiberIDToProfilesMap = null;
     }
   };
 }
@@ -244,20 +240,10 @@ const TODO_DEBUBG_printSnapshot = (snapshot: Snapshot, depth: number = 0): void 
     console.log('----- committed at', snapshot.profile.commitTime);
   }
   if (snapshot.profile.actualDuration > 0) {
-    console.log('•'.repeat(depth), snapshot.profile.name, 'start:', snapshot.profile.startTime, 'duration:', snapshot.profile.actualDuration);
+    console.log('•'.repeat(depth), snapshot.profile.name, 'start:', snapshot.profile.startTime, 'duration:', snapshot.profile.actualDuration, 'id:', snapshot.profile.fiberID);
   } else {
-    console.log('•'.repeat(depth), snapshot.profile.name);
+    console.log('•'.repeat(depth), snapshot.profile.name, 'id:', snapshot.profile.fiberID);
   }
   
   snapshot.children.forEach(child => TODO_DEBUBG_printSnapshot(child, depth + 1));
-};
-
-const TODO_DEBUG_crawlTree = (fiber: any): void => {
-  console.log(fiber.actualStartTime, '>', fiber.actualDuration, fiber);
-  if (fiber.sibling) {
-    TODO_DEBUG_crawlTree(fiber.sibling);
-  }
-  if (fiber.child) {
-    TODO_DEBUG_crawlTree(fiber.child);
-  }
 };

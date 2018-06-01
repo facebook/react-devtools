@@ -15,15 +15,15 @@ export type Profile = {
   actualDuration: number,
   baseTime: number,
   commitTime: number,
-  fiber: any,
+  fiberID: string,
   name: string,
   startTime: number,
 };
 
-export type FiberToProfilesMap = Map<any, Profile>;
+export type FiberIDToProfilesMap = Map<string, Profile>;
 
 export type Commit = {
-  fiberToProfilesMap: FiberToProfilesMap,
+  fiberToProfilesMap: FiberIDToProfilesMap,
   root: any,
 };
 
