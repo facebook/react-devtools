@@ -178,6 +178,23 @@ class Store extends EventEmitter {
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
     });
+    this._bridge.on('storeSnapshot', (data) => {
+      // TODO (bvaughn) store
+      console.log('storeSnapshot()', data);
+
+      const TODO_DEBUBG_printSnapshot = (snapshot, profileMap, depth: number = 0): void => {
+        if (depth === 0) {
+          console.log('- - - - - committed at', snapshot.commitTime);
+        }
+        console.log('• '.repeat(depth) + snapshot.name, 'start:', snapshot.startTime, 'duration:', snapshot.actualDuration, 'id:', snapshot.fiberID);
+        snapshot.childIDs.forEach(childID => TODO_DEBUBG_printSnapshot(profileMap[childID], profileMap, depth + 1));
+      };
+
+      TODO_DEBUBG_printSnapshot(data.ROOT, data);
+    });
+    this._bridge.on('clearSnapshots', () => {
+      // TODO (bvaughn) clear
+    });
 
     this._establishConnection();
     this._eventQueue = [];

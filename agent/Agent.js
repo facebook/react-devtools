@@ -220,6 +220,8 @@ class Agent extends EventEmitter {
     this.on('setSelection', data => bridge.send('select', data));
     this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
     this.on('isRecording', isRecording => bridge.send('isRecording', isRecording));
+    this.on('storeSnapshot', (data) => bridge.send('storeSnapshot', data));
+    this.on('clearSnapshots', () => bridge.send('clearSnapshots'));
   }
 
   scrollToNode(id: ElementID): void {

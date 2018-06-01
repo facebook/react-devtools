@@ -10,7 +10,6 @@
  */
 'use strict';
 
-import type {Commit} from './ProfilerTypes';
 import type Bridge from '../../agent/Bridge';
 
 var {EventEmitter} = require('events');
@@ -38,7 +37,7 @@ class Store extends EventEmitter {
     this._mainStore.setIsRecording(isRecording);
   }
 
-  storeCommit(commit: Commit): void {
+  storeCommit(data: any): void {
     // TODO Store
   }
 }

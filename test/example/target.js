@@ -24,6 +24,26 @@ const App = () => (
   <Stateful />
 );
 
+/*
+class Temp extends Component {
+  state = {
+    count: 1,
+  };
+  render() {
+    return (
+      <ul onClick={this.updateCount}>
+        <li><SlowComponent/></li>
+        {this.state.count % 2 ? <li><SlowComponent/></li> : null}
+      </ul>
+    );
+  }
+  updateCount = () =>
+    this.setState(prevState => ({
+      count: prevState.count + 1,
+    }));
+}
+*/
+
 class Stateful extends Component {
   state = {
     count: 1,

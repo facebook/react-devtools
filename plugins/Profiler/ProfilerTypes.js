@@ -14,20 +14,11 @@
 export type Profile = {
   actualDuration: number,
   baseTime: number,
+  childIDs: Array<string>,
   commitTime: number,
   fiberID: string,
   name: string,
   startTime: number,
 };
 
-export type FiberIDToProfilesMap = Map<string, Profile>;
-
-export type Commit = {
-  fiberToProfilesMap: FiberIDToProfilesMap,
-  root: any,
-};
-
-export type Snapshot = {
-  children: Array<Snapshot>,
-  profile: Profile,
-};
+export type FiberIDToProfiles = {[id: string]: Profile};
