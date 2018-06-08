@@ -88,6 +88,8 @@ class ProfilerManager {
       return;
     }
 
+    // TODO Store info in a typed array to later, lazily re-construct the full tree for each commit.
+    // This will need to handle the fact that conditional rendering may dramatically alter the tree over time.
     const profile: Profile = {
       actualDuration: data.profilerData.actualDuration,
       baseTime: data.profilerData.baseTime,

@@ -23,6 +23,7 @@ var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
+import type {FiberIDToProfiles} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -108,6 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
+  currentSnapshot: FiberIDToProfiles | null;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
@@ -124,6 +126,7 @@ class Store extends EventEmitter {
     this._bridge = bridge;
 
     // Public state
+    this.currentSnapshot = null;
     this.isInspectEnabled = false;
     this.roots = new List();
     this.contextMenu = null;
@@ -179,21 +182,12 @@ class Store extends EventEmitter {
       this.setSelectedTab('Elements');
     });
     this._bridge.on('storeSnapshot', (data) => {
-      // TODO (bvaughn) store
-      console.log('storeSnapshot()', data);
-
-      const TODO_DEBUBG_printSnapshot = (snapshot, profileMap, depth: number = 0): void => {
-        if (depth === 0) {
-          console.log('- - - - - committed at', snapshot.commitTime);
-        }
-        console.log('• '.repeat(depth) + snapshot.name, 'start:', snapshot.startTime, 'duration:', snapshot.actualDuration, 'id:', snapshot.fiberID);
-        snapshot.childIDs.forEach(childID => TODO_DEBUBG_printSnapshot(profileMap[childID], profileMap, depth + 1));
-      };
-
-      TODO_DEBUBG_printSnapshot(data.ROOT, data);
+      this.currentSnapshot = data;
+      this.emit('storeSnapshot');
     });
     this._bridge.on('clearSnapshots', () => {
-      // TODO (bvaughn) clear
+      this.currentSnapshot = null;
+      this.emit('clearSnapshots');
     });
 
     this._establishConnection();
