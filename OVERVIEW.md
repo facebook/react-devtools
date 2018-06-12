@@ -20,9 +20,9 @@ Much of the code (e.g. the frontend UI, stores, and bridge) is shared between th
 
 DevTools comes in a couple of flavors:
 
-- [**react-devtools-core**](https://www.npmjs.com/package/react-devtools-core) and [**react-devtools**](https://www.npmjs.com/package/react-devtools) NPM packages; these comprise a standalone build and Nuclide plug-in and are used for React Native.
-- **Browser extension** for React DOM; supports both Chrome and Firefox browsers.
-- **"Plain" shell** for testing UI changes in development mode.
+- [**react-devtools-core**](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools-core) and [**react-devtools**](https://github.com/facebook/react-devtools/tree/master/packages/react-devtools) NPM packages; these comprise a standalone build and Nuclide plug-in and are used for React Native.
+- [**Browser extension**](https://github.com/facebook/react-devtools/tree/master/shells/webextension) for React DOM; supports both [Chrome](https://github.com/facebook/react-devtools/tree/master/shells/chrome) and [Firefox](https://github.com/facebook/react-devtools/tree/master/shells/firefox) browsers.
+- [**"Plain" shell**](https://github.com/facebook/react-devtools/tree/master/shells/plain) for testing UI changes in development mode.
 
 ## Backend
 
