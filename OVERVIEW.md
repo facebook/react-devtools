@@ -68,6 +68,7 @@ The overview above describes the high level components and their purposes. This 
 - Interops between renderer impls (e.g. stack, fiber) and hook.
   - Decorates **stack** render methods and "emits" them as hook events (e.g. "mount", "update", "root").
   - **Fiber** explicitly calls the hook (on commit or unmount) which calls `attachRendererFiber` which "emits" them as hook events (e.g. "mount", "update", "root").
+    - Updates are only emitted if either the data, or the order of children, has changed.
 
 ## [`agent/inject`](https://github.com/facebook/react-devtools/blob/master/agent/inject.js) (backend)
 
@@ -89,6 +90,7 @@ The overview above describes the high level components and their purposes. This 
 - Generates unique IDs for each React instance and maintains maps of ID-to-instance and instance-to-ID.
 - Also manages a map of ID to mounted React Elements.
 - Observes events from the backend (root, mount, update, unmount) and forwards them through the Bridge to the frontend.
+  - Maps child nodes (e.g. fibers) to string IDs before sending them through the Bridge
 - Also fires events for things like selection, start/stop inspecting, and highlighting.
 - Receives events from the frontend and relays them to the appropriate elements (e.g. set `props` or `state`) or native handles (e.g. set `textContent`).
 
@@ -100,3 +102,8 @@ The overview above describes the high level components and their purposes. This 
   - "Cleans" complex data types before sending them through the wall.
   - Reconstructs them on the other side as proxies.
   - Cleaned data can be inspected on the other side by passing an ID and a callback to get more detail.
+
+## [`frontend/Store`](https://github.com/facebook/react-devtools/blob/master/frontend/Store.js) (frontend)
+
+- Listens to the Bridge for "mount", "update", and "umount" events.
+- Maintains Maps of id to node, id to parent id, and node-name to nodes.
