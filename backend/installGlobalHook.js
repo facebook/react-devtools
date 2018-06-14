@@ -108,17 +108,8 @@ function installGlobalHook(window: Object) {
           return 'unminified';
         }
         // Seems like we're using the production version.
-        // Now let's check if we're still on 0.14 or lower:
-        if (renderRootCode.indexOf('._registerComponent') !== -1) {
-          // TODO: we can remove the condition above once 16
-          // is older than a year. Since this branch only runs
-          // for Stack, we can flip it completely when Stack
-          // is old enough. The branch for Fiber is above,
-          // and it can check renderer.version directly.
-          return 'outdated';
-        }
-        // We're all good.
-        return 'production';
+        // However, the branch above is Stack-only so this is 15 or earlier.
+        return 'outdated';
       }
     } catch (err) {
       // Weird environments may exist.
