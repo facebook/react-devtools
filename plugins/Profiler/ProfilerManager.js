@@ -13,7 +13,29 @@
 
 type Agent = any;
 
-import type {FiberIDToProfiles, Profile} from './ProfilerTypes';
+import type {StoreSnapshot} from './ProfilerTypes';
+
+/** TODO (bvaughn)
+
+The Profiler needs to display the entire React tree, with timing info, for each commit.
+The frontend store only has the latest/current tree at any given time though,
+So the profiler must either capture snapshots of this tree or be able to reconstruct it later.
+
+It would be expensive to pass the entire tree (even as a map of IDs) across the bridge,
+So instead, the ProfilerCollector gathers small actions (e.g. "mount", "update", or "unmount"),
+That can be patched on top of an existing tree to represent an updated one.
+These patches are then stored in batches (by commit) and used to reconstruct the tree at that time.
+
+When the ProfilerCollector is started initially, it walks the current tree (for each root),
+And initializes it using a series of "mount" actions.
+Subsequent commits (with timing info) are patched on top of this initial tree.
+
+When displaying each commit, the "tree base time" is used to determine the flame graph width,
+And the "actual duration" is used to determine whether the component was re-rendered in that commit.
+Because of this, we will also need to store this timing information for every node.
+(In other words, we will need to send it along with every "mount" and "update" action.)
+
+*/
 
 // TODO (bvaughn) Should this live in a shared constants file like ReactSymbols?
 // Or should it be in a Fiber-specific file somewhere (like getData)?
@@ -23,34 +45,24 @@ const ProfileMode = 0b100;
 // This will likely cause pain in a future version of React.
 class ProfilerManager {
   _agent: Agent;
-  _commitTime: number = 0;
-  _fiberIDToProfilesMap: FiberIDToProfiles = {};
-  _lastFiberID: string | null = null;
+  _committedNodes: Array<string> = [];
   _isRecording: boolean = false;
 
   constructor(agent: Agent) {
     this._agent = agent;
 
-    agent.on('commitRoot', this._onCommitRoot);
     agent.on('isRecording', this._onIsRecording);
     agent.on('mount', this._onMountOrUpdate);
     agent.on('update', this._onMountOrUpdate);
-  }
-
-  _storeCurrentCommit(test) {
-    if (this._lastFiberID !== null) {
-      this._fiberIDToProfilesMap.ROOT = this._fiberIDToProfilesMap[((this._lastFiberID: any): string)];
-      this._agent.emit('storeSnapshot', this._fiberIDToProfilesMap);
-    }
+    agent.on('rootCommitted', this._onRootCommitted);
   }
 
   // Deeply enables ProfileMode.
   // Newly inserted Fibers will inherit the mode,
   // But existing Fibers need to be explicitly activated.
   _enableProfileMode = fiber => {
-    // eslint-disable-next-line no-bitwise
-    if (fiber.mode & ProfileMode) {
-      // Bailout if profiling is already enabled for the subtree.
+    // Bailout if profiling is already enabled for the subtree.
+    if (fiber.mode & ProfileMode) { // eslint-disable-line no-bitwise
       return;
     }
 
@@ -67,54 +79,18 @@ class ProfilerManager {
     }
   };
 
-  _onCommitRoot = rootID => {
-    if (!this._isRecording) {
-      return;
-    }
-
-    this._storeCurrentCommit(true);
-
-    // This will not match the commit time logged to Profilers in this commit,
-    // But that's probably okay.
-    // DevTools only needs it to group all of the profile timings,
-    // And to place them at a certain point in time in the replay view.
-    this._commitTime = performance.now();
-    this._fiberIDToProfilesMap = {};
-    this._lastFiberID = null;
-  };
-
-  _onMountOrUpdate = (data: any) => {
-    if (!this._isRecording || !data.profilerData) {
-      return;
-    }
-
-    // TODO Store info in a typed array to later, lazily re-construct the full tree for each commit.
-    // This will need to handle the fact that conditional rendering may dramatically alter the tree over time.
-    const profile: Profile = {
-      actualDuration: data.profilerData.actualDuration,
-      baseTime: data.profilerData.baseTime,
-      childIDs: [],
-      commitTime: this._commitTime,
-      fiberID: data.id,
-      name: data.name,
-      startTime: data.profilerData.actualStartTime,
+  _takeCommitSnapshotForRoot(root: string) {
+    const storeSnapshot: StoreSnapshot = {
+      committedNodes: this._committedNodes,
+      commitTime: performance.now(),
+      root,
     };
 
-    const fiber = this._agent.internalInstancesById.get(data.id);
-    let child = fiber.child;
-    while (child !== null) {
-      const childID = this._agent.idsByInternalInstances.get(child);
-      if (this._fiberIDToProfilesMap[childID]) {
-        profile.childIDs.push(childID);
-      }
-      child = child.sibling;
-    }
-
-    this._lastFiberID = data.id;
-    this._fiberIDToProfilesMap[data.id] = profile;
-  };
+    this._agent.emit('storeSnapshot', storeSnapshot);
+  }
 
   _onIsRecording = isRecording => {
+    this._committedNodes = [];
     this._isRecording = isRecording;
 
     // Flip ProfilerMode on or off for each tree.
@@ -128,13 +104,30 @@ class ProfilerManager {
     }
 
     if (isRecording) {
+      // Maybe in the future, we'll allow collecting multiple profiles and stepping through them.
+      // For now, clear old snapshots when we start recordig new data though.
       this._agent.emit('clearSnapshots');
-    } else {
-      this._storeCurrentCommit(false);
-      this._fiberIDToProfilesMap = {};
-      this._lastFiberID = null;
     }
   };
+
+  _onMountOrUpdate = (data: any) => {
+    if (!this._isRecording || data.actualDuration === undefined) {
+      return;
+    }
+
+    this._committedNodes.push(data.id);
+  };
+
+  _onRootCommitted = (root: string) => {
+    if (!this._isRecording) {
+      return;
+    }
+
+    // Once all roots have been committed,
+    // Take a snapshot of the current tree.
+    this._takeCommitSnapshotForRoot(root);
+    this._committedNodes = [];
+  }
 }
 
 function init(agent: Agent): ProfilerManager {

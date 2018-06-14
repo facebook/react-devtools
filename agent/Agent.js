@@ -379,9 +379,9 @@ class Agent extends EventEmitter {
     this.emit('root', id);
   }
 
-  commitRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
+  rootCommitted(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
     var id = this.getId(internalInstance);
-    this.emit('commitRoot', id);
+    this.emit('rootCommitted', id);
   }
 
   onMounted(renderer: RendererID, component: OpaqueNodeHandle, data: DataType) {

@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../frontend/types';
-import type {FiberIDToProfiles} from './ProfilerTypes';
+import type {Snapshot} from './ProfilerTypes';
 
 const PropTypes = require('prop-types');
 
@@ -27,12 +27,82 @@ const Flamegraph = require('./Flamegraph');
 // The widths should be the tree base times.
 // Horizontal offsets should just be center-aligned within their parents.
 // Color should indicate whether the component re-rendered (actualDuration > 0).
-// Changes in base time could perhaps be animated.
+// Changes in base time could perhaps be animated between commits.
+
+// TODO Better Flow types for snapshot
+const preprocessNode = (snapshot: any, nodeID, parentID = null, startTimeOffset = 0) => {
+  const { nodes, nodeDepths, nodeStartTimes } = snapshot;
+
+  const node = nodes.get(nodeID);
+
+  let depth = 0;
+  let startTime = 0;
+
+  // Parent/child alignment should be:
+  // |----------------------------------|
+  // | A                                |
+  // |----------------------------------|
+  //           |---------| |------------|
+  //           | B       | | C          |
+  //           |---------| |------------|
+  //                            |-------|
+  //                            | D     |
+  //                            |-------|
+  if (parentID !== null) {
+    const parentDepth = nodeDepths.get(parentID);
+    const parentStartTime = nodeStartTimes.get(parentID);
+
+    depth = parentDepth + 1;
+    startTime = parentStartTime + startTimeOffset;
+
+    snapshot.maxDepth = Math.max(snapshot.maxDepth, depth);
+  }
+
+  nodeDepths.set(nodeID, depth);
+  nodeStartTimes.set(nodeID, startTime);
+
+  let children = node.get('children');
+  if (children) {
+    if (!Array.isArray(children)) {
+      children = [children];
+    }
+
+    const totalChildBaseTimes = children.reduce((totalTime, childID) => {
+      const childNode = nodes.get(childID);
+      return (childNode != null ? childNode.get('treeBaseTime') : 0) + totalTime;
+    }, 0);
+
+    if (totalChildBaseTimes > 0) {
+      let childStartTimeOffset = node.get('treeBaseTime') - totalChildBaseTimes;
+
+      children.forEach(childID => {
+        preprocessNode(snapshot, childID, nodeID, childStartTimeOffset);
+
+        childStartTimeOffset += nodes.get(childID).get('treeBaseTime');
+      });
+    }
+  }
+};
+
+// TODO Better Flow types for snapshot
+const preprocessSnapshot = (snapshot: any) => {
+  snapshot.maxDepth = 0;
+  snapshot.nodeDepths = new Map();
+  snapshot.nodeStartTimes = new Map();
+
+  // Don't include the root itself.
+  // It doesn't have a name or a base time and isn't meaningful to users.
+  const rootNode = snapshot.nodes.get(snapshot.root);
+  const children = rootNode.get('children');
+  const rootNodeID = Array.isArray(children) ? children[0] : children;
+
+  preprocessNode(snapshot, rootNodeID);
+};
 
 type Props = {|
   clearSnapshots: () => void,
   isRecording: boolean,
-  snapshots: Array<FiberIDToProfiles>,
+  snapshots: Array<Snapshot>,
   toggleIsRecording: (value: boolean) => void,
 |};
 
@@ -85,7 +155,7 @@ class ProfilerTab extends React.Component<Props, void> {
 }
 
 type SnapshotProps = {
-  snapshots: Array<FiberIDToProfiles>,
+  snapshots: Array<Snapshot>,
   theme: any,
 };
 type SnapshotState = {
@@ -103,7 +173,6 @@ class Snapshots extends React.Component<SnapshotProps, SnapshotState> {
     const {selectedIndex} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
-    console.log('<Snapshots>', selectedIndex, selectedSnapshot);
     console.log(JSON.stringify(snapshots, null, 2));
     return (
       <div style={styles.content}>
@@ -111,29 +180,30 @@ class Snapshots extends React.Component<SnapshotProps, SnapshotState> {
           {snapshots.map((snapshot, index) => (
             <label key={index}>
               <input type="radio" onChange={() => this.handleChange(index)} checked={index === selectedIndex} />
-              {Math.round(snapshot.ROOT.commitTime * 10) / 10}ms
+              {Math.round(snapshot.commitTime * 10) / 10}ms
             </label>
           ))}
         </div>
-        <Snapshot snapshot={selectedSnapshot} theme={theme} />
+        <SnapshotView snapshot={selectedSnapshot} theme={theme} />
       </div>
     );
   }
 }
 
-const Snapshot = ({snapshot, theme}) => {
-  let maxDepth = 0; // TODO: Maybe pre-calculate this?
-  const addDepth = (node, nodeMap, depth = 0) => {
-    maxDepth = Math.max(maxDepth, depth);
-    (node: any).depth = depth; // TODO Maybe store this to begin with?
-    node.childIDs.forEach(id => {
-      addDepth(nodeMap[id], nodeMap, depth + 1);
-    });
-  };
-  addDepth(snapshot.ROOT, snapshot);
+const SnapshotView = ({snapshot, theme}) => {
+  preprocessSnapshot(snapshot);
+
+  const rootNode = snapshot.nodes.get(snapshot.root);
+  const children = rootNode.get('children');
+  const rootNodeID = Array.isArray(children) ? children[0] : children;
 
   return (
-    <Flamegraph depth={maxDepth} nodeMap={snapshot} width={1280} height={200} />
+    <Flamegraph
+      rootNodeID={rootNodeID}
+      snapshot={snapshot}
+      width={1280}
+      height={200}
+    />
   );
 };
 
@@ -191,7 +261,7 @@ const RecordButton = Hoverable(
   )
 );
 
-// TODO
+// TODO Make this interactive
 const RefreshButton = ({ theme }) => (
   <button
     disabled={true}

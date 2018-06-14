@@ -23,7 +23,7 @@ var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
-import type {FiberIDToProfiles} from '../plugins/Profiler/ProfilerTypes';
+import type {SnapshotData} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -109,7 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
-  currentSnapshot: FiberIDToProfiles | null;
+  snapshotData: ?SnapshotData;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
@@ -126,7 +126,6 @@ class Store extends EventEmitter {
     this._bridge = bridge;
 
     // Public state
-    this.currentSnapshot = null;
     this.isInspectEnabled = false;
     this.roots = new List();
     this.contextMenu = null;
@@ -181,12 +180,12 @@ class Store extends EventEmitter {
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
     });
-    this._bridge.on('storeSnapshot', (data) => {
-      this.currentSnapshot = data;
+    this._bridge.on('storeSnapshot', snapshotData => {
+      this.snapshotData = snapshotData;
       this.emit('storeSnapshot');
     });
     this._bridge.on('clearSnapshots', () => {
-      this.currentSnapshot = null;
+      this.snapshotData = null;
       this.emit('clearSnapshots');
     });
 

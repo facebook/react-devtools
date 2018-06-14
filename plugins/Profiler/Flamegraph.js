@@ -5,26 +5,15 @@ const HORIZONTAL_TEXT_OFFSET = 4;
 
 // TODO Virtualize to avoid rendering too many expensive nodes.
 
-const hashCode = string => {
-  let hash = 0, i, chr;
-  if (string.length === 0) return hash;
-  for (i = 0; i < string.length; i++) {
-    chr = string.charCodeAt(i);
-    hash = ((hash << 5) - hash) + chr;
-    hash |= 0; // Convert to 32bit integer
-  }
-  return hash;
-};
-
 // TODO Better colors
-const colors = ['#6ea1e3', '#9b7fe6', '#74b265', '#efc457'];
-const getColor = node => colors[Math.abs(hashCode(node.name)) % colors.length];
+const getColor = (node, snapshot) => snapshot.committedNodes.includes(node.id) ? '#f75858' : '#cccccc';
+
 const round = number => Math.round(number * 10) / 10;
 
-const FlameRect = ({ horizontalScale, node, rowHeight, shouldDim, timeOffset, verticalOffset }) => {
-  const x = Math.round(horizontalScale * (node.startTime - timeOffset));
-  const width = Math.round(horizontalScale * node.actualDuration);
-  const roundedDuration = round(node.actualDuration); '';
+const FlameRect = ({ horizontalOffset, horizontalScale, node, rowHeight, shouldDim, snapshot, startTime, verticalOffset }) => {
+  const x = (horizontalOffset * horizontalScale) + Math.round(horizontalScale * startTime);
+  const width = Math.round(horizontalScale * node.treeBaseTime);
+  const roundedDuration = snapshot.committedNodes.includes(node.id) ? round(node.actualDuration) : 0;
 
   if (width <= BORDER_THICKNESS) {
     return null;
@@ -33,21 +22,23 @@ const FlameRect = ({ horizontalScale, node, rowHeight, shouldDim, timeOffset, ve
   return (
     <g>
       <rect
-        data-id={node.fiberID}
+        data-id={node.id}
         x={x + BORDER_THICKNESS}
         y={verticalOffset + BORDER_THICKNESS}
-        width={width - BORDER_THICKNESS}
         height={rowHeight - BORDER_THICKNESS}
+        width={width}
         style={{
-          fill: getColor(node),
+          fill: getColor(node, snapshot),
           opacity: shouldDim ? 0.35 : 1,
+          width: `${width}px`,
+          transition: 'all 0.2s ease-in-out',
         }}
       />
-      <title>{node.name} - {roundedDuration}ms</title>
+      <title>{node.name} - {roundedDuration}ms render time</title>
       <text
         alignmentBaseline="central"
         textAnchor="start"
-        x={Math.max(0, x) + HORIZONTAL_TEXT_OFFSET}
+        x={Math.max(0, x - horizontalOffset) + HORIZONTAL_TEXT_OFFSET}
         y={verticalOffset + rowHeight / 2}
         style={{
           clipPath: `polygon(0 0, ${width - HORIZONTAL_TEXT_OFFSET}px 0, ${width - HORIZONTAL_TEXT_OFFSET}px ${rowHeight}px, 0 ${rowHeight}px)`,
@@ -57,7 +48,7 @@ const FlameRect = ({ horizontalScale, node, rowHeight, shouldDim, timeOffset, ve
           pointerEvents: 'none',
         }}
       >
-        {node.name} - {roundedDuration}ms
+        {node.name}
       </text>
     </g>
   );
@@ -65,41 +56,60 @@ const FlameRect = ({ horizontalScale, node, rowHeight, shouldDim, timeOffset, ve
 
 const Level = ({
   horizontalScale,
-  level,
-  node,
-  nodeMap,
+  nodeID,
   rowHeight,
-  selectedNode,
-  timeOffset,
+  selectedNodeID,
+  snapshot,
   width,
 }) => {
+  // Ignore text children that don't map to Fiber IDs.
+  // TODO (bvaughn) Look at what DevTools is doing elsewhere for a cleaner solution.
+  if (!snapshot.nodes.has(nodeID)) {
+    return null;
+  }
+
+  const node = snapshot.nodes.get(nodeID).toJS();
+  const depth = snapshot.nodeDepths.get(nodeID);
+  const startTime = snapshot.nodeStartTimes.get(nodeID);
+
+  const selectedNode = snapshot.nodes.get(selectedNodeID);
+  const selectedNodeStartTime = snapshot.nodeStartTimes.get(selectedNodeID);
+
+  // Filter based on selected node duration to "zoom in" horizontally
   if (
-    node.startTime >= selectedNode.startTime + selectedNode.actualDuration ||
-    node.startTime + node.actualDuration <= selectedNode.startTime
+    startTime >= selectedNodeStartTime + selectedNode.treeBaseTime ||
+    startTime + node.treeBaseTime <= selectedNodeStartTime
   ) {
     return null;
   }
 
+  let children = null;
+  if (node.children) {
+    children = Array.isArray(node.children) ? node.children : [node.children];
+  }
+
   return (
     <Fragment>
-      <FlameRect
-        horizontalScale={horizontalScale}
-        node={node}
-        rowHeight={rowHeight}
-        shouldDim={level < selectedNode.depth}
-        timeOffset={timeOffset}
-        verticalOffset={level * rowHeight}
-      />
-      {node.childIDs.map(id => (
+      {node.treeBaseTime > 0 && (
+        <FlameRect
+          horizontalOffset={-selectedNodeStartTime}
+          horizontalScale={horizontalScale}
+          node={node}
+          rowHeight={rowHeight}
+          shouldDim={depth < snapshot.nodeDepths.get(selectedNodeID)}
+          snapshot={snapshot}
+          startTime={startTime}
+          verticalOffset={depth * rowHeight}
+        />
+      )}
+      {children !== null && children.map(id => (
         <Level
           key={id}
           horizontalScale={horizontalScale}
-          level={level + 1}
-          node={nodeMap[id]}
-          nodeMap={nodeMap}
+          nodeID={id}
           rowHeight={rowHeight}
-          selectedNode={selectedNode}
-          timeOffset={timeOffset}
+          selectedNodeID={selectedNodeID}
+          snapshot={snapshot}
           width={width}
         />
       ))}
@@ -111,10 +121,10 @@ class Flamegraph extends Component {
   state = {};
 
   static getDerivedStateFromProps(props, state) {
-    if (props.nodeMap !== state.prevNodeMap) {
+    if (props.snapshot !== state.prevSnapshot) {
       return {
-        selectedNode: props.nodeMap.ROOT,
-        prevNodeMap: props.nodeMap,
+        selectedNodeID: props.rootNodeID,
+        prevSnapshot: props.snapshot,
       };
     }
     return null;
@@ -123,32 +133,30 @@ class Flamegraph extends Component {
   handleClick = event => {
     const id = event.target.getAttribute('data-id');
     if (id) {
-      this.setState({ selectedNode: this.props.nodeMap[id] });
+      this.setState({ selectedNodeID: id });
     }
   };
 
   render() {
-    const {depth, height, nodeMap, rowHeight = 20, width} = this.props;
-    const {selectedNode} = this.state;
+    const {height, rowHeight = 20, rootNodeID, snapshot, width} = this.props;
+    const {selectedNodeID} = this.state;
 
-    const rootNode = nodeMap.ROOT;
-    const horizontalScale = width / selectedNode.actualDuration;
+    const selectedNode = snapshot.nodes.get(selectedNodeID).toJS();
+    const horizontalScale = width / selectedNode.treeBaseTime;
 
     return (
       <svg
         height={height}
         onClick={this.handleClick}
         width={width}
-        viewBox={`0 0 ${width} ${depth * rowHeight}`}
+        viewBox={`0 0 ${width} ${snapshot.maxDepth * rowHeight}`}
       >
         <Level
           horizontalScale={horizontalScale}
-          level={0}
-          node={rootNode}
-          nodeMap={nodeMap}
+          nodeID={rootNodeID}
           rowHeight={rowHeight}
-          selectedNode={selectedNode}
-          timeOffset={selectedNode.startTime}
+          selectedNodeID={selectedNodeID}
+          snapshot={snapshot}
           width={width}
         />
       </svg>

@@ -11,104 +11,32 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
+const React = require('react');
+const ReactDOM = require('react-dom');
 
-const { Component, Fragment, PureComponent, unstable_Profiler: Profiler } = React;
+const { Component, Fragment, unstable_Profiler: Profiler } = React;
 
 const onRender = (id, mode, actualTime, baseTime, startTime, commitTime) => {
   console.log(`${id}\t(${mode})\tactual:${actualTime}\tbase:${baseTime}\tstart:${startTime}\tcommit:${commitTime}`);
 };
 
-const App = () => (
-  <Stateful />
-);
+let instance;
 
-/*
-class Temp extends Component {
+class App extends Component {
   state = {
     count: 1,
   };
   render() {
-    return (
-      <ul onClick={this.updateCount}>
-        <li><SlowComponent/></li>
-        {this.state.count % 2 ? <li><SlowComponent/></li> : null}
-      </ul>
-    );
+    instance = this;
+    const { count } = this.state;
+    return count % 2 === 1
+      ? <Fragment><A count={count} /><B count={count} /></Fragment>
+      : <Fragment><A count={count} /><E count={count} /></Fragment>;
   }
   updateCount = () =>
     this.setState(prevState => ({
       count: prevState.count + 1,
     }));
-}
-*/
-
-class Stateful extends Component {
-  state = {
-    count: 1,
-  };
-  render() {
-    return (
-      <div>
-        <button onClick={this.rerender}>
-          Re-render with same props
-        </button>
-        <button onClick={this.updateCount}>
-          Re-render with new props
-        </button>
-        <Shell count={this.state.count} />
-      </div>
-    );
-  }
-  rerender = () => this.forceUpdate();
-  updateCount = () =>
-    this.setState(prevState => ({
-      count: prevState.count + 1,
-    }));
-}
-
-function Shell({count}) {
-  return (
-    <Fragment>
-      <Profiler id="GoodMemoization" onRender={onRender}>
-        <div>
-          <GoodMemoization count={count} />
-        </div>
-      </Profiler>
-      <Profiler id="BadMemoization" onRender={onRender}>
-        <div>
-          {count % 2 ? <BadMemoization count={count} /> : null}
-        </div>
-      </Profiler>
-    </Fragment>
-  );
-}
-
-class BadMemoization extends Component {
-  render() {
-    return (
-      <p>
-        <label>BadMemoization</label>
-        <SlowComponent/>
-        <SlowComponent/>
-        <SlowComponent/>
-      </p>
-    );
-  }
-}
-
-class GoodMemoization extends PureComponent {
-  render() {
-    return (
-      <p>
-        <label>GoodMemoization</label>
-        <SlowComponent/>
-        <SlowComponent/>
-        <SlowComponent/>
-      </p>
-    );
-  }
 }
 
 const sleepFor = duration => {
@@ -116,11 +44,36 @@ const sleepFor = duration => {
   while (new Date().getTime() < now + duration) {}
 };
 
-const SlowComponent = () => {
-  sleepFor(10);
-  return <span>SlowComponent</span>;
+const A = ({ count }) => {
+  sleepFor(5);
+  return count % 2 === 1 ? count : <D count={count} />;
+};
+const C = ({ count }) => {
+  sleepFor(3);
+  return count;
+};
+const B = ({count}) => {
+  sleepFor(4);
+  return <C count={count} />;
+};
+const D = ({ count }) => {
+  sleepFor(9);
+  return count;
+};
+const E = ({ count }) => {
+  sleepFor(11);
+  return count;
 };
 
 var node = document.createElement('div');
 document.body.appendChild(node);
-ReactDOM.render(<App />, node);
+ReactDOM.render(
+  <Profiler id="root" onRender={onRender}>
+    <App />
+  </Profiler>,
+  node
+);
+
+document.body.addEventListener('click', () => {
+  instance.updateCount();
+});

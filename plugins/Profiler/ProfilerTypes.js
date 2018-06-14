@@ -11,14 +11,17 @@
 
 'use strict';
 
-export type Profile = {
-  actualDuration: number,
-  baseTime: number,
-  childIDs: Array<string>,
-  commitTime: number,
-  fiberID: string,
-  name: string,
-  startTime: number,
-};
+const {Map} = require('immutable');
 
-export type FiberIDToProfiles = {[id: string]: Profile};
+export type Snapshot = {|
+  committedNodes: Array<string>,
+  commitTime: number,
+  nodes: Map,
+  root: string,
+|};
+
+export type StoreSnapshot = {|
+  committedNodes: Array<string>,
+  commitTime: number,
+  root: string,
+|};

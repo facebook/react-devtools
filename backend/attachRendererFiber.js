@@ -125,6 +125,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     opaqueNodes.delete(opaqueNode);
   }
 
+  function markRootCommitted(fiber) {
+    pendingEvents.push({
+      internalInstance: getOpaqueNode(fiber),
+      renderer: rid,
+      type: 'rootCommitted',
+    });
+  }
+
   function mountFiber(fiber) {
     // Depth-first.
     // Logs mounting of children first, parents later.
@@ -207,6 +215,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     hook.getFiberRoots(rid).forEach(root => {
       // Hydrate all the roots for the first time.
       mountFiber(root.current);
+      markRootCommitted(root.current);
     });
     flushPendingEvents();
   }
@@ -245,6 +254,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       // Mount a new root.
       mountFiber(current);
     }
+    markRootCommitted(current);
     // We're done here.
     flushPendingEvents();
   }

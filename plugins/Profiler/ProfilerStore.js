@@ -11,16 +11,16 @@
 'use strict';
 
 import type Bridge from '../../agent/Bridge';
-import type {FiberIDToProfiles} from './ProfilerTypes';
+import type {Snapshot} from './ProfilerTypes';
 
-var {EventEmitter} = require('events');
+const {EventEmitter} = require('events');
 
 class Store extends EventEmitter {
   _bridge: Bridge;
   _mainStore: Object;
 
   isRecording: boolean = false;
-  snapshots: Array<FiberIDToProfiles> = [];
+  snapshots: Array<Snapshot> = [];
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -29,7 +29,10 @@ class Store extends EventEmitter {
     this._mainStore = mainStore;
     this._mainStore.on('clearSnapshots', () => this.clearSnapshots());
     this._mainStore.on('storeSnapshot', () => {
-      this.snapshots.push(this._mainStore.currentSnapshot);
+      this.snapshots.push({
+        ...this._mainStore.snapshotData,
+        nodes: mainStore._nodes, // TODO (bvaughn)
+      });
       this.emit('snapshots', this.snapshots);
     });
   }
