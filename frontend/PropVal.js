@@ -12,9 +12,9 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var PropTypes = require('prop-types');
 
 var consts = require('../agent/consts');
-var createFragment = require('react-addons-create-fragment');
 var {getInvertedWeak} = require('./Themes/utils');
 var flash = require('./flash');
 
@@ -48,7 +48,7 @@ class PropVal extends React.Component<Props> {
 }
 
 PropVal.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
@@ -149,49 +149,47 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
 }
 
 function previewArray(val, inverted, theme) {
-  var items = {};
+  var items = [];
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} theme={theme} />;
-    items['c' + i] = ', ';
+    if (i > 0) {
+      items.push(<span key={i+','}>{', '}</span>);
+    }
+    items.push(
+      <PropVal key={i} val={item} nested={true} inverted={inverted} theme={theme} />
+    );
   });
-  if (val.length > 3) {
-    items.last = '…';
-  } else {
-    delete items['c' + (val.length - 1)];
-  }
   var style = {
     color: inverted ? theme.base03 : theme.special01,
   };
   return (
     <span style={style}>
-      [{createFragment(items)}]
+      {'['}{items}{val.length > 3 ? ', …' : ''}{']'}
     </span>
   );
 }
 
 function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
-  var items = {};
+  var items = [];
   var attrStyle = {
     color: inverted ? getInvertedWeak(theme.state02) : theme.special06,
   };
   names.slice(0, 3).forEach((name, i) => {
-    items['k' + i] = <span style={attrStyle}>{name}</span>;
-    items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />;
-    items['m' + i] = ', ';
+    items.push( // Fragment
+      <span key={i}>
+        {i > 0 ? ', ' : ''}
+        <span style={attrStyle}>{name}</span>
+        {': '}
+        <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />
+      </span>
+    );
   });
-  if (names.length > 3) {
-    items.rest = '…';
-  } else {
-    delete items['m' + (names.length - 1)];
-  }
   var style = {
     color: inverted ? getInvertedWeak(theme.state02) : theme.special01,
   };
   return (
     <span style={style}>
-      {'{'}{createFragment(items)}{'}'}
+      {'{'}{items}{names.length > 3 ? ', …' : ''}{'}'}
     </span>
   );
 }
