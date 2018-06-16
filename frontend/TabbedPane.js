@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var decorate = require('./decorate');
 var {sansSerif} = require('./Themes/Fonts');
@@ -55,7 +57,7 @@ class TabbedPane extends React.Component<Props> {
 }
 
 TabbedPane.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const tabsStyle = (theme: Theme) => ({

@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 
 import type {Theme} from '../types';
@@ -39,7 +41,7 @@ class DetailPaneSection extends React.Component<Props> {
 }
 
 DetailPaneSection.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const sectionStyle = (theme: Theme) => ({

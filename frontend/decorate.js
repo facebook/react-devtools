@@ -10,6 +10,8 @@
  */
 'use strict';
 
+var PropTypes = require('prop-types');
+
 var React = require('react');
 
 type Options = {
@@ -127,7 +129,7 @@ module.exports = function(options: Options, Component: any): any {
 
   Wrapper.contextTypes = {
     // $FlowFixMe
-    [storeKey]: React.PropTypes.object,
+    [storeKey]: PropTypes.object,
   };
 
   Wrapper.displayName = 'Wrapper(' + Component.name + ')';

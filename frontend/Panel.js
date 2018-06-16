@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var Container = require('./Container');
 var Store = require('./Store');
@@ -355,14 +357,14 @@ class Panel extends React.Component<Props, State> {
 }
 
 Panel.childContextTypes = {
-  browserName: React.PropTypes.string.isRequired,
-  defaultThemeName: React.PropTypes.string.isRequired,
-  showHiddenThemes: React.PropTypes.bool.isRequired,
-  showInspectButton: React.PropTypes.bool.isRequired,
-  store: React.PropTypes.object,
-  theme: React.PropTypes.object.isRequired,
-  themeName: React.PropTypes.string.isRequired,
-  themes: React.PropTypes.object.isRequired,
+  browserName: PropTypes.string.isRequired,
+  defaultThemeName: PropTypes.string.isRequired,
+  showHiddenThemes: PropTypes.bool.isRequired,
+  showInspectButton: PropTypes.bool.isRequired,
+  store: PropTypes.object,
+  theme: PropTypes.object.isRequired,
+  themeName: PropTypes.string.isRequired,
+  themes: PropTypes.object.isRequired,
 };
 
 var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {

@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var PropVal = require('./PropVal');
 var {getInvertedMid} = require('./Themes/utils');
@@ -61,7 +63,7 @@ class Props extends React.Component<PropsProps> {
 }
 
 Props.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const attributeNameStyle = (isInverted: boolean, theme: Theme) => ({

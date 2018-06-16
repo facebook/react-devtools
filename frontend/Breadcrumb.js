@@ -15,6 +15,7 @@ import type {ElementID} from './types';
 import type {Theme} from './types';
 
 var {sansSerif} = require('./Themes/Fonts');
+const PropTypes = require('prop-types');
 var React = require('react');
 var decorate = require('./decorate');
 
@@ -79,7 +80,7 @@ class Breadcrumb extends React.Component<Props, State> {
 }
 
 Breadcrumb.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const containerStyle = (theme: Theme) => ({
