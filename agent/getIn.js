@@ -8,6 +8,8 @@
  *
  */
 
+var hasOwnProperty = Object.prototype.hasOwnProperty;
+
 /**
  * Retrieves the value from the path of nested objects
  * @param  {Object} base Base or root object for path
@@ -17,7 +19,7 @@
 function getIn(base, path) {
   return path.reduce((obj, attr) => {
     if (obj) {
-      if (obj.hasOwnProperty(attr)) {
+      if (hasOwnProperty.call(obj, attr)) {
         return obj[attr];
       }
       if (typeof obj[Symbol.iterator] === 'function') {
