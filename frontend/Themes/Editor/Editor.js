@@ -12,6 +12,7 @@
 
 const {copy} = require('clipboard-js');
 const decorate = require('../../decorate');
+const PropTypes = require('prop-types');
 const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
@@ -199,7 +200,7 @@ class Editor extends React.Component<Props, State> {
 }
 
 Editor.childContextTypes = {
-  theme: React.PropTypes.object,
+  theme: PropTypes.object,
 };
 
 const WrappedEditor = decorate({

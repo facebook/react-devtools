@@ -424,11 +424,11 @@ class Wrap extends React.Component {
   }
 }
 
-var PropTester = React.createClass({
+class PropTester extends React.Component {
   render() {
     return null;
-  },
-});
+  }
+}
 
 class Nested extends React.Component {
   render() {

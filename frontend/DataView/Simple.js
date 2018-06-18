@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var ReactDOM = require('react-dom');
 
@@ -148,14 +150,14 @@ class Simple extends React.Component<Props, State> {
 }
 
 Simple.propTypes = {
-  data: React.PropTypes.any,
-  path: React.PropTypes.array,
-  readOnly: React.PropTypes.bool,
+  data: PropTypes.any,
+  path: PropTypes.array,
+  readOnly: PropTypes.bool,
 };
 
 Simple.contextTypes = {
-  onChange: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 const inputStyle = (theme: Theme) => ({

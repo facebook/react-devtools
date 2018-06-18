@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var nullthrows = require('nullthrows').default;
 
@@ -405,8 +407,8 @@ class Node extends React.Component<PropsType, StateType> {
 }
 
 Node.contextTypes = {
-  scrollTo: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  scrollTo: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 var WrappedNode = decorate({

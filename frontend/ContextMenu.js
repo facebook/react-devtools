@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var nullthrows = require('nullthrows').default;
 var {sansSerif} = require('./Themes/Fonts');
@@ -120,7 +122,7 @@ class ContextMenu extends React.Component<Props, State> {
 }
 
 ContextMenu.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 var Wrapped = decorate({

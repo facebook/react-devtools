@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 const React = require('react');
 
 const decorate = require('./decorate');
@@ -164,16 +166,16 @@ class PreferencesPanel extends React.Component<Props, State> {
 }
 
 PreferencesPanel.contextTypes = {
-  browserName: React.PropTypes.string.isRequired,
-  showHiddenThemes: React.PropTypes.bool.isRequired,
-  theme: React.PropTypes.object.isRequired,
-  themeName: React.PropTypes.string.isRequired,
-  themes: React.PropTypes.object.isRequired,
+  browserName: PropTypes.string.isRequired,
+  showHiddenThemes: PropTypes.bool.isRequired,
+  theme: PropTypes.object.isRequired,
+  themeName: PropTypes.string.isRequired,
+  themes: PropTypes.object.isRequired,
 };
 PreferencesPanel.propTypes = {
-  changeTheme: React.PropTypes.func,
-  hide: React.PropTypes.func,
-  open: React.PropTypes.bool,
+  changeTheme: PropTypes.func,
+  hide: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 
