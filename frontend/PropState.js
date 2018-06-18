@@ -16,6 +16,7 @@ var DetailPane = require('./detail_pane/DetailPane');
 var DetailPaneSection = require('./detail_pane/DetailPaneSection');
 var {sansSerif} = require('./Themes/Fonts');
 var PropVal = require('./PropVal');
+const PropTypes = require('prop-types');
 var React = require('react');
 var PropTypes = require('prop-types');
 

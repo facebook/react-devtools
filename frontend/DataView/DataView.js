@@ -13,6 +13,7 @@
 import type {Theme, DOMEvent} from '../types';
 
 var {sansSerif} = require('../Themes/Fonts');
+const PropTypes = require('prop-types');
 var React = require('react');
 var PropTypes = require('prop-types');
 var Simple = require('./Simple');

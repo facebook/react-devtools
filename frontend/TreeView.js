@@ -12,6 +12,7 @@
 
 var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
+const PropTypes = require('prop-types');
 var React = require('react');
 var PropTypes = require('prop-types');
 var SearchUtils = require('./SearchUtils');

@@ -10,6 +10,8 @@
  */
 'use strict';
 
+var PropTypes = require('prop-types');
+
 var React = require('react');
 var PropTypes = require('prop-types');
 

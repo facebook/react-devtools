@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var PropTypes = require('prop-types');
 var PropVal = require('./PropVal');
