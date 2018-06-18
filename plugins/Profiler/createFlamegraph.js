@@ -11,10 +11,10 @@ const {
 
 require('./flamegraph.css');
 
-module.exports = function createFlamegraph() {
-  let w = 960; // graph width
-  let h = null; // graph height
-  let c = 18; // cell height
+export default function createFlamegraph() {
+  let graphWidth = 960; // graph width
+  let graphHeight = null; // graph height
+  let cellHeight = 18; // cell height
   let selection = null; // selection
   let title = ''; // graph title
   const transitionDuration = 250;
@@ -146,7 +146,7 @@ module.exports = function createFlamegraph() {
   function filterNodes(root) {
     var nodeList = root.descendants();
     if (minFrameSize > 0) {
-      var kx = w / (root.x1 - root.x0);
+      var kx = graphWidth / (root.x1 - root.x0);
       nodeList = nodeList.filter(el => (el.x1 - el.x0) * kx > minFrameSize);
     }
     return nodeList;
@@ -154,8 +154,8 @@ module.exports = function createFlamegraph() {
 
   function update() {
     selection.each(function(root) {
-      var x = scaleLinear().range([0, w]);
-      var y = scaleLinear().range([0, c]);
+      var x = scaleLinear().range([0, graphWidth]);
+      var y = scaleLinear().range([0, cellHeight]);
 
       if (sort) {
         root.sort(doSort);
@@ -176,10 +176,8 @@ module.exports = function createFlamegraph() {
       });
       p(root);
 
-      var kx = w / (root.x1 - root.x0);
-      function width(d) {
-        return (d.x1 - d.x0) * kx;
-      }
+      var kx = graphWidth / (root.x1 - root.x0);
+      const cellWidth = (d) => (d.x1 - d.x0) * kx;
 
       var descendants = filterNodes(root);
       var g = select(this)
@@ -198,12 +196,12 @@ module.exports = function createFlamegraph() {
             'translate(' +
             x(d.x0) +
             ',' +
-            (inverted ? y(d.depth) : h - y(d.depth) - c) +
+            (inverted ? y(d.depth) : graphHeight - y(d.depth) - cellHeight) +
             ')'
           );
         });
 
-      g.select('rect').attr('width', width);
+      g.select('rect').attr('width', cellWidth);
 
       var node = g
         .enter()
@@ -213,7 +211,7 @@ module.exports = function createFlamegraph() {
             'translate(' +
             x(d.x0) +
             ',' +
-            (inverted ? y(d.depth) : h - y(d.depth) - c) +
+            (inverted ? y(d.depth) : graphHeight - y(d.depth) - cellHeight) +
             ')'
           );
         });
@@ -222,7 +220,7 @@ module.exports = function createFlamegraph() {
         .append('svg:rect')
         .transition()
         .delay(transitionDuration / 2)
-        .attr('width', width);
+        .attr('width', cellWidth);
       
       node.append('svg:title');
       node.append('foreignObject').append('xhtml:div');
@@ -234,25 +232,25 @@ module.exports = function createFlamegraph() {
         .data(descendants, d => d.data.id);
 
       g
-        .attr('width', width)
-        .attr('height', () => c)
+        .attr('width', cellWidth)
+        .attr('height', () => cellHeight)
         .attr('name', d => name(d))
         .attr('class', d => d.data.fade ? 'frame fade' : 'frame');
 
       g
         .select('rect')
-        .attr('height', c)
+        .attr('height', cellHeight)
         .attr('fill', d => d.data.color);
 
       g.select('title').text(label);
 
       g
         .select('foreignObject')
-        .attr('width', width)
-        .attr('height', () => c)
+        .attr('width', cellWidth)
+        .attr('height', () => cellHeight)
         .select('div')
         .attr('class', 'd3-flame-graph-label')
-        .style('display', d => width(d) < minWidthToDisplay ? 'none' : 'block')
+        .style('display', d => cellWidth(d) < minWidthToDisplay ? 'none' : 'block')
         .transition()
         .delay(transitionDuration)
         .text(name);
@@ -297,16 +295,16 @@ module.exports = function createFlamegraph() {
       return;
     }
 
-    if (!h) {
-      h = (root.height + 2) * c;
+    if (!graphHeight) {
+      graphHeight = (root.height + 1) * cellHeight;
     }
 
     selection.each(function(data) {
       if (!svg) {
         svg = select(this)
           .append('svg:svg')
-          .attr('width', w)
-          .attr('height', h)
+          .attr('width', graphWidth)
+          .attr('height', graphHeight)
           .attr('class', 'partition d3-flame-graph');
 
         svg
@@ -314,7 +312,7 @@ module.exports = function createFlamegraph() {
           .attr('class', 'title')
           .attr('text-anchor', 'middle')
           .attr('y', '25')
-          .attr('x', w / 2)
+          .attr('x', graphWidth / 2)
           .attr('fill', '#808080')
           .text(title);
       }
@@ -325,17 +323,17 @@ module.exports = function createFlamegraph() {
   }
 
   chart.setHeight = function(newHeight) {
-    h = newHeight;
+    graphHeight = newHeight;
     return chart;
   };
 
   chart.setWidth = function(newWidth) {
-    w = newWidth;
+    graphWidth = newWidth;
     return chart;
   };
 
   chart.setCellHeight = function(newCellHeight) {
-    c = newCellHeight;
+    cellHeight = newCellHeight;
     return chart;
   };
 
@@ -388,4 +386,4 @@ module.exports = function createFlamegraph() {
   };
 
   return chart;
-};
+}
