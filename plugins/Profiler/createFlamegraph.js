@@ -295,7 +295,7 @@ module.exports = function createFlamegraph() {
           return c;
         })
         .select('div')
-        .attr('class', 'd3-flame-graph-label')
+        .attr('class', d => d.data.labelClassName)
         .style('display', function(d) {
           return width(d) < 35 ? 'none' : 'block';
         })

@@ -6,6 +6,7 @@
   cursor: pointer;
 }
 
+.d3-flame-graph-label-no-render,
 .d3-flame-graph-label {
   pointer-events: none;
   white-space: nowrap;
@@ -20,6 +21,10 @@
   font-weight: 400;
   color: black;
   text-align: left;
+}
+
+.d3-flame-graph-label-no-render {
+  color: #22693b;
 }
 
 .d3-flame-graph .fade {
