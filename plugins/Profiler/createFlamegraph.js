@@ -8,7 +8,6 @@ const {
   scaleLinear,
   easeCubic,
 } = require('d3');
-const d3Tip = require('d3-tip');
 
 require('./flamegraph.css');
 
@@ -26,12 +25,6 @@ module.exports = function createFlamegraph() {
   const minFrameSize = 0;
   const minWidthToDisplay = 35;
   const details = null;
-
-  const tip = d3Tip()
-    .direction('s')
-    .offset([8, 0])
-    .attr('class', 'd3-flame-graph-tip')
-    .html(d => label(d));
 
   let svg;
 
@@ -96,7 +89,6 @@ module.exports = function createFlamegraph() {
   }
 
   function zoom(d) {
-    tip.hide(d);
     hideSiblings(d);
     show(d);
     fadeAncestors(d);
@@ -315,8 +307,7 @@ module.exports = function createFlamegraph() {
           .append('svg:svg')
           .attr('width', w)
           .attr('height', h)
-          .attr('class', 'partition d3-flame-graph')
-          .call(tip);
+          .attr('class', 'partition d3-flame-graph');
 
         svg
           .append('svg:text')
