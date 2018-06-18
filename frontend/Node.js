@@ -11,14 +11,12 @@
 'use strict';
 
 const PropTypes = require('prop-types');
+const React = require('react');
+const nullthrows = require('nullthrows').default;
 
-var React = require('react');
-var PropTypes = require('prop-types');
-var nullthrows = require('nullthrows').default;
-
-var decorate = require('./decorate');
-var Props = require('./Props');
-var {getInvertedWeak, hexToRgba} = require('./Themes/utils');
+const decorate = require('./decorate');
+const Props = require('./Props');
+const {getInvertedWeak, hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
 import type {Theme} from './types';

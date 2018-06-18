@@ -11,9 +11,7 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
 const React = require('react');
-const PropTypes = require('prop-types');
 
 const decorate = require('./decorate');
 const {sansSerif} = require('./Themes/Fonts');

@@ -11,11 +11,9 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
-var React = require('react');
-var PropTypes = require('prop-types');
-var PropVal = require('./PropVal');
-var {getInvertedMid} = require('./Themes/utils');
+const React = require('react');
+const PropVal = require('./PropVal');
+const {getInvertedMid} = require('./Themes/utils');
 
 import type {Theme} from './types';
 

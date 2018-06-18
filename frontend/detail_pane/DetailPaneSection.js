@@ -11,9 +11,7 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
-var React = require('react');
-var PropTypes = require('prop-types');
+const React = require('react');
 
 import type {Theme} from '../types';
 

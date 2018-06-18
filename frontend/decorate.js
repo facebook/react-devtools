@@ -11,9 +11,7 @@
 'use strict';
 
 var PropTypes = require('prop-types');
-
 var React = require('react');
-var PropTypes = require('prop-types');
 
 type Options = {
   /** A function determining whether the component should rerender when the
