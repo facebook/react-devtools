@@ -24,11 +24,13 @@ class Flamegraph extends Component<FlamegraphProps, void> {
   }
 
   componentDidUpdate(prevProps) {
-    const { data } = this.props;
+    const { data, width } = this.props;
 
     if (data !== prevProps.data) {
       this.flamegraph.clear();
       this.flamegraph.merge(data);
+    } else if (width !== prevProps.width) {
+      this.flamegraph.setWidth(width).update();
     }
   }
 
@@ -44,7 +46,7 @@ class Flamegraph extends Component<FlamegraphProps, void> {
   createFlamegraph() {
     const { data, width } = this.props;
 
-    this.flamegraph = createFlamegraph().setWidth(width);
+    this.flamegraph = createFlamegraph(width);
 
     this.ref.current.innerHTML = '';
 

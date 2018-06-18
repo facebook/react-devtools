@@ -11,9 +11,9 @@ const {
 
 require('./flamegraph.css');
 
-export default function createFlamegraph() {
-  let graphWidth = 960; // graph width
-  let graphHeight = null; // graph height
+export default function createFlamegraph(initialGraphWidth, initialGraphHeight = null) {
+  let graphWidth = initialGraphWidth; // graph width
+  let graphHeight = initialGraphHeight; // graph height
   let cellHeight = 18; // cell height
   let selection = null; // selection
   let title = ''; // graph title
@@ -324,11 +324,13 @@ export default function createFlamegraph() {
 
   chart.setHeight = function(newHeight) {
     graphHeight = newHeight;
+    svg.attr('width', newHeight);
     return chart;
   };
 
   chart.setWidth = function(newWidth) {
     graphWidth = newWidth;
+    svg.attr('width', newWidth);
     return chart;
   };
 
@@ -372,6 +374,8 @@ export default function createFlamegraph() {
       zoom(data); // zoom to root
     });
   };
+
+  chart.update = update;
 
   chart.merge = function(samples) {
     var newRoot; // Need to re-create hierarchy after data changes.
