@@ -12,8 +12,8 @@
 
 const {copy} = require('clipboard-js');
 const decorate = require('../../decorate');
-const React = require('react');
 const PropTypes = require('prop-types');
+const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
 const Hoverable = require('../../Hoverable');

@@ -23,7 +23,7 @@ var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
-import type {SnapshotData} from '../plugins/Profiler/ProfilerTypes';
+import type {StoreSnapshot} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -109,7 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
-  snapshotData: ?SnapshotData;
+  snapshotData: ?StoreSnapshot;
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,

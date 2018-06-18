@@ -77,6 +77,11 @@ class ProfilerManager {
     if (fiber.sibling !== null) {
       this._enableProfileMode(fiber.sibling);
     }
+
+    // TODO (bvaughn) We should force a re-render now somehow,
+    // B'c there are no treeBaseTimes for existing Fibers that weren't profiling,
+    // And this would mess up subsequent graphs.
+    // Alternately we could update React to always collect timings if the DevTools hook is enabled.
   };
 
   _takeCommitSnapshotForRoot(root: string) {

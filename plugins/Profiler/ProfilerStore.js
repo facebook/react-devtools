@@ -29,6 +29,9 @@ class Store extends EventEmitter {
     this._mainStore = mainStore;
     this._mainStore.on('clearSnapshots', () => this.clearSnapshots());
     this._mainStore.on('storeSnapshot', () => {
+      // TODO (bvaughn) The Store nodes Map may not be accurate!
+      // Nodes that were not re-rendered might have their alternates in the tree.
+      // I think the only way to handle this is to re-crawl the tree from a known committed Fiber...
       this.snapshots.push({
         ...this._mainStore.snapshotData,
         nodes: mainStore._nodes, // TODO (bvaughn)

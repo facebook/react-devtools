@@ -15,89 +15,62 @@ import type {Snapshot} from './ProfilerTypes';
 
 const PropTypes = require('prop-types');
 
-var React = require('react');
-var decorate = require('../../frontend/decorate');
-var {sansSerif} = require('../../frontend/Themes/Fonts');
+const React = require('react');
+const decorate = require('../../frontend/decorate');
+const {sansSerif} = require('../../frontend/Themes/Fonts');
 const SvgIcon = require('../../frontend/SvgIcon');
 const Icons = require('../../frontend/Icons');
 const Hoverable = require('../../frontend/Hoverable');
 const Flamegraph = require('./Flamegraph');
 
-// TODO Each flame graph should be the entire fiber tree (at the time of this commit).
-// The widths should be the tree base times.
-// Horizontal offsets should just be center-aligned within their parents.
-// Color should indicate whether the component re-rendered (actualDuration > 0).
-// Changes in base time could perhaps be animated between commits.
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
-// TODO Better Flow types for snapshot
-const preprocessNode = (snapshot: any, nodeID, parentID = null, startTimeOffset = 0) => {
-  const { nodes, nodeDepths, nodeStartTimes } = snapshot;
+// http://gka.github.io/palettes/#diverging|c0=#34bd65,#f4d03f|c1=#f4d03f,#ea384d,#f5344a|steps=50|bez0=1|bez1=1|coL0=0|coL1=0
+const colors = [
+  '#34bd65', '#44be64', '#50bf62', '#5bc061', '#65c160', '#6fc25f', '#77c35d', '#80c45c', '#88c55b', '#8fc659', '#97c658',
+  '#9ec756', '#a5c855', '#acc953', '#b2ca52', '#b9ca50', '#bfcb4e', '#c6cc4d', '#cccc4b', '#d2cd49', '#d9ce48', '#dfce46',
+  '#e5cf44', '#ebcf42', '#f1d040', '#f4cb40', '#f5c142', '#f5b744', '#f5ae46', '#f4a447', '#f49c48', '#f49349', '#f48b49',
+  '#f3834a', '#f37c4a', '#f3744b', '#f26d4b', '#f2674b', '#f2604b', '#f25a4b', '#f1544b', '#f14e4b', '#f2494b', '#f2444b',
+  '#f2404b', '#f23c4b', '#f3394b', '#f3374a', '#f4354a', '#f5344a',
+];
 
-  const node = nodes.get(nodeID);
+const convertSnapshotToChartData = (snapshot, rootNodeID) => {
+  let maxDuration = 0;
 
-  let depth = 0;
-  let startTime = 0;
-
-  // Parent/child alignment should be:
-  // |----------------------------------|
-  // | A                                |
-  // |----------------------------------|
-  //           |---------| |------------|
-  //           | B       | | C          |
-  //           |---------| |------------|
-  //                            |-------|
-  //                            | D     |
-  //                            |-------|
-  if (parentID !== null) {
-    const parentDepth = nodeDepths.get(parentID);
-    const parentStartTime = nodeStartTimes.get(parentID);
-
-    depth = parentDepth + 1;
-    startTime = parentStartTime + startTimeOffset;
-
-    snapshot.maxDepth = Math.max(snapshot.maxDepth, depth);
-  }
-
-  nodeDepths.set(nodeID, depth);
-  nodeStartTimes.set(nodeID, startTime);
-
-  let children = node.get('children');
-  if (children) {
-    if (!Array.isArray(children)) {
-      children = [children];
+  snapshot.committedNodes.forEach(nodeID => {
+    const duration = snapshot.nodes.getIn([nodeID, 'actualDuration']);
+    if (duration > 0) {
+      maxDuration = Math.max(maxDuration, duration);
     }
+  });
 
-    const totalChildBaseTimes = children.reduce((totalTime, childID) => {
-      const childNode = nodes.get(childID);
-      return (childNode != null ? childNode.get('treeBaseTime') : 0) + totalTime;
-    }, 0);
+  const convertNodeToDatum = nodeID => {
+    const node = snapshot.nodes.get(nodeID).toJSON();
+    const renderedInCommit = snapshot.committedNodes.includes(nodeID);
+    const name = node.name || 'Unknown';
 
-    if (totalChildBaseTimes > 0) {
-      let childStartTimeOffset = node.get('treeBaseTime') - totalChildBaseTimes;
+    return {
+      children: node.children
+        ? (Array.isArray(node.children) ? node.children : [node.children])
+          .filter(childID => snapshot.nodes.has(childID))
+          .map(convertNodeToDatum)
+        : [],
+      id: node.id,
+      name: name,
+      tooltip: renderedInCommit
+        ? `${name} (render time ${Math.round(node.actualDuration * 10) / 10}ms)`
+        : name,
+      value: node.treeBaseTime,
+      color: renderedInCommit
+        ? colors[Math.round((node.actualDuration / maxDuration) * (colors.length - 1))]
+        : colors[0],
+    };
+  };
 
-      children.forEach(childID => {
-        preprocessNode(snapshot, childID, nodeID, childStartTimeOffset);
-
-        childStartTimeOffset += nodes.get(childID).get('treeBaseTime');
-      });
-    }
-  }
+  return convertNodeToDatum(rootNodeID);
 };
 
-// TODO Better Flow types for snapshot
-const preprocessSnapshot = (snapshot: any) => {
-  snapshot.maxDepth = 0;
-  snapshot.nodeDepths = new Map();
-  snapshot.nodeStartTimes = new Map();
-
-  // Don't include the root itself.
-  // It doesn't have a name or a base time and isn't meaningful to users.
-  const rootNode = snapshot.nodes.get(snapshot.root);
-  const children = rootNode.get('children');
-  const rootNodeID = Array.isArray(children) ? children[0] : children;
-
-  preprocessNode(snapshot, rootNodeID);
-};
+// - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
 
 type Props = {|
   clearSnapshots: () => void,
@@ -166,44 +139,38 @@ class Snapshots extends React.Component<SnapshotProps, SnapshotState> {
     selectedIndex: 0,
   };
 
-  handleChange = index => this.setState({ selectedIndex: index });
+  handleChange = event => this.setState({ selectedIndex: event.currentTarget.valueAsNumber });
+  selectPrevious = event => this.setState(prevState => ({ selectedIndex: prevState.selectedIndex - 1 }));
+  selectNext = event => this.setState(prevState => ({ selectedIndex: prevState.selectedIndex + 1 }));
 
   render() {
     const {snapshots, theme} = this.props;
     const {selectedIndex} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
-    console.log(JSON.stringify(snapshots, null, 2));
     return (
-      <div style={styles.content}>
+      <React.Fragment>
         <div>
-          {snapshots.map((snapshot, index) => (
-            <label key={index}>
-              <input type="radio" onChange={() => this.handleChange(index)} checked={index === selectedIndex} />
-              {Math.round(snapshot.commitTime * 10) / 10}ms
-            </label>
-          ))}
+          <button disabled={selectedIndex === 0} onClick={this.selectPrevious}>prev</button>
+          <input type="range" min={0} max={snapshots.length - 1} value={selectedIndex} onChange={this.handleChange} />
+          <button disabled={selectedIndex === snapshots.length - 1} onClick={this.selectNext}>next</button>
         </div>
         <SnapshotView snapshot={selectedSnapshot} theme={theme} />
-      </div>
+      </React.Fragment>
     );
   }
 }
 
+// TODO (bvaughn) Use something like AutoSizer to fill the viewport
 const SnapshotView = ({snapshot, theme}) => {
-  preprocessSnapshot(snapshot);
-
   const rootNode = snapshot.nodes.get(snapshot.root);
   const children = rootNode.get('children');
   const rootNodeID = Array.isArray(children) ? children[0] : children;
 
+  const data = convertSnapshotToChartData(snapshot, rootNodeID);
+
   return (
-    <Flamegraph
-      rootNodeID={rootNodeID}
-      snapshot={snapshot}
-      width={1280}
-      height={200}
-    />
+    <Flamegraph width={1000} height={400} data={data} />
   );
 };
 

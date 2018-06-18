@@ -152,7 +152,7 @@ function previewArray(val, inverted, theme) {
   var items = [];
   val.slice(0, 3).forEach((item, i) => {
     if (i > 0) {
-      items.push(<span key={i+','}>{', '}</span>);
+      items.push(', ');
     }
     items.push(
       <PropVal key={i} val={item} nested={true} inverted={inverted} theme={theme} />

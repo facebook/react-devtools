@@ -64,6 +64,15 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
+  function hasProfileChanged(prevFiber, nextFiber) {
+    return (
+      prevFiber.actualDuration !== nextFiber.actualDuration ||
+      prevFiber.actualStartTime !== nextFiber.actualStartTime ||
+      prevFiber.selfBaseTime !== nextFiber.selfBaseTime ||
+      prevFiber.treeBaseTime !== nextFiber.treeBaseTime
+    );
+  }
+
   let pendingEvents = [];
 
   function flushPendingEvents() {
@@ -94,7 +103,11 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
-    if (!hasChildOrderChanged && !hasDataChanged(fiber.alternate, fiber)) {
+    if (
+      !hasChildOrderChanged &&
+      !hasDataChanged(fiber.alternate, fiber) &&
+      !hasProfileChanged(fiber.alternate, fiber)
+    ) {
       return;
     }
     pendingEvents.push({

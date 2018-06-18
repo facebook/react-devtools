@@ -11,9 +11,9 @@
 
 const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+const PropTypes = require('prop-types');
 const React = require('react');
 const ReactDOM = require('react-dom');
-const PropTypes = require('prop-types');
 const {sansSerif} = require('./Themes/Fonts');
 const SearchUtils = require('./SearchUtils');
 const SvgIcon = require('./SvgIcon');
