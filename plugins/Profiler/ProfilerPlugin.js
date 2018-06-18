@@ -17,7 +17,7 @@ var React = require('react');
 var provideStore = require('../../frontend/provideStore');
 
 var ProfilerStore = require('./ProfilerStore');
-var ProfilerTab = require('./ProfilerTab');
+var ProfilerTab = require('./views/ProfilerTab');
 var StoreWrapper = provideStore('profilerStore');
 
 class ProfilerPlugin {
