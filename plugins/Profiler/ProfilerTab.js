@@ -34,7 +34,7 @@ const colorGradient = [
   '#f3834a', '#f37c4a', '#f3744b', '#f26d4b', '#f2674b', '#f2604b', '#f25a4b', '#f1544b', '#f14e4b', '#f2494b', '#f2444b',
   '#f2404b', '#f23c4b', '#f3394b', '#f3374a', '#f4354a', '#f5344a',
 ];
-const didNotRenderColor = '#94d1a9';
+const didNotRenderColor = '#ddd';
 
 const convertSnapshotToChartData = (snapshot, rootNodeID) => {
   let maxDuration = 0;
@@ -58,7 +58,6 @@ const convertSnapshotToChartData = (snapshot, rootNodeID) => {
           .map(convertNodeToDatum)
         : [],
       id: node.id,
-      labelClassName: renderedInCommit ? 'd3-flame-graph-label' : 'd3-flame-graph-label-no-render',
       name: name,
       tooltip: renderedInCommit
         ? `${name} (render time ${Math.round(node.actualDuration * 10) / 10}ms)`

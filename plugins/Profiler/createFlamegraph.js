@@ -1,3 +1,5 @@
+// Forked from https://github.com/spiermar/d3-flame-graph
+
 const {
   select,
   ascending,
@@ -11,29 +13,27 @@ const d3Tip = require('d3-tip');
 require('./flamegraph.css');
 
 module.exports = function createFlamegraph() {
-  var w = 960; // graph width
-  var h = null; // graph height
-  var c = 18; // cell height
-  var selection = null; // selection
-  var tooltip = true; // enable tooltip
-  var title = ''; // graph title
-  var transitionDuration = 250;
-  var transitionEase = easeCubic; // tooltip offset
-  var sort = false;
-  var inverted = true; // invert the graph direction
-  var clickHandler = null;
-  var minFrameSize = 0;
-  var details = null;
+  let w = 960; // graph width
+  let h = null; // graph height
+  let c = 18; // cell height
+  let selection = null; // selection
+  let title = ''; // graph title
+  const transitionDuration = 250;
+  const transitionEase = easeCubic; // tooltip offset
+  let sort = false;
+  const inverted = true; // invert the graph direction
+  const clickHandler = null;
+  const minFrameSize = 0;
+  const minWidthToDisplay = 35;
+  const details = null;
 
-  var tip = d3Tip()
+  const tip = d3Tip()
     .direction('s')
     .offset([8, 0])
     .attr('class', 'd3-flame-graph-tip')
-    .html(function(d) {
-      return label(d);
-    });
+    .html(d => label(d));
 
-  var svg;
+  let svg;
 
   function name(d) {
     return d.data.n || d.data.name;
@@ -47,19 +47,13 @@ module.exports = function createFlamegraph() {
     return d.v || d.value;
   }
 
-  var label = function(d) {
-    return d.data.tooltip;
-  };
+  const label = d => d.data.tooltip;
 
   function setDetails(t) {
     if (details) {
       details.innerHTML = t;
     }
   }
-
-  var colorMapper = function(d) {
-    return d.data.color;
-  };
 
   function hide(d) {
     d.data.hide = true;
@@ -88,9 +82,7 @@ module.exports = function createFlamegraph() {
 
   function hideSiblings(d) {
     var siblings = getSiblings(d);
-    siblings.forEach(function(s) {
-      hide(s);
-    });
+    siblings.forEach(hide);
     if (d.parent) {
       hideSiblings(d.parent);
     }
@@ -102,13 +94,6 @@ module.exports = function createFlamegraph() {
       fadeAncestors(d.parent);
     }
   }
-
-  // function getRoot (d) {
-  //   if (d.parent) {
-  //     return getRoot(d.parent)
-  //   }
-  //   return d
-  // }
 
   function zoom(d) {
     tip.hide(d);
@@ -129,7 +114,7 @@ module.exports = function createFlamegraph() {
       var innerName = name(innerD);
 
       if (children(innerD)) {
-        children(innerD).forEach(function(child) {
+        children(innerD).forEach(child => {
           searchInner(child);
         });
       }
@@ -149,7 +134,7 @@ module.exports = function createFlamegraph() {
   function clear(d) {
     d.highlight = false;
     if (children(d)) {
-      children(d).forEach(function(child) {
+      children(d).forEach(child => {
         clear(child);
       });
     }
@@ -170,9 +155,7 @@ module.exports = function createFlamegraph() {
     var nodeList = root.descendants();
     if (minFrameSize > 0) {
       var kx = w / (root.x1 - root.x0);
-      nodeList = nodeList.filter(function(el) {
-        return (el.x1 - el.x0) * kx > minFrameSize;
-      });
+      nodeList = nodeList.filter(el => (el.x1 - el.x0) * kx > minFrameSize);
     }
     return nodeList;
   }
@@ -248,57 +231,36 @@ module.exports = function createFlamegraph() {
         .transition()
         .delay(transitionDuration / 2)
         .attr('width', width);
-
-      if (!tooltip) {
-        node.append('svg:title');
-      }
-
+      
+      node.append('svg:title');
       node.append('foreignObject').append('xhtml:div');
 
       // Now we have to re-select to see the new elements (why?).
       g = select(this)
         .select('svg')
         .selectAll('g')
-        .data(descendants, function(d) {
-          return d.data.id;
-        });
+        .data(descendants, d => d.data.id);
 
       g
         .attr('width', width)
-        .attr('height', function(d) {
-          return c;
-        })
-        .attr('name', function(d) {
-          return name(d);
-        })
-        .attr('class', function(d) {
-          return d.data.fade ? 'frame fade' : 'frame';
-        });
+        .attr('height', () => c)
+        .attr('name', d => name(d))
+        .attr('class', d => d.data.fade ? 'frame fade' : 'frame');
 
       g
         .select('rect')
-        .attr('height', function(d) {
-          return c;
-        })
-        .attr('fill', function(d) {
-          return colorMapper(d);
-        });
+        .attr('height', c)
+        .attr('fill', d => d.data.color);
 
-      if (!tooltip) {
-        g.select('title').text(label);
-      }
+      g.select('title').text(label);
 
       g
         .select('foreignObject')
         .attr('width', width)
-        .attr('height', function() {
-          return c;
-        })
+        .attr('height', () => c)
         .select('div')
-        .attr('class', d => d.data.labelClassName)
-        .style('display', function(d) {
-          return width(d) < 35 ? 'none' : 'block';
-        })
+        .attr('class', 'd3-flame-graph-label')
+        .style('display', d => width(d) < minWidthToDisplay ? 'none' : 'block')
         .transition()
         .delay(transitionDuration)
         .text(name);
@@ -308,34 +270,26 @@ module.exports = function createFlamegraph() {
       g.exit().remove();
 
       g
-        .on('mouseover', function(d) {
-          if (tooltip) {
-            tip.show(d, this);
-          }
-          setDetails(label(d));
-        })
-        .on('mouseout', function(d) {
-          if (tooltip) {
-            tip.hide(d);
-          }
-          setDetails('');
-        });
+        .on('mouseover', d => setDetails(label(d)))
+        .on('mouseout', d => setDetails(''));
     });
   }
 
   function merge(data, samples) {
     const find = (nodes, id) => nodes.find(node => node.id === id);
 
-    samples.forEach(function(sample) {
+    samples.forEach(sample => {
       var node = find(data, sample.id);
       if (node) {
         // eslint-disable-next-line no-unused-vars
         const { children: _, ...rest } = sample;
         Object.assign(node, rest);
 
+        // Remove children that are no longer in the graph.
+        node.children = node.children.filter(child => find(samples, child.id));
+
         // Merge existing children, so selection is maintained,
         // And animations work properly.
-        node.children = node.children.filter(child => find(samples, child.id));
         merge(node.children, sample.children);
       } else {
         data.push(sample);
@@ -344,9 +298,7 @@ module.exports = function createFlamegraph() {
   }
 
   function chart(s) {
-    var root = hierarchy(s.datum(), function(d) {
-      return children(d);
-    });
+    var root = hierarchy(s.datum(), d => children(d));
     selection = s.datum(root);
 
     if (!arguments.length) {
@@ -381,73 +333,34 @@ module.exports = function createFlamegraph() {
     update();
   }
 
-  chart.height = function(_) {
-    if (!arguments.length) {
-      return h;
-    }
-    h = _;
+  chart.setHeight = function(newHeight) {
+    h = newHeight;
     return chart;
   };
 
-  chart.width = function(_) {
-    if (!arguments.length) {
-      return w;
-    }
-    w = _;
+  chart.setWidth = function(newWidth) {
+    w = newWidth;
     return chart;
   };
 
-  chart.cellHeight = function(_) {
-    if (!arguments.length) {
-      return c;
-    }
-    c = _;
+  chart.setCellHeight = function(newCellHeight) {
+    c = newCellHeight;
     return chart;
   };
 
-  chart.title = function(_) {
-    if (!arguments.length) {
-      return title;
-    }
-    title = _;
+  chart.setTitle = function(newTitle) {
+    title = newTitle;
     return chart;
   };
 
-  chart.transitionDuration = function(_) {
-    if (!arguments.length) {
-      return transitionDuration;
-    }
-    transitionDuration = _;
-    return chart;
-  };
-
-  chart.transitionEase = function(_) {
-    if (!arguments.length) {
-      return transitionEase;
-    }
-    transitionEase = _;
-    return chart;
-  };
-
-  chart.sort = function(_) {
-    if (!arguments.length) {
-      return sort;
-    }
-    sort = _;
-    return chart;
-  };
-
-  chart.label = function(_) {
-    if (!arguments.length) {
-      return label;
-    }
-    label = _;
+  chart.sort = function(newSort) {
+    sort = newSort;
     return chart;
   };
 
   chart.search = function(term) {
     var searchResults = [];
-    selection.each(function(data) {
+    selection.each(data => {
       searchResults = searchTree(data, term);
       update();
     });
@@ -455,28 +368,20 @@ module.exports = function createFlamegraph() {
   };
 
   chart.clear = function() {
-    selection.each(function(data) {
+    selection.each(data => {
       clear(data);
       update();
     });
   };
 
-  chart.zoomTo = function(d) {
-    zoom(d);
+  chart.zoomTo = function(data) {
+    zoom(data);
   };
 
   chart.resetZoom = function() {
-    selection.each(function(data) {
+    selection.each(data => {
       zoom(data); // zoom to root
     });
-  };
-
-  chart.onClick = function(_) {
-    if (!arguments.length) {
-      return clickHandler;
-    }
-    clickHandler = _;
-    return chart;
   };
 
   chart.merge = function(samples) {
@@ -489,30 +394,6 @@ module.exports = function createFlamegraph() {
     });
     selection = selection.datum(newRoot);
     update();
-  };
-
-  chart.color = function(_) {
-    if (!arguments.length) {
-      return colorMapper;
-    }
-    colorMapper = _;
-    return chart;
-  };
-
-  chart.minFrameSize = function(_) {
-    if (!arguments.length) {
-      return minFrameSize;
-    }
-    minFrameSize = _;
-    return chart;
-  };
-
-  chart.details = function(_) {
-    if (!arguments.length) {
-      return details;
-    }
-    details = _;
-    return chart;
   };
 
   return chart;

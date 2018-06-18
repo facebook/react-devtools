@@ -1,5 +1,3 @@
-// Forked from https://github.com/spiermar/d3-flame-graph
-
 import React, { createRef, Component } from 'react';
 import { select } from 'd3';
 
@@ -46,7 +44,7 @@ class Flamegraph extends Component<FlamegraphProps, void> {
   createFlamegraph() {
     const { data, width } = this.props;
 
-    this.flamegraph = createFlamegraph().width(width);
+    this.flamegraph = createFlamegraph().setWidth(width);
 
     this.ref.current.innerHTML = '';
 
