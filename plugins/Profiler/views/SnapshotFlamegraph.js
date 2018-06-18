@@ -15,12 +15,13 @@ import type {Snapshot} from '../ProfilerTypes';
 const React = require('react');
 const AutoSizer = require('react-virtualized-auto-sizer');
 const Flamegraph = require('./Flamegraph');
+import { didNotRender, gradient } from './colors';
 
 type Props = {|
   snapshot: Snapshot,
 |};
 
-const SnapshotView = ({snapshot}: Props) => {
+const SnapshotFlamegraph = ({snapshot}: Props) => {
   const rootNode = snapshot.nodes.get(snapshot.root);
   const children = rootNode.get('children');
   const rootNodeID = Array.isArray(children) ? children[0] : children;
@@ -35,16 +36,6 @@ const SnapshotView = ({snapshot}: Props) => {
     </AutoSizer>
   );
 };
-
-// http://gka.github.io/palettes/#diverging|c0=#34bd65,#f4d03f|c1=#f4d03f,#ea384d,#f5344a|steps=50|bez0=1|bez1=1|coL0=0|coL1=0
-const colorGradient = [
-  '#34bd65', '#44be64', '#50bf62', '#5bc061', '#65c160', '#6fc25f', '#77c35d', '#80c45c', '#88c55b', '#8fc659', '#97c658',
-  '#9ec756', '#a5c855', '#acc953', '#b2ca52', '#b9ca50', '#bfcb4e', '#c6cc4d', '#cccc4b', '#d2cd49', '#d9ce48', '#dfce46',
-  '#e5cf44', '#ebcf42', '#f1d040', '#f4cb40', '#f5c142', '#f5b744', '#f5ae46', '#f4a447', '#f49c48', '#f49349', '#f48b49',
-  '#f3834a', '#f37c4a', '#f3744b', '#f26d4b', '#f2674b', '#f2604b', '#f25a4b', '#f1544b', '#f14e4b', '#f2494b', '#f2444b',
-  '#f2404b', '#f23c4b', '#f3394b', '#f3374a', '#f4354a', '#f5344a',
-];
-const didNotRenderColor = '#ddd';
 
 const convertSnapshotToChartData = (snapshot, rootNodeID) => {
   let maxDuration = 0;
@@ -70,16 +61,16 @@ const convertSnapshotToChartData = (snapshot, rootNodeID) => {
       id: node.id,
       name: name,
       tooltip: renderedInCommit
-        ? `${name} (render time ${Math.round(node.actualDuration * 10) / 10}ms)`
+        ? `${name} (render time ${node.actualDuration.toFixed(2)}ms)`
         : name,
       value: node.treeBaseTime,
       color: renderedInCommit
-        ? colorGradient[Math.round((node.actualDuration / maxDuration) * (colorGradient.length - 1))]
-        : didNotRenderColor,
+        ? gradient[Math.round((node.actualDuration / maxDuration) * (gradient.length - 1))]
+        : didNotRender,
     };
   };
 
   return convertNodeToDatum(rootNodeID);
 };
 
-module.exports = SnapshotView;
+module.exports = SnapshotFlamegraph;

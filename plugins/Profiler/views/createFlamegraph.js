@@ -1,4 +1,5 @@
-// Forked from https://github.com/spiermar/d3-flame-graph
+// Heavily modified fork of https://github.com/spiermar/d3-flame-graph
+// TODO Figure out liscensing? The forked source was Apache 2.0
 
 const {
   select,
@@ -8,8 +9,6 @@ const {
   scaleLinear,
   easeCubic,
 } = require('d3');
-
-require('./flamegraph.css');
 
 export default function createFlamegraph(initialGraphWidth, initialGraphHeight = null) {
   let graphWidth = initialGraphWidth; // graph width
@@ -249,7 +248,7 @@ export default function createFlamegraph(initialGraphWidth, initialGraphHeight =
         .attr('width', cellWidth)
         .attr('height', () => cellHeight)
         .select('div')
-        .attr('class', 'd3-flame-graph-label')
+        .attr('class', 'd3-graph-label')
         .style('display', d => cellWidth(d) < minWidthToDisplay ? 'none' : 'block')
         .transition()
         .delay(transitionDuration)
@@ -305,7 +304,7 @@ export default function createFlamegraph(initialGraphWidth, initialGraphHeight =
           .append('svg:svg')
           .attr('width', graphWidth)
           .attr('height', graphHeight)
-          .attr('class', 'partition d3-flame-graph');
+          .attr('class', 'partition d3-graph');
 
         svg
           .append('svg:text')

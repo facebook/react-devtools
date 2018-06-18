@@ -13,17 +13,22 @@
 import type {Snapshot} from '../ProfilerTypes';
 
 const React = require('react');
-const SnapshotView = require('./SnapshotView');
+const SnapshotFlamegraph = require('./SnapshotFlamegraph');
+const WeightedSnapshot = require('./WeightedSnapshot');
+
+type Mode = 'flamegraph' | 'weighted';
 
 type SnapshotProps = {
   snapshots: Array<Snapshot>,
 };
 type SnapshotState = {
-  selectedIndex: number
+  selectedIndex: number,
+  selectedMode: Mode,
 };
 class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotState> {
   state: SnapshotState = {
     selectedIndex: 0,
+    selectedMode: 'flamegraph',
   };
 
   handleChange = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ selectedIndex: parseInt(event.currentTarget.value, 10) });
@@ -32,18 +37,44 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
 
   render() {
     const {snapshots} = this.props;
-    const {selectedIndex} = this.state;
+    const {selectedIndex, selectedMode} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
     return (
-      <div style={styles.Snapshots}>
-        <div style={styles.SnapshotNavButtons}>
-          <button disabled={selectedIndex === 0} onClick={this.selectPrevious}>prev</button>
-          <input type="range" min={0} max={snapshots.length - 1} value={selectedIndex} onChange={this.handleChange} />
-          <button disabled={selectedIndex === snapshots.length - 1} onClick={this.selectNext}>next</button>
+      <div style={styles.Main}>
+        <div style={styles.TopNav}>
+          <div>
+            <label style={styles.ModeRadioOption}>
+              <input
+                type="radio"
+                checked={selectedMode === 'flamegraph'}
+                onChange={() => this.setState({ selectedMode: 'flamegraph' })}
+              /> Flamegraph
+            </label>
+            <label style={styles.ModeRadioOption}>
+            <input
+              type="radio"
+              checked={selectedMode === 'weighted'}
+              onChange={() => this.setState({ selectedMode: 'weighted' })}
+            /> Weighted
+            </label>
+          </div>
+          <div style={styles.SnapshotSliderOptions}>
+            <button disabled={selectedIndex === 0} onClick={this.selectPrevious}>prev</button>
+            <input
+              type="range"
+              style={styles.SnapshotSlider}
+              min={0}
+              max={snapshots.length - 1}
+              value={selectedIndex}
+              onChange={this.handleChange}
+            />
+            <button disabled={selectedIndex === snapshots.length - 1} onClick={this.selectNext}>next</button>
+          </div>
         </div>
-        <div style={styles.Snapshot}>
-          <SnapshotView snapshot={selectedSnapshot} />
+        <div style={styles.ChartingArea}>
+          {selectedMode === 'flamegraph' && (<SnapshotFlamegraph snapshot={selectedSnapshot} />)}
+          {selectedMode === 'weighted' && (<WeightedSnapshot snapshot={selectedSnapshot} />)}
         </div>
       </div>
     );
@@ -51,7 +82,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
 }
 
 const styles = {
-  Snapshots: {
+  Main: {
     flex: 1,
     width: '100%',
     display: 'flex',
@@ -61,10 +92,26 @@ const styles = {
     padding: '0.5rem',
     boxSizing: 'border-box',
   },
-  SnapshotNavButtons: {
+  TopNav: {
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
     marginBottom: '0.5rem',
   },
-  Snapshot: {
+  ModeRadioOption: {
+    marginRight: '0.5rem',
+  },
+  SnapshotSliderOptions: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  SnapshotSlider: {
+    margin: '0 0.5rem',
+  },
+  ChartingArea: {
     flex: 1,
     width: '100%',
   },

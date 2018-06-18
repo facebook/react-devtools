@@ -3,6 +3,8 @@ import { select } from 'd3';
 
 import createFlamegraph from './createFlamegraph';
 
+require('./d3-graph.css');
+
 export type Node = {|
   children: Array<Node>,
   color: string,
