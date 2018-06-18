@@ -13,6 +13,7 @@
 import type {Theme} from '../../frontend/types';
 import type {Snapshot} from './ProfilerTypes';
 
+const AutoSizer = require('react-virtualized-auto-sizer');
 const PropTypes = require('prop-types');
 
 const React = require('react');
@@ -149,14 +150,16 @@ class Snapshots extends React.Component<SnapshotProps, SnapshotState> {
     const selectedSnapshot = snapshots[selectedIndex];
 
     return (
-      <React.Fragment>
-        <div>
+      <div style={styles.Snapshots}>
+        <div style={styles.SnapshotNavButtons}>
           <button disabled={selectedIndex === 0} onClick={this.selectPrevious}>prev</button>
           <input type="range" min={0} max={snapshots.length - 1} value={selectedIndex} onChange={this.handleChange} />
           <button disabled={selectedIndex === snapshots.length - 1} onClick={this.selectNext}>next</button>
         </div>
-        <SnapshotView snapshot={selectedSnapshot} theme={theme} />
-      </React.Fragment>
+        <div style={styles.Snapshot}>
+          <SnapshotView snapshot={selectedSnapshot} theme={theme} />
+        </div>
+      </div>
     );
   }
 }
@@ -170,7 +173,14 @@ const SnapshotView = ({snapshot, theme}) => {
   const data = convertSnapshotToChartData(snapshot, rootNodeID);
 
   return (
-    <Flamegraph width={1000} height={400} data={data} />
+    <AutoSizer onResize={args => console.log('onResize()', args)}>
+      {({ height, width }) => {
+        console.log('<AutoSizer>', { height, width });
+        return (
+          <Flamegraph width={width} height={height} data={data} />
+        );
+      }}
+    </AutoSizer>
   );
 };
 
@@ -268,6 +278,23 @@ var styles = {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  Snapshots: {
+    flex: 1,
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0.5rem',
+    boxSizing: 'border-box',
+  },
+  SnapshotNavButtons: {
+    marginBottom: '0.5rem',
+  },
+  Snapshot: {
+    flex: 1,
+    width: '100%',
   },
 };
 
