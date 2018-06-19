@@ -93,6 +93,9 @@
   left: 100%;
 }
 
+.d3-animated-all {
+  transition: all ease-in-out 250ms;
+}
 .d3-animated-resize {
-  transition: width 250ms;
+  transition: width ease-in-out 250ms;
 }

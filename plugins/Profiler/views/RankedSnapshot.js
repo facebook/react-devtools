@@ -10,10 +10,10 @@
  */
 'use strict';
 
-// $FlowFixMe
-import React, { createRef, Component } from 'react';
+import React, { Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { scaleLinear } from 'd3'; // TODO Move to utils
+import ChartNode from './ChartNode';
+import scale from './scale';
 import { gradient } from './colors';
 
 import type {Snapshot} from '../ProfilerTypes';
@@ -21,7 +21,6 @@ import type {Snapshot} from '../ProfilerTypes';
 require('./d3-graph.css');
 
 // TODO constants
-const minWidthToDisplay = 35;
 const barHeight = 20;
 
 type Props = {|
@@ -64,11 +63,6 @@ type RankedState = {|
 |};
 
 class Ranked extends Component<RankedProps, RankedState> {
-  bar: any = null;
-  chart: any = null;
-  ref = createRef();
-  x: any = null;
-
   state: RankedState = {
     maxValue: this.props.data.maxValue,
     prevData: this.props.data,
@@ -92,40 +86,23 @@ class Ranked extends Component<RankedProps, RankedState> {
 
     const { nodes } = data;
 
-    const x = scaleLinear()
-      .domain([0, maxValue])
-      .range([0, width]);
+    const scaleX = scale(0, maxValue, 0, width);
 
     return (
       <div style={{ height, width, overflow: 'auto' }}>
         <svg className="d3-graph" height={barHeight * nodes.length} width={width}>
           {nodes.map((node, index) => (
-            <g
-              key={node.id}
+            <ChartNode
               className={node.value > maxValue ? 'fade' : ''}
-              transform={`translate(0,${barHeight * index})`}
-            >
-              <title>{node.label}</title>
-              <rect
-                className="d3-animated-resize"
-                width={x(node.value)}
-                height={barHeight}
-                fill={this.getNodeColor(node)}
-                onClick={() => this.selectNode(node)}
-              />
-              <foreignObject
-                className="d3-animated-resize"
-                width={x(node.value)}
-                height={barHeight}
-                style={{
-                  display: x(node.value) < minWidthToDisplay ? 'none' : 'block',
-                }}
-              >
-                <div className="d3-graph-label">
-                  {node.label}
-                </div>
-              </foreignObject>
-            </g>
+              color={this.getNodeColor(node)}
+              height={barHeight}
+              key={node.id}
+              label={node.label}
+              onClick={() => this.selectNode(node)}
+              width={scaleX(node.value)}
+              x={0}
+              y={barHeight * index}
+            />
           ))}
         </svg>
       </div>

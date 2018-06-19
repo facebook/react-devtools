@@ -13,7 +13,6 @@
     "cli-spinners": "^1.0.0",
     "clipboard-js": "^0.3.3",
     "css-loader": "^0.28.11",
-    "d3": "^5.4.0",
     "es6-symbol": "3.0.2",
     "eslint": "2.10.2",
     "eslint-plugin-react": "5.1.1",

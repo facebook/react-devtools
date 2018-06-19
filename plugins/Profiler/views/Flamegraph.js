@@ -10,68 +10,141 @@
  */
 'use strict';
 
-// $FlowFixMe
-import React, { createRef, Component } from 'react';
-import { select } from 'd3';
-
-import createFlamegraph from './createFlamegraph';
+import React, { Component, Fragment } from 'react';
+import scale from './scale';
+import ChartNode from './ChartNode';
 
 require('./d3-graph.css');
+
+// TODO constants
+const barHeight = 20;
 
 export type Node = {|
   children: Array<Node>,
   color: string,
-  id: any,
+  id: string,
   label: string,
+  value: number,
   tooltip: string,
   value: number,
+  x?: number,
 |};
 
-type Props = {|
+type FlamegraphProps = {|
   data: Node,
   height: number,
   width: number,
 |};
 
-class Flamegraph extends Component<Props, void> {
-  flamegraph: any = null;
-  ref = createRef();
+type FlamegraphState = {|
+  maxValue: number,
+  prevData: Node,
+  selectedNode: Node,
+|};
 
-  componentDidMount() {
-    this.createFlamegraph();
-  }
+class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
+  state: FlamegraphState = {
+    maxValue: this.props.data.value,
+    prevData: this.props.data,
+    selectedNode: this.props.data,
+  };
 
-  componentDidUpdate(prevProps: Props) {
-    const { data, width } = this.props;
-
-    if (data !== prevProps.data) {
-      this.flamegraph.clear();
-      this.flamegraph.merge(data);
-    } else if (width !== prevProps.width) {
-      this.flamegraph.setWidth(width).update();
+  static getDerivedStateFromProps(props: FlamegraphProps, state: FlamegraphState): $Shape<FlamegraphState> {
+    if (state.prevData !== props.data) {
+      return {
+        maxValue: props.data.value,
+        prevData: props.data,
+        selectedNode: props.data,
+      };
     }
+    return null;
   }
 
   render() {
-    const { height, width } = this.props;
+    const { data, height, width } = this.props;
+    const { maxValue, selectedNode } = this.state;
+
+    // TODO: Memoize
+    const depth = preprocessData(data);
+
+    const scaleX = scale(0, maxValue, 0, width);
+
     return (
       <div style={{ height, width, overflow: 'auto' }}>
-        <div ref={this.ref} />
+        <svg className="d3-graph" height={barHeight * depth} width={width}>
+          <RecursiveNode
+            maxValue={maxValue}
+            node={data}
+            scaleX={scaleX}
+            selectedNode={selectedNode}
+            selectNode={this.selectNode}
+          />
+        </svg>
       </div>
     );
   }
 
-  createFlamegraph() {
-    const { data, width } = this.props;
-
-    this.flamegraph = createFlamegraph(width);
-
-    this.ref.current.innerHTML = '';
-
-    select(this.ref.current)
-      .datum(data)
-      .call(this.flamegraph);
-  }
+  selectNode = (node: Node) => this.setState({
+    maxValue: node.value,
+    selectedNode: node,
+  });
 }
+
+const preprocessData = (node: Node) => {
+  let maxDepth = 0;
+
+  const processNode = (currentNode: Node, currentDepth: number = 0, currentX = 0) => {
+    maxDepth = Math.max(maxDepth, currentDepth);
+
+    currentNode.x = currentX;
+
+    let relativeX = 0;
+
+    currentNode.children.map(childNode => {
+      processNode(childNode, currentDepth + 1, currentX + relativeX);
+      relativeX += childNode.value;
+    });
+  };
+
+  processNode(node);
+
+  return maxDepth;
+};
+
+type RecursiveNodeProps = {|
+  depth?: number,
+  maxValue: number,
+  node: Node,
+  scaleX: Function,
+  selectedNode: Node,
+  selectNode: Function,
+  x?: number,
+|};
+const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, selectNode, x = 0 }: RecursiveNodeProps) => (
+  <Fragment>
+    <ChartNode
+      className={node.value > maxValue ? 'd3-animated-move fade' : 'd3-animated-move'}
+      color={node.color}
+      height={barHeight}
+      label={node.label}
+      onClick={() => selectNode(node)}
+      width={scaleX(node.value)}
+      x={scaleX(x) - scaleX(selectedNode.x)}
+      y={barHeight * depth}
+    />
+    {node.children.map((childNode, index) => (
+      <RecursiveNode
+        key={index}
+        depth={depth + 1}
+        maxValue={maxValue}
+        node={childNode}
+        scaleX={scaleX}
+        selectedNode={selectedNode}
+        selectNode={selectNode}
+        x={childNode.x}
+      />
+    ))} 
+  </Fragment>
+);
 
 module.exports = Flamegraph;
