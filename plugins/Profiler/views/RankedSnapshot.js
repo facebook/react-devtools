@@ -13,12 +13,16 @@
 // $FlowFixMe
 import React, { createRef, Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-import { scaleLinear, select } from 'd3';
+import { scaleLinear } from 'd3'; // TODO Move to utils
 import { gradient } from './colors';
 
 import type {Snapshot} from '../ProfilerTypes';
 
 require('./d3-graph.css');
+
+// TODO constants
+const minWidthToDisplay = 35;
+const barHeight = 20;
 
 type Props = {|
   snapshot: Snapshot,
@@ -54,6 +58,7 @@ type RankedProps = {|
 |};
 
 type RankedState = {|
+  maxValue: number,
   prevData: RankedData,
   selectedNode: Node | null,
 |};
@@ -65,17 +70,15 @@ class Ranked extends Component<RankedProps, RankedState> {
   x: any = null;
 
   state: RankedState = {
+    maxValue: this.props.data.maxValue,
     prevData: this.props.data,
     selectedNode: null,
   };
 
-  componentDidMount() {
-    this.createChart();
-  }
-
   static getDerivedStateFromProps(props: RankedProps, state: RankedState): $Shape<RankedState> {
     if (state.prevData !== props.data) {
       return {
+        maxValue: props.data.maxValue,
         prevData: props.data,
         selectedNode: null,
       };
@@ -83,110 +86,59 @@ class Ranked extends Component<RankedProps, RankedState> {
     return null;
   }
 
-  componentDidUpdate(prevProps: RankedProps, prevState: RankedState) {
-    const { data, width } = this.props;
-    const { selectedNode } = this.state;
-
-    if (data !== prevProps.data) {
-      this.createChart();
-    } else if (
-      width !== prevProps.width ||
-      selectedNode !== prevState.selectedNode
-    ) {
-      this.resizeChart();
-    }
-  }
-
   render() {
-    const { height, width } = this.props;
+    const { height, data, width } = this.props;
+    const { maxValue } = this.state;
+
+    const { nodes } = data;
+
+    const x = scaleLinear()
+      .domain([0, maxValue])
+      .range([0, width]);
+
     return (
       <div style={{ height, width, overflow: 'auto' }}>
-        <svg ref={this.ref} className="d3-graph" />
+        <svg className="d3-graph" height={barHeight * nodes.length} width={width}>
+          {nodes.map((node, index) => (
+            <g
+              key={node.id}
+              className={node.value > maxValue ? 'fade' : ''}
+              transform={`translate(0,${barHeight * index})`}
+            >
+              <title>{node.label}</title>
+              <rect
+                className="d3-animated-resize"
+                width={x(node.value)}
+                height={barHeight}
+                fill={this.getNodeColor(node)}
+                onClick={() => this.selectNode(node)}
+              />
+              <foreignObject
+                className="d3-animated-resize"
+                width={x(node.value)}
+                height={barHeight}
+                style={{
+                  display: x(node.value) < minWidthToDisplay ? 'none' : 'block',
+                }}
+              >
+                <div className="d3-graph-label">
+                  {node.label}
+                </div>
+              </foreignObject>
+            </g>
+          ))}
+        </svg>
       </div>
     );
   }
 
-  getDataLabel = d => d.label;
-  getScaledDataValue = d => this.x(d.value);
+  getNodeColor = (node: Node): string =>
+    gradient[Math.round((node.value / this.props.data.maxValue) * (gradient.length - 1))];
 
-  createChart() {
-    const { data, width } = this.props;
-    const { selectedNode } = this.state;
-
-    this.ref.current.innerHTML = '';
-
-    const {nodes} = data;
-    const barHeight = 20; // TODO from constants
-    const minWidthToDisplay = 35; // TODO from constants
-
-    const maxValue = selectedNode !== null
-      ? selectedNode.value
-      : data.maxValue;
-
-    this.x = scaleLinear()
-      .domain([0, maxValue])
-      .range([0, width]);
-
-    this.chart = select(this.ref.current)
-      .attr('width', width)
-      .attr('height', barHeight * nodes.length);
-
-    this.bar = this.chart.selectAll('g')
-      .data(nodes)
-      .enter()
-      .append('g')
-      .attr('transform', (d, i) => 'translate(0,' + barHeight * i + ')');
-    
-    this.bar.append('rect')
-      .attr('fill', d => gradient[Math.round((d.value / maxValue) * (gradient.length - 1))])
-      .attr('width', this.getScaledDataValue)
-      .attr('height', barHeight);
-
-    this.bar.on('click', this.selectNode);
-
-    this.bar.append('foreignObject').append('xhtml:div');
-    this.bar
-      .select('foreignObject')
-      .style('display', d => this.getScaledDataValue(d) < minWidthToDisplay ? 'none' : 'block')
-      .attr('width', this.getScaledDataValue)
-      .attr('height', barHeight)
-      .select('div')
-      .attr('class', 'd3-graph-label')
-      .text(this.getDataLabel);
-    
-    this.bar.append('svg:title');
-    this.bar.select('title')
-      .text(this.getDataLabel);
-  }
-
-  resizeChart() {
-    const { data, width } = this.props;
-    const { selectedNode } = this.state;
-
-    const maxValue = selectedNode !== null
-      ? selectedNode.value
-      : data.maxValue;
-
-    const minWidthToDisplay = 35;
-
-    this.x
-      .domain([0, maxValue])
-      .range([0, width]);
-
-    this.chart.attr('width', width);
-
-    this.bar
-      .selectAll('rect')
-      .attr('class', d => d.value > maxValue ? 'fade' : '')
-      .attr('width', this.getScaledDataValue);
-
-    this.bar
-      .selectAll('foreignObject')
-      .style('display', d => this.getScaledDataValue(d) < minWidthToDisplay ? 'none' : 'block')
-      .attr('width', this.getScaledDataValue);
-  }
-
-  selectNode = (node: Node) => this.setState({ selectedNode: node });
+  selectNode = (node: Node) => this.setState({
+    maxValue: node.value,
+    selectedNode: node,
+  });
 }
 
 const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {

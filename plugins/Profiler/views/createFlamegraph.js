@@ -194,9 +194,7 @@ export default function createFlamegraph(initialGraphWidth: number, initialGraph
       var g = select(this)
         .select('svg')
         .selectAll('g')
-        .data(descendants, function(d) {
-          return d.data.id;
-        });
+        .data(descendants, d => d.data.id);
 
       g
         .transition()
@@ -276,6 +274,7 @@ export default function createFlamegraph(initialGraphWidth: number, initialGraph
     });
   }
 
+  // TODO This function looks suspect, particularly the pruning of old nodes.
   function merge(data, samples) {
     const find = (nodes, id) => nodes.find(node => node.id === id);
 

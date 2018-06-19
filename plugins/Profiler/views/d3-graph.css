@@ -92,3 +92,7 @@
   top: 50%;
   left: 100%;
 }
+
+.d3-animated-resize {
+  transition: width 250ms;
+}
