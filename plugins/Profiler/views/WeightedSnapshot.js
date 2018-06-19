@@ -35,7 +35,10 @@ type WeightedProps = {|
 |};
 
 class Weighted extends Component<WeightedProps, void> {
+  bar: any = null;
+  chart: any = null;
   ref = createRef();
+  x: any = null;
 
   componentDidMount() {
     this.createChart();
@@ -47,7 +50,7 @@ class Weighted extends Component<WeightedProps, void> {
     if (data !== prevProps.data) {
       this.createChart();
     } else if (width !== prevProps.width) {
-      // TODO
+      this.resizeChart();
     }
   }
 
@@ -60,39 +63,69 @@ class Weighted extends Component<WeightedProps, void> {
     );
   }
 
+  getDataLabel = d => d.label;
+  getDataValue = d => this.x(d.value);
+
   createChart() {
     const { data, width } = this.props;
 
     this.ref.current.innerHTML = '';
 
     const {nodes, maxValue} = data;
-    const barHeight = 20;
+    const barHeight = 20; // TODO from constants
+    const minWidthToDisplay = 35; // TODO from constants
 
-    const x = scaleLinear()
-        .domain([0, maxValue])
-        .range([0, width]);
-    
-    const chart = select(this.ref.current)
-        .attr('width', width)
-        .attr('height', barHeight * nodes.length);
+    this.x = scaleLinear()
+      .domain([0, maxValue])
+      .range([0, width]);
 
-    const bar = chart.selectAll('g')
-        .data(nodes)
-        .enter()
-        .append('g')
-        .attr('transform', (d, i) => 'translate(0,' + barHeight * i + ')');
+    this.chart = select(this.ref.current)
+      .attr('width', width)
+      .attr('height', barHeight * nodes.length);
+
+    this.bar = this.chart.selectAll('g')
+      .data(nodes)
+      .enter()
+      .append('g')
+      .attr('transform', (d, i) => 'translate(0,' + barHeight * i + ')');
     
-    bar.append('rect')
-        .attr('fill', d => gradient[Math.round((d.value / maxValue) * (gradient.length - 1))])
-        .attr('width', d => x(d.value))
-        .attr('height', barHeight);
+    this.bar.append('rect')
+      .attr('fill', d => gradient[Math.round((d.value / maxValue) * (gradient.length - 1))])
+      .attr('width', this.getDataValue)
+      .attr('height', barHeight);
+
+    this.bar.append('foreignObject').append('xhtml:div');
+    this.bar
+      .select('foreignObject')
+      .style('display', d => this.getDataValue(d) < minWidthToDisplay ? 'none' : 'block')
+      .attr('width', this.getDataValue)
+      .attr('height', barHeight)
+      .select('div')
+      .attr('class', 'd3-graph-label')
+      .text(this.getDataLabel);
     
-    bar.append('text')
-        .classed('d3-graph-label', true)
-        .attr('x', 4)
-        .attr('y', barHeight / 2)
-        .attr('dy', '.35em')
-        .text(d => d.label);
+    this.bar.append('svg:title');
+    this.bar.select('title')
+      .text(this.getDataLabel);
+  }
+
+  resizeChart() {
+    const { width } = this.props;
+
+    const minWidthToDisplay = 35;
+
+    this.x.range([0, width]);
+
+    this.chart.attr('width', width);
+
+    this.bar
+      .selectAll('rect')
+      .attr('width', this.getDataValue);
+
+    this.bar
+      .selectAll('foreignObject')
+      .style('display', d => this.getDataValue(d) < minWidthToDisplay ? 'none' : 'block')
+      .attr('width', this.getDataValue);
   }
 }
 

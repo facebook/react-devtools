@@ -43,7 +43,7 @@ const ProfileMode = 0b100;
 
 // TODO (bvaughn) This entire implementation is coupled to Fiber.
 // This will likely cause pain in a future version of React.
-class ProfilerManager {
+class ProfilerCollector {
   _agent: Agent;
   _committedNodes: Array<string> = [];
   _isRecording: boolean = false;
@@ -135,8 +135,8 @@ class ProfilerManager {
   }
 }
 
-function init(agent: Agent): ProfilerManager {
-  return new ProfilerManager(agent);
+function init(agent: Agent): ProfilerCollector {
+  return new ProfilerCollector(agent);
 }
 
 module.exports = {

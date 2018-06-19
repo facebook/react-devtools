@@ -11,7 +11,7 @@
 'use strict';
 
 var Agent = require('../../agent/Agent');
-var ProfilerManager = require('../../plugins/Profiler/ProfilerManager');
+var ProfileCollector = require('../../plugins/Profiler/ProfileCollector');
 var TraceUpdatesBackendManager = require('../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../agent/Bridge');
 var setupHighlighter = require('../../frontend/Highlighter/setup');
@@ -42,5 +42,5 @@ setupHighlighter(agent);
 setupProfiler(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
-ProfilerManager.init(agent);
+ProfileCollector.init(agent);
 TraceUpdatesBackendManager.init(agent);

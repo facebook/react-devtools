@@ -33,6 +33,7 @@ class ProfilerPlugin {
     this.profilerStore = new ProfilerStore(bridge, store);
 
     // Wait until roots have been initialized...
+    // The 1s delay follows the precedent used by the Relay plug-in.
     setTimeout(() => {
       bridge.call('profiler:check', [], hasProfiler => {
         this.hasProfiler = hasProfiler;
