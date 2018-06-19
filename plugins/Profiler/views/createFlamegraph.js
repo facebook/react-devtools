@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
+
 // Heavily modified fork of https://github.com/spiermar/d3-flame-graph
 // TODO Figure out liscensing? The forked source was Apache 2.0
 
@@ -10,11 +22,11 @@ const {
   easeCubic,
 } = require('d3');
 
-export default function createFlamegraph(initialGraphWidth, initialGraphHeight = null) {
+export default function createFlamegraph(initialGraphWidth: number, initialGraphHeight: number = -1) {
   let graphWidth = initialGraphWidth; // graph width
   let graphHeight = initialGraphHeight; // graph height
   let cellHeight = 18; // cell height
-  let selection = null; // selection
+  let selection: any = null; // selection
   let title = ''; // graph title
   const transitionDuration = 250;
   const transitionEase = easeCubic; // tooltip offset
@@ -28,7 +40,7 @@ export default function createFlamegraph(initialGraphWidth, initialGraphHeight =
   let svg;
 
   function name(d) {
-    return d.data.n || d.data.name;
+    return d.data.n || d.data.label;
   }
 
   function children(d) {
@@ -286,7 +298,7 @@ export default function createFlamegraph(initialGraphWidth, initialGraphHeight =
     });
   }
 
-  function chart(s) {
+  function chart(s: any) {
     var root = hierarchy(s.datum(), d => children(d));
     selection = s.datum(root);
 
@@ -294,7 +306,7 @@ export default function createFlamegraph(initialGraphWidth, initialGraphHeight =
       return;
     }
 
-    if (!graphHeight) {
+    if (graphHeight < 0) {
       graphHeight = (root.height + 1) * cellHeight;
     }
 

@@ -58,15 +58,15 @@ const convertSnapshotToChartData = (snapshot, rootNodeID) => {
           .filter(childID => snapshot.nodes.has(childID))
           .map(convertNodeToDatum)
         : [],
+      color: renderedInCommit
+        ? gradient[Math.round((node.actualDuration / maxDuration) * (gradient.length - 1))]
+        : didNotRender,
       id: node.id,
-      name: name,
+      label: name,
       tooltip: renderedInCommit
         ? `${name} (render time ${node.actualDuration.toFixed(2)}ms)`
         : name,
       value: node.treeBaseTime,
-      color: renderedInCommit
-        ? gradient[Math.round((node.actualDuration / maxDuration) * (gradient.length - 1))]
-        : didNotRender,
     };
   };
 

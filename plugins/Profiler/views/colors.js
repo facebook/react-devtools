@@ -1,3 +1,15 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
+
 // http://gka.github.io/palettes/#diverging|c0=#34bd65,#f4d03f|c1=#f4d03f,#ea384d,#f5344a|steps=50|bez0=1|bez1=1|coL0=0|coL1=0
 export const gradient = [
   '#34bd65', '#44be64', '#50bf62', '#5bc061', '#65c160', '#6fc25f', '#77c35d', '#80c45c', '#88c55b', '#8fc659', '#97c658',

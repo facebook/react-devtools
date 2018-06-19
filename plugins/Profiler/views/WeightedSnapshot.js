@@ -1,3 +1,16 @@
+/**
+ * Copyright (c) 2015-present, Facebook, Inc.
+ * All rights reserved.
+ *
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
+ *
+ * @flow
+ */
+'use strict';
+
+// $FlowFixMe
 import React, { createRef, Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { scaleLinear, select } from 'd3';
@@ -22,6 +35,13 @@ const WeightedSnapshot = ({snapshot}: Props) => {
     </AutoSizer>
   );
 };
+
+
+type Node = {|
+  id: any,
+  label: string,
+  value: number,
+|};
 
 type WeightedData = {|
   maxValue: number,
