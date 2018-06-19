@@ -24,13 +24,13 @@ type Props = {|
   snapshot: Snapshot,
 |};
 
-const WeightedSnapshot = ({snapshot}: Props) => {
+const RankedSnapshot = ({snapshot}: Props) => {
   const data = convertSnapshotToChartData(snapshot);
 
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Weighted width={width} height={height} data={data} />
+        <Ranked width={width} height={height} data={data} />
       )}
     </AutoSizer>
   );
@@ -43,18 +43,18 @@ type Node = {|
   value: number,
 |};
 
-type WeightedData = {|
+type RankedData = {|
   maxValue: number,
   nodes: Array<Node>,
 |};
 
-type WeightedProps = {|
-  data: WeightedData,
+type RankedProps = {|
+  data: RankedData,
   height: number,
   width: number,
 |};
 
-class Weighted extends Component<WeightedProps, void> {
+class Ranked extends Component<RankedProps, void> {
   bar: any = null;
   chart: any = null;
   ref = createRef();
@@ -149,7 +149,7 @@ class Weighted extends Component<WeightedProps, void> {
   }
 }
 
-const convertSnapshotToChartData = (snapshot: Snapshot): WeightedData => {
+const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
   let maxValue = 0;
 
   const nodes = snapshot.committedNodes
@@ -174,4 +174,4 @@ const convertSnapshotToChartData = (snapshot: Snapshot): WeightedData => {
   };
 };
 
-module.exports = WeightedSnapshot;
+module.exports = RankedSnapshot;

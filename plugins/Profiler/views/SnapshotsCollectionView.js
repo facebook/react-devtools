@@ -14,9 +14,9 @@ import type {Snapshot} from '../ProfilerTypes';
 
 const React = require('react');
 const SnapshotFlamegraph = require('./SnapshotFlamegraph');
-const WeightedSnapshot = require('./WeightedSnapshot');
+const RankedSnapshot = require('./RankedSnapshot');
 
-type Mode = 'flamegraph' | 'weighted';
+type Mode = 'flamegraph' | 'ranked';
 
 type SnapshotProps = {
   snapshots: Array<Snapshot>,
@@ -54,9 +54,9 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
             <label style={styles.ModeRadioOption}>
             <input
               type="radio"
-              checked={selectedMode === 'weighted'}
-              onChange={() => this.setState({ selectedMode: 'weighted' })}
-            /> Weighted
+              checked={selectedMode === 'ranked'}
+              onChange={() => this.setState({ selectedMode: 'ranked' })}
+            /> Ranked
             </label>
           </div>
           <div style={styles.SnapshotSliderOptions}>
@@ -74,7 +74,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
         </div>
         <div style={styles.ChartingArea}>
           {selectedMode === 'flamegraph' && (<SnapshotFlamegraph snapshot={selectedSnapshot} />)}
-          {selectedMode === 'weighted' && (<WeightedSnapshot snapshot={selectedSnapshot} />)}
+          {selectedMode === 'ranked' && (<RankedSnapshot snapshot={selectedSnapshot} />)}
         </div>
       </div>
     );
