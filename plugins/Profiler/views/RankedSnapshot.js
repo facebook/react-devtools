@@ -36,7 +36,6 @@ const RankedSnapshot = ({snapshot}: Props) => {
   );
 };
 
-
 type Node = {|
   id: any,
   label: string,
@@ -54,22 +53,46 @@ type RankedProps = {|
   width: number,
 |};
 
-class Ranked extends Component<RankedProps, void> {
+type RankedState = {|
+  prevData: RankedData,
+  selectedNode: Node | null,
+|};
+
+class Ranked extends Component<RankedProps, RankedState> {
   bar: any = null;
   chart: any = null;
   ref = createRef();
   x: any = null;
 
+  state: RankedState = {
+    prevData: this.props.data,
+    selectedNode: null,
+  };
+
   componentDidMount() {
     this.createChart();
   }
 
-  componentDidUpdate(prevProps) {
+  static getDerivedStateFromProps(props: RankedProps, state: RankedState): $Shape<RankedState> {
+    if (state.prevData !== props.data) {
+      return {
+        prevData: props.data,
+        selectedNode: null,
+      };
+    }
+    return null;
+  }
+
+  componentDidUpdate(prevProps: RankedProps, prevState: RankedState) {
     const { data, width } = this.props;
+    const { selectedNode } = this.state;
 
     if (data !== prevProps.data) {
       this.createChart();
-    } else if (width !== prevProps.width) {
+    } else if (
+      width !== prevProps.width ||
+      selectedNode !== prevState.selectedNode
+    ) {
       this.resizeChart();
     }
   }
@@ -84,16 +107,21 @@ class Ranked extends Component<RankedProps, void> {
   }
 
   getDataLabel = d => d.label;
-  getDataValue = d => this.x(d.value);
+  getScaledDataValue = d => this.x(d.value);
 
   createChart() {
     const { data, width } = this.props;
+    const { selectedNode } = this.state;
 
     this.ref.current.innerHTML = '';
 
-    const {nodes, maxValue} = data;
+    const {nodes} = data;
     const barHeight = 20; // TODO from constants
     const minWidthToDisplay = 35; // TODO from constants
+
+    const maxValue = selectedNode !== null
+      ? selectedNode.value
+      : data.maxValue;
 
     this.x = scaleLinear()
       .domain([0, maxValue])
@@ -111,14 +139,16 @@ class Ranked extends Component<RankedProps, void> {
     
     this.bar.append('rect')
       .attr('fill', d => gradient[Math.round((d.value / maxValue) * (gradient.length - 1))])
-      .attr('width', this.getDataValue)
+      .attr('width', this.getScaledDataValue)
       .attr('height', barHeight);
+
+    this.bar.on('click', this.selectNode);
 
     this.bar.append('foreignObject').append('xhtml:div');
     this.bar
       .select('foreignObject')
-      .style('display', d => this.getDataValue(d) < minWidthToDisplay ? 'none' : 'block')
-      .attr('width', this.getDataValue)
+      .style('display', d => this.getScaledDataValue(d) < minWidthToDisplay ? 'none' : 'block')
+      .attr('width', this.getScaledDataValue)
       .attr('height', barHeight)
       .select('div')
       .attr('class', 'd3-graph-label')
@@ -130,23 +160,33 @@ class Ranked extends Component<RankedProps, void> {
   }
 
   resizeChart() {
-    const { width } = this.props;
+    const { data, width } = this.props;
+    const { selectedNode } = this.state;
+
+    const maxValue = selectedNode !== null
+      ? selectedNode.value
+      : data.maxValue;
 
     const minWidthToDisplay = 35;
 
-    this.x.range([0, width]);
+    this.x
+      .domain([0, maxValue])
+      .range([0, width]);
 
     this.chart.attr('width', width);
 
     this.bar
       .selectAll('rect')
-      .attr('width', this.getDataValue);
+      .attr('class', d => d.value > maxValue ? 'fade' : '')
+      .attr('width', this.getScaledDataValue);
 
     this.bar
       .selectAll('foreignObject')
-      .style('display', d => this.getDataValue(d) < minWidthToDisplay ? 'none' : 'block')
-      .attr('width', this.getDataValue);
+      .style('display', d => this.getScaledDataValue(d) < minWidthToDisplay ? 'none' : 'block')
+      .attr('width', this.getScaledDataValue);
   }
+
+  selectNode = (node: Node) => this.setState({ selectedNode: node });
 }
 
 const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
