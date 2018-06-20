@@ -156,7 +156,7 @@ const BackButton = Hoverable(
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={clearButtonStyle(isActive, isHovered, theme)}
+      style={clearButtonStyle(isActive, !disabled, isHovered, theme)}
       title="Clear profiling data"
     >
       <SvgIcon path={Icons.BACK} />
@@ -171,7 +171,7 @@ const ForwardButton = Hoverable(
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={clearButtonStyle(isActive, isHovered, theme)}
+      style={clearButtonStyle(isActive, !disabled, isHovered, theme)}
       title="Clear profiling data"
     >
       <SvgIcon path={Icons.FORWARD} />
@@ -179,12 +179,13 @@ const ForwardButton = Hoverable(
   )
 );
 
-const clearButtonStyle = (isActive: boolean, isHovered: boolean, theme: Theme) => ({
+const clearButtonStyle = (isActive: boolean, isEnabled: boolean, isHovered: boolean, theme: Theme) => ({
   background: 'none',
   border: 'none',
   outline: 'none',
-  cursor: 'pointer',
+  cursor: isEnabled ? 'pointer' : 'default',
   color: isHovered ? theme.state06 : 'inherit',
+  opacity: isEnabled ? 1 : 0.5,
   padding: '4px 8px',
 });
 
