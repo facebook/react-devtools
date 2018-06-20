@@ -10,14 +10,18 @@
  */
 'use strict';
 
+import type {Theme} from '../../../frontend/types';
+
 const React = require('react');
+const { ChartAnimatedNode, ChartLabel, ChartRect } = require('./SharedProfilerStyles');
 
 type Props = {|
-  className: string,
   color: string,
   height: number,
   label: string,
   onClick: Function,
+  style: ?Object,
+  theme: Theme,
   width: number,
   x: number,
   y: number,
@@ -25,29 +29,32 @@ type Props = {|
 
 const minWidthToDisplay = 35;
 
-const ChartNode = ({ className, color, height, label, onClick, width, x, y }: Props) => (
+const ChartNode = ({ color, height, label, onClick, style, theme, width, x, y }: Props) => (
   <g
-    className={`profiler-animated-node ${className || ''}`}
+    style={{
+      ...ChartAnimatedNode,
+      ...style,
+    }}
     transform={`translate(${x},${y})`}
   >
     <title>{label}</title>
     <rect
-      className="profiler-animated-node"
       width={width}
       height={height}
       fill={color}
       onClick={onClick}
+      style={ChartRect(theme)}
     />
     <foreignObject
-      className="profiler-animated-node"
       width={width}
       height={height}
       style={{
+        ...ChartAnimatedNode,
         display: width < minWidthToDisplay ? 'none' : 'block',
         paddingLeft: x < 0 ? -x : 0,
       }}
     >
-      <div className="profiler-graph-label">
+      <div style={ChartLabel}>
         {label}
       </div>
     </foreignObject>

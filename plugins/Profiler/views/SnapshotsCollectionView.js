@@ -45,6 +45,10 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
     const {selectedIndex, selectedMode} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
+    const SelectedChartComponent = selectedMode === 'flamegraph'
+      ? SnapshotFlamegraph
+      : RankedSnapshot;
+
     return (
       <div style={styles.Main}>
         <div style={styles.TopNav}>
@@ -85,8 +89,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
           </div>
         </div>
         <div style={styles.ChartingArea}>
-          {selectedMode === 'flamegraph' && (<SnapshotFlamegraph snapshot={selectedSnapshot} />)}
-          {selectedMode === 'ranked' && (<RankedSnapshot snapshot={selectedSnapshot} />)}
+          <SelectedChartComponent snapshot={selectedSnapshot} theme={theme} />
         </div>
       </div>
     );

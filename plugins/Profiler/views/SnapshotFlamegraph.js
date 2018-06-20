@@ -11,19 +11,20 @@
 'use strict';
 
 import type {Snapshot} from '../ProfilerTypes';
+import type {Theme} from '../../../frontend/types';
 
 import React, { Component, Fragment } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
 import { barHeight, didNotRender, gradient, scale } from './constants';
-
-require('./shared-profiler-styles.css');
+import { ChartNodeDimmed } from './SharedProfilerStyles';
 
 type Props = {|
   snapshot: Snapshot,
+  theme: Theme,
 |};
 
-const SnapshotFlamegraph = ({snapshot}: Props) => {
+const SnapshotFlamegraph = ({snapshot, theme}: Props) => {
   const rootNode = snapshot.nodes.get(snapshot.root);
   const children = rootNode.get('children');
   const rootNodeID = Array.isArray(children) ? children[0] : children;
@@ -33,7 +34,7 @@ const SnapshotFlamegraph = ({snapshot}: Props) => {
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Flamegraph width={width} height={height} data={data} />
+        <Flamegraph width={width} height={height} data={data} theme={theme} />
       )}
     </AutoSizer>
   );
@@ -51,6 +52,7 @@ export type Node = {|
 type FlamegraphProps = {|
   data: Node,
   height: number,
+  theme: Theme,
   width: number,
 |};
 
@@ -79,7 +81,7 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
   }
 
   render() {
-    const { data, height, width } = this.props;
+    const { data, height, theme, width } = this.props;
     const { maxValue, selectedNode } = this.state;
 
     // TODO: Memoize
@@ -89,13 +91,14 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
 
     return (
       <div style={{ height, width, overflow: 'auto' }}>
-        <svg className="profiler-graph" height={barHeight * depth} width={width}>
+        <svg height={barHeight * depth} width={width}>
           <RecursiveNode
             maxValue={maxValue}
             node={data}
             scaleX={scaleX}
             selectedNode={selectedNode}
             selectNode={this.selectNode}
+            theme={theme}
           />
         </svg>
       </div>
@@ -136,16 +139,18 @@ type RecursiveNodeProps = {|
   scaleX: Function,
   selectedNode: Node,
   selectNode: Function,
+  theme: Theme,
   x?: number,
 |};
-const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, selectNode, x = 0 }: RecursiveNodeProps) => (
+const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, selectNode, theme, x = 0 }: RecursiveNodeProps) => (
   <Fragment>
     <ChartNode
-      className={node.value > maxValue ? 'fade' : ''}
       color={node.color}
       height={barHeight}
       label={node.label}
       onClick={() => selectNode(node)}
+      style={node.value > maxValue ? ChartNodeDimmed : null}
+      theme={theme}
       width={scaleX(node.value)}
       x={scaleX(x) - scaleX(selectedNode.x)}
       y={barHeight * depth}
@@ -159,6 +164,7 @@ const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, select
         scaleX={scaleX}
         selectedNode={selectedNode}
         selectNode={selectNode}
+        theme={theme}
         x={childNode.x}
       />
     ))} 

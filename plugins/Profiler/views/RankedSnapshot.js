@@ -10,26 +10,27 @@
  */
 'use strict';
 
+import type {Snapshot} from '../ProfilerTypes';
+import type {Theme} from '../../../frontend/types';
+
 import React, { Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
 import { barHeight, gradient, scale } from './constants';
-
-import type {Snapshot} from '../ProfilerTypes';
-
-require('./shared-profiler-styles.css');
+import { ChartNodeDimmed } from './SharedProfilerStyles';
 
 type Props = {|
   snapshot: Snapshot,
+  theme: Theme,
 |};
 
-const RankedSnapshot = ({snapshot}: Props) => {
+const RankedSnapshot = ({snapshot, theme}: Props) => {
   const data = convertSnapshotToChartData(snapshot);
 
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Ranked width={width} height={height} data={data} />
+        <Ranked width={width} height={height} data={data} theme={theme} />
       )}
     </AutoSizer>
   );
@@ -49,6 +50,7 @@ type RankedData = {|
 type RankedProps = {|
   data: RankedData,
   height: number,
+  theme: Theme,
   width: number,
 |};
 
@@ -77,7 +79,7 @@ class Ranked extends Component<RankedProps, RankedState> {
   }
 
   render() {
-    const { height, data, width } = this.props;
+    const { height, data, theme, width } = this.props;
     const { maxValue } = this.state;
 
     const { nodes } = data;
@@ -86,15 +88,16 @@ class Ranked extends Component<RankedProps, RankedState> {
 
     return (
       <div style={{ height, width, overflow: 'auto' }}>
-        <svg className="profiler-graph" height={barHeight * nodes.length} width={width}>
+        <svg height={barHeight * nodes.length} width={width}>
           {nodes.map((node, index) => (
             <ChartNode
-              className={node.value > maxValue ? 'fade' : ''}
               color={this.getNodeColor(node)}
               height={barHeight}
               key={node.id}
               label={node.label}
               onClick={() => this.selectNode(node)}
+              style={node.value > maxValue ? ChartNodeDimmed : null}
+              theme={theme}
               width={scaleX(node.value)}
               x={0}
               y={barHeight * index}
