@@ -13,8 +13,9 @@
 import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
-import React, { Component } from 'react';
+import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
+// TODO import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, getGradientColor, scale } from './constants';
 import { ChartNodeDimmed } from './SharedProfilerStyles';
@@ -72,7 +73,7 @@ type RankedState = {|
   prevData: RankedData,
 |};
 
-class Ranked extends Component<RankedProps, RankedState> {
+class Ranked extends PureComponent<RankedProps, RankedState> {
   state: RankedState = {
     focusedNode: null,
     maxValue: this.props.data.maxValue,

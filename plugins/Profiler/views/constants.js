@@ -23,6 +23,8 @@ export const didNotRender = '#ddd';
 
 export const barHeight = 20;
 export const barWidth = 100;
+export const minBarHeight = 5;
+export const textHeight = 18;
 
 export const scale = (minValue: number, maxValue: number, minRange: number, maxRange: number) => (value: number) =>
   (value / (maxValue - minValue)) * (maxRange - minRange);

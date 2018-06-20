@@ -16,7 +16,7 @@ import type {Theme} from '../../../frontend/types';
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
-import { barWidth, scale, getGradientColor } from './constants';
+import { barWidth, minBarHeight, getGradientColor, scale } from './constants';
 
 type Node = {|
   maxCommitValue: number,
@@ -89,21 +89,24 @@ const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width
   return (
     <div style={{ height, width, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
       <svg height={height} width={width}>
-        {nodes.map((node, index) => (
-          <ChartNode
-            color={getGradientColor(node.value / node.maxCommitValue)}
-            height={scaleY(node.value)}
-            key={index}
-            label={`${node.value.toFixed(3)}ms`}
-            onClick={emptyFunction}
-            onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
-            style={null}
-            theme={theme}
-            width={scaleX(barWidth)}
-            x={scaleX(barWidth * index)}
-            y={height - scaleY(node.value)}
-          />
-        ))}
+        {nodes.map((node, index) => {
+          const safeHeight = Math.max(minBarHeight, scaleY(node.value));
+          return (
+            <ChartNode
+              color={getGradientColor(node.value / node.maxCommitValue)}
+              height={safeHeight}
+              key={index}
+              label={`${node.value.toFixed(3)}ms`}
+              onClick={emptyFunction}
+              onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
+              style={null}
+              theme={theme}
+              width={scaleX(barWidth)}
+              x={scaleX(barWidth * index)}
+              y={height - safeHeight}
+            />
+          );
+        })}
       </svg>
     </div>
   );

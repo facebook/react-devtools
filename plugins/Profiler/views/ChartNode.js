@@ -13,6 +13,7 @@
 import type {Theme} from '../../../frontend/types';
 
 const React = require('react');
+const { textHeight } = require('./constants');
 const { ChartAnimatedNode, ChartLabel, ChartRect } = require('./SharedProfilerStyles');
 
 type Props = {|
@@ -21,6 +22,7 @@ type Props = {|
   label: string,
   onClick: Function,
   onDoubleClick: Function,
+  placeLabelAboveNode?: boolean,
   style: ?Object,
   theme: Theme,
   width: number,
@@ -47,19 +49,22 @@ const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme,
       onDoubleClick={onDoubleClick}
       style={ChartRect(theme)}
     />
-    <foreignObject
-      width={width}
-      height={height}
-      style={{
-        ...ChartAnimatedNode,
-        display: width < minWidthToDisplay ? 'none' : 'block',
-        paddingLeft: x < 0 ? -x : 0,
-      }}
-    >
-      <div style={ChartLabel}>
-        {label}
-      </div>
-    </foreignObject>
+    {width >= minWidthToDisplay && (
+      <foreignObject
+        width={width}
+        height={height}
+        style={{
+          ...ChartAnimatedNode,
+          display: width < minWidthToDisplay ? 'none' : 'block',
+          paddingLeft: x < 0 ? -x : 0,
+        }}
+        y={height < textHeight ? -textHeight : 0}
+      >
+        <div style={ChartLabel}>
+          {label}
+        </div>
+      </foreignObject>
+    )}
   </g>
 );
 

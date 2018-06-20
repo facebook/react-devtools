@@ -13,8 +13,10 @@
 import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
-import React, { Component, Fragment } from 'react';
+import memoize from 'memoize-one';
+import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, didNotRender, getGradientColor, scale } from './constants';
 import { ChartNodeDimmed } from './SharedProfilerStyles';
@@ -42,8 +44,7 @@ const SnapshotFlamegraph = ({selectNode, snapshot, theme}: Props) => {
   const children = rootNode.get('children');
   const rootNodeID = Array.isArray(children) ? children[0] : children;
 
-  // TODO Memoize this
-  const data = convertSnapshotToChartData(snapshot, rootNodeID);
+  const data = convertSnapshotToChartData(snapshot, rootNodeID); // (Memoized)
 
   return (
     <AutoSizer>
@@ -74,7 +75,7 @@ type FlamegraphState = {|
   prevData: Node,
 |};
 
-class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
+class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
   state: FlamegraphState = {
     focusedNode: this.props.data,
     maxValue: this.props.data.value,
@@ -96,25 +97,28 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
     const { data, height, selectNode, theme, width } = this.props;
     const { maxValue, focusedNode } = this.state;
 
-    // TODO: Memoize
-    const depth = preprocessData(data);
+    const nodesByDepth = preprocessData(data); // Memoized
 
-    const scaleX = scale(0, maxValue, 0, width);
+    const listData = this.getListData(
+      focusedNode,
+      this.focusNode,
+      maxValue,
+      nodesByDepth,
+      selectNode,
+      theme,
+      width,
+    );
 
     return (
-      <div style={{ height, width, overflow: 'auto' }}>
-        <svg height={barHeight * depth} width={width}>
-          <RecursiveNode
-            focusedNode={focusedNode}
-            focusNode={this.focusNode}
-            maxValue={maxValue}
-            node={data}
-            scaleX={scaleX}
-            selectNode={selectNode}
-            theme={theme}
-          />
-        </svg>
-      </div>
+      <List
+        data={listData}
+        height={height}
+        itemCount={nodesByDepth.length}
+        itemSize={barHeight}
+        width={width}
+      >
+        {ListItem}
+      </List>
     );
   }
 
@@ -122,13 +126,72 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
     focusedNode: node,
     maxValue: node.value,
   });
+
+  getListData = memoize((focusedNode, focusNode, maxValue, nodesByDepth, selectNode, theme, width) => ({
+    focusedNode,
+    focusNode: focusNode,
+    maxValue,
+    nodesByDepth,
+    scaleX: scale(0, maxValue, 0, width),
+    selectNode,
+    theme,
+    width,
+  }));
 }
 
-const preprocessData = (node: Node) => {
-  let maxDepth = 0;
+class ListItem extends PureComponent<any, void> {
+  render() {
+    const { data, index, style } = this.props;
+
+    const nodes = data.nodesByDepth[index];
+
+    return (
+      <svg style={style}>
+        {nodes.map(node => {
+          const focusedNodeX = data.scaleX(data.focusedNode.x);
+          const nodeX = data.scaleX(node.x);
+          const nodeWidth = data.scaleX(node.value);
+
+          // Filter out nodes that are outside of the horizontal window
+          if (
+            nodeX + nodeWidth < focusedNodeX ||
+            nodeX > focusedNodeX + data.width
+          ) {
+            return null;
+          }
+
+          return (
+            <ChartNode
+              color={node.color}
+              height={barHeight}
+              key={node.id}
+              label={node.label}
+              onClick={() => data.focusNode(node)}
+              onDoubleClick={() => data.selectNode(node.id, node.name)}
+              style={node.value > data.maxValue ? ChartNodeDimmed : null}
+              theme={data.theme}
+              width={nodeWidth}
+              x={nodeX - focusedNodeX}
+              y={0}
+            />
+          );
+        })}
+      </svg>
+    );
+  }
+}
+
+// TODO Combine preprocessData() and convertSnapshotToChartData()
+
+const preprocessData = memoize((node: Node) => {
+  const nodesByDepth = [];
 
   const processNode = (currentNode: Node, currentDepth: number = 0, currentX = 0) => {
-    maxDepth = Math.max(maxDepth, currentDepth);
+    if (nodesByDepth.length === currentDepth) {
+      nodesByDepth[currentDepth] = [currentNode];
+    } else {
+      nodesByDepth[currentDepth].push(currentNode);
+    }
 
     currentNode.x = currentX;
 
@@ -142,52 +205,10 @@ const preprocessData = (node: Node) => {
 
   processNode(node);
 
-  return maxDepth;
-};
+  return nodesByDepth;
+});
 
-type RecursiveNodeProps = {|
-  depth?: number,
-  focusedNode: Node,
-  focusNode: (nodee: Node) => void,
-  maxValue: number,
-  node: Node,
-  scaleX: Function,
-  selectNode: SelectNode,
-  theme: Theme,
-  x?: number,
-|};
-const RecursiveNode = ({ depth = 0, focusedNode, focusNode, maxValue, node, scaleX, selectNode, theme, x = 0 }: RecursiveNodeProps) => (
-  <Fragment>
-    <ChartNode
-      color={node.color}
-      height={barHeight}
-      label={node.label}
-      onClick={() => focusNode(node)}
-      onDoubleClick={() => selectNode(node.id, node.name)}
-      style={node.value > maxValue ? ChartNodeDimmed : null}
-      theme={theme}
-      width={scaleX(node.value)}
-      x={scaleX(x) - scaleX(focusedNode.x)}
-      y={barHeight * depth}
-    />
-    {node.children.map((childNode, index) => (
-      <RecursiveNode
-        key={index}
-        depth={depth + 1}
-        focusedNode={focusedNode}
-        focusNode={focusNode}
-        maxValue={maxValue}
-        node={childNode}
-        scaleX={scaleX}
-        selectNode={selectNode}
-        theme={theme}
-        x={childNode.x}
-      />
-    ))} 
-  </Fragment>
-);
-
-const convertSnapshotToChartData = (snapshot, rootNodeID) => {
+const convertSnapshotToChartData = memoize((snapshot, rootNodeID) => {
   let maxDuration = 0;
 
   snapshot.committedNodes.forEach(nodeID => {
@@ -221,6 +242,6 @@ const convertSnapshotToChartData = (snapshot, rootNodeID) => {
   };
 
   return convertNodeToDatum(rootNodeID);
-};
+});
 
 module.exports = SnapshotFlamegraph;
