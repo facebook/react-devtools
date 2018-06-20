@@ -11,15 +11,20 @@
 'use strict';
 
 import type {Snapshot} from '../ProfilerTypes';
+import type {Theme} from '../../../frontend/types';
 
 const React = require('react');
 const SnapshotFlamegraph = require('./SnapshotFlamegraph');
 const RankedSnapshot = require('./RankedSnapshot');
+const Hoverable = require('../../../frontend/Hoverable');
+const Icons = require('../../../frontend/Icons');
+const SvgIcon = require('../../../frontend/SvgIcon');
 
 type Mode = 'flamegraph' | 'ranked';
 
 type SnapshotProps = {
   snapshots: Array<Snapshot>,
+  theme: Theme,
 };
 type SnapshotState = {
   selectedIndex: number,
@@ -36,7 +41,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
   selectNext = (event: SyntheticEvent<HTMLButtonElement>) => this.setState(prevState => ({ selectedIndex: prevState.selectedIndex + 1 }));
 
   render() {
-    const {snapshots} = this.props;
+    const {snapshots, theme} = this.props;
     const {selectedIndex, selectedMode} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
@@ -60,16 +65,23 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
             </label>
           </div>
           <div style={styles.SnapshotSliderOptions}>
-            <button disabled={selectedIndex === 0} onClick={this.selectPrevious}>prev</button>
+            Commits: <BackButton
+              disabled={selectedIndex === 0}
+              onClick={this.selectPrevious}
+              theme={theme}
+            />
             <input
               type="range"
-              style={styles.SnapshotSlider}
               min={0}
               max={snapshots.length - 1}
               value={selectedIndex}
               onChange={this.handleChange}
             />
-            <button disabled={selectedIndex === snapshots.length - 1} onClick={this.selectNext}>next</button>
+            <ForwardButton
+              disabled={selectedIndex === snapshots.length - 1}
+              onClick={this.selectNext}
+              theme={theme}
+            />
           </div>
         </div>
         <div style={styles.ChartingArea}>
@@ -80,6 +92,45 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
     );
   }
 }
+
+const BackButton = Hoverable(
+  ({ disabled, isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={clearButtonStyle(isActive, isHovered, theme)}
+      title="Clear profiling data"
+    >
+      <SvgIcon path={Icons.BACK} />
+    </button>
+  )
+);
+
+const ForwardButton = Hoverable(
+  ({ disabled, isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+    <button
+      disabled={disabled}
+      onClick={onClick}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+      style={clearButtonStyle(isActive, isHovered, theme)}
+      title="Clear profiling data"
+    >
+      <SvgIcon path={Icons.FORWARD} />
+    </button>
+  )
+);
+
+const clearButtonStyle = (isActive: boolean, isHovered: boolean, theme: Theme) => ({
+  background: 'none',
+  border: 'none',
+  outline: 'none',
+  cursor: 'pointer',
+  color: isHovered ? theme.state06 : 'inherit',
+  padding: '4px 8px',
+});
 
 const styles = {
   Main: {
@@ -107,9 +158,6 @@ const styles = {
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  SnapshotSlider: {
-    margin: '0 0.5rem',
   },
   ChartingArea: {
     flex: 1,
