@@ -20,28 +20,27 @@ import { barWidth, scale, getGradientColor } from './constants';
 
 type Node = {|
   maxCommitValue: number,
-  name: string,
   parentSnapshot: Snapshot,
   value: number,
 |};
 
 type ChartData = {|
   maxValue: number,
+  name: string,
   nodes: Array<Node>,
 |};
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
+  exitChart: Function,
   nodeID: string,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
   theme: Theme,
 |};
 
-// TODO Display "no commits found for node X"
-
-const FiberRenderDurations = ({nodeID, selectSnapshot, snapshots, theme}: Props) => {
+const FiberRenderDurations = ({exitChart, nodeID, selectSnapshot, snapshots, theme}: Props) => {
   // TODO Memoize this
   const data = convertSnapshotToChartData(nodeID, snapshots);
 
@@ -50,6 +49,7 @@ const FiberRenderDurations = ({nodeID, selectSnapshot, snapshots, theme}: Props)
       {({ height, width }) => (
         <RenderDurations
           data={data}
+          exitChart={exitChart}
           height={height}
           selectSnapshot={selectSnapshot}
           theme={theme}
@@ -64,28 +64,31 @@ function emptyFunction() {}
 
 type RenderDurationsProps = {|
   data: ChartData,
+  exitChart: Function,
   height: number,
   selectSnapshot: SelectSnapshot,
   theme: Theme,
   width: number,
 |};
 
-const RenderDurations = ({ data, height, selectSnapshot, theme, width }: RenderDurationsProps) => {
-  const { maxValue, nodes } = data;
+const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width }: RenderDurationsProps) => {
+  const { maxValue, name, nodes } = data;
 
   if (maxValue === 0) {
     return (
-      <div style={{ height, width, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        No render times for the selected node
+      <div style={{ height, width, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+        <div>No render times recorded for <strong>{name}</strong></div>
+        <button onClick={exitChart}>Go back</button>
       </div>
     );
   }
 
+  const scaleX = scale(0, nodes.length * barWidth, 0, width);
   const scaleY = scale(0, maxValue, 0, height);
 
   return (
-    <div style={{ height, width, overflow: 'auto' }}>
-      <svg height={height} width={barWidth * nodes.length}>
+    <div style={{ height, width, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <svg height={height} width={width}>
         {nodes.map((node, index) => (
           <ChartNode
             color={getGradientColor(node.value / node.maxCommitValue)}
@@ -96,8 +99,8 @@ const RenderDurations = ({ data, height, selectSnapshot, theme, width }: RenderD
             onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
             style={null}
             theme={theme}
-            width={barWidth}
-            x={barWidth * index}
+            width={scaleX(barWidth)}
+            x={scaleX(barWidth * index)}
             y={height - scaleY(node.value)}
           />
         ))}
@@ -108,6 +111,7 @@ const RenderDurations = ({ data, height, selectSnapshot, theme, width }: RenderD
 
 const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>): ChartData => {
   let maxValue = 0;
+  let name = null;
 
   const nodes: Array<Node> = snapshots
     .filter((snapshot: Snapshot) => snapshot.committedNodes.indexOf(nodeID) >= 0)
@@ -116,15 +120,22 @@ const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>):
         Math.max(reduced, snapshot.nodes.getIn([currentNodeID, 'actualDuration'])),
         0
       );
-      const name = snapshot.nodes.getIn([nodeID, 'name']) || 'Unknown';
       const value = snapshot.nodes.getIn([nodeID, 'actualDuration']);
 
       maxValue = Math.max(maxValue, value);
 
-      return { maxCommitValue, name, parentSnapshot: snapshot, value };
+      if (name === null) {
+        name = snapshot.nodes.getIn([nodeID, 'name']) || 'Unknown';
+      }
+
+      return { maxCommitValue, parentSnapshot: snapshot, value };
     });
 
-  return { maxValue, nodes };
+  return {
+    maxValue,
+    name: name || 'Unknown',
+    nodes,
+  };
 };
 
 module.exports = FiberRenderDurations;

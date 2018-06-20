@@ -87,6 +87,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
           </div>
           <div style={styles.ChartingArea}>
             <FiberRenderDurations
+              exitChart={this.deselectNode}
               nodeID={selectedNodeID}
               selectSnapshot={this.selectSnapshot}
               snapshots={snapshots}
