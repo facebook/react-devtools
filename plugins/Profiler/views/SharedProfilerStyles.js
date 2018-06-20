@@ -17,6 +17,7 @@ export const ChartAnimatedNode = {
 };
 
 export const ChartRect = (theme: Theme) => ({
+  cursor: 'pointer',
   stroke: theme.base00,
   ...ChartAnimatedNode,
 });
