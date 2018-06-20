@@ -71,6 +71,7 @@ type FlamegraphProps = {|
 
 type FlamegraphState = {|
   focusedNode: Node,
+  focusedNodeIndex: number,
   maxValue: number,
   prevData: Node,
 |};
@@ -78,6 +79,7 @@ type FlamegraphState = {|
 class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
   state: FlamegraphState = {
     focusedNode: this.props.data,
+    focusedNodeIndex: 0,
     maxValue: this.props.data.value,
     prevData: this.props.data,
   };
@@ -85,9 +87,10 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
   static getDerivedStateFromProps(props: FlamegraphProps, state: FlamegraphState): $Shape<FlamegraphState> {
     if (state.prevData !== props.data) {
       return {
+        focusedNode: props.data,
+        focusedNodeIndex: 0,
         maxValue: props.data.value,
         prevData: props.data,
-        focusedNode: props.data,
       };
     }
     return null;
@@ -95,12 +98,13 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
 
   render() {
     const { data, height, selectNode, theme, width } = this.props;
-    const { maxValue, focusedNode } = this.state;
+    const { maxValue, focusedNode, focusedNodeIndex } = this.state;
 
     const nodesByDepth = preprocessData(data); // Memoized
 
     const listData = this.getListData(
       focusedNode,
+      focusedNodeIndex,
       this.focusNode,
       maxValue,
       nodesByDepth,
@@ -122,14 +126,16 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
     );
   }
 
-  focusNode = (node: Node) => this.setState({
+  focusNode = (node: Node, index: number) => this.setState({
     focusedNode: node,
+    focusedNodeIndex: index,
     maxValue: node.value,
   });
 
-  getListData = memoize((focusedNode, focusNode, maxValue, nodesByDepth, selectNode, theme, width) => ({
+  getListData = memoize((focusedNode, focusedNodeIndex, focusNode, maxValue, nodesByDepth, selectNode, theme, width) => ({
     focusedNode,
-    focusNode: focusNode,
+    focusedNodeIndex,
+    focusNode,
     maxValue,
     nodesByDepth,
     scaleX: scale(0, maxValue, 0, width),
@@ -166,9 +172,9 @@ class ListItem extends PureComponent<any, void> {
               height={barHeight}
               key={node.id}
               label={node.label}
-              onClick={() => data.focusNode(node)}
+              onClick={() => data.focusNode(node, index)}
               onDoubleClick={() => data.selectNode(node.id, node.name)}
-              style={node.value > data.maxValue ? ChartNodeDimmed : null}
+              style={index < data.focusedNodeIndex ? ChartNodeDimmed : null}
               theme={data.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}

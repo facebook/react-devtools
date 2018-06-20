@@ -68,24 +68,21 @@ type RankedProps = {|
 |};
 
 type RankedState = {|
-  focusedNode: Node | null,
-  maxValue: number,
+  focusedNodeIndex: number,
   prevData: RankedData,
 |};
 
 class Ranked extends PureComponent<RankedProps, RankedState> {
   state: RankedState = {
-    focusedNode: null,
-    maxValue: this.props.data.maxValue,
+    focusedNodeIndex: 0,
     prevData: this.props.data,
   };
 
   static getDerivedStateFromProps(props: RankedProps, state: RankedState): $Shape<RankedState> {
     if (state.prevData !== props.data) {
       return {
-        maxValue: props.data.maxValue,
+        focusedNodeIndex: 0,
         prevData: props.data,
-        focusedNode: null,
       };
     }
     return null;
@@ -93,12 +90,13 @@ class Ranked extends PureComponent<RankedProps, RankedState> {
 
   render() {
     const { height, data, selectNode, theme, width } = this.props;
-    const { maxValue } = this.state;
+    const { focusedNodeIndex } = this.state;
 
     const { nodes } = data;
 
-    const scaleX = scale(0, maxValue, 0, width);
+    const scaleX = scale(0, nodes[focusedNodeIndex].value, 0, width);
 
+    // TODO Use react-window
     return (
       <div style={{ height, width, overflow: 'auto' }}>
         <svg height={barHeight * nodes.length} width={width}>
@@ -108,9 +106,9 @@ class Ranked extends PureComponent<RankedProps, RankedState> {
               height={barHeight}
               key={node.id}
               label={node.label}
-              onClick={() => this.focusNode(node)}
+              onClick={() => this.focusNode(index)}
               onDoubleClick={() => selectNode(node.id, node.name)}
-              style={node.value > maxValue ? ChartNodeDimmed : null}
+              style={index < focusedNodeIndex ? ChartNodeDimmed : null}
               theme={theme}
               width={scaleX(node.value)}
               x={0}
@@ -122,9 +120,8 @@ class Ranked extends PureComponent<RankedProps, RankedState> {
     );
   }
 
-  focusNode = (node: Node) => this.setState({
-    maxValue: node.value,
-    focusedNode: node,
+  focusNode = (index: number) => this.setState({
+    focusedNodeIndex: index,
   });
 }
 
@@ -133,7 +130,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
 
   const nodes = snapshot.committedNodes
     .filter(nodeID => snapshot.nodes.has(nodeID) && snapshot.nodes.getIn([nodeID, 'actualDuration']) > 0)
-    .map(nodeID => {
+    .map((nodeID, index) => {
       const node = snapshot.nodes.get(nodeID).toJSON();
       const name = node.name || 'Unknown';
 
