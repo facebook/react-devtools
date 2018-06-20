@@ -121,7 +121,8 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
               </label>
             </div>
             <div style={styles.SnapshotSliderOptions}>
-              Commits: <BackButton
+              Render ({selectedIndex + 1} / {snapshots.length})
+              <BackButton
                 disabled={selectedIndex === 0}
                 onClick={this.selectPrevious}
                 theme={theme}
