@@ -14,6 +14,7 @@ import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 const React = require('react');
+const FiberRenderDurations = require('./FiberRenderDurations');
 const SnapshotFlamegraph = require('./SnapshotFlamegraph');
 const RankedSnapshot = require('./RankedSnapshot');
 const Hoverable = require('../../../frontend/Hoverable');
@@ -29,70 +30,113 @@ type SnapshotProps = {
 type SnapshotState = {
   selectedIndex: number,
   selectedMode: Mode,
+  selectedNodeID: string | null,
+  selectedNodeName: string | null,
 };
 class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotState> {
   state: SnapshotState = {
     selectedIndex: 0,
     selectedMode: 'flamegraph',
+    selectedNodeID: null,
+    selectedNodeName: null,
   };
 
-  handleChange = (event: SyntheticEvent<HTMLInputElement>) => this.setState({ selectedIndex: parseInt(event.currentTarget.value, 10) });
-  selectPrevious = (event: SyntheticEvent<HTMLButtonElement>) => this.setState(prevState => ({ selectedIndex: prevState.selectedIndex - 1 }));
-  selectNext = (event: SyntheticEvent<HTMLButtonElement>) => this.setState(prevState => ({ selectedIndex: prevState.selectedIndex + 1 }));
+  deselectNode = () =>
+    this.setState({
+      selectedNodeID: null,
+      selectedNodeName: null,
+    });
+
+  handleChange = (event: SyntheticEvent<HTMLInputElement>) =>
+    this.setState({ selectedIndex: parseInt(event.currentTarget.value, 10) });
+
+  selectNext = (event: SyntheticEvent<HTMLButtonElement>) =>
+    this.setState(prevState => ({ selectedIndex: prevState.selectedIndex + 1 }));
+
+  selectNode = (nodeID: string, nodeName: string) =>
+    this.setState({
+      selectedNodeID: nodeID,
+      selectedNodeName: nodeName,
+    });
+
+  selectPrevious = (event: SyntheticEvent<HTMLButtonElement>) =>
+    this.setState(prevState => ({ selectedIndex: prevState.selectedIndex - 1 }));
 
   render() {
     const {snapshots, theme} = this.props;
-    const {selectedIndex, selectedMode} = this.state;
+    const {selectedIndex, selectedMode, selectedNodeID, selectedNodeName} = this.state;
     const selectedSnapshot = snapshots[selectedIndex];
 
-    const SelectedChartComponent = selectedMode === 'flamegraph'
-      ? SnapshotFlamegraph
-      : RankedSnapshot;
+    if (selectedNodeID !== null) {
+      return (
+        <div style={styles.Main}>
+          <div style={styles.TopNav}>
+            <div>
+              Render times for <strong>{selectedNodeName}</strong>
+            </div>
+            <div>
+              <button onClick={this.deselectNode}>Close</button>
+            </div>
+          </div>
+          <div style={styles.ChartingArea}>
+            <FiberRenderDurations
+              nodeID={selectedNodeID}
+              snapshots={snapshots}
+              theme={theme}
+            />
+          </div>
+        </div>
+      );
+    } else {
+      const SelectedChartComponent = selectedMode === 'flamegraph'
+        ? SnapshotFlamegraph
+        : RankedSnapshot;
 
-    return (
-      <div style={styles.Main}>
-        <div style={styles.TopNav}>
-          <div>
-            <label style={styles.ModeRadioOption}>
+      return (
+        <div style={styles.Main}>
+          <div style={styles.TopNav}>
+            <div>
+              <label style={styles.ModeRadioOption}>
+                <input
+                  type="radio"
+                  checked={selectedMode === 'flamegraph'}
+                  onChange={() => this.setState({ selectedMode: 'flamegraph' })}
+                /> Flamegraph
+              </label>
+              <label style={styles.ModeRadioOption}>
               <input
                 type="radio"
-                checked={selectedMode === 'flamegraph'}
-                onChange={() => this.setState({ selectedMode: 'flamegraph' })}
-              /> Flamegraph
-            </label>
-            <label style={styles.ModeRadioOption}>
-            <input
-              type="radio"
-              checked={selectedMode === 'ranked'}
-              onChange={() => this.setState({ selectedMode: 'ranked' })}
-            /> Ranked
-            </label>
+                checked={selectedMode === 'ranked'}
+                onChange={() => this.setState({ selectedMode: 'ranked' })}
+              /> Ranked
+              </label>
+            </div>
+            <div style={styles.SnapshotSliderOptions}>
+              Commits: <BackButton
+                disabled={selectedIndex === 0}
+                onClick={this.selectPrevious}
+                theme={theme}
+              />
+              <input
+                type="range"
+                min={0}
+                max={snapshots.length - 1}
+                value={selectedIndex}
+                onChange={this.handleChange}
+              />
+              <ForwardButton
+                disabled={selectedIndex === snapshots.length - 1}
+                onClick={this.selectNext}
+                theme={theme}
+              />
+            </div>
           </div>
-          <div style={styles.SnapshotSliderOptions}>
-            Commits: <BackButton
-              disabled={selectedIndex === 0}
-              onClick={this.selectPrevious}
-              theme={theme}
-            />
-            <input
-              type="range"
-              min={0}
-              max={snapshots.length - 1}
-              value={selectedIndex}
-              onChange={this.handleChange}
-            />
-            <ForwardButton
-              disabled={selectedIndex === snapshots.length - 1}
-              onClick={this.selectNext}
-              theme={theme}
-            />
+          <div style={styles.ChartingArea}>
+            <SelectedChartComponent selectNode={this.selectNode} snapshot={selectedSnapshot} theme={theme} />
           </div>
         </div>
-        <div style={styles.ChartingArea}>
-          <SelectedChartComponent snapshot={selectedSnapshot} theme={theme} />
-        </div>
-      </div>
-    );
+      );
+    }
   }
 }
 

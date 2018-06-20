@@ -20,6 +20,7 @@ type Props = {|
   height: number,
   label: string,
   onClick: Function,
+  onDoubleClick: Function,
   style: ?Object,
   theme: Theme,
   width: number,
@@ -29,7 +30,7 @@ type Props = {|
 
 const minWidthToDisplay = 35;
 
-const ChartNode = ({ color, height, label, onClick, style, theme, width, x, y }: Props) => (
+const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme, width, x, y }: Props) => (
   <g
     style={{
       ...ChartAnimatedNode,
@@ -43,6 +44,7 @@ const ChartNode = ({ color, height, label, onClick, style, theme, width, x, y }:
       height={height}
       fill={color}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       style={ChartRect(theme)}
     />
     <foreignObject

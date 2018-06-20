@@ -16,57 +16,69 @@ import type {Theme} from '../../../frontend/types';
 import React, { Component, Fragment } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
-import { barHeight, didNotRender, gradient, scale } from './constants';
+import { barHeight, didNotRender, getGradientColor, scale } from './constants';
 import { ChartNodeDimmed } from './SharedProfilerStyles';
-
-type Props = {|
-  snapshot: Snapshot,
-  theme: Theme,
-|};
-
-const SnapshotFlamegraph = ({snapshot, theme}: Props) => {
-  const rootNode = snapshot.nodes.get(snapshot.root);
-  const children = rootNode.get('children');
-  const rootNodeID = Array.isArray(children) ? children[0] : children;
-
-  const data = convertSnapshotToChartData(snapshot, rootNodeID);
-
-  return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <Flamegraph width={width} height={height} data={data} theme={theme} />
-      )}
-    </AutoSizer>
-  );
-};
 
 export type Node = {|
   children: Array<Node>,
   color: string,
   id: string,
   label: string,
+  name: string,
   value: number,
   x?: number,
 |};
 
+type SelectNode = (nodeID: string, name: string) => void;
+
+type Props = {|
+  selectNode: SelectNode,
+  snapshot: Snapshot,
+  theme: Theme,
+|};
+
+const SnapshotFlamegraph = ({selectNode, snapshot, theme}: Props) => {
+  const rootNode = snapshot.nodes.get(snapshot.root);
+  const children = rootNode.get('children');
+  const rootNodeID = Array.isArray(children) ? children[0] : children;
+
+  // TODO Memoize this
+  const data = convertSnapshotToChartData(snapshot, rootNodeID);
+
+  return (
+    <AutoSizer>
+      {({ height, width }) => (
+        <Flamegraph
+          data={data}
+          height={height}
+          selectNode={selectNode}
+          theme={theme}
+          width={width}
+        />
+      )}
+    </AutoSizer>
+  );
+};
+
 type FlamegraphProps = {|
   data: Node,
   height: number,
+  selectNode: SelectNode,
   theme: Theme,
   width: number,
 |};
 
 type FlamegraphState = {|
+  focusedNode: Node,
   maxValue: number,
   prevData: Node,
-  selectedNode: Node,
 |};
 
 class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
   state: FlamegraphState = {
+    focusedNode: this.props.data,
     maxValue: this.props.data.value,
     prevData: this.props.data,
-    selectedNode: this.props.data,
   };
 
   static getDerivedStateFromProps(props: FlamegraphProps, state: FlamegraphState): $Shape<FlamegraphState> {
@@ -74,15 +86,15 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
       return {
         maxValue: props.data.value,
         prevData: props.data,
-        selectedNode: props.data,
+        focusedNode: props.data,
       };
     }
     return null;
   }
 
   render() {
-    const { data, height, theme, width } = this.props;
-    const { maxValue, selectedNode } = this.state;
+    const { data, height, selectNode, theme, width } = this.props;
+    const { maxValue, focusedNode } = this.state;
 
     // TODO: Memoize
     const depth = preprocessData(data);
@@ -93,11 +105,12 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
       <div style={{ height, width, overflow: 'auto' }}>
         <svg height={barHeight * depth} width={width}>
           <RecursiveNode
+            focusedNode={focusedNode}
+            focusNode={this.focusNode}
             maxValue={maxValue}
             node={data}
             scaleX={scaleX}
-            selectedNode={selectedNode}
-            selectNode={this.selectNode}
+            selectNode={selectNode}
             theme={theme}
           />
         </svg>
@@ -105,9 +118,9 @@ class Flamegraph extends Component<FlamegraphProps, FlamegraphState> {
     );
   }
 
-  selectNode = (node: Node) => this.setState({
+  focusNode = (node: Node) => this.setState({
+    focusedNode: node,
     maxValue: node.value,
-    selectedNode: node,
   });
 }
 
@@ -134,35 +147,38 @@ const preprocessData = (node: Node) => {
 
 type RecursiveNodeProps = {|
   depth?: number,
+  focusedNode: Node,
+  focusNode: (nodee: Node) => void,
   maxValue: number,
   node: Node,
   scaleX: Function,
-  selectedNode: Node,
-  selectNode: Function,
+  selectNode: SelectNode,
   theme: Theme,
   x?: number,
 |};
-const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, selectNode, theme, x = 0 }: RecursiveNodeProps) => (
+const RecursiveNode = ({ depth = 0, focusedNode, focusNode, maxValue, node, scaleX, selectNode, theme, x = 0 }: RecursiveNodeProps) => (
   <Fragment>
     <ChartNode
       color={node.color}
       height={barHeight}
       label={node.label}
-      onClick={() => selectNode(node)}
+      onClick={() => focusNode(node)}
+      onDoubleClick={() => selectNode(node.id, node.name)}
       style={node.value > maxValue ? ChartNodeDimmed : null}
       theme={theme}
       width={scaleX(node.value)}
-      x={scaleX(x) - scaleX(selectedNode.x)}
+      x={scaleX(x) - scaleX(focusedNode.x)}
       y={barHeight * depth}
     />
     {node.children.map((childNode, index) => (
       <RecursiveNode
         key={index}
         depth={depth + 1}
+        focusedNode={focusedNode}
+        focusNode={focusNode}
         maxValue={maxValue}
         node={childNode}
         scaleX={scaleX}
-        selectedNode={selectedNode}
         selectNode={selectNode}
         theme={theme}
         x={childNode.x}
@@ -193,12 +209,13 @@ const convertSnapshotToChartData = (snapshot, rootNodeID) => {
           .map(convertNodeToDatum)
         : [],
       color: renderedInCommit
-        ? gradient[Math.round((node.actualDuration / maxDuration) * (gradient.length - 1))]
+        ? getGradientColor(node.actualDuration / maxDuration)
         : didNotRender,
       id: node.id,
       label: renderedInCommit
         ? `${name} (${node.actualDuration.toFixed(2)}ms)`
         : name,
+      name,
       value: node.treeBaseTime,
     };
   };

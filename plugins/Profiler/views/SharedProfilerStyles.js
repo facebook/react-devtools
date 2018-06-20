@@ -21,11 +21,6 @@ export const ChartRect = (theme: Theme) => ({
   ...ChartAnimatedNode,
 });
 
-// TODO?
-// .profiler-graph rect:hover {
-//   cursor: pointer;
-// }
-
 export const ChartLabel = {
   pointerEvents: 'none',
   whiteSpace: 'nowrap',

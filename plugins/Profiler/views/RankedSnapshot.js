@@ -16,31 +16,42 @@ import type {Theme} from '../../../frontend/types';
 import React, { Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
-import { barHeight, gradient, scale } from './constants';
+import { barHeight, getGradientColor, scale } from './constants';
 import { ChartNodeDimmed } from './SharedProfilerStyles';
 
+type Node = {|
+  id: any,
+  label: string,
+  name: string,
+  value: number,
+|};
+
+type SelectNode = (nodeID: string, name: string) => void;
+
 type Props = {|
+  selectNode: SelectNode,
   snapshot: Snapshot,
   theme: Theme,
 |};
 
-const RankedSnapshot = ({snapshot, theme}: Props) => {
+const RankedSnapshot = ({selectNode, snapshot, theme}: Props) => {
+  // TODO Memoize this
   const data = convertSnapshotToChartData(snapshot);
 
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Ranked width={width} height={height} data={data} theme={theme} />
+        <Ranked
+          data={data}
+          height={height}
+          selectNode={selectNode}
+          theme={theme}
+          width={width}
+        />
       )}
     </AutoSizer>
   );
 };
-
-type Node = {|
-  id: any,
-  label: string,
-  value: number,
-|};
 
 type RankedData = {|
   maxValue: number,
@@ -50,21 +61,22 @@ type RankedData = {|
 type RankedProps = {|
   data: RankedData,
   height: number,
+  selectNode: SelectNode,
   theme: Theme,
   width: number,
 |};
 
 type RankedState = {|
+  focusedNode: Node | null,
   maxValue: number,
   prevData: RankedData,
-  selectedNode: Node | null,
 |};
 
 class Ranked extends Component<RankedProps, RankedState> {
   state: RankedState = {
+    focusedNode: null,
     maxValue: this.props.data.maxValue,
     prevData: this.props.data,
-    selectedNode: null,
   };
 
   static getDerivedStateFromProps(props: RankedProps, state: RankedState): $Shape<RankedState> {
@@ -72,14 +84,14 @@ class Ranked extends Component<RankedProps, RankedState> {
       return {
         maxValue: props.data.maxValue,
         prevData: props.data,
-        selectedNode: null,
+        focusedNode: null,
       };
     }
     return null;
   }
 
   render() {
-    const { height, data, theme, width } = this.props;
+    const { height, data, selectNode, theme, width } = this.props;
     const { maxValue } = this.state;
 
     const { nodes } = data;
@@ -91,11 +103,12 @@ class Ranked extends Component<RankedProps, RankedState> {
         <svg height={barHeight * nodes.length} width={width}>
           {nodes.map((node, index) => (
             <ChartNode
-              color={this.getNodeColor(node)}
+              color={getGradientColor(node.value / data.maxValue)}
               height={barHeight}
               key={node.id}
               label={node.label}
-              onClick={() => this.selectNode(node)}
+              onClick={() => this.focusNode(node)}
+              onDoubleClick={() => selectNode(node.id, node.name)}
               style={node.value > maxValue ? ChartNodeDimmed : null}
               theme={theme}
               width={scaleX(node.value)}
@@ -108,12 +121,9 @@ class Ranked extends Component<RankedProps, RankedState> {
     );
   }
 
-  getNodeColor = (node: Node): string =>
-    gradient[Math.round((node.value / this.props.data.maxValue) * (gradient.length - 1))];
-
-  selectNode = (node: Node) => this.setState({
+  focusNode = (node: Node) => this.setState({
     maxValue: node.value,
-    selectedNode: node,
+    focusedNode: node,
   });
 }
 
@@ -131,6 +141,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
       return {
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
+        name,
         value: node.actualDuration,
       };
     })
