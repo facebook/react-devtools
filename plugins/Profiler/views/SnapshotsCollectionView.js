@@ -62,6 +62,13 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
   selectPrevious = (event: SyntheticEvent<HTMLButtonElement>) =>
     this.setState(prevState => ({ selectedIndex: prevState.selectedIndex - 1 }));
 
+  selectSnapshot = (snapshot: Snapshot) =>
+    this.setState({
+      selectedIndex: this.props.snapshots.indexOf(snapshot),
+      selectedNodeID: null,
+      selectedNodeName: null,
+    });
+
   render() {
     const {snapshots, theme} = this.props;
     const {selectedIndex, selectedMode, selectedNodeID, selectedNodeName} = this.state;
@@ -81,6 +88,7 @@ class SnapshotsCollectionView extends React.Component<SnapshotProps, SnapshotSta
           <div style={styles.ChartingArea}>
             <FiberRenderDurations
               nodeID={selectedNodeID}
+              selectSnapshot={this.selectSnapshot}
               snapshots={snapshots}
               theme={theme}
             />

@@ -19,7 +19,9 @@ import ChartNode from './ChartNode';
 import { barWidth, scale, getGradientColor } from './constants';
 
 type Node = {|
+  maxCommitValue: number,
   name: string,
+  parentSnapshot: Snapshot,
   value: number,
 |};
 
@@ -28,15 +30,18 @@ type ChartData = {|
   nodes: Array<Node>,
 |};
 
+type SelectSnapshot = (snapshot: Snapshot) => void;
+
 type Props = {|
   nodeID: string,
+  selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
   theme: Theme,
 |};
 
 // TODO Display "no commits found for node X"
 
-const FiberRenderDurations = ({nodeID, snapshots, theme}: Props) => {
+const FiberRenderDurations = ({nodeID, selectSnapshot, snapshots, theme}: Props) => {
   // TODO Memoize this
   const data = convertSnapshotToChartData(nodeID, snapshots);
 
@@ -46,6 +51,7 @@ const FiberRenderDurations = ({nodeID, snapshots, theme}: Props) => {
         <RenderDurations
           data={data}
           height={height}
+          selectSnapshot={selectSnapshot}
           theme={theme}
           width={width}
         />
@@ -59,12 +65,12 @@ function emptyFunction() {}
 type RenderDurationsProps = {|
   data: ChartData,
   height: number,
+  selectSnapshot: SelectSnapshot,
   theme: Theme,
   width: number,
 |};
 
-const RenderDurations = ({ data, height, theme, width }: RenderDurationsProps) => {
-  console.log('<RenderDurations>', data);
+const RenderDurations = ({ data, height, selectSnapshot, theme, width }: RenderDurationsProps) => {
   const { maxValue, nodes } = data;
 
   if (maxValue === 0) {
@@ -82,12 +88,12 @@ const RenderDurations = ({ data, height, theme, width }: RenderDurationsProps) =
       <svg height={height} width={barWidth * nodes.length}>
         {nodes.map((node, index) => (
           <ChartNode
-            color={getGradientColor(node.value / maxValue)}
+            color={getGradientColor(node.value / node.maxCommitValue)}
             height={scaleY(node.value)}
             key={index}
             label={`${node.value.toFixed(3)}ms`}
             onClick={emptyFunction}
-            onDoubleClick={emptyFunction}
+            onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
             style={null}
             theme={theme}
             width={barWidth}
@@ -106,12 +112,16 @@ const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>):
   const nodes: Array<Node> = snapshots
     .filter((snapshot: Snapshot) => snapshot.committedNodes.indexOf(nodeID) >= 0)
     .map((snapshot: Snapshot) => {
+      const maxCommitValue = snapshot.committedNodes.reduce((reduced, currentNodeID) =>
+        Math.max(reduced, snapshot.nodes.getIn([currentNodeID, 'actualDuration'])),
+        0
+      );
       const name = snapshot.nodes.getIn([nodeID, 'name']) || 'Unknown';
       const value = snapshot.nodes.getIn([nodeID, 'actualDuration']);
 
       maxValue = Math.max(maxValue, value);
 
-      return { name, value };
+      return { maxCommitValue, name, parentSnapshot: snapshot, value };
     });
 
   return { maxValue, nodes };
