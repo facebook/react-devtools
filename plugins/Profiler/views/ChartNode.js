@@ -27,19 +27,19 @@ const minWidthToDisplay = 35;
 
 const ChartNode = ({ className, color, height, label, onClick, width, x, y }: Props) => (
   <g
-    className={className}
+    className={`profiler-animated-node ${className || ''}`}
     transform={`translate(${x},${y})`}
   >
     <title>{label}</title>
     <rect
-      className="profiler-animated-resize"
+      className="profiler-animated-node"
       width={width}
       height={height}
       fill={color}
       onClick={onClick}
     />
     <foreignObject
-      className="profiler-animated-resize"
+      className="profiler-animated-node"
       width={width}
       height={height}
       style={{

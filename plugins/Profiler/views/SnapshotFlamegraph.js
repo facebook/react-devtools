@@ -141,7 +141,7 @@ type RecursiveNodeProps = {|
 const RecursiveNode = ({ depth = 0, maxValue, node, scaleX, selectedNode, selectNode, x = 0 }: RecursiveNodeProps) => (
   <Fragment>
     <ChartNode
-      className={node.value > maxValue ? 'profiler-animated-move fade' : 'profiler-animated-move'}
+      className={node.value > maxValue ? 'fade' : ''}
       color={node.color}
       height={barHeight}
       label={node.label}

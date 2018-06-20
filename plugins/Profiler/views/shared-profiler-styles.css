@@ -36,9 +36,6 @@
   font-family: Verdana;
 }
 
-.profiler-animated-all {
+.profiler-animated-node {
   transition: all ease-in-out 250ms;
-}
-.profiler-animated-resize {
-  transition: width ease-in-out 250ms;
 }
