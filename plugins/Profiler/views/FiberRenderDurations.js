@@ -116,8 +116,9 @@ const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>):
   const nodes: Array<Node> = snapshots
     .filter((snapshot: Snapshot) => snapshot.committedNodes.indexOf(nodeID) >= 0)
     .map((snapshot: Snapshot) => {
+      // TODO Why are some durations undefined?
       const maxCommitValue = snapshot.committedNodes.reduce((reduced, currentNodeID) =>
-        Math.max(reduced, snapshot.nodes.getIn([currentNodeID, 'actualDuration'])),
+        Math.max(reduced, snapshot.nodes.getIn([currentNodeID, 'actualDuration']) || 0),
         0
       );
       const value = snapshot.nodes.getIn([nodeID, 'actualDuration']);
