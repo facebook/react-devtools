@@ -32,21 +32,22 @@ const ChartNode = ({ className, color, height, label, onClick, width, x, y }: Pr
   >
     <title>{label}</title>
     <rect
-      className="d3-animated-resize"
+      className="profiler-animated-resize"
       width={width}
       height={height}
       fill={color}
       onClick={onClick}
     />
     <foreignObject
-      className="d3-animated-resize"
+      className="profiler-animated-resize"
       width={width}
       height={height}
       style={{
         display: width < minWidthToDisplay ? 'none' : 'block',
+        paddingLeft: x < 0 ? -x : 0,
       }}
     >
-      <div className="d3-graph-label">
+      <div className="profiler-graph-label">
         {label}
       </div>
     </foreignObject>

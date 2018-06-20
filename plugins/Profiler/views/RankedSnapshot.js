@@ -13,15 +13,11 @@
 import React, { Component } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
-import scale from './scale';
-import { gradient } from './colors';
+import { barHeight, gradient, scale } from './constants';
 
 import type {Snapshot} from '../ProfilerTypes';
 
-require('./d3-graph.css');
-
-// TODO constants
-const barHeight = 20;
+require('./shared-profiler-styles.css');
 
 type Props = {|
   snapshot: Snapshot,
@@ -90,7 +86,7 @@ class Ranked extends Component<RankedProps, RankedState> {
 
     return (
       <div style={{ height, width, overflow: 'auto' }}>
-        <svg className="d3-graph" height={barHeight * nodes.length} width={width}>
+        <svg className="profiler-graph" height={barHeight * nodes.length} width={width}>
           {nodes.map((node, index) => (
             <ChartNode
               className={node.value > maxValue ? 'fade' : ''}
@@ -131,7 +127,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
 
       return {
         id: node.id,
-        label: `${name} - ${node.actualDuration.toFixed(2)}ms`,
+        label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
         value: node.actualDuration,
       };
     })

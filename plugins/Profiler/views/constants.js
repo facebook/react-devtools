@@ -20,3 +20,8 @@ export const gradient = [
 ];
 
 export const didNotRender = '#ddd';
+
+export const barHeight = 20;
+
+export const scale = (minValue: number, maxValue: number, minRange: number, maxRange: number) => (value: number) =>
+  (value / (maxValue - minValue)) * (maxRange - minRange);
