@@ -14,16 +14,15 @@ import type {Theme} from '../../../frontend/types';
 
 import React from 'react';
 import { textHeight } from './constants';
-import { ChartAnimatedNode, ChartLabel, ChartRect } from './SharedProfilerStyles';
 
 type Props = {|
   color: string,
   height: number,
+  isDimmed?: boolean,
   label: string,
   onClick: Function,
   onDoubleClick: Function,
   placeLabelAboveNode?: boolean,
-  style: ?Object,
   theme: Theme,
   width: number,
   x: number,
@@ -32,12 +31,9 @@ type Props = {|
 
 const minWidthToDisplay = 35;
 
-const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme, width, x, y }: Props) => (
+const ChartNode = ({ color, height, isDimmed = false, label, onClick, onDoubleClick, theme, width, x, y }: Props) => (
   <g
-    style={{
-      ...ChartAnimatedNode,
-      ...style,
-    }}
+    style={ChartAnimatedNode}
     transform={`translate(${x},${y})`}
   >
     <title>{label}</title>
@@ -47,7 +43,7 @@ const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme,
       fill={color}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
-      style={ChartRect(theme)}
+      style={ChartRect(theme, isDimmed)}
     />
     {width >= minWidthToDisplay && (
       <foreignObject
@@ -55,6 +51,7 @@ const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme,
         height={height}
         style={{
           ...ChartAnimatedNode,
+          opacity: isDimmed ? 0.75 : 1,
           display: width < minWidthToDisplay ? 'none' : 'block',
           paddingLeft: x < 0 ? -x : 0,
         }}
@@ -67,5 +64,33 @@ const ChartNode = ({ color, height, label, onClick, onDoubleClick, style, theme,
     )}
   </g>
 );
+
+const ChartAnimatedNode = {
+  transition: 'all ease-in-out 250ms',
+};
+
+const ChartRect = (theme: Theme, isDimmed: boolean) => ({
+  cursor: 'pointer',
+  opacity: isDimmed ? 0.5 : 1,
+  stroke: theme.base00,
+  ...ChartAnimatedNode,
+});
+
+const ChartLabel = {
+  pointerEvents: 'none',
+  whiteSpace: 'nowrap',
+  textOverflow: 'ellipsis',
+  overflow: 'hidden',
+  fontSize: '12px',
+  fontFamily: 'sans-serif',
+  marginLeft: '4px',
+  marginRight: '4px',
+  lineHeight: '1.5',
+  padding: '0 0 0',
+  fontWeight: '400',
+  color: 'black',
+  textAlign: 'left',
+  ...ChartAnimatedNode,
+};
 
 export default ChartNode;

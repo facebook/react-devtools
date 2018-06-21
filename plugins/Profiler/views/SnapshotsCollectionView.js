@@ -223,4 +223,4 @@ const styles = {
   },
 };
 
-module.exports = SnapshotsCollectionView;
+export default SnapshotsCollectionView;

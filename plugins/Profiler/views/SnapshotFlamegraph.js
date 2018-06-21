@@ -19,7 +19,6 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, didNotRender, getGradientColor, scale } from './constants';
-import { ChartNodeDimmed } from './SharedProfilerStyles';
 
 export type Node = {|
   children: Array<Node>,
@@ -146,7 +145,6 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
   }));
 }
 
-// TODO Add Flow types
 class ListItem extends PureComponent<any, void> {
   render() {
     const { data, index, style } = this.props;
@@ -178,11 +176,11 @@ class ListItem extends PureComponent<any, void> {
             <ChartNode
               color={node.color}
               height={barHeight}
+              isDimmed={index < data.focusedNodeIndex}
               key={node.id}
               label={node.label}
               onClick={() => data.focusNode(node, index)}
               onDoubleClick={() => data.selectNode(node.id, node.name)}
-              style={index < data.focusedNodeIndex ? ChartNodeDimmed : null}
               theme={data.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}

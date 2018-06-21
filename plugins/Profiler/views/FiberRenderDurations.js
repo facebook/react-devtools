@@ -99,7 +99,6 @@ const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width
               label={`${node.value.toFixed(3)}ms`}
               onClick={emptyFunction}
               onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
-              style={null}
               theme={theme}
               width={scaleX(barWidth)}
               x={scaleX(barWidth * index)}

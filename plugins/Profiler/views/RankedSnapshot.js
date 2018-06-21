@@ -18,7 +18,6 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 // TODO import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, getGradientColor, scale } from './constants';
-import { ChartNodeDimmed } from './SharedProfilerStyles';
 
 type Node = {|
   id: any,
@@ -104,11 +103,11 @@ class Ranked extends PureComponent<RankedProps, RankedState> {
             <ChartNode
               color={getGradientColor(node.value / data.maxValue)}
               height={barHeight}
+              isDimmed={index < focusedNodeIndex}
               key={node.id}
               label={node.label}
               onClick={() => this.focusNode(index)}
               onDoubleClick={() => selectNode(node.id, node.name)}
-              style={index < focusedNodeIndex ? ChartNodeDimmed : null}
               theme={theme}
               width={scaleX(node.value)}
               x={0}
@@ -129,7 +128,14 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
   let maxValue = 0;
 
   const nodes = snapshot.committedNodes
-    .filter(nodeID => snapshot.nodes.has(nodeID) && snapshot.nodes.getIn([nodeID, 'actualDuration']) > 0)
+    .filter(nodeID => {
+      const node = snapshot.nodes.get(nodeID);
+      return (
+        node !== undefined &&
+        node.get('nodeType') !== 'Native' &&
+        node.get('actualDuration') > 0
+      );
+    })
     .map((nodeID, index) => {
       const node = snapshot.nodes.get(nodeID).toJSON();
       const name = node.name || 'Unknown';
