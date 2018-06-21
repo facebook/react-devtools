@@ -15,7 +15,7 @@ import type {Snapshot} from './ProfilerTypes';
 
 const {EventEmitter} = require('events');
 
-class Store extends EventEmitter {
+class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
   _mainStore: Object;
 
@@ -56,4 +56,4 @@ class Store extends EventEmitter {
   }
 }
 
-module.exports = Store;
+module.exports = ProfilerStore;
