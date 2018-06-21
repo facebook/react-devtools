@@ -6253,7 +6253,7 @@ react-virtualized-auto-sizer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.2.tgz#a61dd4f756458bbf63bd895a92379f9b70f803bd"
 
-"react-window@file:../react-window":
+react-window@/Users/bvaughn/Documents/git/react-window:
   version "1.0.0-alpha.3"
   dependencies:
     memoize-one "^3.1.1"

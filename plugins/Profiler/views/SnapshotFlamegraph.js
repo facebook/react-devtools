@@ -14,7 +14,7 @@ import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
-import React, { PureComponent } from 'react';
+import React, { Fragment, PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
@@ -115,9 +115,10 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
 
     return (
       <List
-        data={listData}
+        containerTag="svg"
         height={height}
         itemCount={nodesByDepth.length}
+        itemData={listData}
         itemSize={barHeight}
         width={width}
       >
@@ -145,14 +146,21 @@ class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
   }));
 }
 
+// TODO Add Flow types
 class ListItem extends PureComponent<any, void> {
   render() {
     const { data, index, style } = this.props;
 
     const nodes = data.nodesByDepth[index];
 
+    // List items are absolutely positioned using the CSS "top" attribute.
+    // The "left" value will always be 0.
+    // Since height is fixed, and width is based on the node's duration,
+    // We can ignore those values as well.
+    const top = parseInt(style.top, 10);
+
     return (
-      <svg style={style}>
+      <Fragment>
         {nodes.map(node => {
           const focusedNodeX = data.scaleX(data.focusedNode.x);
           const nodeX = data.scaleX(node.x);
@@ -178,11 +186,11 @@ class ListItem extends PureComponent<any, void> {
               theme={data.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
-              y={0}
+              y={top}
             />
           );
         })}
-      </svg>
+      </Fragment>
     );
   }
 }
@@ -250,4 +258,4 @@ const convertSnapshotToChartData = memoize((snapshot, rootNodeID) => {
   return convertNodeToDatum(rootNodeID);
 });
 
-module.exports = SnapshotFlamegraph;
+export default SnapshotFlamegraph;

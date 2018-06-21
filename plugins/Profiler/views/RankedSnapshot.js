@@ -151,4 +151,4 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
   };
 };
 
-module.exports = RankedSnapshot;
+export default RankedSnapshot;

@@ -12,9 +12,9 @@
 
 import type {Theme} from '../../../frontend/types';
 
-const React = require('react');
-const { textHeight } = require('./constants');
-const { ChartAnimatedNode, ChartLabel, ChartRect } = require('./SharedProfilerStyles');
+import React from 'react';
+import { textHeight } from './constants';
+import { ChartAnimatedNode, ChartLabel, ChartRect } from './SharedProfilerStyles';
 
 type Props = {|
   color: string,

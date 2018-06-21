@@ -13,15 +13,14 @@
 import type {Theme} from '../../../frontend/types';
 import type {Snapshot} from '../ProfilerTypes';
 
-const PropTypes = require('prop-types');
-
-const React = require('react');
-const decorate = require('../../../frontend/decorate');
-const {sansSerif} = require('../../../frontend/Themes/Fonts');
-const SvgIcon = require('../../../frontend/SvgIcon');
-const Icons = require('../../../frontend/Icons');
-const Hoverable = require('../../../frontend/Hoverable');
-const SnapshotsCollectionView = require('./SnapshotsCollectionView');
+import PropTypes from 'prop-types';
+import React from 'react';
+import decorate from '../../../frontend/decorate';
+import {sansSerif} from '../../../frontend/Themes/Fonts';
+import SvgIcon from '../../../frontend/SvgIcon';
+import Icons from '../../../frontend/Icons';
+import Hoverable from '../../../frontend/Hoverable';
+import SnapshotsCollectionView from './SnapshotsCollectionView';
 
 type Props = {|
   clearSnapshots: () => void,
@@ -228,7 +227,7 @@ const stopRecordingButtonStyle = (theme: Theme) => ({
   marginTop: '0.5rem',
 });
 
-module.exports = decorate({
+export default decorate({
   store: 'profilerStore',
   listeners: () => ['isRecording', 'snapshots'],
   props(store) {

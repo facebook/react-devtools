@@ -13,12 +13,11 @@
 import type Bridge from '../../agent/Bridge';
 import type Store from '../../frontend/Store';
 
-var React = require('react');
-var provideStore = require('../../frontend/provideStore');
-
-var ProfilerStore = require('./ProfilerStore');
-var ProfilerTab = require('./views/ProfilerTab');
-var StoreWrapper = provideStore('profilerStore');
+const React = require('react');
+const provideStore = require('../../frontend/provideStore');
+const ProfilerStore = require('./ProfilerStore');
+const ProfilerTab = require('./views/ProfilerTab').default;
+const StoreWrapper = provideStore('profilerStore');
 
 class ProfilerPlugin {
   hasProfiler: bool;

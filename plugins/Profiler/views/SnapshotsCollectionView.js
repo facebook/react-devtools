@@ -13,13 +13,13 @@
 import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
-const React = require('react');
-const FiberRenderDurations = require('./FiberRenderDurations');
-const SnapshotFlamegraph = require('./SnapshotFlamegraph');
-const RankedSnapshot = require('./RankedSnapshot');
-const Hoverable = require('../../../frontend/Hoverable');
-const Icons = require('../../../frontend/Icons');
-const SvgIcon = require('../../../frontend/SvgIcon');
+import React from 'react';
+import FiberRenderDurations from './FiberRenderDurations';
+import SnapshotFlamegraph from './SnapshotFlamegraph';
+import RankedSnapshot from './RankedSnapshot';
+import Hoverable from '../../../frontend/Hoverable';
+import Icons from '../../../frontend/Icons';
+import SvgIcon from '../../../frontend/SvgIcon';
 
 type Mode = 'flamegraph' | 'ranked';
 

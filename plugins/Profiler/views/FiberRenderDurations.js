@@ -142,4 +142,4 @@ const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>):
   };
 };
 
-module.exports = FiberRenderDurations;
+export default FiberRenderDurations;
