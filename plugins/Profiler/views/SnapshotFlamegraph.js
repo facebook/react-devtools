@@ -23,6 +23,7 @@ import { barHeight, didNotRender, getGradientColor, scale } from './constants';
 export type Node = {|
   children: Array<Node>,
   color: string,
+  fiber: Object,
   id: string,
   label: string,
   name: string,
@@ -30,28 +31,34 @@ export type Node = {|
   x?: number,
 |};
 
-type SelectNode = (nodeID: string, name: string) => void;
+type SelectOrInspectFiber = (fiber: Object) => void;
 
 type Props = {|
-  selectNode: SelectNode,
+  inspectFiber: SelectOrInspectFiber,
+  selectedFiberID: string | null,
+  selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
   theme: Theme,
 |};
 
-const SnapshotFlamegraph = ({selectNode, snapshot, theme}: Props) => {
+const SnapshotFlamegraph = ({inspectFiber, selectedFiberID, selectFiber, snapshot, theme}: Props) => {
   const rootNode = snapshot.nodes.get(snapshot.root);
   const children = rootNode.get('children');
   const rootNodeID = Array.isArray(children) ? children[0] : children;
 
-  const data = convertSnapshotToChartData(snapshot, rootNodeID); // (Memoized)
+  // The following conversion methods are memoized,
+  // So it's okay to call them on every render.
+  const data = convertSnapshotToChartData(snapshot, rootNodeID);
 
   return (
     <AutoSizer>
       {({ height, width }) => (
         <Flamegraph
           data={data}
+          inspectFiber={inspectFiber}
           height={height}
-          selectNode={selectNode}
+          selectedFiberID={selectedFiberID}
+          selectFiber={selectFiber}
           theme={theme}
           width={width}
         />
@@ -62,88 +69,47 @@ const SnapshotFlamegraph = ({selectNode, snapshot, theme}: Props) => {
 
 type FlamegraphProps = {|
   data: Node,
+  inspectFiber: SelectOrInspectFiber,
   height: number,
-  selectNode: SelectNode,
+  selectedFiberID: string | null,
+  selectFiber: SelectOrInspectFiber,
   theme: Theme,
   width: number,
 |};
 
-type FlamegraphState = {|
-  focusedNode: Node,
-  focusedNodeIndex: number,
-  maxValue: number,
-  prevData: Node,
-|};
-
-class Flamegraph extends PureComponent<FlamegraphProps, FlamegraphState> {
-  state: FlamegraphState = {
-    focusedNode: this.props.data,
-    focusedNodeIndex: 0,
-    maxValue: this.props.data.value,
-    prevData: this.props.data,
-  };
-
-  static getDerivedStateFromProps(props: FlamegraphProps, state: FlamegraphState): $Shape<FlamegraphState> {
-    if (state.prevData !== props.data) {
-      return {
-        focusedNode: props.data,
-        focusedNodeIndex: 0,
-        maxValue: props.data.value,
-        prevData: props.data,
-      };
-    }
-    return null;
-  }
-
-  render() {
-    const { data, height, selectNode, theme, width } = this.props;
-    const { maxValue, focusedNode, focusedNodeIndex } = this.state;
-
-    const nodesByDepth = preprocessData(data); // Memoized
-
-    const listData = this.getListData(
-      focusedNode,
-      focusedNodeIndex,
-      this.focusNode,
-      maxValue,
-      nodesByDepth,
-      selectNode,
-      theme,
-      width,
-    );
-
-    return (
-      <List
-        containerTag="svg"
-        height={height}
-        itemCount={nodesByDepth.length}
-        itemData={listData}
-        itemSize={barHeight}
-        width={width}
-      >
-        {ListItem}
-      </List>
-    );
-  }
-
-  focusNode = (node: Node, index: number) => this.setState({
-    focusedNode: node,
-    focusedNodeIndex: index,
-    maxValue: node.value,
-  });
-
-  getListData = memoize((focusedNode, focusedNodeIndex, focusNode, maxValue, nodesByDepth, selectNode, theme, width) => ({
+const Flamegraph = ({ data, inspectFiber, height, selectedFiberID, selectFiber, theme, width }: FlamegraphProps) => {
+  // The following conversion methods are memoized,
+  // So it's okay to call them on every render.
+  const {
     focusedNode,
     focusedNodeIndex,
-    focusNode,
+    maxValue,
+  } = getFocusedNodeData(data, selectedFiberID);
+  const nodesByDepth = getNodesByDepthMap(data);
+  const listData = getListData(
+    focusedNode,
+    focusedNodeIndex,
+    inspectFiber,
     maxValue,
     nodesByDepth,
-    scaleX: scale(0, maxValue, 0, width),
-    selectNode,
+    selectFiber,
     theme,
     width,
-  }));
-}
+  );
+
+  return (
+    <List
+      containerTag="svg"
+      height={height}
+      itemCount={nodesByDepth.length}
+      itemData={listData}
+      itemSize={barHeight}
+      width={width}
+    >
+      {ListItem}
+    </List>
+  );
+};
 
 class ListItem extends PureComponent<any, void> {
   render() {
@@ -179,8 +145,8 @@ class ListItem extends PureComponent<any, void> {
               isDimmed={index < data.focusedNodeIndex}
               key={node.id}
               label={node.label}
-              onClick={() => data.focusNode(node, index)}
-              onDoubleClick={() => data.selectNode(node.id, node.name)}
+              onClick={() => data.selectFiber(node)}
+              onDoubleClick={() => data.inspectFiber(node)}
               theme={data.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
@@ -193,9 +159,49 @@ class ListItem extends PureComponent<any, void> {
   }
 }
 
-// TODO Combine preprocessData() and convertSnapshotToChartData()
+const getFocusedNodeData = memoize((data: Node, selectedFiberID: string | null) => {
+  let focusedNode = data;
+  let focusedNodeIndex = 0;
+  let maxValue = data.value;
 
-const preprocessData = memoize((node: Node) => {
+  if (selectedFiberID !== null) {
+    const findNode = (node: Node, depth: number = 0) => {
+      if (node.id === selectedFiberID) {
+        focusedNode = node;
+        focusedNodeIndex = depth;
+        maxValue = node.value;
+      } else {
+        node.children.find(childNode => findNode(childNode, depth + 1));
+      }
+    };
+
+    findNode(data);
+  }
+
+  return {
+    focusedNode,
+    focusedNodeIndex,
+    maxValue,
+  };
+});
+
+const getListData = memoize((focusedNode, focusedNodeIndex, inspectFiber, maxValue, nodesByDepth, selectFiber, theme, width) => {
+  return {
+    focusedNode,
+    focusedNodeIndex,
+    inspectFiber,
+    maxValue,
+    nodesByDepth,
+    scaleX: scale(0, maxValue, 0, width),
+    selectFiber,
+    theme,
+    width,
+  };
+});
+
+// TODO Combine getNodesByDepthMap() and convertSnapshotToChartData() ?
+
+const getNodesByDepthMap = memoize((node: Node) => {
   const nodesByDepth = [];
 
   const processNode = (currentNode: Node, currentDepth: number = 0, currentX = 0) => {
@@ -244,6 +250,7 @@ const convertSnapshotToChartData = memoize((snapshot, rootNodeID) => {
       color: renderedInCommit
         ? getGradientColor(node.actualDuration / maxDuration)
         : didNotRender,
+      fiber: node,
       id: node.id,
       label: renderedInCommit
         ? `${name} (${node.actualDuration.toFixed(2)}ms)`

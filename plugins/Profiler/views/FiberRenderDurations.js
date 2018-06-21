@@ -13,6 +13,7 @@
 import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
+import memoize from 'memoize-one';
 import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import ChartNode from './ChartNode';
@@ -33,23 +34,24 @@ type ChartData = {|
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
-  exitChart: Function,
-  nodeID: string,
+  selectedFiberID: string,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
+  stopInspecting: Function,
   theme: Theme,
 |};
 
-const FiberRenderDurations = ({exitChart, nodeID, selectSnapshot, snapshots, theme}: Props) => {
-  // TODO Memoize this
-  const data = convertSnapshotToChartData(nodeID, snapshots);
+const FiberRenderDurations = ({selectedFiberID, selectSnapshot, snapshots, stopInspecting, theme}: Props) => {
+  // The following conversion methods are memoized,
+  // So it's okay to call them on every render.
+  const data = convertSnapshotToChartData(selectedFiberID, snapshots);
 
   return (
     <AutoSizer>
       {({ height, width }) => (
         <RenderDurations
           data={data}
-          exitChart={exitChart}
+          stopInspecting={stopInspecting}
           height={height}
           selectSnapshot={selectSnapshot}
           theme={theme}
@@ -60,25 +62,23 @@ const FiberRenderDurations = ({exitChart, nodeID, selectSnapshot, snapshots, the
   );
 };
 
-function emptyFunction() {}
-
 type RenderDurationsProps = {|
   data: ChartData,
-  exitChart: Function,
   height: number,
   selectSnapshot: SelectSnapshot,
+  stopInspecting: Function,
   theme: Theme,
   width: number,
 |};
 
-const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width }: RenderDurationsProps) => {
+const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, width }: RenderDurationsProps) => {
   const { maxValue, name, nodes } = data;
 
   if (maxValue === 0) {
     return (
       <div style={{ height, width, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
         <div>No render times recorded for <strong>{name}</strong></div>
-        <button onClick={exitChart}>Go back</button>
+        <button onClick={stopInspecting}>Go back</button>
       </div>
     );
   }
@@ -97,8 +97,7 @@ const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width
               height={safeHeight}
               key={index}
               label={`${node.value.toFixed(3)}ms`}
-              onClick={emptyFunction}
-              onDoubleClick={() => selectSnapshot(node.parentSnapshot)}
+              onClick={() => selectSnapshot(node.parentSnapshot)}
               theme={theme}
               width={scaleX(barWidth)}
               x={scaleX(barWidth * index)}
@@ -111,7 +110,7 @@ const RenderDurations = ({ data, exitChart, height, selectSnapshot, theme, width
   );
 };
 
-const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>): ChartData => {
+const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Snapshot>): ChartData => {
   let maxValue = 0;
   let name = null;
 
@@ -139,6 +138,6 @@ const convertSnapshotToChartData = (nodeID: string, snapshots: Array<Snapshot>):
     name: name || 'Unknown',
     nodes,
   };
-};
+});
 
 export default FiberRenderDurations;

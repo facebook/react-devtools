@@ -21,7 +21,7 @@ type Props = {|
   isDimmed?: boolean,
   label: string,
   onClick: Function,
-  onDoubleClick: Function,
+  onDoubleClick?: Function,
   placeLabelAboveNode?: boolean,
   theme: Theme,
   width: number,

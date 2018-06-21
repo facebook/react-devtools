@@ -13,29 +13,34 @@
 import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
-import React, { PureComponent } from 'react';
+import memoize from 'memoize-one';
+import React from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 // TODO import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, getGradientColor, scale } from './constants';
 
 type Node = {|
+  fiber: Object,
   id: any,
   label: string,
   name: string,
   value: number,
 |};
 
-type SelectNode = (nodeID: string, name: string) => void;
+type SelectOrInspectFiber = (fiber: Object) => void;
 
 type Props = {|
-  selectNode: SelectNode,
+  inspectFiber: SelectOrInspectFiber,
+  selectedFiberID: string | null,
+  selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
   theme: Theme,
 |};
 
-const RankedSnapshot = ({selectNode, snapshot, theme}: Props) => {
-  // TODO Memoize this
+const RankedSnapshot = ({inspectFiber, selectedFiberID, selectFiber, snapshot, theme}: Props) => {
+  // The following conversion methods are memoized,
+  // So it's okay to call them on every render.
   const data = convertSnapshotToChartData(snapshot);
 
   return (
@@ -44,7 +49,9 @@ const RankedSnapshot = ({selectNode, snapshot, theme}: Props) => {
         <Ranked
           data={data}
           height={height}
-          selectNode={selectNode}
+          inspectFiber={inspectFiber}
+          selectedFiberID={selectedFiberID}
+          selectFiber={selectFiber}
           theme={theme}
           width={width}
         />
@@ -61,78 +68,70 @@ type RankedData = {|
 type RankedProps = {|
   data: RankedData,
   height: number,
-  selectNode: SelectNode,
+  inspectFiber: SelectOrInspectFiber,
+  selectedFiberID: string | null,
+  selectFiber: SelectOrInspectFiber,
   theme: Theme,
   width: number,
 |};
 
-type RankedState = {|
-  focusedNodeIndex: number,
-  prevData: RankedData,
-|};
+const Ranked = ({ data, height, inspectFiber, selectedFiberID, selectFiber, theme, width }: RankedProps) => {
+  // The following conversion methods are memoized,
+  // So it's okay to call them on every render.
+  const focusedNodeIndex = getNodeIndex(data, selectedFiberID);
 
-class Ranked extends PureComponent<RankedProps, RankedState> {
-  state: RankedState = {
-    focusedNodeIndex: 0,
-    prevData: this.props.data,
-  };
+  const { nodes } = data;
 
-  static getDerivedStateFromProps(props: RankedProps, state: RankedState): $Shape<RankedState> {
-    if (state.prevData !== props.data) {
-      return {
-        focusedNodeIndex: 0,
-        prevData: props.data,
-      };
+  const scaleX = scale(0, nodes[focusedNodeIndex].value, 0, width);
+
+  // TODO Use react-window
+  return (
+    <div style={{ height, width, overflow: 'auto' }}>
+      <svg height={barHeight * nodes.length} width={width}>
+        {nodes.map((node, index) => (
+          <ChartNode
+            color={getGradientColor(node.value / data.maxValue)}
+            height={barHeight}
+            isDimmed={index < focusedNodeIndex}
+            key={node.id}
+            label={node.label}
+            onClick={() => selectFiber(node.fiber)}
+            onDoubleClick={() => inspectFiber(node.fiber)}
+            theme={theme}
+            width={scaleX(node.value)}
+            x={0}
+            y={barHeight * index}
+          />
+        ))}
+      </svg>
+    </div>
+  );
+};
+
+const getNodeIndex = memoize((data: RankedData, id: string | null): number => {
+  if (id === null) {
+    return 0;
+  }
+  const { nodes } = data;
+  for (let index = 0; index < nodes.length; index++) {
+    if (nodes[index].id === id) {
+      return index;
     }
-    return null;
   }
+  return 0;
+});
 
-  render() {
-    const { height, data, selectNode, theme, width } = this.props;
-    const { focusedNodeIndex } = this.state;
-
-    const { nodes } = data;
-
-    const scaleX = scale(0, nodes[focusedNodeIndex].value, 0, width);
-
-    // TODO Use react-window
-    return (
-      <div style={{ height, width, overflow: 'auto' }}>
-        <svg height={barHeight * nodes.length} width={width}>
-          {nodes.map((node, index) => (
-            <ChartNode
-              color={getGradientColor(node.value / data.maxValue)}
-              height={barHeight}
-              isDimmed={index < focusedNodeIndex}
-              key={node.id}
-              label={node.label}
-              onClick={() => this.focusNode(index)}
-              onDoubleClick={() => selectNode(node.id, node.name)}
-              theme={theme}
-              width={scaleX(node.value)}
-              x={0}
-              y={barHeight * index}
-            />
-          ))}
-        </svg>
-      </div>
-    );
-  }
-
-  focusNode = (index: number) => this.setState({
-    focusedNodeIndex: index,
-  });
-}
-
-const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
+const convertSnapshotToChartData = memoize((snapshot: Snapshot): RankedData => {
   let maxValue = 0;
 
   const nodes = snapshot.committedNodes
     .filter(nodeID => {
       const node = snapshot.nodes.get(nodeID);
+      const nodeType = node && node.get('nodeType');
       return (
         node !== undefined &&
-        node.get('nodeType') !== 'Native' &&
+        nodeType !== 'Native' &&
+        nodeType !== 'Wrapper' &&
         node.get('actualDuration') > 0
       );
     })
@@ -143,6 +142,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
       maxValue = Math.max(node.actualDuration, maxValue);
 
       return {
+        fiber: node,
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
         name,
@@ -155,6 +155,6 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
     nodes,
     maxValue,
   };
-};
+});
 
 export default RankedSnapshot;
