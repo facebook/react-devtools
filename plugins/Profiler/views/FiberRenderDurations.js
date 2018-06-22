@@ -50,9 +50,9 @@ const FiberRenderDurations = ({selectedFiberID, selectSnapshot, snapshots, stopI
       {({ height, width }) => (
         <RenderDurations
           data={data}
-          stopInspecting={stopInspecting}
           height={height}
           selectSnapshot={selectSnapshot}
+          stopInspecting={stopInspecting}
           theme={theme}
           width={width}
         />
@@ -96,6 +96,7 @@ const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, 
               key={index}
               label={`${node.value.toFixed(2)}ms`}
               onClick={() => selectSnapshot(node.parentSnapshot)}
+              onDoubleClick={stopInspecting}
               theme={theme}
               width={scaleX(barWidth)}
               x={scaleX(barWidth * index)}

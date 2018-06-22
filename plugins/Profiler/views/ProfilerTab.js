@@ -17,6 +17,9 @@ import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
 import decorate from '../../../frontend/decorate';
 import {monospace, sansSerif} from '../../../frontend/Themes/Fonts';
+import DataView from '../../../frontend/DataView/DataView';
+import DetailPane from '../../../frontend/detail_pane/DetailPane';
+import DetailPaneSection from '../../../frontend/detail_pane/DetailPaneSection';
 import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
 import Hoverable from '../../../frontend/Hoverable';
@@ -93,7 +96,6 @@ class ProfilerTab extends React.Component<Props, State> {
 
   selectSnapshot = (snapshot: Snapshot) =>
     this.setState({
-      isInspectingSelectedFiber: false,
       snapshotIndex: this.props.snapshots.indexOf(snapshot),
     });
 
@@ -177,7 +179,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
                 <span>Render ({snapshotIndex + 1} / {snapshots.length})</span>
                 <IconButton
-                  disabled={snapshotIndex === 0}
+                  disabled={snapshotIndex === 0 || isInspectingSelectedFiber}
                   icon={Icons.BACK}
                   isTransparent={true}
                   onClick={this.selectPreviousSnapshotIndex}
@@ -185,6 +187,7 @@ class ProfilerTab extends React.Component<Props, State> {
                   title="Previous render"
                 />
                 <input
+                  disabled={isInspectingSelectedFiber}
                   type="range"
                   min={0}
                   max={snapshots.length - 1}
@@ -192,7 +195,7 @@ class ProfilerTab extends React.Component<Props, State> {
                   onChange={this.handleSnapshotSliderChange}
                 />
                 <IconButton
-                  disabled={snapshotIndex === snapshots.length - 1}
+                  disabled={snapshotIndex === snapshots.length - 1 || isInspectingSelectedFiber}
                   icon={Icons.FORWARD}
                   isTransparent={true}
                   onClick={this.selectNextSnapshotIndex}
@@ -217,17 +220,24 @@ class ProfilerTab extends React.Component<Props, State> {
               theme={theme}
             />
           )}
+          {!selectedFiber && (
+            <div style={styles.FiberDetailPaneEmpty(theme)}>
+              Nothing select
+            </div>
+          )}
         </div>
       </div>
     );
   }
 }
 
+const emptyFunction = () => {};
+
 // TODO Maybe move into its own file?
 // TODO Flow type
 const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown', snapshot, snapshotFiber, theme }) => (
   <Fragment>
-    <div style={styles.FiberDetailPaneHeader}>
+    <div style={styles.FiberDetailPaneHeader(theme)}>
       <div style={styles.SelectedFiberName}>
         {name}
       </div>
@@ -239,7 +249,32 @@ const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown',
         title={`Inspect ${name}`}
       />
     </div>
-    <pre style={{whiteSpace: 'pre-wrap'}}>{JSON.stringify(snapshotFiber.get('props'))}</pre>
+    {snapshotFiber !== null && (
+      <div style={styles.DetailPaneWrapper}>
+        <DetailPane theme={theme}>
+          <DetailPaneSection title="Props">
+            <DataView
+              path={['props']}
+              readOnly={true}
+              inspect={emptyFunction}
+              showMenu={emptyFunction}
+              data={snapshotFiber.get('props')}
+            />
+          </DetailPaneSection>
+          {snapshotFiber.get('state') && (
+            <DetailPaneSection title="State">
+              <DataView
+                path={['state']}
+                readOnly={true}
+                inspect={emptyFunction}
+                showMenu={emptyFunction}
+                data={snapshotFiber.get('state')}
+              />
+            </DetailPaneSection>
+          )}
+        </DetailPane>
+      </div>
+    )}
   </Fragment>
 );
 
@@ -298,6 +333,7 @@ const RecordButton = Hoverable(
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={styles.recordButtonStyle(isActive, isHovered, theme)}
+      title={isActive ? 'Stop profiling' : 'Start profiling'}
     >
       <SvgIcon path={Icons.RECORD} />
     </button>
@@ -344,17 +380,34 @@ var styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
-  FiberDetailPaneHeader: {
+  FiberDetailPaneEmpty: (theme: Theme) => ({
+    color: theme.base04,
+    fontSize: sansSerif.sizes.large,
+    height: '100%',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0.25rem',
+  }),
+  DetailPaneWrapper: {
+    flex: 1,
+    overflow: 'auto',
+  },
+  FiberDetailPaneHeader: (theme: Theme) => ({
     width: '100%',
     display: 'flex',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: '1rem',
-  },
+    padding: '0.25rem',
+    backgroundColor: theme.base01,
+    borderBottom: `1px solid ${theme.base03}`,
+    boxSizing: 'border-box',
+  }),
   SelectedFiberName: {
     fontFamily: monospace.family,
-    fontSize: sansSerif.sizes.large,
+    fontSize: monospace.sizes.large,
   },
   Content: {
     flex: 1,
@@ -370,10 +423,8 @@ var styles = {
     flex: '0 1 300px',
     display: 'flex',
     flexDirection: 'column',
-    alignItems: 'center',
+    alignItems: 'stretch',
     justifyContent: 'stretch',
-    padding: '0.5rem',
-    backgroundColor: theme.base01,
     borderLeft: `1px solid ${theme.base03}`,
     boxSizing: 'border-box',
   }),
