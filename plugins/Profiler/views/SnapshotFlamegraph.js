@@ -18,7 +18,7 @@ import React, { Fragment, PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import { barHeight, didNotRender, getGradientColor, scale } from './constants';
+import { barHeight, barWidthThreshold, didNotRender, getGradientColor, scale } from './constants';
 
 export type Node = {|
   children: Array<Node>,
@@ -130,7 +130,13 @@ class ListItem extends PureComponent<any, void> {
           const nodeX = data.scaleX(node.x);
           const nodeWidth = data.scaleX(node.value);
 
-          // Filter out nodes that are outside of the horizontal window
+          // Filter out nodes that are too small to see or click.
+          // This also helps render large trees faster.
+          if (nodeWidth < barWidthThreshold) {
+            return null;
+          }
+
+          // Filter out nodes that are outside of the horizontal window.
           if (
             nodeX + nodeWidth < focusedNodeX ||
             nodeX > focusedNodeX + data.width

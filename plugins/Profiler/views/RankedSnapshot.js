@@ -18,7 +18,7 @@ import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import { barHeight, getGradientColor, scale } from './constants';
+import { barHeight, getGradientColor, minBarWidth, scale } from './constants';
 
 type Node = {|
   fiber: Object,
@@ -126,7 +126,7 @@ class ListItem extends PureComponent<any, void> {
         onClick={() => data.selectFiber(node.fiber)}
         onDoubleClick={() => data.inspectFiber(node.fiber)}
         theme={data.theme}
-        width={scaleX(node.value)}
+        width={Math.max(minBarWidth, scaleX(node.value))}
         x={0}
         y={top}
       />

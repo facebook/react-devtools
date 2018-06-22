@@ -238,7 +238,7 @@ const emptyFunction = () => {};
 const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown', snapshot, snapshotFiber, theme }) => (
   <Fragment>
     <div style={styles.FiberDetailPaneHeader(theme)}>
-      <div style={styles.SelectedFiberName}>
+      <div style={styles.SelectedFiberName} title={name}>
         {name}
       </div>
       <IconButton
@@ -408,6 +408,9 @@ var styles = {
   SelectedFiberName: {
     fontFamily: monospace.family,
     fontSize: monospace.sizes.large,
+    overflow: 'hidden',
+    textOverflow: 'ellipsis',
+    whiteSpace: 'nowrap',
   },
   Content: {
     flex: 1,
@@ -421,6 +424,7 @@ var styles = {
   },
   Right: (theme: Theme) => ({
     flex: '0 1 300px',
+    maxWidth: '300px',
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'stretch',
