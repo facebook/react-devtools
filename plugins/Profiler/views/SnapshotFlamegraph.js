@@ -86,7 +86,7 @@ const Flamegraph = ({ data, inspectFiber, height, selectedFiberID, selectFiber, 
     maxValue,
   } = getFocusedNodeData(data, selectedFiberID);
   const nodesByDepth = getNodesByDepthMap(data);
-  const listData = getListData(
+  const itemData = getItemData(
     focusedNode,
     focusedNodeIndex,
     inspectFiber,
@@ -102,7 +102,7 @@ const Flamegraph = ({ data, inspectFiber, height, selectedFiberID, selectFiber, 
       containerTag="svg"
       height={height}
       itemCount={nodesByDepth.length}
-      itemData={listData}
+      itemData={itemData}
       itemSize={barHeight}
       width={width}
     >
@@ -189,7 +189,7 @@ const getFocusedNodeData = memoize((data: Node, selectedFiberID: string | null) 
   };
 });
 
-const getListData = memoize((focusedNode, focusedNodeIndex, inspectFiber, maxValue, nodesByDepth, selectFiber, theme, width) => {
+const getItemData = memoize((focusedNode, focusedNodeIndex, inspectFiber, maxValue, nodesByDepth, selectFiber, theme, width) => {
   return {
     focusedNode,
     focusedNodeIndex,

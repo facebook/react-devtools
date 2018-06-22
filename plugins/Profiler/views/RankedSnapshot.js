@@ -14,9 +14,9 @@ import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
-import React from 'react';
+import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
-// TODO import { FixedSizeList as List } from 'react-window';
+import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { barHeight, getGradientColor, scale } from './constants';
 
@@ -79,34 +79,78 @@ const Ranked = ({ data, height, inspectFiber, selectedFiberID, selectFiber, them
   // The following conversion methods are memoized,
   // So it's okay to call them on every render.
   const focusedNodeIndex = getNodeIndex(data, selectedFiberID);
+  const itemData = getItemData(
+    data,
+    focusedNodeIndex,
+    inspectFiber,
+    selectFiber,
+    theme,
+    width,
+  );
 
-  const { nodes } = data;
-
-  const scaleX = scale(0, nodes[focusedNodeIndex].value, 0, width);
-
-  // TODO Use react-window
   return (
-    <div style={{ height, width, overflow: 'auto' }}>
-      <svg height={barHeight * nodes.length} width={width}>
-        {nodes.map((node, index) => (
-          <ChartNode
-            color={getGradientColor(node.value / data.maxValue)}
-            height={barHeight}
-            isDimmed={index < focusedNodeIndex}
-            key={node.id}
-            label={node.label}
-            onClick={() => selectFiber(node.fiber)}
-            onDoubleClick={() => inspectFiber(node.fiber)}
-            theme={theme}
-            width={scaleX(node.value)}
-            x={0}
-            y={barHeight * index}
-          />
-        ))}
-      </svg>
-    </div>
+    <List
+      containerTag="svg"
+      height={height}
+      itemCount={data.nodes.length}
+      itemData={itemData}
+      itemSize={barHeight}
+      width={width}
+    >
+      {ListItem}
+    </List>
   );
 };
+
+class ListItem extends PureComponent<any, void> {
+  render() {
+    const { data, index, style } = this.props;
+
+    const node = data.nodes[index];
+
+    const { scaleX } = data;
+
+    // List items are absolutely positioned using the CSS "top" attribute.
+    // The "left" value will always be 0.
+    // Since height is fixed, and width is based on the node's duration,
+    // We can ignore those values as well.
+    const top = parseInt(style.top, 10);
+
+    return (
+      <ChartNode
+        color={getGradientColor(node.value / data.maxValue)}
+        height={barHeight}
+        isDimmed={index < data.focusedNodeIndex}
+        key={node.id}
+        label={node.label}
+        onClick={() => data.selectFiber(node.fiber)}
+        onDoubleClick={() => data.inspectFiber(node.fiber)}
+        theme={data.theme}
+        width={scaleX(node.value)}
+        x={0}
+        y={top}
+      />
+    );
+  }
+}
+
+const getItemData = memoize((
+  data: RankedData,
+  focusedNodeIndex: number,
+  inspectFiber: SelectOrInspectFiber,
+  selectFiber: SelectOrInspectFiber,
+  theme: Theme,
+  width: number,
+) => ({
+  focusedNode: data.nodes[focusedNodeIndex],
+  focusedNodeIndex,
+  inspectFiber,
+  nodes: data.nodes,
+  maxValue: data.maxValue,
+  scaleX: scale(0, data.nodes[focusedNodeIndex].value, 0, width),
+  selectFiber,
+  theme,
+}));
 
 const getNodeIndex = memoize((data: RankedData, id: string | null): number => {
   if (id === null) {

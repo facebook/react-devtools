@@ -107,7 +107,7 @@ class ProfilerTab extends React.Component<Props, State> {
     const { isInspectingSelectedFiber, selectedChart, selectedFiber, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
-    const snapshotFiber = selectedFiber !== null ? snapshot.nodes.get(selectedFiber.id) : null;
+    const snapshotFiber = selectedFiber && snapshot.nodes.get(selectedFiber.id) || null;
 
     let content;
     if (isRecording) {
