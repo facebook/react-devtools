@@ -33,7 +33,8 @@ type Props = {|
 |};
 
 type State = {|
-  inspectSelectedFiber: boolean,
+  isInspectingSelectedFiber: boolean,
+  prevIsRecording: boolean,
   selectedChart: Chart,
   selectedFiber: Object | null,
   snapshotIndex: number,
@@ -45,27 +46,38 @@ class ProfilerTab extends React.Component<Props, State> {
   };
 
   state: State = {
-    inspectSelectedFiber: false,
+    isInspectingSelectedFiber: false,
+    prevIsRecording: this.props.isRecording,
     selectedChart: 'flamegraph',
     selectedFiber: null,
     snapshotIndex: 0,
   };
 
-  // TODO Reset e.g. selectedFiber when snapshotIndex changes (if fiber not in snapshot)
+  static getDerivedStateFromProps(props: Props, state: State): $Shape<State> {
+    if (props.isRecording !== state.prevIsRecording) {
+      return {
+        prevIsRecording: props.isRecording,
+        selectedFiber: null,
+        snapshotIndex: 0,
+      };
+    }
+    return null;
+  }
 
   handleSnapshotSliderChange = (event: SyntheticEvent<HTMLInputElement>) =>
     this.setState({ snapshotIndex: parseInt(event.currentTarget.value, 10) });
 
-  inspect = () => this.setState({ inspectSelectedFiber: true });
+  inspect = () => this.setState({ isInspectingSelectedFiber: true });
 
   inspectFiber = (fiber: Object) =>
     this.setState({
-      inspectSelectedFiber: true,
+      isInspectingSelectedFiber: true,
       selectedFiber: fiber,
     });
 
   selectChart = (chart: Chart) =>
     this.setState({
+      isInspectingSelectedFiber: false,
       selectedChart: chart,
       selectedFiber: null,
     });
@@ -81,16 +93,19 @@ class ProfilerTab extends React.Component<Props, State> {
 
   selectSnapshot = (snapshot: Snapshot) =>
     this.setState({
-      inspectSelectedFiber: false,
+      isInspectingSelectedFiber: false,
       snapshotIndex: this.props.snapshots.indexOf(snapshot),
     });
 
-  stopInspecting = () => this.setState({ inspectSelectedFiber: false });
+  stopInspecting = () => this.setState({ isInspectingSelectedFiber: false });
 
   render() {
     const { theme } = this.context;
     const { isRecording, snapshots, toggleIsRecording } = this.props;
-    const { inspectSelectedFiber, selectedChart, selectedFiber, snapshotIndex } = this.state;
+    const { isInspectingSelectedFiber, selectedChart, selectedFiber, snapshotIndex } = this.state;
+
+    const snapshot = snapshots[snapshotIndex];
+    const snapshotFiber = selectedFiber !== null ? snapshot.nodes.get(selectedFiber.id) : null;
 
     let content;
     if (isRecording) {
@@ -98,7 +113,7 @@ class ProfilerTab extends React.Component<Props, State> {
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
       );
     } else if (snapshots.length > 0) {
-      if (inspectSelectedFiber && selectedFiber !== null) {
+      if (isInspectingSelectedFiber && selectedFiber !== null) {
         content = (
           <FiberRenderDurations
             selectedFiberID={selectedFiber.id}
@@ -117,7 +132,7 @@ class ProfilerTab extends React.Component<Props, State> {
             inspectFiber={this.inspectFiber}
             selectedFiberID={selectedFiber ? selectedFiber.id : null}
             selectFiber={this.selectFiber}
-            snapshot={snapshots[snapshotIndex]}
+            snapshot={snapshot}
             theme={theme}
           />
         );
@@ -129,7 +144,7 @@ class ProfilerTab extends React.Component<Props, State> {
     }
 
     return (
-      <div style={styles.container}>
+      <div style={styles.container(theme)}>
         <div style={styles.Left}>
           <div style={styles.settingsRowStyle(theme)}>
             <RecordButton
@@ -145,14 +160,15 @@ class ProfilerTab extends React.Component<Props, State> {
                 <label>
                   <input
                     type="radio"
-                    checked={selectedChart === 'flamegraph'}
+                    checked={!isInspectingSelectedFiber && selectedChart === 'flamegraph'}
                     onChange={() => this.selectChart('flamegraph')}
                   /> Flamegraph
                 </label>
+                &nbsp;
                 <label>
                   <input
                     type="radio"
-                    checked={selectedChart === 'ranked'}
+                    checked={!isInspectingSelectedFiber && selectedChart === 'ranked'}
                     onChange={() => this.selectChart('ranked')}
                   /> Ranked
                 </label>
@@ -160,10 +176,13 @@ class ProfilerTab extends React.Component<Props, State> {
                 <div style={{flex: 1}} />
 
                 <span>Render ({snapshotIndex + 1} / {snapshots.length})</span>
-                <BackButton
+                <IconButton
                   disabled={snapshotIndex === 0}
+                  icon={Icons.BACK}
+                  isTransparent={true}
                   onClick={this.selectPreviousSnapshotIndex}
                   theme={theme}
+                  title="Previous render"
                 />
                 <input
                   type="range"
@@ -172,10 +191,13 @@ class ProfilerTab extends React.Component<Props, State> {
                   value={snapshotIndex}
                   onChange={this.handleSnapshotSliderChange}
                 />
-                <ForwardButton
+                <IconButton
                   disabled={snapshotIndex === snapshots.length - 1}
+                  icon={Icons.FORWARD}
+                  isTransparent={true}
                   onClick={this.selectNextSnapshotIndex}
                   theme={theme}
+                  title="Next render"
                 />
               </Fragment>
             )}
@@ -187,9 +209,12 @@ class ProfilerTab extends React.Component<Props, State> {
         <div style={styles.Right(theme)}>
           {selectedFiber && (
             <FiberDetailPane
-              fiber={selectedFiber}
               inspect={this.inspect}
-              isInspecting={inspectSelectedFiber}
+              isInspectingSelectedFiber={isInspectingSelectedFiber}
+              name={selectedFiber.name}
+              snapshot={snapshot}
+              snapshotFiber={snapshotFiber}
+              theme={theme}
             />
           )}
         </div>
@@ -200,52 +225,41 @@ class ProfilerTab extends React.Component<Props, State> {
 
 // TODO Maybe move into its own file?
 // TODO Flow type
-const FiberDetailPane = ({ fiber, inspect, isInspecting }) => (
-  <div style={styles.column}>
-    <div style={styles.SelectedFiberName}>
-      {fiber.name || 'Unknown'}
+const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown', snapshot, snapshotFiber, theme }) => (
+  <Fragment>
+    <div style={styles.FiberDetailPaneHeader}>
+      <div style={styles.SelectedFiberName}>
+        {name}
+      </div>
+      <IconButton
+        disabled={isInspectingSelectedFiber}
+        icon={Icons.BARS}
+        onClick={inspect}
+        theme={theme}
+        title={`Inspect ${name}`}
+      />
     </div>
-    <button
-      disabled={isInspecting}
-      onClick={inspect}
-    >
-      Inspect
-    </button>
-  </div>
+    <pre style={{whiteSpace: 'pre-wrap'}}>{JSON.stringify(snapshotFiber.get('props'))}</pre>
+  </Fragment>
 );
 
-const BackButton = Hoverable(
-  ({ disabled, isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
+const IconButton = Hoverable(
+  ({ disabled, icon, isActive = false, isHovered, isTransparent = false, onClick, onMouseEnter, onMouseLeave, theme, title }) => (
     <button
       disabled={disabled}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      style={clearButtonStyle(isActive, !disabled, isHovered, theme)}
-      title="Clear profiling data"
+      style={iconButtonStyle(isActive, !disabled, isHovered, isTransparent, theme)}
+      title={title}
     >
-      <SvgIcon path={Icons.BACK} />
+      <SvgIcon path={icon} />
     </button>
   )
 );
 
-const ForwardButton = Hoverable(
-  ({ disabled, isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={clearButtonStyle(isActive, !disabled, isHovered, theme)}
-      title="Clear profiling data"
-    >
-      <SvgIcon path={Icons.FORWARD} />
-    </button>
-  )
-);
-
-const clearButtonStyle = (isActive: boolean, isEnabled: boolean, isHovered: boolean, theme: Theme) => ({
-  background: 'none',
+const iconButtonStyle = (isActive: boolean, isEnabled: boolean, isHovered: boolean, isTransparent: boolean, theme: Theme) => ({
+  background: isTransparent ? 'none' : theme.base00,
   border: 'none',
   outline: 'none',
   cursor: isEnabled ? 'pointer' : 'default',
@@ -284,10 +298,6 @@ const RecordButton = Hoverable(
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={styles.recordButtonStyle(isActive, isHovered, theme)}
-      title={isActive
-        ? 'Stop recording'
-        : 'Record profiling information'
-      }
     >
       <SvgIcon path={Icons.RECORD} />
     </button>
@@ -295,16 +305,17 @@ const RecordButton = Hoverable(
 );
 
 var styles = {
-  container: {
+  container: (theme: Theme) => ({
     width: '100%',
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
     justifyContent: 'stretch',
     flexDirection: 'row',
+    color: theme.base05,
     fontFamily: sansSerif.family,
     fontSize: sansSerif.sizes.normal,
-  },
+  }),
   column: {
     display: 'flex',
     flexDirection: 'column',
@@ -333,10 +344,17 @@ var styles = {
     alignItems: 'center',
     justifyContent: 'center',
   },
+  FiberDetailPaneHeader: {
+    width: '100%',
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: '1rem',
+  },
   SelectedFiberName: {
     fontFamily: monospace.family,
     fontSize: sansSerif.sizes.large,
-    marginBottom: '1rem',
   },
   Content: {
     flex: 1,
@@ -353,7 +371,7 @@ var styles = {
     display: 'flex',
     flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'flex-start',
+    justifyContent: 'stretch',
     padding: '0.5rem',
     backgroundColor: theme.base01,
     borderLeft: `1px solid ${theme.base03}`,

@@ -145,8 +145,8 @@ class ListItem extends PureComponent<any, void> {
               isDimmed={index < data.focusedNodeIndex}
               key={node.id}
               label={node.label}
-              onClick={() => data.selectFiber(node)}
-              onDoubleClick={() => data.inspectFiber(node)}
+              onClick={() => data.selectFiber(node.fiber)}
+              onDoubleClick={() => data.inspectFiber(node.fiber)}
               theme={data.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
@@ -167,9 +167,13 @@ const getFocusedNodeData = memoize((data: Node, selectedFiberID: string | null) 
   if (selectedFiberID !== null) {
     const findNode = (node: Node, depth: number = 0) => {
       if (node.id === selectedFiberID) {
-        focusedNode = node;
-        focusedNodeIndex = depth;
-        maxValue = node.value;
+        // Don't "zoom in" on a node that wasn't part of this commit.
+        // This would problems with the scaling logic elsewhere.
+        if (node.value > 0) {
+          focusedNode = node;
+          focusedNodeIndex = depth;
+          maxValue = node.value;
+        }
       } else {
         node.children.find(childNode => findNode(childNode, depth + 1));
       }

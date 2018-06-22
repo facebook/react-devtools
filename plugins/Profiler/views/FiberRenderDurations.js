@@ -27,7 +27,6 @@ type Node = {|
 
 type ChartData = {|
   maxValue: number,
-  name: string,
   nodes: Array<Node>,
 |};
 
@@ -72,13 +71,12 @@ type RenderDurationsProps = {|
 |};
 
 const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, width }: RenderDurationsProps) => {
-  const { maxValue, name, nodes } = data;
+  const { maxValue, nodes } = data;
 
   if (maxValue === 0) {
     return (
       <div style={{ height, width, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-        <div>No render times recorded for <strong>{name}</strong></div>
-        <button onClick={stopInspecting}>Go back</button>
+        <button onClick={stopInspecting}>No render times recorded</button>
       </div>
     );
   }
@@ -96,7 +94,7 @@ const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, 
               color={getGradientColor(node.value / node.maxCommitValue)}
               height={safeHeight}
               key={index}
-              label={`${node.value.toFixed(3)}ms`}
+              label={`${node.value.toFixed(2)}ms`}
               onClick={() => selectSnapshot(node.parentSnapshot)}
               theme={theme}
               width={scaleX(barWidth)}
@@ -112,7 +110,6 @@ const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, 
 
 const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Snapshot>): ChartData => {
   let maxValue = 0;
-  let name = null;
 
   const nodes: Array<Node> = snapshots
     .filter((snapshot: Snapshot) => snapshot.committedNodes.indexOf(nodeID) >= 0)
@@ -126,16 +123,11 @@ const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Sna
 
       maxValue = Math.max(maxValue, value);
 
-      if (name === null) {
-        name = snapshot.nodes.getIn([nodeID, 'name']) || 'Unknown';
-      }
-
       return { maxCommitValue, parentSnapshot: snapshot, value };
     });
 
   return {
     maxValue,
-    name: name || 'Unknown',
     nodes,
   };
 });
