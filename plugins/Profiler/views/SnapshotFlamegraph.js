@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
@@ -37,24 +37,62 @@ type LazyNodesByDepth = Array<Array<Node>>;
 type LazyIdToNodeMap = {[id: string]: Node};
 type LazyIdToDepthMap = {[id: string]: number};
 
+type FlamegraphData = {|
+  flameGraphDepth: number,
+  lazyNodesByDepth: LazyNodesByDepth,
+  lazyIdToDepthMap: LazyIdToDepthMap,
+  lazyIdToNodeMap: LazyIdToNodeMap,
+  maxDuration: number,
+  maxTreeBaseTime: number,
+  showNativeNodes: boolean,
+|};
+
 type SelectOrInspectFiber = (id: string, name: string) => void;
 
 type Props = {|
+  cacheDataForSnapshot: CacheDataForSnapshot,
+  getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean,
   snapshot: Snapshot,
+  snapshotIndex: number,
   theme: Theme,
 |};
 
-const SnapshotFlamegraph = ({inspectFiber, selectedFiberID, selectFiber, showNativeNodes, snapshot, theme}: Props) => {
+const SnapshotFlamegraph = ({
+  cacheDataForSnapshot,
+  getCachedDataForSnapshot,
+  inspectFiber,
+  selectedFiberID,
+  selectFiber,
+  showNativeNodes,
+  snapshot,
+  snapshotIndex,
+  theme
+}: Props) => {
+  // Skip the "Wrapper" Fiber.
+  const rootNode = snapshot.nodes.get(snapshot.root);
+  const children = rootNode.get('children');
+  const rootNodeID = Array.isArray(children) ? children[0] : children;
+
+  // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
+  const dataKey = showNativeNodes ? 'SnapshotFlamegraphWithNativeNodes' : 'SnapshotFlamegraphWithoutNativeNodes';
+  let flamegraphData = getCachedDataForSnapshot(snapshotIndex, dataKey);
+  if (flamegraphData === null) {
+    flamegraphData = convertSnapshotToChartData(rootNodeID, selectedFiberID, showNativeNodes, snapshot);
+    cacheDataForSnapshot(snapshotIndex, dataKey, flamegraphData);
+  }
+
   return (
     <AutoSizer>
       {({ height, width }) => (
         <Flamegraph
+          flamegraphData={((flamegraphData: any): FlamegraphData)}
           height={height}
           inspectFiber={inspectFiber}
+          rootNodeID={rootNodeID}
           selectedFiberID={selectedFiberID}
           selectFiber={selectFiber}
           showNativeNodes={showNativeNodes}
@@ -68,8 +106,10 @@ const SnapshotFlamegraph = ({inspectFiber, selectedFiberID, selectFiber, showNat
 };
 
 type FlamegraphProps = {|
+  flamegraphData: FlamegraphData,
   height: number,
   inspectFiber: SelectOrInspectFiber,
+  rootNodeID: string,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean,
@@ -79,8 +119,10 @@ type FlamegraphProps = {|
 |};
 
 const Flamegraph = ({
+  flamegraphData,
   height,
   inspectFiber,
+  rootNodeID,
   selectedFiberID,
   selectFiber,
   showNativeNodes,
@@ -88,46 +130,23 @@ const Flamegraph = ({
   theme,
   width,
 }: FlamegraphProps) => {
-  const rootNode = snapshot.nodes.get(snapshot.root);
-  const children = rootNode.get('children');
-  const rootNodeID = Array.isArray(children) ? children[0] : children;
+  const { flameGraphDepth, lazyNodesByDepth, lazyIdToNodeMap } = flamegraphData;
 
-  // The following conversion methods are memoized,
-  // So it's okay to call them on every render.
-  // Expensive things (like lazyNodesByDepth) should only depend on the snapshot.
-  // TODO Cache values in ProfilerStore so we only have to compute them the first time a Snapshot is shown.
-  const flameGraphDepth = calculateFlameGraphDepth(snapshot, rootNodeID, showNativeNodes);
-  const maxDuration = getMaxDurationForSnapshot(snapshot);
-  const maxTreeBaseTime = getMaxTreeBaseTime(snapshot, selectedFiberID, rootNodeID);
-  const lazyNodesByDepth = initLazyNodesByDepth(snapshot, rootNodeID, maxDuration, showNativeNodes);
-  const lazyIdToDepthMap = initLazyIdToDepthMap(lazyNodesByDepth, showNativeNodes);
-  const lazyIdToNodeMap = initLazyIdToNodeMap(lazyNodesByDepth, showNativeNodes);
-
-  // Create enough of the flamegraph to include the focused Fiber.
+  // Initialize enough of the flamegraph to include the focused Fiber.
   // Otherwise the horizontal scale will be off.
   if (selectedFiberID !== null) {
     let index = lazyNodesByDepth.length;
     while (lazyIdToNodeMap[selectedFiberID] === undefined && index < flameGraphDepth) {
-      findOrCreateNodesForDepth(
-        index,
-        lazyIdToDepthMap,
-        lazyIdToNodeMap,
-        lazyNodesByDepth,
-        maxDuration,
-        snapshot,
-        showNativeNodes,
-      );
+      findOrCreateNodesForDepth(flamegraphData, index, snapshot);
       index++;
     }
   }
 
+  // Pass required contextual data down to the ListItem renderer.
+  // (This method is memoized so it's safe to call on every render.)
   const itemData = getItemData(
+    flamegraphData,
     inspectFiber,
-    lazyIdToDepthMap,
-    lazyIdToNodeMap,
-    lazyNodesByDepth,
-    maxDuration,
-    maxTreeBaseTime,
     rootNodeID,
     selectedFiberID,
     selectFiber,
@@ -155,15 +174,7 @@ class ListItem extends PureComponent<any, void> {
   render() {
     const { data, index, style } = this.props;
 
-    const {
-      lazyIdToDepthMap,
-      lazyIdToNodeMap,
-      lazyNodesByDepth,
-      maxDuration,
-      selectedFiberID,
-      showNativeNodes,
-      snapshot,
-    } = data;
+    const { lazyIdToDepthMap, lazyIdToNodeMap, selectedFiberID } = data.flamegraphData;
 
     // List items are absolutely positioned using the CSS "top" attribute.
     // The "left" value will always be 0.
@@ -171,15 +182,7 @@ class ListItem extends PureComponent<any, void> {
     // We can ignore those values as well.
     const top = parseInt(style.top, 10);
 
-    const nodes = findOrCreateNodesForDepth(
-      index,
-      lazyIdToDepthMap,
-      lazyIdToNodeMap,
-      lazyNodesByDepth,
-      maxDuration,
-      snapshot,
-      showNativeNodes,
-    );
+    const nodes = findOrCreateNodesForDepth(data.flamegraphData, index, data.snapshot);
 
     const focusedNodeIndex = lazyIdToDepthMap[selectedFiberID] || 0;
     const focusedNode = lazyIdToNodeMap[selectedFiberID];
@@ -226,7 +229,46 @@ class ListItem extends PureComponent<any, void> {
   }
 }
 
-const calculateFlameGraphDepth = memoize((snapshot: Snapshot, rootNodeID: string, showNativeNodes: boolean): number => {
+const convertSnapshotToChartData = (
+  rootNodeID: string,
+  selectedFiberID: string | null,
+  showNativeNodes: boolean,
+  snapshot: Snapshot,
+): FlamegraphData => {
+  const maxDuration = getMaxDurationForSnapshot(snapshot);
+
+  // Initialize the first row in our lazy maps.
+  // All other rows will derive from this one.
+  const fiber = snapshot.nodes.get(rootNodeID);
+  const actualDuration = fiber.get('actualDuration') || 0;
+  const name = fiber.get('name') || 'Unknown';
+  const didRender = snapshot.committedNodes.includes(rootNodeID);
+
+  const rootNode = {
+    color: didRender
+      ? getGradientColor(actualDuration / maxDuration)
+      : didNotRender,
+    id: rootNodeID,
+    label: didRender
+      ? `${name} (${actualDuration.toFixed(2)}ms)`
+      : name,
+    name,
+    treeBaseTime: fiber.get('treeBaseTime'),
+    x: 0,
+  };
+
+  return {
+    flameGraphDepth: calculateFlameGraphDepth(rootNodeID, showNativeNodes, snapshot),
+    lazyNodesByDepth: [[rootNode]],
+    lazyIdToDepthMap: {[rootNodeID]: 0},
+    lazyIdToNodeMap: {[rootNodeID]: rootNode},
+    maxDuration,
+    maxTreeBaseTime: getMaxTreeBaseTime(rootNodeID, selectedFiberID, snapshot),
+    showNativeNodes,
+  };
+};
+
+const calculateFlameGraphDepth = (rootNodeID: string, showNativeNodes: boolean, snapshot: Snapshot): number => {
   let maxDepth = 0;
 
   const walkTree = (nodeID: string, currentDepth: number = 0) => {
@@ -251,15 +293,11 @@ const calculateFlameGraphDepth = memoize((snapshot: Snapshot, rootNodeID: string
   walkTree(rootNodeID);
 
   return maxDepth;
-});
+};
 
 const getItemData = memoize((
+  flamegraphData: FlamegraphData,
   inspectFiber: SelectOrInspectFiber,
-  lazyIdToDepthMap: LazyIdToDepthMap,
-  lazyIdToNodeMap: LazyIdToNodeMap,
-  lazyNodesByDepth: LazyNodesByDepth,
-  maxDuration: number,
-  maxTreeBaseTime: number,
   rootNodeID: string,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
@@ -269,12 +307,9 @@ const getItemData = memoize((
   width: number,
 ) => {
   return {
+    flamegraphData,
     inspectFiber,
-    lazyIdToDepthMap,
-    lazyIdToNodeMap,
-    lazyNodesByDepth,
-    maxDuration,
-    scaleX: scale(0, maxTreeBaseTime, 0, width),
+    scaleX: scale(0, flamegraphData.maxTreeBaseTime, 0, width),
     selectedFiberID,
     selectFiber,
     showNativeNodes,
@@ -284,50 +319,7 @@ const getItemData = memoize((
   };
 });
 
-const initLazyIdToDepthMap = memoize((lazyNodesByDepth: LazyNodesByDepth, showNativeNodes: boolean): LazyIdToDepthMap =>
-  lazyNodesByDepth.reduce((lazyIdToDepthMap: LazyIdToDepthMap, nodes: Array<Node>, index: number) => {
-    nodes.forEach(node => {
-      lazyIdToDepthMap[node.id] = index;
-    });
-    return lazyIdToDepthMap;
-  }, {}));
-
-const initLazyIdToNodeMap = memoize((lazyNodesByDepth: LazyNodesByDepth, showNativeNodes: boolean): LazyIdToNodeMap =>
-  lazyNodesByDepth.reduce((lazyIdToNodeMap: LazyIdToNodeMap, nodes: Array<Node>, index: number) => {
-    nodes.forEach(node => {
-      lazyIdToNodeMap[node.id] = node;
-    });
-    return lazyIdToNodeMap;
-  }, {}));
-
-const initLazyNodesByDepth = memoize((
-  snapshot: Snapshot,
-  rootNodeID: string,
-  maxDuration: number,
-  showNativeNodes: boolean,
-): LazyNodesByDepth => {
-  const fiber = snapshot.nodes.get(rootNodeID);
-  const actualDuration = fiber.get('actualDuration') || 0;
-  const name = fiber.get('name') || 'Unknown';
-  const didRender = snapshot.committedNodes.includes(rootNodeID);
-
-  // Only initialize the first row.
-  // All other rows will derive from this one.
-  return [[{
-    color: didRender
-      ? getGradientColor(actualDuration / maxDuration)
-      : didNotRender,
-    id: rootNodeID,
-    label: didRender
-      ? `${name} (${actualDuration.toFixed(2)}ms)`
-      : name,
-    name,
-    treeBaseTime: fiber.get('treeBaseTime'),
-    x: 0,
-  }]];
-});
-
-const getMaxDurationForSnapshot = memoize((snapshot: Snapshot): number => {
+const getMaxDurationForSnapshot = (snapshot: Snapshot): number => {
   let maxDuration = 0;
   snapshot.committedNodes.forEach(nodeID => {
     const duration = snapshot.nodes.getIn([nodeID, 'actualDuration']);
@@ -336,38 +328,32 @@ const getMaxDurationForSnapshot = memoize((snapshot: Snapshot): number => {
     }
   });
   return maxDuration;
-});
+};
 
 // TODO This doesn't work when you have multiple roots.
 // The scale gets messed up because the Fiber may be in the snapshot map, but not in the rendered graph.
-const getMaxTreeBaseTime = memoize((snapshot: Snapshot, selectedFiberID: string | null, rootNodeID: string): number =>
+const getMaxTreeBaseTime = (rootNodeID: string, selectedFiberID: string | null, snapshot: Snapshot): number =>
   snapshot.nodes.getIn([selectedFiberID, 'treeBaseTime']) ||
-  snapshot.nodes.getIn([rootNodeID, 'treeBaseTime']));
+  snapshot.nodes.getIn([rootNodeID, 'treeBaseTime']);
 
 // This method depends on rows being initialized in-order.
-const findOrCreateNodesForDepth = (
-  depth: number,
-  lazyIdToDepthMap: LazyIdToDepthMap,
-  lazyIdToNodeMap: LazyIdToNodeMap,
-  lazyNodesByDepth: LazyNodesByDepth,
-  maxDuration: number,
-  snapshot: Snapshot,
-  showNativeNodes: boolean,
-): Array<Node> => {
+const findOrCreateNodesForDepth = (flamegraphData: FlamegraphData, depth: number, snapshot: Snapshot): Array<Node> => {
+  const { lazyNodesByDepth } = flamegraphData;
+
   for (let index = lazyNodesByDepth.length; index <= depth; index++) {
     const nodesAtPreviousDepth = lazyNodesByDepth[index - 1];
     lazyNodesByDepth[index] = nodesAtPreviousDepth.reduce(
       (nodesAtDepth: Array<Node>, parentNode: Node) =>
         findOrCreateNodesForDepthCrawler(
           snapshot,
-          maxDuration,
-          lazyIdToDepthMap,
-          lazyIdToNodeMap,
+          flamegraphData.maxDuration,
+          flamegraphData.lazyIdToDepthMap,
+          flamegraphData.lazyIdToNodeMap,
           nodesAtDepth,
           parentNode.id,
           index,
           parentNode.x,
-          showNativeNodes,
+          flamegraphData.showNativeNodes,
         ), []
     );
   }

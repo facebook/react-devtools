@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
@@ -30,27 +30,42 @@ type Node = {|
 type SelectOrInspectFiber = (id: string, name: string) => void;
 
 type Props = {|
+  cacheDataForSnapshot: CacheDataForSnapshot,
+  getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
-  showNativeNodes: boolean,
+  showNativeNodes: boolean, // Ignored by this charting type
   snapshot: Snapshot,
+  snapshotIndex: number,
   theme: Theme,
 |};
 
-const RankedSnapshot = ({inspectFiber, selectedFiberID, selectFiber, showNativeNodes, snapshot, theme}: Props) => {
-  // The following conversion methods are memoized,
-  // So it's okay to call them on every render.
-  // TODO Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
-  const data = convertSnapshotToChartData(snapshot);
+const RankedSnapshot = ({
+  cacheDataForSnapshot,
+  getCachedDataForSnapshot,
+  inspectFiber,
+  selectedFiberID,
+  selectFiber,
+  showNativeNodes,
+  snapshot,
+  snapshotIndex,
+  theme
+}: Props) => {
+  // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
+  let rankedData = getCachedDataForSnapshot(snapshotIndex, 'RankedSnapshotData');
+  if (rankedData === null) {
+    rankedData = convertSnapshotToChartData(snapshot);
+    cacheDataForSnapshot(snapshotIndex, 'RankedSnapshotData', rankedData);
+  }
 
   return (
     <AutoSizer>
       {({ height, width }) => (
         <Ranked
-          data={data}
           height={height}
           inspectFiber={inspectFiber}
+          rankedData={((rankedData: any): RankedData)}
           selectedFiberID={selectedFiberID}
           selectFiber={selectFiber}
           theme={theme}
@@ -67,23 +82,23 @@ type RankedData = {|
 |};
 
 type RankedProps = {|
-  data: RankedData,
   height: number,
   inspectFiber: SelectOrInspectFiber,
+  rankedData: RankedData,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   theme: Theme,
   width: number,
 |};
 
-const Ranked = ({ data, height, inspectFiber, selectedFiberID, selectFiber, theme, width }: RankedProps) => {
+const Ranked = ({ height, inspectFiber, rankedData, selectedFiberID, selectFiber, theme, width }: RankedProps) => {
   // The following conversion methods are memoized,
   // So it's okay to call them on every render.
-  const focusedNodeIndex = getNodeIndex(data, selectedFiberID);
+  const focusedNodeIndex = getNodeIndex(rankedData, selectedFiberID);
   const itemData = getItemData(
-    data,
     focusedNodeIndex,
     inspectFiber,
+    rankedData,
     selectFiber,
     theme,
     width,
@@ -93,7 +108,7 @@ const Ranked = ({ data, height, inspectFiber, selectedFiberID, selectFiber, them
     <List
       containerTag="svg"
       height={height}
-      itemCount={data.nodes.length}
+      itemCount={rankedData.nodes.length}
       itemData={itemData}
       itemSize={barHeight}
       width={width}
@@ -136,28 +151,28 @@ class ListItem extends PureComponent<any, void> {
 }
 
 const getItemData = memoize((
-  data: RankedData,
   focusedNodeIndex: number,
   inspectFiber: SelectOrInspectFiber,
+  rankedData: RankedData,
   selectFiber: SelectOrInspectFiber,
   theme: Theme,
   width: number,
 ) => ({
-  focusedNode: data.nodes[focusedNodeIndex],
+  focusedNode: rankedData.nodes[focusedNodeIndex],
   focusedNodeIndex,
   inspectFiber,
-  nodes: data.nodes,
-  maxValue: data.maxValue,
-  scaleX: scale(0, data.nodes[focusedNodeIndex].value, 0, width),
+  nodes: rankedData.nodes,
+  maxValue: rankedData.maxValue,
+  scaleX: scale(0, rankedData.nodes[focusedNodeIndex].value, 0, width),
   selectFiber,
   theme,
 }));
 
-const getNodeIndex = memoize((data: RankedData, id: string | null): number => {
+const getNodeIndex = memoize((rankedData: RankedData, id: string | null): number => {
   if (id === null) {
     return 0;
   }
-  const { nodes } = data;
+  const { nodes } = rankedData;
   for (let index = 0; index < nodes.length; index++) {
     if (nodes[index].id === id) {
       return index;
@@ -166,7 +181,7 @@ const getNodeIndex = memoize((data: RankedData, id: string | null): number => {
   return 0;
 });
 
-const convertSnapshotToChartData = memoize((snapshot: Snapshot): RankedData => {
+const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
   let maxValue = 0;
 
   const nodes = snapshot.committedNodes
@@ -199,6 +214,6 @@ const convertSnapshotToChartData = memoize((snapshot: Snapshot): RankedData => {
     nodes,
     maxValue,
   };
-});
+};
 
 export default RankedSnapshot;

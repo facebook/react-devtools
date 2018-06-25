@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
@@ -30,6 +30,8 @@ import RankedSnapshot from './RankedSnapshot';
 type Chart = 'flamegraph' | 'ranked';
 
 type Props = {|
+  cacheDataForSnapshot: CacheDataForSnapshot,
+  getCachedDataForSnapshot: GetCachedDataForSnapshot,
   isRecording: boolean,
   snapshots: Array<Snapshot>,
   toggleIsRecording: (value: boolean) => void,
@@ -121,7 +123,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
   render() {
     const { theme } = this.context;
-    const { isRecording, snapshots, toggleIsRecording } = this.props;
+    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, snapshots, toggleIsRecording } = this.props;
     const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
@@ -149,11 +151,14 @@ class ProfilerTab extends React.Component<Props, State> {
           : SnapshotFlamegraph;
         content = (
           <ChartComponent
+            cacheDataForSnapshot={cacheDataForSnapshot}
+              getCachedDataForSnapshot={getCachedDataForSnapshot}
             inspectFiber={this.inspectFiber}
             selectedFiberID={selectedFiberID}
             selectFiber={this.selectFiber}
             showNativeNodes={showNativeNodes}
             snapshot={snapshot}
+            snapshotIndex={snapshotIndex}
             theme={theme}
           />
         );
@@ -507,6 +512,8 @@ export default decorate({
   listeners: () => ['isRecording', 'snapshots'],
   props(store) {
     return {
+      cacheDataForSnapshot: (...args) => store.cacheDataForSnapshot(...args),
+      getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       isRecording: !!store.isRecording,
       snapshots: store.snapshots,
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),

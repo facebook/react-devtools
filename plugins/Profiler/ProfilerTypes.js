@@ -13,6 +13,17 @@
 
 const {Map} = require('immutable');
 
+export type CacheDataForSnapshot = (
+  snapshotIndex: number,
+  key: string,
+  data: any
+) => void;
+
+export type GetCachedDataForSnapshot = (
+  snapshotIndex: number,
+  key: string
+) => any | null;
+
 export type Snapshot = {|
   committedNodes: Array<string>,
   commitTime: number,
