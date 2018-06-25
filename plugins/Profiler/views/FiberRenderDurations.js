@@ -115,7 +115,7 @@ const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Sna
   const nodes: Array<Node> = snapshots
     .filter((snapshot: Snapshot) => snapshot.committedNodes.indexOf(nodeID) >= 0)
     .map((snapshot: Snapshot) => {
-      // TODO Why are some durations undefined?
+      // Filter out Text nodes; they won't have durations.
       const maxCommitValue = snapshot.committedNodes.reduce((reduced, currentNodeID) =>
         Math.max(reduced, snapshot.nodes.getIn([currentNodeID, 'actualDuration']) || 0),
         0

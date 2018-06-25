@@ -39,7 +39,9 @@ type State = {|
   isInspectingSelectedFiber: boolean,
   prevIsRecording: boolean,
   selectedChart: Chart,
-  selectedFiber: Object | null,
+  selectedFiberID: string | null,
+  selectedFiberName: string | null,
+  showNativeNodes: boolean,
   snapshotIndex: number,
 |};
 
@@ -52,7 +54,9 @@ class ProfilerTab extends React.Component<Props, State> {
     isInspectingSelectedFiber: false,
     prevIsRecording: this.props.isRecording,
     selectedChart: 'flamegraph',
-    selectedFiber: null,
+    selectedFiberID: null,
+    selectedFiberName: null,
+    showNativeNodes: false,
     snapshotIndex: 0,
   };
 
@@ -60,7 +64,8 @@ class ProfilerTab extends React.Component<Props, State> {
     if (props.isRecording !== state.prevIsRecording) {
       return {
         prevIsRecording: props.isRecording,
-        selectedFiber: null,
+        selectedFiberID: null,
+        selectedFiberName: null,
         snapshotIndex: 0,
       };
     }
@@ -72,17 +77,19 @@ class ProfilerTab extends React.Component<Props, State> {
 
   inspect = () => this.setState({ isInspectingSelectedFiber: true });
 
-  inspectFiber = (fiber: Object) =>
+  inspectFiber = (id: string, name: string) =>
     this.setState({
       isInspectingSelectedFiber: true,
-      selectedFiber: fiber,
+      selectedFiberID: id,
+      selectedFiberName: name,
     });
 
   selectChart = (chart: Chart) =>
     this.setState({
       isInspectingSelectedFiber: false,
       selectedChart: chart,
-      selectedFiber: null,
+      selectedFiberID: null,
+      selectedFiberName: null,
     });
 
   selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
@@ -91,8 +98,14 @@ class ProfilerTab extends React.Component<Props, State> {
   selectPreviousSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
     this.setState(prevState => ({ snapshotIndex: prevState.snapshotIndex - 1 }));
 
-  selectFiber = (fiber: Object) =>
-    this.setState({ selectedFiber: fiber });
+  // We store the ID and name separately,
+  // Because a Fiber may not exist in all snapshots.
+  // In that case, it's still important to show the selected fiber (name) in the details pane.
+  selectFiber = (id: string, name: string) =>
+    this.setState({
+      selectedFiberID: id,
+      selectedFiberName: name,
+    });
 
   selectSnapshot = (snapshot: Snapshot) =>
     this.setState({
@@ -101,13 +114,18 @@ class ProfilerTab extends React.Component<Props, State> {
 
   stopInspecting = () => this.setState({ isInspectingSelectedFiber: false });
 
+  toggleShowNativeNodes = () =>
+    this.setState(prevState => ({
+      showNativeNodes: !prevState.showNativeNodes,
+    }));
+
   render() {
     const { theme } = this.context;
     const { isRecording, snapshots, toggleIsRecording } = this.props;
-    const { isInspectingSelectedFiber, selectedChart, selectedFiber, snapshotIndex } = this.state;
+    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
-    const snapshotFiber = selectedFiber && snapshot.nodes.get(selectedFiber.id) || null;
+    const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
 
     let content;
     if (isRecording) {
@@ -115,10 +133,10 @@ class ProfilerTab extends React.Component<Props, State> {
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
       );
     } else if (snapshots.length > 0) {
-      if (isInspectingSelectedFiber && selectedFiber !== null) {
+      if (isInspectingSelectedFiber && selectedFiberID !== null) {
         content = (
           <FiberRenderDurations
-            selectedFiberID={selectedFiber.id}
+            selectedFiberID={selectedFiberID}
             selectSnapshot={this.selectSnapshot}
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}
@@ -132,8 +150,9 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <ChartComponent
             inspectFiber={this.inspectFiber}
-            selectedFiberID={selectedFiber ? selectedFiber.id : null}
+            selectedFiberID={selectedFiberID}
             selectFiber={this.selectFiber}
+            showNativeNodes={showNativeNodes}
             snapshot={snapshot}
             theme={theme}
           />
@@ -145,6 +164,7 @@ class ProfilerTab extends React.Component<Props, State> {
       );
     }
 
+    // TODO Add "Show host nodes" option to header+state (disabled by default)
     return (
       <div style={styles.container(theme)}>
         <div style={styles.Left}>
@@ -173,6 +193,21 @@ class ProfilerTab extends React.Component<Props, State> {
                     checked={!isInspectingSelectedFiber && selectedChart === 'ranked'}
                     onChange={() => this.selectChart('ranked')}
                   /> Ranked
+                </label>
+
+                <div style={{flex: 1}} />
+
+                <label
+                  style={{
+                    opacity: isInspectingSelectedFiber || selectedChart !== 'flamegraph' ? 0.5 : 1,
+                  }}
+                >
+                  <input
+                    type="checkbox"
+                    disabled={isInspectingSelectedFiber || selectedChart !== 'flamegraph'}
+                    checked={showNativeNodes}
+                    onChange={this.toggleShowNativeNodes}
+                  /> Show native?
                 </label>
 
                 <div style={{flex: 1}} />
@@ -210,17 +245,17 @@ class ProfilerTab extends React.Component<Props, State> {
           </div>
         </div>
         <div style={styles.Right(theme)}>
-          {selectedFiber && (
+          {selectedFiberName && (
             <FiberDetailPane
               inspect={this.inspect}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
-              name={selectedFiber.name}
+              name={selectedFiberName}
               snapshot={snapshot}
               snapshotFiber={snapshotFiber}
               theme={theme}
             />
           )}
-          {!selectedFiber && (
+          {!selectedFiberName && (
             <div style={styles.FiberDetailPaneEmpty(theme)}>
               Nothing select
             </div>

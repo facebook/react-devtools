@@ -21,26 +21,27 @@ import ChartNode from './ChartNode';
 import { barHeight, getGradientColor, minBarWidth, scale } from './constants';
 
 type Node = {|
-  fiber: Object,
   id: any,
   label: string,
   name: string,
   value: number,
 |};
 
-type SelectOrInspectFiber = (fiber: Object) => void;
+type SelectOrInspectFiber = (id: string, name: string) => void;
 
 type Props = {|
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
+  showNativeNodes: boolean,
   snapshot: Snapshot,
   theme: Theme,
 |};
 
-const RankedSnapshot = ({inspectFiber, selectedFiberID, selectFiber, snapshot, theme}: Props) => {
+const RankedSnapshot = ({inspectFiber, selectedFiberID, selectFiber, showNativeNodes, snapshot, theme}: Props) => {
   // The following conversion methods are memoized,
   // So it's okay to call them on every render.
+  // TODO Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const data = convertSnapshotToChartData(snapshot);
 
   return (
@@ -123,8 +124,8 @@ class ListItem extends PureComponent<any, void> {
         isDimmed={index < data.focusedNodeIndex}
         key={node.id}
         label={node.label}
-        onClick={() => data.selectFiber(node.fiber)}
-        onDoubleClick={() => data.inspectFiber(node.fiber)}
+        onClick={() => data.selectFiber(node.id, node.name)}
+        onDoubleClick={() => data.inspectFiber(node.id, node.name)}
         theme={data.theme}
         width={Math.max(minBarWidth, scaleX(node.value))}
         x={0}
@@ -186,7 +187,6 @@ const convertSnapshotToChartData = memoize((snapshot: Snapshot): RankedData => {
       maxValue = Math.max(node.actualDuration, maxValue);
 
       return {
-        fiber: node,
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
         name,
