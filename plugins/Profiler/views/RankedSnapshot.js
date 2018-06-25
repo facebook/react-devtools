@@ -50,7 +50,7 @@ const RankedSnapshot = ({
   showNativeNodes,
   snapshot,
   snapshotIndex,
-  theme
+  theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   let rankedData = getCachedDataForSnapshot(snapshotIndex, 'RankedSnapshotData');
