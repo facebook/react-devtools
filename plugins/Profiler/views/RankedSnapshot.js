@@ -27,13 +27,26 @@ type Node = {|
   value: number,
 |};
 
-type SelectOrInspectFiber = (id: string, name: string) => void;
+type SelectOrInspectFiber = (id: string, name: string, rootID: string) => void;
+
+type ItemData = {|
+  focusedNode: Node,
+  focusedNodeIndex: number,
+  inspectFiber: SelectOrInspectFiber,
+  nodes: Array<Node>,
+  maxValue: number,
+  scaleX: (value: number) => number,
+  selectFiber: SelectOrInspectFiber,
+  snapshot: Snapshot,
+  theme: Theme,
+|};
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
+  selectedRootID: string | null,
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean, // Ignored by this charting type
   snapshot: Snapshot,
@@ -46,6 +59,7 @@ const RankedSnapshot = ({
   getCachedDataForSnapshot,
   inspectFiber,
   selectedFiberID,
+  selectedRootID,
   selectFiber,
   showNativeNodes,
   snapshot,
@@ -67,7 +81,9 @@ const RankedSnapshot = ({
           inspectFiber={inspectFiber}
           rankedData={((rankedData: any): RankedData)}
           selectedFiberID={selectedFiberID}
+          selectedRootID={selectedRootID}
           selectFiber={selectFiber}
+          snapshot={snapshot}
           theme={theme}
           width={width}
         />
@@ -86,20 +102,36 @@ type RankedProps = {|
   inspectFiber: SelectOrInspectFiber,
   rankedData: RankedData,
   selectedFiberID: string | null,
+  selectedRootID: string | null,
   selectFiber: SelectOrInspectFiber,
+  snapshot: Snapshot,
   theme: Theme,
   width: number,
 |};
 
-const Ranked = ({ height, inspectFiber, rankedData, selectedFiberID, selectFiber, theme, width }: RankedProps) => {
+const Ranked = ({
+  height,
+  inspectFiber,
+  rankedData,
+  selectedFiberID,
+  selectedRootID,
+  selectFiber,
+  snapshot,
+  theme,
+  width,
+}: RankedProps) => {
+  const focusedNodeIndex = selectedRootID === snapshot.root
+    ? getNodeIndex(rankedData, selectedFiberID)
+    : 0;
+
   // The following conversion methods are memoized,
   // So it's okay to call them on every render.
-  const focusedNodeIndex = getNodeIndex(rankedData, selectedFiberID);
   const itemData = getItemData(
     focusedNodeIndex,
     inspectFiber,
     rankedData,
     selectFiber,
+    snapshot,
     theme,
     width,
   );
@@ -139,8 +171,8 @@ class ListItem extends PureComponent<any, void> {
         isDimmed={index < data.focusedNodeIndex}
         key={node.id}
         label={node.label}
-        onClick={() => data.selectFiber(node.id, node.name)}
-        onDoubleClick={() => data.inspectFiber(node.id, node.name)}
+        onClick={() => data.selectFiber(node.id, node.name, data.snapshot.root)}
+        onDoubleClick={() => data.inspectFiber(node.id, node.name, data.snapshot.root)}
         theme={data.theme}
         width={Math.max(minBarWidth, scaleX(node.value))}
         x={0}
@@ -155,9 +187,10 @@ const getItemData = memoize((
   inspectFiber: SelectOrInspectFiber,
   rankedData: RankedData,
   selectFiber: SelectOrInspectFiber,
+  snapshot: Snapshot,
   theme: Theme,
   width: number,
-) => ({
+): ItemData => ({
   focusedNode: rankedData.nodes[focusedNodeIndex],
   focusedNodeIndex,
   inspectFiber,
@@ -165,6 +198,7 @@ const getItemData = memoize((
   maxValue: rankedData.maxValue,
   scaleX: scale(0, rankedData.nodes[focusedNodeIndex].value, 0, width),
   selectFiber,
+  snapshot,
   theme,
 }));
 

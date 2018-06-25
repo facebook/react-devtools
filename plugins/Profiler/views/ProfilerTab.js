@@ -43,6 +43,7 @@ type State = {|
   selectedChart: Chart,
   selectedFiberID: string | null,
   selectedFiberName: string | null,
+  selectedRootID: string | null,
   showNativeNodes: boolean,
   snapshotIndex: number,
 |};
@@ -58,6 +59,7 @@ class ProfilerTab extends React.Component<Props, State> {
     selectedChart: 'flamegraph',
     selectedFiberID: null,
     selectedFiberName: null,
+    selectedRootID: null,
     showNativeNodes: false,
     snapshotIndex: 0,
   };
@@ -68,6 +70,7 @@ class ProfilerTab extends React.Component<Props, State> {
         prevIsRecording: props.isRecording,
         selectedFiberID: null,
         selectedFiberName: null,
+        selectedRootID: null,
         snapshotIndex: 0,
       };
     }
@@ -79,11 +82,12 @@ class ProfilerTab extends React.Component<Props, State> {
 
   inspect = () => this.setState({ isInspectingSelectedFiber: true });
 
-  inspectFiber = (id: string, name: string) =>
+  inspectFiber = (id: string, name: string, rootID: string) =>
     this.setState({
       isInspectingSelectedFiber: true,
       selectedFiberID: id,
       selectedFiberName: name,
+      selectedRootID: rootID,
     });
 
   selectChart = (chart: Chart) =>
@@ -92,6 +96,7 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedChart: chart,
       selectedFiberID: null,
       selectedFiberName: null,
+      selectedRootID: null,
     });
 
   selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
@@ -103,10 +108,11 @@ class ProfilerTab extends React.Component<Props, State> {
   // We store the ID and name separately,
   // Because a Fiber may not exist in all snapshots.
   // In that case, it's still important to show the selected fiber (name) in the details pane.
-  selectFiber = (id: string, name: string) =>
+  selectFiber = (id: string, name: string, rootID: string) =>
     this.setState({
       selectedFiberID: id,
       selectedFiberName: name,
+      selectedRootID: rootID,
     });
 
   selectSnapshot = (snapshot: Snapshot) =>
@@ -118,13 +124,16 @@ class ProfilerTab extends React.Component<Props, State> {
 
   toggleShowNativeNodes = () =>
     this.setState(prevState => ({
+      selectedFiberID: null,
+      selectedFiberName: null,
+      selectedRootID: null,
       showNativeNodes: !prevState.showNativeNodes,
     }));
 
   render() {
     const { theme } = this.context;
     const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, snapshots, toggleIsRecording } = this.props;
-    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
+    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, selectedRootID, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
     const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
@@ -152,9 +161,10 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <ChartComponent
             cacheDataForSnapshot={cacheDataForSnapshot}
-              getCachedDataForSnapshot={getCachedDataForSnapshot}
+            getCachedDataForSnapshot={getCachedDataForSnapshot}
             inspectFiber={this.inspectFiber}
             selectedFiberID={selectedFiberID}
+            selectedRootID={selectedRootID}
             selectFiber={this.selectFiber}
             showNativeNodes={showNativeNodes}
             snapshot={snapshot}
