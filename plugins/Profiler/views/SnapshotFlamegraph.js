@@ -295,11 +295,11 @@ const calculateFlameGraphDepth = (showNativeNodes: boolean, snapshot: Snapshot):
 
     if (nodeType === undefined) {
       return;
-    } else if (showNativeNodes || nodeType !== 'Native') {
+    } else if (nodeType === 'Composite' || showNativeNodes && nodeType === 'Native') {
       currentDepth++;
-    }
 
-    maxDepth = Math.max(maxDepth, currentDepth);
+      maxDepth = Math.max(maxDepth, currentDepth);
+    }
 
     const children = snapshot.nodes.getIn([nodeID, 'children']);
     if (Array.isArray(children)) {
@@ -406,7 +406,11 @@ const calculateFibersAtDepthCrawler = (
       if (fiber === undefined) {
         // Bailout on Text nodes
         return;
-      } if (!showNativeNodes && fiber.get('nodeType') === 'Native') {
+      }
+      
+      const nodeType = fiber.get('nodeType');
+
+      if (nodeType !== 'Composite' && (nodeType !== 'Native' || !showNativeNodes)) {
         // Skip over native fibers if they are being filtered from the view
         calculateFibersAtDepthCrawler(
           depth,

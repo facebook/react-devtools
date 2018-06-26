@@ -19,6 +19,7 @@ class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
   _mainStore: Object;
 
+  cachedData = {};
   isRecording: boolean = false;
   snapshots: Array<Snapshot> = [];
 
@@ -27,26 +28,32 @@ class ProfilerStore extends EventEmitter {
 
     this._bridge = bridge;
     this._mainStore = mainStore;
-    this._mainStore.on('clearSnapshots', () => this.clearSnapshots());
-    this._mainStore.on('storeSnapshot', () => {
-      // TODO (bvaughn) The Store nodes Map may not be accurate!
-      // Nodes that were not re-rendered might have their alternates in the tree.
-      // I think the only way to handle this is to re-crawl the tree from a known committed Fiber...
-      this.snapshots.push({
-        ...this._mainStore.snapshotData,
-        nodes: mainStore._nodes, // TODO (bvaughn)
-      });
-      this.emit('snapshots', this.snapshots);
-    });
+    this._mainStore.on('clearSnapshots', this.clearSnapshots);
+    this._mainStore.on('storeSnapshot', this.storeSnapsnot);
   }
 
   off() {
     // Noop
   }
 
-  clearSnapshots(): void {
+  cacheDataForSnapshot(snapshotIndex: number, key: string, data: any): void {
+    if (this.cachedData[snapshotIndex] === undefined) {
+      this.cachedData[snapshotIndex] = {};
+    }
+    this.cachedData[snapshotIndex][key] = data;
+  }
+
+  clearSnapshots = () => {
     this.snapshots = [];
+    this.cachedData = {};
     this.emit('snapshots', this.snapshots);
+  };
+
+  getCachedDataForSnapshot(snapshotIndex: number, key: string): any {
+    if (this.cachedData[snapshotIndex] === undefined) {
+      return null;
+    }
+    return this.cachedData[snapshotIndex][key] || null;
   }
 
   setIsRecording(isRecording: boolean): void {
@@ -54,6 +61,17 @@ class ProfilerStore extends EventEmitter {
     this.emit('isRecording', isRecording);
     this._mainStore.setIsRecording(isRecording);
   }
+
+  storeSnapsnot = () => {
+    // TODO (bvaughn) The Store nodes Map may not be accurate!
+    // Nodes that were not re-rendered might have their alternates in the tree.
+    // I think the only way to handle this is to re-crawl the tree from a known committed Fiber...
+    this.snapshots.push({
+      ...this._mainStore.snapshotData,
+      nodes: this._mainStore._nodes, // TODO (bvaughn)
+    });
+    this.emit('snapshots', this.snapshots);
+  };
 }
 
 module.exports = ProfilerStore;

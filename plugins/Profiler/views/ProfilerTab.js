@@ -179,7 +179,6 @@ class ProfilerTab extends React.Component<Props, State> {
       );
     }
 
-    // TODO Add "Show host nodes" option to header+state (disabled by default)
     return (
       <div style={styles.container(theme)}>
         <div style={styles.Left}>

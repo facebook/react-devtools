@@ -24,7 +24,7 @@ import type {StoreSnapshot} from './ProfilerTypes';
  */
 class ProfileCollector {
   _agent: Agent;
-  _committedNodes: Array<string> = [];
+  _committedNodes: Set<string> = new Set();
   _isRecording: boolean = false;
 
   constructor(agent: Agent) {
@@ -32,13 +32,14 @@ class ProfileCollector {
 
     agent.on('isRecording', this._onIsRecording);
     agent.on('mount', this._onMountOrUpdate);
-    agent.on('update', this._onMountOrUpdate);
     agent.on('rootCommitted', this._onRootCommitted);
+    agent.on('unmount', this._onUnmount);
+    agent.on('update', this._onMountOrUpdate);
   }
 
   _takeCommitSnapshotForRoot(root: string) {
     const storeSnapshot: StoreSnapshot = {
-      committedNodes: this._committedNodes,
+      committedNodes: Array.from(this._committedNodes),
       commitTime: performance.now(),
       root,
     };
@@ -47,7 +48,7 @@ class ProfileCollector {
   }
 
   _onIsRecording = isRecording => {
-    this._committedNodes = [];
+    this._committedNodes = new Set();
     this._isRecording = isRecording;
 
     if (isRecording) {
@@ -65,7 +66,7 @@ class ProfileCollector {
       return;
     }
 
-    this._committedNodes.push(data.id);
+    this._committedNodes.add(data.id);
   };
 
   _onRootCommitted = (root: string) => {
@@ -76,8 +77,12 @@ class ProfileCollector {
     // Once all roots have been committed,
     // Take a snapshot of the current tree.
     this._takeCommitSnapshotForRoot(root);
-    this._committedNodes = [];
+    this._committedNodes = new Set();
   }
+
+  _onUnmount = (id: string) => {
+    this._committedNodes.delete(id);
+  };
 }
 
 function init(agent: Agent): ProfileCollector {
