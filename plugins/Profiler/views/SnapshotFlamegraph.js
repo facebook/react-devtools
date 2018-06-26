@@ -354,10 +354,18 @@ const getMaxTreeBaseTime = (
   selectedFiberID: string | null,
   selectedRootID: string | null,
   snapshot: Snapshot,
-): number =>
-  selectedRootID === snapshot.root
-    ? snapshot.nodes.getIn([selectedFiberID, 'treeBaseTime'])
-    : snapshot.nodes.getIn([flamegraphData.lazyIDsByDepth[0][0], 'treeBaseTime']);
+): number => {
+  const baseNodeID = flamegraphData.lazyIDsByDepth[0][0];
+
+  // If the selected fiber is in a different root,
+  // Just scale everything to the base node in this flamegraph.
+  // Even if the root matches, it's possible the Fiber won't be included in this commit though.
+  // (For example, it may have been removed.)
+  // In that case, we should still fallback to the base node time.
+  return selectedRootID === snapshot.root
+    ? snapshot.nodes.getIn([selectedFiberID, 'treeBaseTime']) || snapshot.nodes.getIn([baseNodeID, 'treeBaseTime'])
+    : snapshot.nodes.getIn([baseNodeID, 'treeBaseTime']);
+};
 
 // This method depends on rows being initialized in-order.
 const calculateFibersAtDepth = (flamegraphData: FlamegraphData, depth: number, snapshot: Snapshot): Array<string> => {
