@@ -51,6 +51,7 @@ type Props = {|
   showNativeNodes: boolean, // Ignored by this charting type
   snapshot: Snapshot,
   snapshotIndex: number,
+  snapshotRootID: string, // Ignored by this charting type
   theme: Theme,
 |};
 
@@ -67,10 +68,10 @@ const RankedSnapshot = ({
   theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
-  let rankedData = getCachedDataForSnapshot(snapshotIndex, 'RankedSnapshotData');
+  let rankedData = getCachedDataForSnapshot(snapshotIndex, snapshot.root, 'RankedSnapshotData');
   if (rankedData === null) {
     rankedData = convertSnapshotToChartData(snapshot);
-    cacheDataForSnapshot(snapshotIndex, 'RankedSnapshotData', rankedData);
+    cacheDataForSnapshot(snapshotIndex, snapshot.root, 'RankedSnapshotData', rankedData);
   }
 
   return (

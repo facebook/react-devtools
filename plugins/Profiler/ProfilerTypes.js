@@ -15,12 +15,14 @@ const {Map} = require('immutable');
 
 export type CacheDataForSnapshot = (
   snapshotIndex: number,
+  snapshotRootID: string,
   key: string,
   data: any
 ) => void;
 
 export type GetCachedDataForSnapshot = (
   snapshotIndex: number,
+  snapshotRootID: string,
   key: string
 ) => any | null;
 

@@ -13,6 +13,7 @@
 import type Bridge from '../../agent/Bridge';
 import type {Snapshot} from './ProfilerTypes';
 
+const {List} = require('immutable');
 const {EventEmitter} = require('events');
 
 class ProfilerStore extends EventEmitter {
@@ -21,6 +22,7 @@ class ProfilerStore extends EventEmitter {
 
   cachedData = {};
   isRecording: boolean = false;
+  roots: List = new List();
   snapshots: Array<Snapshot> = [];
 
   constructor(bridge: Bridge, mainStore: Object) {
@@ -29,6 +31,7 @@ class ProfilerStore extends EventEmitter {
     this._bridge = bridge;
     this._mainStore = mainStore;
     this._mainStore.on('clearSnapshots', this.clearSnapshots);
+    this._mainStore.on('roots', this.saveRoots);
     this._mainStore.on('storeSnapshot', this.storeSnapsnot);
   }
 
@@ -36,11 +39,14 @@ class ProfilerStore extends EventEmitter {
     // Noop
   }
 
-  cacheDataForSnapshot(snapshotIndex: number, key: string, data: any): void {
+  cacheDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string, data: any): void {
     if (this.cachedData[snapshotIndex] === undefined) {
       this.cachedData[snapshotIndex] = {};
     }
-    this.cachedData[snapshotIndex][key] = data;
+    if (this.cachedData[snapshotIndex][snapshotRootID] === undefined) {
+      this.cachedData[snapshotIndex][snapshotRootID] = {};
+    }
+    this.cachedData[snapshotIndex][snapshotRootID][key] = data;
   }
 
   clearSnapshots = () => {
@@ -49,12 +55,20 @@ class ProfilerStore extends EventEmitter {
     this.emit('snapshots', this.snapshots);
   };
 
-  getCachedDataForSnapshot(snapshotIndex: number, key: string): any {
+  getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
     if (this.cachedData[snapshotIndex] === undefined) {
       return null;
     }
-    return this.cachedData[snapshotIndex][key] || null;
+    if (this.cachedData[snapshotIndex][snapshotRootID] === undefined) {
+      return null;
+    }
+    return this.cachedData[snapshotIndex][snapshotRootID][key] || null;
   }
+
+  saveRoots = () => {
+    this.roots = this._mainStore.roots;
+    this.emit('roots', this._mainStore.roots);
+  };
 
   setIsRecording(isRecording: boolean): void {
     this.isRecording = isRecording;

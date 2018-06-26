@@ -10,6 +10,7 @@
  */
 'use strict';
 
+import type {List} from 'immutable';
 import type {Theme} from '../../../frontend/types';
 import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 
@@ -33,6 +34,7 @@ type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   isRecording: boolean,
+  roots: List,
   snapshots: Array<Snapshot>,
   toggleIsRecording: (value: boolean) => void,
 |};
@@ -76,6 +78,14 @@ class ProfilerTab extends React.Component<Props, State> {
     }
     return null;
   }
+
+  deselectFiber = () =>
+    this.setState({
+      selectedFiberID: null,
+      selectedFiberName: null,
+      selectedRootID: null,
+    });
+
 
   handleSnapshotSliderChange = (event: SyntheticEvent<HTMLInputElement>) =>
     this.setState({ snapshotIndex: parseInt(event.currentTarget.value, 10) });
@@ -132,7 +142,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
   render() {
     const { theme } = this.context;
-    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, snapshots, toggleIsRecording } = this.props;
+    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, roots, snapshots, toggleIsRecording } = this.props;
     const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, selectedRootID, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
@@ -155,23 +165,53 @@ class ProfilerTab extends React.Component<Props, State> {
           />
         );
       } else {
-        const ChartComponent = selectedChart === 'ranked'
-          ? RankedSnapshot
-          : SnapshotFlamegraph;
-        content = (
-          <ChartComponent
-            cacheDataForSnapshot={cacheDataForSnapshot}
-            getCachedDataForSnapshot={getCachedDataForSnapshot}
-            inspectFiber={this.inspectFiber}
-            selectedFiberID={selectedFiberID}
-            selectedRootID={selectedRootID}
-            selectFiber={this.selectFiber}
-            showNativeNodes={showNativeNodes}
-            snapshot={snapshot}
-            snapshotIndex={snapshotIndex}
-            theme={theme}
-          />
-        );
+        if (selectedRootID === null && selectedChart === 'flamegraph') {
+          content = roots.map((rootID: string) => (
+            <div key={rootID} style={{ flex: 1, height: '100%' }}>
+              <SnapshotFlamegraph
+                cacheDataForSnapshot={cacheDataForSnapshot}
+                getCachedDataForSnapshot={getCachedDataForSnapshot}
+                inspectFiber={this.inspectFiber}
+                selectedFiberID={selectedFiberID}
+                selectedRootID={selectedRootID}
+                selectFiber={this.selectFiber}
+                showNativeNodes={showNativeNodes}
+                snapshot={snapshot}
+                snapshotIndex={snapshotIndex}
+                snapshotRootID={rootID}
+                theme={theme}
+              />
+            </div>
+          ));
+        } else {
+          const ChartComponent = selectedChart === 'ranked'
+            ? RankedSnapshot
+            : SnapshotFlamegraph;
+          const showDeselectButton = roots.size > 1 && selectedChart === 'flamegraph';
+
+          content = (
+            <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
+              {showDeselectButton && (
+                <button onClick={this.deselectFiber} style={styles.ClearButton}>
+                  Show all roots
+                </button>
+              )}
+              <ChartComponent
+                cacheDataForSnapshot={cacheDataForSnapshot}
+                getCachedDataForSnapshot={getCachedDataForSnapshot}
+                inspectFiber={this.inspectFiber}
+                selectedFiberID={selectedFiberID}
+                selectedRootID={selectedRootID}
+                selectFiber={this.selectFiber}
+                showNativeNodes={showNativeNodes}
+                snapshot={snapshot}
+                snapshotIndex={snapshotIndex}
+                snapshotRootID={((selectedRootID: any): string)}
+                theme={theme}
+              />
+            </div>
+          );
+        }
       }
     } else {
       content = (
@@ -461,8 +501,13 @@ var styles = {
     textOverflow: 'ellipsis',
     whiteSpace: 'nowrap',
   },
+  ClearButton: {
+    marginBottom: '0.5rem',
+  },
   Content: {
     flex: 1,
+    display: 'flex',
+    flexDirection: 'row',
     padding: '0.5rem',
     boxSizing: 'border-box',
   },
@@ -518,12 +563,13 @@ var styles = {
 
 export default decorate({
   store: 'profilerStore',
-  listeners: () => ['isRecording', 'snapshots'],
+  listeners: () => ['isRecording', 'roots', 'snapshots'],
   props(store) {
     return {
       cacheDataForSnapshot: (...args) => store.cacheDataForSnapshot(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       isRecording: !!store.isRecording,
+      roots: store.roots,
       snapshots: store.snapshots,
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
     };

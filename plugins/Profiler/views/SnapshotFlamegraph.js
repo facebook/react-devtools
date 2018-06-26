@@ -65,6 +65,7 @@ type ItemData = {|
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
+  snapshotRootID: string,
   theme: Theme,
   width: number,
 |};
@@ -79,6 +80,7 @@ type Props = {|
   showNativeNodes: boolean,
   snapshot: Snapshot,
   snapshotIndex: number,
+  snapshotRootID: string,
   theme: Theme,
 |};
 
@@ -91,15 +93,16 @@ const SnapshotFlamegraph = ({
   selectFiber,
   showNativeNodes,
   snapshot,
+  snapshotRootID,
   snapshotIndex,
   theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const dataKey = showNativeNodes ? 'SnapshotFlamegraphWithNativeNodes' : 'SnapshotFlamegraphWithoutNativeNodes';
-  let flamegraphData = getCachedDataForSnapshot(snapshotIndex, dataKey);
+  let flamegraphData = getCachedDataForSnapshot(snapshotIndex, snapshotRootID, dataKey);
   if (flamegraphData === null) {
-    flamegraphData = convertSnapshotToChartData(showNativeNodes, snapshot);
-    cacheDataForSnapshot(snapshotIndex, dataKey, flamegraphData);
+    flamegraphData = convertSnapshotToChartData(showNativeNodes, snapshot, snapshotRootID);
+    cacheDataForSnapshot(snapshotIndex, snapshotRootID, dataKey, flamegraphData);
   }
 
   return (
@@ -114,6 +117,7 @@ const SnapshotFlamegraph = ({
           selectFiber={selectFiber}
           showNativeNodes={showNativeNodes}
           snapshot={snapshot}
+          snapshotRootID={snapshotRootID}
           theme={theme}
           width={width}
         />
@@ -131,6 +135,7 @@ type FlamegraphProps = {|
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean,
   snapshot: Snapshot,
+  snapshotRootID: string,
   theme: Theme,
   width: number,
 |};
@@ -144,6 +149,7 @@ const Flamegraph = ({
   selectFiber,
   showNativeNodes,
   snapshot,
+  snapshotRootID,
   theme,
   width,
 }: FlamegraphProps) => {
@@ -168,6 +174,7 @@ const Flamegraph = ({
     selectedRootID,
     selectFiber,
     snapshot,
+    snapshotRootID,
     theme,
     width,
   );
@@ -207,7 +214,7 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { flamegraphData, scaleX, selectedFiberID, snapshot } = itemData;
+    const { flamegraphData, scaleX, selectedFiberID, snapshot, snapshotRootID } = itemData;
     const { lazyIDToDepthMap, lazyIDToXMap, maxDuration } = flamegraphData;
     const { committedNodes, nodes } = snapshot;
 
@@ -260,8 +267,8 @@ class ListItem extends PureComponent<any, void> {
               isDimmed={index < focusedNodeIndex}
               key={id}
               label={didRender ? `${name} (${actualDuration.toFixed(2)}ms)` : name}
-              onClick={() => itemData.selectFiber(id, name, snapshot.root)}
-              onDoubleClick={() => itemData.inspectFiber(id, name, snapshot.root)}
+              onClick={() => itemData.selectFiber(id, name, snapshotRootID)}
+              onDoubleClick={() => itemData.inspectFiber(id, name, snapshotRootID)}
               theme={itemData.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
@@ -277,11 +284,12 @@ class ListItem extends PureComponent<any, void> {
 const convertSnapshotToChartData = (
   showNativeNodes: boolean,
   snapshot: Snapshot,
+  snapshotRootID: string,
 ): FlamegraphData => {
   const maxDuration = getMaxDurationForSnapshot(snapshot);
 
   const flamegraphData: FlamegraphData = {
-    flameGraphDepth: calculateFlameGraphDepth(showNativeNodes, snapshot),
+    flameGraphDepth: calculateFlameGraphDepth(showNativeNodes, snapshot, snapshotRootID),
     lazyIDToDepthMap: {},
     lazyIDToXMap: {},
     lazyIDsByDepth: [],
@@ -294,7 +302,7 @@ const convertSnapshotToChartData = (
   flamegraphData.lazyIDsByDepth[0] = calculateFibersAtDepthCrawler(
     0,
     flamegraphData,
-    snapshot.root,
+    snapshotRootID,
     0,
     [],
     snapshot,
@@ -303,7 +311,7 @@ const convertSnapshotToChartData = (
   return flamegraphData;
 };
 
-const calculateFlameGraphDepth = (showNativeNodes: boolean, snapshot: Snapshot): number => {
+const calculateFlameGraphDepth = (showNativeNodes: boolean, snapshot: Snapshot, snapshotRootID: string): number => {
   let maxDepth = 0;
 
   const walkTree = (nodeID: string, currentDepth: number = 0) => {
@@ -325,7 +333,7 @@ const calculateFlameGraphDepth = (showNativeNodes: boolean, snapshot: Snapshot):
     }
   };
 
-  walkTree(snapshot.root);
+  walkTree(snapshotRootID);
 
   return maxDepth;
 };
@@ -337,10 +345,11 @@ const getItemData = memoize((
   selectedRootID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
+  snapshotRootID: string,
   theme: Theme,
   width: number,
 ): ItemData => {
-  const maxTreeBaseTime = getMaxTreeBaseTime(flamegraphData, selectedFiberID, selectedRootID, snapshot);
+  const maxTreeBaseTime = getMaxTreeBaseTime(flamegraphData, selectedFiberID, selectedRootID, snapshot, snapshotRootID);
   return {
     flamegraphData,
     inspectFiber,
@@ -349,6 +358,7 @@ const getItemData = memoize((
     selectedFiberID,
     selectFiber,
     snapshot,
+    snapshotRootID,
     theme,
     width,
   };
@@ -370,6 +380,7 @@ const getMaxTreeBaseTime = (
   selectedFiberID: string | null,
   selectedRootID: string | null,
   snapshot: Snapshot,
+  snapshotRootID: string,
 ): number => {
   const baseNodeID = flamegraphData.lazyIDsByDepth[0][0];
 
@@ -378,7 +389,7 @@ const getMaxTreeBaseTime = (
   // Even if the root matches, it's possible the Fiber won't be included in this commit though.
   // (For example, it may have been removed.)
   // In that case, we should still fallback to the base node time.
-  return selectedRootID === snapshot.root
+  return selectedRootID === snapshotRootID
     ? snapshot.nodes.getIn([selectedFiberID, 'treeBaseTime']) || snapshot.nodes.getIn([baseNodeID, 'treeBaseTime'])
     : snapshot.nodes.getIn([baseNodeID, 'treeBaseTime']);
 };
