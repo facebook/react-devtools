@@ -211,6 +211,7 @@ class Agent extends EventEmitter {
     this.on('root', id => bridge.send('root', id));
     this.on('mount', data => bridge.send('mount', data));
     this.on('update', data => bridge.send('update', data));
+    this.on('updateProfileTimes', data => bridge.send('updateProfileTimes', data));
     this.on('unmount', id => {
       bridge.send('unmount', id);
       // once an element has been unmounted, the bridge doesn't need to be
@@ -413,6 +414,21 @@ class Agent extends EventEmitter {
     delete send.type;
     delete send.updater;
     this.emit('update', send);
+  }
+
+  onUpdatedProfileTimes(component: OpaqueNodeHandle, data: DataType) {
+    var id = this.getId(component);
+    this.elementData.set(id, data);
+
+    var send = assign({}, data);
+    if (send.children && send.children.map) {
+      send.children = send.children.map(c => this.getId(c));
+    }
+    send.id = id;
+    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    delete send.type;
+    delete send.updater;
+    this.emit('updateProfileTimes', send);
   }
 
   onUnmounted(component: OpaqueNodeHandle) {

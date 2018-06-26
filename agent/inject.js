@@ -25,6 +25,7 @@ module.exports = function(hook: Hook, agent: Agent) {
     hook.sub('mount', ({renderer, internalInstance, data}) => agent.onMounted(renderer, internalInstance, data)),
     hook.sub('root', ({renderer, internalInstance}) => agent.addRoot(renderer, internalInstance)),
     hook.sub('update', ({renderer, internalInstance, data}) => agent.onUpdated(internalInstance, data)),
+    hook.sub('updateProfileTimes', ({renderer, internalInstance, data}) => agent.onUpdatedProfileTimes(internalInstance, data)),
     hook.sub('unmount', ({renderer, internalInstance}) => agent.onUnmounted(internalInstance)),
   ];
 

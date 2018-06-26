@@ -163,6 +163,7 @@ class Store extends EventEmitter {
     });
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
+    this._bridge.on('updateProfileTimes', (data) => this._updateComponentProfileTimes(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
     this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
@@ -684,6 +685,16 @@ class Store extends EventEmitter {
         }
       });
     }
+    this.emit(data.id);
+  }
+
+  _updateComponentProfileTimes(data: DataType) {
+    var node = this.get(data.id);
+    if (!node) {
+      return;
+    }
+    data.renders = node.get('renders') + 1;
+    this._nodes = this._nodes.mergeIn([data.id], Map(data));
     this.emit(data.id);
   }
 

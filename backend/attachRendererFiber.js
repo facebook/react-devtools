@@ -105,9 +105,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
     if (
       !hasChildOrderChanged &&
-      !hasDataChanged(fiber.alternate, fiber) &&
-      !hasProfileChanged(fiber.alternate, fiber)
+      !hasDataChanged(fiber.alternate, fiber)
     ) {
+      if (hasProfileChanged(fiber.alternate, fiber)) {
+        pendingEvents.push({
+          internalInstance: getOpaqueNode(fiber),
+          data: getDataFiber(fiber, getOpaqueNode),
+          renderer: rid,
+          type: 'updateProfileTimes',
+        });
+      }
       return;
     }
     pendingEvents.push({
