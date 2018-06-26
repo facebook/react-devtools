@@ -40,13 +40,7 @@ class ProfilerStore extends EventEmitter {
   }
 
   cacheDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string, data: any): void {
-    if (this.cachedData[snapshotIndex] === undefined) {
-      this.cachedData[snapshotIndex] = {};
-    }
-    if (this.cachedData[snapshotIndex][snapshotRootID] === undefined) {
-      this.cachedData[snapshotIndex][snapshotRootID] = {};
-    }
-    this.cachedData[snapshotIndex][snapshotRootID][key] = data;
+    this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] = data;
   }
 
   clearSnapshots = () => {
@@ -56,13 +50,7 @@ class ProfilerStore extends EventEmitter {
   };
 
   getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
-    if (this.cachedData[snapshotIndex] === undefined) {
-      return null;
-    }
-    if (this.cachedData[snapshotIndex][snapshotRootID] === undefined) {
-      return null;
-    }
-    return this.cachedData[snapshotIndex][snapshotRootID][key] || null;
+    return this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] || null;
   }
 
   saveRoots = () => {
