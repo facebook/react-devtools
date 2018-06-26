@@ -10,7 +10,6 @@
  */
 'use strict';
 
-import type {List} from 'immutable';
 import type {Theme} from '../../../frontend/types';
 import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 
@@ -34,7 +33,7 @@ type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   isRecording: boolean,
-  roots: List,
+  selectedRootID: string | null,
   snapshots: Array<Snapshot>,
   toggleIsRecording: (value: boolean) => void,
 |};
@@ -45,7 +44,6 @@ type State = {|
   selectedChart: Chart,
   selectedFiberID: string | null,
   selectedFiberName: string | null,
-  selectedRootID: string | null,
   showNativeNodes: boolean,
   snapshotIndex: number,
 |};
@@ -61,7 +59,6 @@ class ProfilerTab extends React.Component<Props, State> {
     selectedChart: 'flamegraph',
     selectedFiberID: null,
     selectedFiberName: null,
-    selectedRootID: null,
     showNativeNodes: false,
     snapshotIndex: 0,
   };
@@ -72,7 +69,6 @@ class ProfilerTab extends React.Component<Props, State> {
         prevIsRecording: props.isRecording,
         selectedFiberID: null,
         selectedFiberName: null,
-        selectedRootID: null,
         snapshotIndex: 0,
       };
     }
@@ -83,7 +79,6 @@ class ProfilerTab extends React.Component<Props, State> {
     this.setState({
       selectedFiberID: null,
       selectedFiberName: null,
-      selectedRootID: null,
     });
 
 
@@ -92,12 +87,11 @@ class ProfilerTab extends React.Component<Props, State> {
 
   inspect = () => this.setState({ isInspectingSelectedFiber: true });
 
-  inspectFiber = (id: string, name: string, rootID: string) =>
+  inspectFiber = (id: string, name: string) =>
     this.setState({
       isInspectingSelectedFiber: true,
       selectedFiberID: id,
       selectedFiberName: name,
-      selectedRootID: rootID,
     });
 
   selectChart = (chart: Chart) =>
@@ -106,7 +100,6 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedChart: chart,
       selectedFiberID: null,
       selectedFiberName: null,
-      selectedRootID: null,
     });
 
   selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
@@ -118,11 +111,10 @@ class ProfilerTab extends React.Component<Props, State> {
   // We store the ID and name separately,
   // Because a Fiber may not exist in all snapshots.
   // In that case, it's still important to show the selected fiber (name) in the details pane.
-  selectFiber = (id: string, name: string, rootID: string) =>
+  selectFiber = (id: string, name: string) =>
     this.setState({
       selectedFiberID: id,
       selectedFiberName: name,
-      selectedRootID: rootID,
     });
 
   selectSnapshot = (snapshot: Snapshot) =>
@@ -136,20 +128,21 @@ class ProfilerTab extends React.Component<Props, State> {
     this.setState(prevState => ({
       selectedFiberID: null,
       selectedFiberName: null,
-      selectedRootID: null,
       showNativeNodes: !prevState.showNativeNodes,
     }));
 
   render() {
     const { theme } = this.context;
-    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, roots, snapshots, toggleIsRecording } = this.props;
-    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, selectedRootID, showNativeNodes, snapshotIndex } = this.state;
+    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, selectedRootID, snapshots, toggleIsRecording } = this.props;
+    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
     const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
 
     let content;
-    if (isRecording) {
+    if (selectedRootID === null) {
+      content = 'Selected a root in the Elements tab to continue'; // TODO
+    } else if (isRecording) {
       content = (
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
       );
@@ -165,53 +158,23 @@ class ProfilerTab extends React.Component<Props, State> {
           />
         );
       } else {
-        if (selectedRootID === null && selectedChart === 'flamegraph') {
-          content = roots.map((rootID: string) => (
-            <div key={rootID} style={{ flex: 1, height: '100%' }}>
-              <SnapshotFlamegraph
-                cacheDataForSnapshot={cacheDataForSnapshot}
-                getCachedDataForSnapshot={getCachedDataForSnapshot}
-                inspectFiber={this.inspectFiber}
-                selectedFiberID={selectedFiberID}
-                selectedRootID={selectedRootID}
-                selectFiber={this.selectFiber}
-                showNativeNodes={showNativeNodes}
-                snapshot={snapshot}
-                snapshotIndex={snapshotIndex}
-                snapshotRootID={rootID}
-                theme={theme}
-              />
-            </div>
-          ));
-        } else {
-          const ChartComponent = selectedChart === 'ranked'
-            ? RankedSnapshot
-            : SnapshotFlamegraph;
-          const showDeselectButton = roots.size > 1 && selectedChart === 'flamegraph';
+        const ChartComponent = selectedChart === 'ranked'
+          ? RankedSnapshot
+          : SnapshotFlamegraph;
 
-          content = (
-            <div style={{ flex: 1, height: '100%', display: 'flex', flexDirection: 'column' }}>
-              {showDeselectButton && (
-                <button onClick={this.deselectFiber} style={styles.ClearButton}>
-                  Show all roots
-                </button>
-              )}
-              <ChartComponent
-                cacheDataForSnapshot={cacheDataForSnapshot}
-                getCachedDataForSnapshot={getCachedDataForSnapshot}
-                inspectFiber={this.inspectFiber}
-                selectedFiberID={selectedFiberID}
-                selectedRootID={selectedRootID}
-                selectFiber={this.selectFiber}
-                showNativeNodes={showNativeNodes}
-                snapshot={snapshot}
-                snapshotIndex={snapshotIndex}
-                snapshotRootID={((selectedRootID: any): string)}
-                theme={theme}
-              />
-            </div>
-          );
-        }
+        content = (
+          <ChartComponent
+            cacheDataForSnapshot={cacheDataForSnapshot}
+            getCachedDataForSnapshot={getCachedDataForSnapshot}
+            inspectFiber={this.inspectFiber}
+            selectedFiberID={selectedFiberID}
+            selectFiber={this.selectFiber}
+            showNativeNodes={showNativeNodes}
+            snapshot={snapshot}
+            snapshotIndex={snapshotIndex}
+            theme={theme}
+          />
+        );
       }
     } else {
       content = (
@@ -393,13 +356,16 @@ const iconButtonStyle = (isActive: boolean, isEnabled: boolean, isHovered: boole
 });
 
 const InactiveNoData = ({startRecording, theme}) => (
-  <span style={styles.InactiveNoData}>
-    Click the record button <RecordButton
-      isActive={false}
-      onClick={startRecording}
-      theme={theme}
-    /> to start a new recording.
-  </span>
+  <div style={styles.InactiveNoData}>
+    <p>No data has been recorded for the selected root.</p>
+    <p>
+      Click the record button <RecordButton
+        isActive={false}
+        onClick={startRecording}
+        theme={theme}
+      /> to start a new recording.
+    </p>
+  </div>
 );
 
 const RecordingInProgress = ({stopRecording, theme}) => (
@@ -457,7 +423,7 @@ var styles = {
     height: '100%',
     flex: 1,
     display: 'flex',
-    flexDirection: 'row',
+    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -506,8 +472,6 @@ var styles = {
   },
   Content: {
     flex: 1,
-    display: 'flex',
-    flexDirection: 'row',
     padding: '0.5rem',
     boxSizing: 'border-box',
   },
@@ -563,14 +527,13 @@ var styles = {
 
 export default decorate({
   store: 'profilerStore',
-  listeners: () => ['isRecording', 'roots', 'snapshots'],
+  listeners: () => ['isRecording', 'selectedRoot', 'snapshots'],
   props(store) {
     return {
       cacheDataForSnapshot: (...args) => store.cacheDataForSnapshot(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       isRecording: !!store.isRecording,
-      roots: store.roots,
-      snapshots: store.snapshots,
+      snapshots: store.snapshots.filter(snapshot => snapshot.root === store.selectedRoot),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
     };
   },

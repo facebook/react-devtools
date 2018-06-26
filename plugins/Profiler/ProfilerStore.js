@@ -23,6 +23,7 @@ class ProfilerStore extends EventEmitter {
   cachedData = {};
   isRecording: boolean = false;
   roots: List = new List();
+  selectedRoot: string | null = null;
   snapshots: Array<Snapshot> = [];
 
   constructor(bridge: Bridge, mainStore: Object) {
@@ -32,6 +33,7 @@ class ProfilerStore extends EventEmitter {
     this._mainStore = mainStore;
     this._mainStore.on('clearSnapshots', this.clearSnapshots);
     this._mainStore.on('roots', this.saveRoots);
+    this._mainStore.on('selected', this.updateSelected);
     this._mainStore.on('storeSnapshot', this.storeSnapsnot);
   }
 
@@ -73,6 +75,22 @@ class ProfilerStore extends EventEmitter {
       nodes: this._mainStore._nodes, // TODO (bvaughn)
     });
     this.emit('snapshots', this.snapshots);
+  };
+
+  updateSelected = () => {
+    let currentID = this._mainStore.selected;
+
+    while (true) {
+      const parentID = this._mainStore.getParent(currentID);
+      if (parentID != null) {
+        currentID = parentID;
+      } else {
+        break;
+      }
+    }
+
+    this.selectedRoot = currentID;
+    this.emit('selectedRoot', this.selectedRoot);
   };
 }
 

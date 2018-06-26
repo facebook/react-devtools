@@ -27,7 +27,7 @@ type Node = {|
   value: number,
 |};
 
-type SelectOrInspectFiber = (id: string, name: string, rootID: string) => void;
+type SelectOrInspectFiber = (id: string, name: string) => void;
 
 type ItemData = {|
   focusedNode: Node,
@@ -46,12 +46,10 @@ type Props = {|
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
-  selectedRootID: string | null,
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean, // Ignored by this charting type
   snapshot: Snapshot,
   snapshotIndex: number,
-  snapshotRootID: string, // Ignored by this charting type
   theme: Theme,
 |};
 
@@ -60,7 +58,6 @@ const RankedSnapshot = ({
   getCachedDataForSnapshot,
   inspectFiber,
   selectedFiberID,
-  selectedRootID,
   selectFiber,
   showNativeNodes,
   snapshot,
@@ -82,7 +79,6 @@ const RankedSnapshot = ({
           inspectFiber={inspectFiber}
           rankedData={((rankedData: any): RankedData)}
           selectedFiberID={selectedFiberID}
-          selectedRootID={selectedRootID}
           selectFiber={selectFiber}
           snapshot={snapshot}
           theme={theme}
@@ -103,7 +99,6 @@ type RankedProps = {|
   inspectFiber: SelectOrInspectFiber,
   rankedData: RankedData,
   selectedFiberID: string | null,
-  selectedRootID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
   theme: Theme,
@@ -115,7 +110,6 @@ const Ranked = ({
   inspectFiber,
   rankedData,
   selectedFiberID,
-  selectedRootID,
   selectFiber,
   snapshot,
   theme,
@@ -137,9 +131,7 @@ const Ranked = ({
     );
   }
 
-  const focusedNodeIndex = selectedRootID === snapshot.root
-    ? getNodeIndex(rankedData, selectedFiberID)
-    : 0;
+  const focusedNodeIndex = getNodeIndex(rankedData, selectedFiberID);
 
   // The following conversion methods are memoized,
   // So it's okay to call them on every render.
