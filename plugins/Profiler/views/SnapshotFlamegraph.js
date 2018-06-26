@@ -172,6 +172,22 @@ const Flamegraph = ({
     width,
   );
 
+  // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
+  // In this case, we could only display an empty graph.
+  if (itemData.maxTreeBaseTime === 0) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height,
+        width,
+      }}>
+        No data for the current selection.
+      </div>
+    );
+  }
+
   return (
     <List
       containerTag="svg"

@@ -120,6 +120,22 @@ const Ranked = ({
   theme,
   width,
 }: RankedProps) => {
+  // If a commit contains no fibers with an actualDuration > 0,
+  // Display a fallback message.
+  if (rankedData.nodes.length === 0) {
+    return (
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        height,
+        width,
+      }}>
+        No data for the current selection.
+      </div>
+    );
+  }
+
   const focusedNodeIndex = selectedRootID === snapshot.root
     ? getNodeIndex(rankedData, selectedFiberID)
     : 0;
