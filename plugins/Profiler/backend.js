@@ -21,6 +21,8 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
     // The presence of an "actualDuration" field signifies:
     // 1) This is a new enough version of React
     // 2) This is a profiling capable bundle (e.g. DEV or PROFILING)
+    // TODO (bvaughn) We should update this check to ensure a version of React after #13058
+    // Maybe this could be done by renaming a field (e.g. treeBaseTime -> treeBaseDuration).
     agent.roots.forEach(id => {
       const root = agent.internalInstancesById.get(id);
       if ((root: any).hasOwnProperty('actualDuration')) {

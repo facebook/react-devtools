@@ -66,10 +66,13 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   function hasProfileChanged(prevFiber, nextFiber) {
     return (
-      prevFiber.actualDuration !== nextFiber.actualDuration ||
-      prevFiber.actualStartTime !== nextFiber.actualStartTime ||
-      prevFiber.selfBaseTime !== nextFiber.selfBaseTime ||
-      prevFiber.treeBaseTime !== nextFiber.treeBaseTime
+      prevFiber.actualDuration !== undefined && // Short-circuit check for non-profiling builds
+      (
+        prevFiber.actualDuration !== nextFiber.actualDuration ||
+        prevFiber.actualStartTime !== nextFiber.actualStartTime ||
+        prevFiber.selfBaseTime !== nextFiber.selfBaseTime ||
+        prevFiber.treeBaseTime !== nextFiber.treeBaseTime
+      )
     );
   }
 
@@ -107,6 +110,10 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       !hasChildOrderChanged &&
       !hasDataChanged(fiber.alternate, fiber)
     ) {
+      // If only timing information has changed, we still need to update the nodes.
+      // But we can do it in a faster way since we know it's safe to skip the children.
+      // It's also important to avoid emitting an "update" signal for the node in this case,
+      // Since that would indicate to the Profiler that it was part of the "commit" when it wasn't.
       if (hasProfileChanged(fiber.alternate, fiber)) {
         pendingEvents.push({
           internalInstance: getOpaqueNode(fiber),
