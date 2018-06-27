@@ -67,12 +67,9 @@ class ProfilerStore extends EventEmitter {
   }
 
   storeSnapsnot = () => {
-    // TODO (bvaughn) The Store nodes Map may not be accurate!
-    // Nodes that were not re-rendered might have their alternates in the tree.
-    // I think the only way to handle this is to re-crawl the tree from a known committed Fiber...
     this.snapshots.push({
       ...this._mainStore.snapshotData,
-      nodes: this._mainStore._nodes, // TODO (bvaughn)
+      nodes: this._mainStore._nodes, // TODO (bvaughn) Don't access a "private" variable of the Store
     });
     this.emit('snapshots', this.snapshots);
   };

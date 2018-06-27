@@ -141,7 +141,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
     let content;
     if (selectedRootID === null) {
-      content = 'Selected a root in the Elements tab to continue'; // TODO
+      content = 'Selected a root in the Elements tab to continue'; // TODO (bvaughn) Center align
     } else if (isRecording) {
       content = (
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
