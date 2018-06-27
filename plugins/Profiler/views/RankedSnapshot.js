@@ -47,7 +47,7 @@ type Props = {|
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
-  showNativeNodes: boolean, // Ignored by this charting type
+  showNativeNodes: boolean,
   snapshot: Snapshot,
   snapshotIndex: number,
   theme: Theme,
@@ -65,10 +65,11 @@ const RankedSnapshot = ({
   theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
-  let rankedData = getCachedDataForSnapshot(snapshotIndex, snapshot.root, 'RankedSnapshotData');
+  const dataKey = showNativeNodes ? 'RankedSnapshotDataWithNativeNodes' : 'RankedSnapshotDataWithoutNativeNodes';
+  let rankedData = getCachedDataForSnapshot(snapshotIndex, snapshot.root, dataKey);
   if (rankedData === null) {
-    rankedData = convertSnapshotToChartData(snapshot);
-    cacheDataForSnapshot(snapshotIndex, snapshot.root, 'RankedSnapshotData', rankedData);
+    rankedData = convertSnapshotToChartData(snapshot, showNativeNodes);
+    cacheDataForSnapshot(snapshotIndex, snapshot.root, dataKey, rankedData);
   }
 
   return (
@@ -224,7 +225,7 @@ const getNodeIndex = memoize((rankedData: RankedData, id: string | null): number
   return 0;
 });
 
-const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
+const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean): RankedData => {
   let maxValue = 0;
 
   const nodes = snapshot.committedNodes
@@ -232,9 +233,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot): RankedData => {
       const node = snapshot.nodes.get(nodeID);
       const nodeType = node && node.get('nodeType');
       return (
-        node !== undefined &&
-        nodeType !== 'Native' &&
-        nodeType !== 'Wrapper' &&
+        (nodeType === 'Custom' || (nodeType === 'Native' && showNativeNodes)) &&
         node.get('actualDuration') > 0
       );
     })

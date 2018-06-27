@@ -216,12 +216,12 @@ class ProfilerTab extends React.Component<Props, State> {
 
                 <label
                   style={{
-                    opacity: isInspectingSelectedFiber || selectedChart !== 'flamegraph' ? 0.5 : 1,
+                    opacity: isInspectingSelectedFiber ? 0.5 : 1,
                   }}
                 >
                   <input
                     type="checkbox"
-                    disabled={isInspectingSelectedFiber || selectedChart !== 'flamegraph'}
+                    disabled={isInspectingSelectedFiber}
                     checked={showNativeNodes}
                     onChange={this.toggleShowNativeNodes}
                   /> Show native?
