@@ -233,7 +233,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
       const node = snapshot.nodes.get(nodeID);
       const nodeType = node && node.get('nodeType');
       return (
-        (nodeType === 'Custom' || (nodeType === 'Native' && showNativeNodes)) &&
+        (nodeType === 'Composite' || (nodeType === 'Native' && showNativeNodes)) &&
         node.get('actualDuration') > 0
       );
     })
