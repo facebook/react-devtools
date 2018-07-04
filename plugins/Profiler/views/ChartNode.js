@@ -54,6 +54,7 @@ const ChartNode = ({ color, height, isDimmed = false, label, onClick, onDoubleCl
           opacity: isDimmed ? 0.75 : 1,
           display: width < minWidthToDisplay ? 'none' : 'block',
           paddingLeft: x < 0 ? -x : 0,
+          pointerEvents: 'none',
         }}
         y={height < textHeight ? -textHeight : 0}
       >
