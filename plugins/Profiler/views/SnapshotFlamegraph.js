@@ -59,7 +59,7 @@ type ItemData = {|
   // Tree base time value for either the root fiber in the tree or the current selected fiber.
   // This value determins the horizontal (time) scale,
   // Which in turn determines which fibers are rendered in the flamegraph.
-  maxTreeBaseTime: number,
+  maxTreeBaseDuration: number,
   // Scales horizontal values (left offset and width) based on the selected fiber's tree base time.
   scaleX: (value: number) => number,
   selectedFiberID: string | null,
@@ -168,7 +168,7 @@ const Flamegraph = ({
 
   // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
   // In this case, we could only display an empty graph.
-  if (flameGraphDepth === 0 || itemData.maxTreeBaseTime === 0) {
+  if (flameGraphDepth === 0 || itemData.maxTreeBaseDuration === 0) {
     return (
       <div style={{
         display: 'flex',
@@ -224,8 +224,8 @@ class ListItem extends PureComponent<any, void> {
       <Fragment>
         {ids.map(id => {
           const fiber = nodes.get(id);
-          const treeBaseTime = fiber.get('treeBaseTime');
-          const nodeWidth = scaleX(treeBaseTime);
+          const treeBaseDuration = fiber.get('treeBaseDuration');
+          const nodeWidth = scaleX(treeBaseDuration);
 
           // Filter out nodes that are too small to see or click.
           // This also helps render large trees faster.
@@ -333,12 +333,12 @@ const getItemData = memoize((
   theme: Theme,
   width: number,
 ): ItemData => {
-  const maxTreeBaseTime = getMaxTreeBaseTime(flamegraphData, selectedFiberID, snapshot);
+  const maxTreeBaseDuration = getMaxTreeBaseDuration(flamegraphData, selectedFiberID, snapshot);
   return {
     flamegraphData,
     inspectFiber,
-    maxTreeBaseTime,
-    scaleX: scale(0, maxTreeBaseTime, 0, width),
+    maxTreeBaseDuration,
+    scaleX: scale(0, maxTreeBaseDuration, 0, width),
     selectedFiberID,
     selectFiber,
     snapshot,
@@ -358,7 +358,7 @@ const getMaxDurationForSnapshot = (snapshot: Snapshot): number => {
   return maxDuration;
 };
 
-const getMaxTreeBaseTime = (
+const getMaxTreeBaseDuration = (
   flamegraphData: FlamegraphData,
   selectedFiberID: string | null,
   snapshot: Snapshot,
@@ -370,7 +370,7 @@ const getMaxTreeBaseTime = (
   // Even if the root matches, it's possible the Fiber won't be included in this commit though.
   // (For example, it may have been removed.)
   // In that case, we should still fallback to the base node time.
-  return snapshot.nodes.getIn([selectedFiberID, 'treeBaseTime']) || snapshot.nodes.getIn([baseNodeID, 'treeBaseTime']);
+  return snapshot.nodes.getIn([selectedFiberID, 'treeBaseDuration']) || snapshot.nodes.getIn([baseNodeID, 'treeBaseDuration']);
 };
 
 // This method depends on rows being initialized in-order.
@@ -438,10 +438,10 @@ const calculateFibersAtDepthCrawler = (
         const prevID = nodesAtDepth.length
           ? nodesAtDepth[nodesAtDepth.length - 1]
           : null;
-        const prevNodeTreeBaseTime = nodes.getIn([prevID, 'treeBaseTime']) || 0;
+        const prevNodeTreeBaseDuration = nodes.getIn([prevID, 'treeBaseDuration']) || 0;
         const prevNodeX = prevID !== null ? lazyIDToXMap[prevID] : 0;
 
-        const x = Math.max(leftOffset, prevNodeX + prevNodeTreeBaseTime);
+        const x = Math.max(leftOffset, prevNodeX + prevNodeTreeBaseDuration);
 
         nodesAtDepth.push(childID);
 

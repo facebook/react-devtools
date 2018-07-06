@@ -57,11 +57,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var text = null;
 
   // Profiler data
-  // TODO (bvaughn) Maybe we only need to store treeBaseTime.
+  // TODO (bvaughn) Maybe we only need to store treeBaseDuration.
   // We don't actually use the duration or start times.
   var actualDuration = null;
   var actualStartTime = null;
-  var treeBaseTime = null;
+  var treeBaseDuration = null;
 
   switch (fiber.tag) {
     case FunctionalComponent:
@@ -216,7 +216,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   if (fiber.actualDuration !== undefined) {
     actualDuration = fiber.actualDuration;
     actualStartTime = fiber.actualStartTime;
-    treeBaseTime = fiber.treeBaseTime;
+    treeBaseDuration = fiber.treeBaseDuration;
   }
 
   // $FlowFixMe
@@ -238,7 +238,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     // Profiler data
     actualDuration,
     actualStartTime,
-    treeBaseTime,
+    treeBaseDuration,
   };
 }
 
