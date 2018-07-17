@@ -10,6 +10,8 @@
  */
 'use strict';
 
+/* globals chrome */
+
 const PropTypes = require('prop-types');
 
 var React = require('react');
@@ -68,6 +70,7 @@ type State = {
   preferencesPanelShown: boolean,
   themeKey: number,
   themeName: ?string,
+  showTroubleshooting: boolean,
 };
 
 class Panel extends React.Component<Props, State> {
@@ -76,6 +79,7 @@ class Panel extends React.Component<Props, State> {
   // eslint shouldn't error on type positions. TODO: update eslint
   // eslint-disable-next-line no-undef
   _checkTimeout: ?TimeoutID;
+  _troubleshootingTimeout: ?TimeoutID; // eslint-disable-line no-undef
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
@@ -90,6 +94,7 @@ class Panel extends React.Component<Props, State> {
     super(props);
     this.state = {
       loading: true,
+      showTroubleshooting: false,
       preferencesPanelShown: false,
       isReact: props.alreadyFoundReact,
       themeKey: 0,
@@ -123,6 +128,13 @@ class Panel extends React.Component<Props, State> {
     if (this.props.reloadSubscribe) {
       this._unsub = this.props.reloadSubscribe(() => this.reload());
     }
+
+    if (this.state.loading) {
+      this._troubleshootingTimeout = setTimeout(
+        () => this.setState({showTroubleshooting: true}),
+        3000
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -131,6 +143,10 @@ class Panel extends React.Component<Props, State> {
       this._unsub();
     }
     this.teardown();
+
+    if (this._troubleshootingTimeout !== null) {
+      clearTimeout(this._troubleshootingTimeout);
+    }
   }
 
   pauseTransfer() {
@@ -256,7 +272,7 @@ class Panel extends React.Component<Props, State> {
     });
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(prevProps: Props, prevState: State) {
     if (!this.state.isReact) {
       if (!this._checkTimeout) {
         this._checkTimeout = setTimeout(() => {
@@ -264,6 +280,17 @@ class Panel extends React.Component<Props, State> {
           this.lookForReact();
         }, 200);
       }
+    }
+
+    if (prevState.loading && !this.state.loading) {
+      if (this._troubleshootingTimeout !== null) {
+        clearTimeout(this._troubleshootingTimeout);
+      }
+    } else if (!prevState.loading && this.state.loading) {
+      this._troubleshootingTimeout = setTimeout(
+        () => this.setState({showTroubleshooting: true}),
+        3000
+      );
     }
   }
 
@@ -292,6 +319,22 @@ class Panel extends React.Component<Props, State> {
       return (
         <div style={loadingStyle(theme)}>
           <h2>Connecting to React…</h2>
+          <br />
+          {this.state.showTroubleshooting && (
+            <a style={{
+              color: 'gray',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+            }} onClick={() => {
+              chrome.tabs.create({
+                active: true,
+                url: 'https://github.com/facebook/react-devtools/blob/master/' +
+                  'README.md#the-react-tab-doesnt-show-up',
+              });
+            }}>
+              Click here for troubleshooting instructions
+            </a>
+          )}
         </div>
       );
     }
