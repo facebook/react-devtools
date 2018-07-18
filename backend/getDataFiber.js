@@ -35,8 +35,8 @@ var {
   PROFILER_SYMBOL_STRING,
   STRICT_MODE_NUMBER,
   STRICT_MODE_SYMBOL_STRING,
-  TIMEOUT_NUMBER,
-  TIMEOUT_SYMBOL_STRING,
+  PLACEHOLDER_NUMBER,
+  PLACEHOLDER_SYMBOL_STRING,
 } = require('./ReactSymbols');
 
 // TODO: we might want to change the data structure
@@ -174,10 +174,10 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
           name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
           children = [];
           break;
-        case TIMEOUT_NUMBER:
-        case TIMEOUT_SYMBOL_STRING:
+        case PLACEHOLDER_NUMBER:
+        case PLACEHOLDER_SYMBOL_STRING:
           nodeType = 'Special';
-          name = 'Timeout';
+          name = 'Placeholder';
           props = fiber.memoizedProps;
           children = [];
           break;
