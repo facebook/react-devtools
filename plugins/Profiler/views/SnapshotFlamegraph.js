@@ -175,8 +175,8 @@ const Flamegraph = ({
 
   return (
     <List
-      containerTagName="svg"
       height={height}
+      innerTagName="svg"
       itemCount={flameGraphDepth}
       itemData={itemData}
       itemSize={barHeight}

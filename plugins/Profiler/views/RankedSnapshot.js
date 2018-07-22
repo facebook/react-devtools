@@ -139,8 +139,8 @@ const Ranked = ({
 
   return (
     <List
-      containerTagName="svg"
       height={height}
+      innerTagName="svg"
       itemCount={rankedData.nodes.length}
       itemData={itemData}
       itemSize={barHeight}

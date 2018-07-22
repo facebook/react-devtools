@@ -6253,9 +6253,9 @@ react-virtualized-auto-sizer@^1.0.2:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/react-virtualized-auto-sizer/-/react-virtualized-auto-sizer-1.0.2.tgz#a61dd4f756458bbf63bd895a92379f9b70f803bd"
 
-react-window@^1.0.0-alpha.4:
-  version "1.0.0-alpha.4"
-  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.0.0-alpha.4.tgz#e81ba566be6b54558a314e507b0f090309c28a72"
+react-window@^1:
+  version "1.0.1"
+  resolved "https://registry.yarnpkg.com/react-window/-/react-window-1.0.1.tgz#2b8f1b608a485125a3d98cdd0baaba4551691364"
   dependencies:
     memoize-one "^3.1.1"
 

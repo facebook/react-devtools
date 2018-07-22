@@ -36,7 +36,7 @@
     "react-dom": "^16.4.1",
     "react-portal": "^3.1.0",
     "react-virtualized-auto-sizer": "^1.0.2",
-    "react-window": "^1.0.0-alpha.4",
+    "react-window": "^1",
     "style-loader": "^0.21.0",
     "webpack": "1.12.9"
   },
