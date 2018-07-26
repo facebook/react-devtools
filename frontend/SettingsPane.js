@@ -47,6 +47,11 @@ class SettingsPane extends React.Component {
     const doc = ReactDOM.findDOMNode(this).ownerDocument;
     // capture=true is needed to prevent chrome devtools console popping up
     doc.addEventListener('keydown', this._key, true);
+
+    const lastSearch = localStorage.getItem('searchText') || '';
+    if (lastSearch !== '') {
+      this.props.onChangeSearch(lastSearch);
+    }
   }
 
   componentWillUnmount() {

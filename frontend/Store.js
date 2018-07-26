@@ -306,6 +306,9 @@ class Store extends EventEmitter {
     this.highlightSearch();
     this.refreshSearch = false;
 
+    // Save the search text in local storage so we can use it after a refresh
+    localStorage.setItem('searchText', text);
+
     // Search input depends on this change being flushed synchronously.
     this.flush();
   }
