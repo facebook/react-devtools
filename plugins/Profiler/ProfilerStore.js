@@ -22,6 +22,7 @@ class ProfilerStore extends EventEmitter {
 
   cachedData = {};
   isRecording: boolean = false;
+  processedInteractions: {[id: string]: Interaction} = {};
   rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
   selectedRoot: string | null = null;
@@ -47,12 +48,23 @@ class ProfilerStore extends EventEmitter {
 
   clearSnapshots = () => {
     this.cachedData = {};
+    this.processedInteractions = {};
     this.rootsToProfilerData = new Map();
     this.emit('profilerData', this.rootsToProfilerData);
   };
 
   getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
     return this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] || null;
+  }
+
+  processInteraction(interaction: Interaction): Interaction {
+    const key = `${interaction.name} at ${interaction.timestamp}`;
+    if (this.processedInteractions.hasOwnProperty(key)) {
+      return this.processedInteractions[key];
+    } else {
+      this.processedInteractions[key] = interaction;
+      return interaction;
+    }
   }
 
   saveRoots = () => {
@@ -67,38 +79,40 @@ class ProfilerStore extends EventEmitter {
   }
 
   storeSnapshot = () => {
-    const snapshot: Snapshot = {
-      ...this._mainStore.snapshotData,
-      nodes: this._mainStore._nodes,
-    };
+    this._mainStore.snapshotQueue.forEach((snapshot: Snapshot) => {
+      const { root } = snapshot;
+      if (!this.rootsToProfilerData.has(root)) {
+        this.rootsToProfilerData.set(root, {
+          interactionsToSnapshots: new Map(),
+          snapshots: [],
+          timestampsToInteractions: new Map(),
+        });
+      }
 
-    const { root } = snapshot;
-    if (!this.rootsToProfilerData.has(root)) {
-      this.rootsToProfilerData.set(root, {
-        interactionsToSnapshots: new Map(),
-        snapshots: [],
-        timestampsToInteractions: new Map(),
+      const {interactionsToSnapshots, snapshots, timestampsToInteractions} =
+        ((this.rootsToProfilerData.get(root): any): RootProfilerData);
+
+      snapshots.push(snapshot);
+
+      snapshot.memoizedInteractions.forEach((interaction: Interaction) => {
+        interaction = this.processInteraction(interaction);
+
+        if (interactionsToSnapshots.has(interaction)) {
+          ((interactionsToSnapshots.get(interaction): any): Set<Snapshot>).add(snapshot);
+        } else {
+          interactionsToSnapshots.set(interaction, new Set([snapshot]));
+        }
+
+        if (timestampsToInteractions.has(interaction.timestamp)) {
+          ((timestampsToInteractions.get(interaction.timestamp): any): Set<Interaction>).add(interaction);
+        } else {
+          timestampsToInteractions.set(interaction.timestamp, new Set([interaction]));
+        }
       });
-    }
-
-    const {interactionsToSnapshots, snapshots, timestampsToInteractions} =
-      ((this.rootsToProfilerData.get(root): any): RootProfilerData);
-
-    snapshots.push(snapshot);
-
-    snapshot.memoizedInteractions.forEach((interaction: Interaction) => {
-      if (interactionsToSnapshots.has(interaction)) {
-        ((interactionsToSnapshots.get(interaction): any): Set<Snapshot>).add(snapshot);
-      } else {
-        interactionsToSnapshots.set(interaction, new Set([snapshot]));
-      }
-
-      if (timestampsToInteractions.has(interaction.timestamp)) {
-        ((timestampsToInteractions.get(interaction.timestamp): any): Set<Interaction>).add(interaction);
-      } else {
-        timestampsToInteractions.set(interaction.timestamp, new Set([interaction]));
-      }
     });
+
+    // Clear the queue once we've processed it.
+    this._mainStore.snapshotQueue.length = 0;
 
     this.emit('profilerData', this.rootsToProfilerData);
   };

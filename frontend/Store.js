@@ -23,7 +23,7 @@ var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
-import type {StoreSnapshot} from '../plugins/Profiler/ProfilerTypes';
+import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -109,7 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
-  snapshotData: ?StoreSnapshot;
+  snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
@@ -181,12 +181,17 @@ class Store extends EventEmitter {
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
     });
-    this._bridge.on('storeSnapshot', snapshotData => {
-      this.snapshotData = snapshotData;
+    this._bridge.on('storeSnapshot', storeSnapshot => {
+      // Store snapshot data for ProfilerStore to process later.
+      // It's important to store it as a queue, because events may be batched.
+      this.snapshotQueue.push({
+        ...storeSnapshot,
+        nodes: this._nodes,
+      });
       this.emit('storeSnapshot');
     });
     this._bridge.on('clearSnapshots', () => {
-      this.snapshotData = null;
+      this.snapshotQueue.length = 0;
       this.emit('clearSnapshots');
     });
 
