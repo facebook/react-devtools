@@ -15,19 +15,15 @@ import type {Theme} from '../../../frontend/types';
 import type {Chart} from './ViewTypes';import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Interaction, RootProfilerData, Snapshot} from '../ProfilerTypes';
 
 import PropTypes from 'prop-types';
-import React, { Fragment } from 'react';
+import React from 'react';
 import decorate from '../../../frontend/decorate';
-import {monospace, sansSerif} from '../../../frontend/Themes/Fonts';
-import DataView from '../../../frontend/DataView/DataView';
-import DetailPane from '../../../frontend/detail_pane/DetailPane';
-import DetailPaneSection from '../../../frontend/detail_pane/DetailPaneSection';
-import Icons from '../../../frontend/Icons';
+import {sansSerif} from '../../../frontend/Themes/Fonts';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
 import SnapshotRanked from './SnapshotRanked';
 import ProfilerTabToolbar from './ProfilerTabToolbar';
-import IconButton from './IconButton';
+import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
@@ -228,7 +224,7 @@ class ProfilerTab extends React.Component<Props, State> {
         </div>
         <div style={styles.Right(theme)}>
           {selectedFiberName && (
-            <FiberDetailPane
+            <ProfilerFiberDetailPane
               inspect={this.inspect}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               name={selectedFiberName}
@@ -248,56 +244,9 @@ class ProfilerTab extends React.Component<Props, State> {
   }
 }
 
-const emptyFunction = () => {};
-
-// TODO Maybe move into its own file?
-// TODO Flow type
-const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown', snapshot, snapshotFiber, theme }) => (
-  <Fragment>
-    <div style={styles.FiberDetailPaneHeader(theme)}>
-      <div style={styles.SelectedFiberName} title={name}>
-        {name}
-      </div>
-      <IconButton
-        disabled={isInspectingSelectedFiber}
-        icon={Icons.BARS}
-        onClick={inspect}
-        theme={theme}
-        title={`Inspect ${name}`}
-      />
-    </div>
-    {snapshotFiber !== null && (
-      <div style={styles.DetailPaneWrapper}>
-        <DetailPane theme={theme}>
-          <DetailPaneSection title="Props">
-            <DataView
-              path={['props']}
-              readOnly={true}
-              inspect={emptyFunction}
-              showMenu={emptyFunction}
-              data={snapshotFiber.get('props')}
-            />
-          </DetailPaneSection>
-          {snapshotFiber.get('state') && (
-            <DetailPaneSection title="State">
-              <DataView
-                path={['state']}
-                readOnly={true}
-                inspect={emptyFunction}
-                showMenu={emptyFunction}
-                data={snapshotFiber.get('state')}
-              />
-            </DetailPaneSection>
-          )}
-        </DetailPane>
-      </div>
-    )}
-  </Fragment>
-);
-
 const InactiveNoData = ({startRecording, theme}) => (
   <div style={styles.InactiveNoData}>
-    <p>No data has been recorded for the selected root.</p>
+    <p><strong>No data has been recorded for the selected root.</strong></p>
     <p>Click the record button to start a new recording.</p>
   </div>
 );
@@ -327,18 +276,6 @@ var styles = {
     fontFamily: sansSerif.family,
     fontSize: sansSerif.sizes.normal,
   }),
-  column: {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  row: {
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
   InactiveNoData: {
     height: '100%',
     flex: 1,
@@ -365,36 +302,11 @@ var styles = {
     justifyContent: 'center',
     padding: '0.25rem',
   }),
-  DetailPaneWrapper: {
-    flex: 1,
-    overflow: 'auto',
-  },
-  FiberDetailPaneHeader: (theme: Theme) => ({
-    width: '100%',
-    display: 'flex',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: '0.25rem',
-    backgroundColor: theme.base01,
-    borderBottom: `1px solid ${theme.base03}`,
-    boxSizing: 'border-box',
-  }),
   Toolbar: (theme: Theme) => ({
     position: 'relative',
     backgroundColor: theme.base01,
     borderBottom: `1px solid ${theme.base03}`,
   }),
-  SelectedFiberName: {
-    fontFamily: monospace.family,
-    fontSize: monospace.sizes.large,
-    overflow: 'hidden',
-    textOverflow: 'ellipsis',
-    whiteSpace: 'nowrap',
-  },
-  ClearButton: {
-    marginBottom: '0.5rem',
-  },
   Content: {
     flex: 1,
     padding: '0.5rem',
