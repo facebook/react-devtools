@@ -169,6 +169,7 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <InteractionTimeline
             interactionsToSnapshots={interactionsToSnapshots}
+            selectedSnapshot={snapshot}
             selectSnapshot={this.selectInteractionSnapshot}
             theme={theme}
             timestampsToInteractions={timestampsToInteractions}

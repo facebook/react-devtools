@@ -24,6 +24,7 @@ type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   theme: Theme,
   timestampsToInteractions: Map<number, Set<Interaction>>,
@@ -31,6 +32,7 @@ type Props = {|
 
 const InteractionTimeline = ({
   interactionsToSnapshots,
+  selectedSnapshot,
   selectSnapshot,
   theme,
   timestampsToInteractions,
@@ -56,6 +58,7 @@ const InteractionTimeline = ({
         <InteractionsList
           height={height}
           interactionsToSnapshots={interactionsToSnapshots}
+          selectedSnapshot={selectedSnapshot}
           selectSnapshot={selectSnapshot}
           theme={theme}
           timestampsToInteractions={timestampsToInteractions}
@@ -69,6 +72,7 @@ const InteractionTimeline = ({
 type InteractionsListProps = {|
   height: number,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   theme: Theme,
   timestampsToInteractions: Map<number, Set<Interaction>>,
@@ -78,6 +82,7 @@ type InteractionsListProps = {|
 const InteractionsList = ({
   height,
   interactionsToSnapshots,
+  selectedSnapshot,
   selectSnapshot,
   theme,
   timestampsToInteractions,
@@ -103,30 +108,27 @@ const InteractionsList = ({
           <div
             style={{
               position: 'absolute',
-              left: '0.25rem',
+              left: '0.35rem',
               top: '0.5rem',
               height: '100%',
-              backgroundColor: theme.base02,
+              backgroundColor: theme.base01,
               width: '0.25rem',
               display: interactionsToSnapshots.size === interactionIndex + 1 ? 'none' : 'block',
             }}
           />
-          <div
+          <SvgIcon
+            path={Icons.INTERACTION}
             style={{
               position: 'absolute',
-              width: '0.75rem',
-              height: '0.75rem',
-              borderRadius: '0.75rem',
-              backgroundColor: theme.base00,
-              border: `3px solid ${theme.state00}`,
-              boxSizing: 'border-box',
+              width: '1rem',
+              height: '1rem',
+              fill: snapshots.has(selectedSnapshot) ? theme.state00 : theme.base04,
             }}
           />
           <div
             style={{
               position: 'relative',
               margin: '0 0 0 1.25rem',
-              top: '-0.125rem',
             }}
           >
             <strong>{interaction.name}</strong> at {formatTime(interaction.timestamp)}ms
@@ -144,6 +146,7 @@ const InteractionsList = ({
                   style={{
                     cursor: 'pointer',
                     margin: '0.5rem 0',
+                    color: snapshot === selectedSnapshot ? theme.state00 : theme.base04,
                   }}
                 >
                   <SvgIcon
