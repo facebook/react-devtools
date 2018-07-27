@@ -11,7 +11,7 @@
 'use strict';
 
 import type Bridge from '../../agent/Bridge';
-import type {Snapshot} from './ProfilerTypes';
+import type {Interaction, RootProfilerData, Snapshot} from './ProfilerTypes';
 
 const {List} = require('immutable');
 const {EventEmitter} = require('events');
@@ -22,9 +22,9 @@ class ProfilerStore extends EventEmitter {
 
   cachedData = {};
   isRecording: boolean = false;
+  rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
   selectedRoot: string | null = null;
-  snapshots: Array<Snapshot> = [];
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -34,7 +34,7 @@ class ProfilerStore extends EventEmitter {
     this._mainStore.on('clearSnapshots', this.clearSnapshots);
     this._mainStore.on('roots', this.saveRoots);
     this._mainStore.on('selected', this.updateSelected);
-    this._mainStore.on('storeSnapshot', this.storeSnapsnot);
+    this._mainStore.on('storeSnapshot', this.storeSnapshot);
   }
 
   off() {
@@ -46,9 +46,9 @@ class ProfilerStore extends EventEmitter {
   }
 
   clearSnapshots = () => {
-    this.snapshots = [];
     this.cachedData = {};
-    this.emit('snapshots', this.snapshots);
+    this.rootsToProfilerData = new Map();
+    this.emit('profilerData', this.rootsToProfilerData);
   };
 
   getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
@@ -66,12 +66,41 @@ class ProfilerStore extends EventEmitter {
     this._mainStore.setIsRecording(isRecording);
   }
 
-  storeSnapsnot = () => {
-    this.snapshots.push({
+  storeSnapshot = () => {
+    const snapshot: Snapshot = {
       ...this._mainStore.snapshotData,
-      nodes: this._mainStore._nodes, // TODO (bvaughn) Don't access a "private" variable of the Store
+      nodes: this._mainStore._nodes,
+    };
+
+    const { root } = snapshot;
+    if (!this.rootsToProfilerData.has(root)) {
+      this.rootsToProfilerData.set(root, {
+        interactionsToSnapshots: new Map(),
+        snapshots: [],
+        timestampsToInteractions: new Map(),
+      });
+    }
+
+    const {interactionsToSnapshots, snapshots, timestampsToInteractions} =
+      ((this.rootsToProfilerData.get(root): any): RootProfilerData);
+
+    snapshots.push(snapshot);
+
+    snapshot.memoizedInteractions.forEach((interaction: Interaction) => {
+      if (interactionsToSnapshots.has(interaction)) {
+        ((interactionsToSnapshots.get(interaction): any): Set<Snapshot>).add(snapshot);
+      } else {
+        interactionsToSnapshots.set(interaction, new Set([snapshot]));
+      }
+
+      if (timestampsToInteractions.has(interaction.timestamp)) {
+        ((timestampsToInteractions.get(interaction.timestamp): any): Set<Interaction>).add(interaction);
+      } else {
+        timestampsToInteractions.set(interaction.timestamp, new Set([interaction]));
+      }
     });
-    this.emit('snapshots', this.snapshots);
+
+    this.emit('profilerData', this.rootsToProfilerData);
   };
 
   updateSelected = () => {

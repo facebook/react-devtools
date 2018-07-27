@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Interaction, RootProfilerData, Snapshot} from '../ProfilerTypes';
 
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
@@ -24,17 +24,20 @@ import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
 import Hoverable from '../../../frontend/Hoverable';
 import FiberRenderDurations from './FiberRenderDurations';
+import InteractionTimeline from './InteractionTimeline';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
 import RankedSnapshot from './RankedSnapshot';
 
-type Chart = 'flamegraph' | 'ranked';
+type Chart = 'flamegraph' | 'interactions' | 'ranked';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
+  interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   selectedRootID: string | null,
   snapshots: Array<Snapshot>,
+  timestampsToInteractions: Map<number, Set<Interaction>>,
   toggleIsRecording: (value: boolean) => void,
 |};
 
@@ -117,6 +120,15 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberName: name,
     });
 
+  selectInteractionSnapshot = (snapshot: Snapshot) =>
+    this.setState({
+      isInspectingSelectedFiber: false,
+      selectedChart: 'flamegraph',
+      selectedFiberID: null,
+      selectedFiberName: null,
+      snapshotIndex: this.props.snapshots.indexOf(snapshot),
+    });
+
   selectSnapshot = (snapshot: Snapshot) =>
     this.setState({
       snapshotIndex: this.props.snapshots.indexOf(snapshot),
@@ -133,7 +145,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
   render() {
     const { theme } = this.context;
-    const { cacheDataForSnapshot, getCachedDataForSnapshot, isRecording, selectedRootID, snapshots, toggleIsRecording } = this.props;
+    const { cacheDataForSnapshot, getCachedDataForSnapshot, interactionsToSnapshots, isRecording, selectedRootID, snapshots, timestampsToInteractions, toggleIsRecording } = this.props;
     const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
@@ -155,6 +167,15 @@ class ProfilerTab extends React.Component<Props, State> {
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}
             theme={theme}
+          />
+        );
+      } else if (selectedChart === 'interactions') {
+        content = (
+          <InteractionTimeline
+            interactionsToSnapshots={interactionsToSnapshots}
+            selectSnapshot={this.selectInteractionSnapshot}
+            theme={theme}
+            timestampsToInteractions={timestampsToInteractions}
           />
         );
       } else {
@@ -196,6 +217,15 @@ class ProfilerTab extends React.Component<Props, State> {
 
             {!isRecording && snapshots.length > 0 && (
               <Fragment>
+                <label>
+                  {/* TODO (bvaughn) Disable if there are no interactions */}
+                  <input
+                    type="radio"
+                    checked={!isInspectingSelectedFiber && selectedChart === 'interactions'}
+                    onChange={() => this.selectChart('interactions')}
+                  /> Interactions
+                </label>
+                &nbsp;
                 <label>
                   <input
                     type="radio"
@@ -527,13 +557,26 @@ var styles = {
 
 export default decorate({
   store: 'profilerStore',
-  listeners: () => ['isRecording', 'selectedRoot', 'snapshots'],
+  listeners: () => ['isRecording', 'selectedRoot', 'profilerData'],
   props(store) {
+    const profilerData: RootProfilerData | null =
+      store.rootsToProfilerData.has(store.selectedRoot)
+        ? ((store.rootsToProfilerData.get(store.selectedRoot): any): RootProfilerData)
+        : null;
+
     return {
       cacheDataForSnapshot: (...args) => store.cacheDataForSnapshot(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
+      interactionsToSnapshots: profilerData !== null
+        ? profilerData.interactionsToSnapshots
+        : new Set(),
       isRecording: !!store.isRecording,
-      snapshots: store.snapshots.filter(snapshot => snapshot.root === store.selectedRoot),
+      snapshots: profilerData !== null
+        ? profilerData.snapshots
+        : [],
+      timestampsToInteractions: profilerData !== null
+        ? profilerData.timestampsToInteractions
+        : new Set(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
     };
   },

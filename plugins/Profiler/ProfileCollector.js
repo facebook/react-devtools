@@ -37,11 +37,14 @@ class ProfileCollector {
     agent.on('update', this._onMountOrUpdate);
   }
 
-  _takeCommitSnapshotForRoot(root: string) {
+  _takeCommitSnapshotForRoot(id: string, data: any) {
+    const {memoizedInteractions} = data.stateNode;
+
     const storeSnapshot: StoreSnapshot = {
+      memoizedInteractions: memoizedInteractions !== null ? Array.from(memoizedInteractions) : [],
       committedNodes: Array.from(this._committedNodes),
       commitTime: performance.now(),
-      root,
+      root: id,
     };
 
     this._agent.emit('storeSnapshot', storeSnapshot);
@@ -69,14 +72,14 @@ class ProfileCollector {
     this._committedNodes.add(data.id);
   };
 
-  _onRootCommitted = (root: string) => {
+  _onRootCommitted = (id: string, data: any) => {
     if (!this._isRecording) {
       return;
     }
 
     // Once all roots have been committed,
     // Take a snapshot of the current tree.
-    this._takeCommitSnapshotForRoot(root);
+    this._takeCommitSnapshotForRoot(id, data);
     this._committedNodes = new Set();
   }
 

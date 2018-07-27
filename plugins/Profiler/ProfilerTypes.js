@@ -26,9 +26,21 @@ export type GetCachedDataForSnapshot = (
   key: string
 ) => any | null;
 
+export type Interaction = {|
+  name: string,
+  timestamp: number,
+|};
+
+export type RootProfilerData = {|
+  interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
+  snapshots: Array<Snapshot>,
+  timestampsToInteractions: Map<number, Set<Interaction>>,
+|};
+
 export type Snapshot = {|
   committedNodes: Array<string>,
   commitTime: number,
+  memoizedInteractions: Array<Interaction>,
   nodes: Map,
   root: string,
 |};
@@ -36,5 +48,6 @@ export type Snapshot = {|
 export type StoreSnapshot = {|
   committedNodes: Array<string>,
   commitTime: number,
+  memoizedInteractions: Array<Interaction>,
   root: string,
 |};
