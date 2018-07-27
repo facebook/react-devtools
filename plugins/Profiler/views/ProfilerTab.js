@@ -11,7 +11,8 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Interaction, RootProfilerData, Snapshot} from '../ProfilerTypes';
+
+import type {Chart} from './ViewTypes';import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Interaction, RootProfilerData, Snapshot} from '../ProfilerTypes';
 
 import PropTypes from 'prop-types';
 import React, { Fragment } from 'react';
@@ -20,15 +21,13 @@ import {monospace, sansSerif} from '../../../frontend/Themes/Fonts';
 import DataView from '../../../frontend/DataView/DataView';
 import DetailPane from '../../../frontend/detail_pane/DetailPane';
 import DetailPaneSection from '../../../frontend/detail_pane/DetailPaneSection';
-import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
-import Hoverable from '../../../frontend/Hoverable';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
 import SnapshotRanked from './SnapshotRanked';
-
-type Chart = 'flamegraph' | 'interactions' | 'ranked';
+import ProfilerTabToolbar from './ProfilerTabToolbar';
+import IconButton from './IconButton';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
@@ -70,6 +69,7 @@ class ProfilerTab extends React.Component<Props, State> {
     if (props.isRecording !== state.prevIsRecording) {
       return {
         prevIsRecording: props.isRecording,
+        selectedChart: 'flamegraph',
         selectedFiberID: null,
         selectedFiberName: null,
         snapshotIndex: 0,
@@ -206,86 +206,21 @@ class ProfilerTab extends React.Component<Props, State> {
     return (
       <div style={styles.container(theme)}>
         <div style={styles.Left}>
-          <div style={styles.settingsRowStyle(theme)}>
-            <RecordButton
-              isActive={isRecording}
-              onClick={toggleIsRecording}
+          <div style={styles.Toolbar(theme)}>
+            <ProfilerTabToolbar
+              handleSnapshotSliderChange={this.handleSnapshotSliderChange}
+              interactionsCount={interactionsToSnapshots.size}
+              isInspectingSelectedFiber={isInspectingSelectedFiber}
+              isRecording={isRecording}
+              selectChart={this.selectChart}
+              selectNextSnapshotIndex={this.selectNextSnapshotIndex}
+              selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
+              selectedChart={selectedChart}
+              snapshotIndex={snapshotIndex}
+              snapshots={snapshots}
               theme={theme}
+              toggleIsRecording={toggleIsRecording}
             />
-
-            <div style={{flex: 1}} />
-
-            {!isRecording && snapshots.length > 0 && (
-              <Fragment>
-                <label>
-                  {/* TODO (bvaughn) Disable if there are no interactions */}
-                  <input
-                    type="radio"
-                    checked={!isInspectingSelectedFiber && selectedChart === 'interactions'}
-                    onChange={() => this.selectChart('interactions')}
-                  /> Interactions
-                </label>
-                &nbsp;
-                <label>
-                  <input
-                    type="radio"
-                    checked={!isInspectingSelectedFiber && selectedChart === 'flamegraph'}
-                    onChange={() => this.selectChart('flamegraph')}
-                  /> Flamegraph
-                </label>
-                &nbsp;
-                <label>
-                  <input
-                    type="radio"
-                    checked={!isInspectingSelectedFiber && selectedChart === 'ranked'}
-                    onChange={() => this.selectChart('ranked')}
-                  /> Ranked
-                </label>
-
-                <div style={{flex: 1}} />
-
-                <label
-                  style={{
-                    opacity: isInspectingSelectedFiber ? 0.5 : 1,
-                  }}
-                >
-                  <input
-                    type="checkbox"
-                    disabled={isInspectingSelectedFiber}
-                    checked={showNativeNodes}
-                    onChange={this.toggleShowNativeNodes}
-                  /> Show native?
-                </label>
-
-                <div style={{flex: 1}} />
-
-                <span>Render ({snapshotIndex + 1} / {snapshots.length})</span>
-                <IconButton
-                  disabled={snapshotIndex === 0 || isInspectingSelectedFiber}
-                  icon={Icons.BACK}
-                  isTransparent={true}
-                  onClick={this.selectPreviousSnapshotIndex}
-                  theme={theme}
-                  title="Previous render"
-                />
-                <input
-                  disabled={isInspectingSelectedFiber}
-                  type="range"
-                  min={0}
-                  max={snapshots.length - 1}
-                  value={snapshotIndex}
-                  onChange={this.handleSnapshotSliderChange}
-                />
-                <IconButton
-                  disabled={snapshotIndex === snapshots.length - 1 || isInspectingSelectedFiber}
-                  icon={Icons.FORWARD}
-                  isTransparent={true}
-                  onClick={this.selectNextSnapshotIndex}
-                  theme={theme}
-                  title="Next render"
-                />
-              </Fragment>
-            )}
           </div>
           <div style={styles.Content}>
             {content}
@@ -360,41 +295,10 @@ const FiberDetailPane = ({ inspect, isInspectingSelectedFiber, name = 'Unknown',
   </Fragment>
 );
 
-const IconButton = Hoverable(
-  ({ disabled, icon, isActive = false, isHovered, isTransparent = false, onClick, onMouseEnter, onMouseLeave, theme, title }) => (
-    <button
-      disabled={disabled}
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={iconButtonStyle(isActive, !disabled, isHovered, isTransparent, theme)}
-      title={title}
-    >
-      <SvgIcon path={icon} />
-    </button>
-  )
-);
-
-const iconButtonStyle = (isActive: boolean, isEnabled: boolean, isHovered: boolean, isTransparent: boolean, theme: Theme) => ({
-  background: isTransparent ? 'none' : theme.base00,
-  border: 'none',
-  outline: 'none',
-  cursor: isEnabled ? 'pointer' : 'default',
-  color: isHovered ? theme.state06 : theme.base05,
-  opacity: isEnabled ? 1 : 0.5,
-  padding: '4px 8px',
-});
-
 const InactiveNoData = ({startRecording, theme}) => (
   <div style={styles.InactiveNoData}>
     <p>No data has been recorded for the selected root.</p>
-    <p>
-      Click the record button <RecordButton
-        isActive={false}
-        onClick={startRecording}
-        theme={theme}
-      /> to start a new recording.
-    </p>
+    <p>Click the record button to start a new recording.</p>
   </div>
 );
 
@@ -409,20 +313,6 @@ const RecordingInProgress = ({stopRecording, theme}) => (
       Stop
     </button>
   </span>
-);
-
-const RecordButton = Hoverable(
-  ({ isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={styles.recordButtonStyle(isActive, isHovered, theme)}
-      title={isActive ? 'Stop profiling' : 'Start profiling'}
-    >
-      <SvgIcon path={Icons.RECORD} />
-    </button>
-  )
 );
 
 var styles = {
@@ -490,6 +380,11 @@ var styles = {
     borderBottom: `1px solid ${theme.base03}`,
     boxSizing: 'border-box',
   }),
+  Toolbar: (theme: Theme) => ({
+    position: 'relative',
+    backgroundColor: theme.base01,
+    borderBottom: `1px solid ${theme.base03}`,
+  }),
   SelectedFiberName: {
     fontFamily: monospace.family,
     fontSize: monospace.sizes.large,
@@ -519,29 +414,6 @@ var styles = {
     justifyContent: 'stretch',
     borderLeft: `1px solid ${theme.base03}`,
     boxSizing: 'border-box',
-  }),
-  settingsRowStyle: (theme: Theme) => ({
-    display: 'flex',
-    flex: '0 0 auto',
-    padding: '0.25rem',
-    flexWrap: 'wrap',
-    alignItems: 'center',
-    position: 'relative',
-    backgroundColor: theme.base01,
-    borderBottom: `1px solid ${theme.base03}`,
-  }),
-  recordButtonStyle: (isActive: boolean, isHovered: boolean, theme: Theme) => ({
-    background: 'none',
-    border: 'none',
-    outline: 'none',
-    cursor: 'pointer',
-    color: isActive
-      ? theme.special03
-      : isHovered ? theme.state06 : theme.base05,
-    filter: isActive
-      ? `drop-shadow( 0 0 2px ${theme.special03} )`
-      : 'none',
-    padding: '4px 8px',
   }),
   stopRecordingButtonStyle: (theme: Theme) => ({
     display: 'flex',
