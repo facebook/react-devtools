@@ -54,7 +54,7 @@ type Props = {|
   theme: Theme,
 |};
 
-const RankedSnapshot = ({
+const SnapshotRanked = ({
   cacheDataForSnapshot,
   getCachedDataForSnapshot,
   inspectFiber,
@@ -66,7 +66,7 @@ const RankedSnapshot = ({
   theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
-  const dataKey = showNativeNodes ? 'RankedSnapshotDataWithNativeNodes' : 'RankedSnapshotDataWithoutNativeNodes';
+  const dataKey = showNativeNodes ? 'SnapshotRankedDataWithNativeNodes' : 'SnapshotRankedDataWithoutNativeNodes';
   let rankedData = getCachedDataForSnapshot(snapshotIndex, snapshot.root, dataKey);
   if (rankedData === null) {
     rankedData = convertSnapshotToChartData(snapshot, showNativeNodes);
@@ -76,7 +76,7 @@ const RankedSnapshot = ({
   return (
     <AutoSizer>
       {({ height, width }) => (
-        <Ranked
+        <SnapshotRankedInner
           height={height}
           inspectFiber={inspectFiber}
           rankedData={((rankedData: any): RankedData)}
@@ -96,7 +96,7 @@ type RankedData = {|
   nodes: Array<Node>,
 |};
 
-type RankedProps = {|
+type SnapshotRankedInnerProps = {|
   height: number,
   inspectFiber: SelectOrInspectFiber,
   rankedData: RankedData,
@@ -107,7 +107,7 @@ type RankedProps = {|
   width: number,
 |};
 
-const Ranked = ({
+const SnapshotRankedInner = ({
   height,
   inspectFiber,
   rankedData,
@@ -116,7 +116,7 @@ const Ranked = ({
   snapshot,
   theme,
   width,
-}: RankedProps) => {
+}: SnapshotRankedInnerProps) => {
   // If a commit contains no fibers with an actualDuration > 0,
   // Display a fallback message.
   if (rankedData.nodes.length === 0) {
@@ -249,4 +249,4 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
   };
 };
 
-export default RankedSnapshot;
+export default SnapshotRanked;

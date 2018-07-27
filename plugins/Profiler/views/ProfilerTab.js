@@ -26,7 +26,7 @@ import Hoverable from '../../../frontend/Hoverable';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
-import RankedSnapshot from './RankedSnapshot';
+import SnapshotRanked from './SnapshotRanked';
 
 type Chart = 'flamegraph' | 'interactions' | 'ranked';
 
@@ -180,7 +180,7 @@ class ProfilerTab extends React.Component<Props, State> {
         );
       } else {
         const ChartComponent = selectedChart === 'ranked'
-          ? RankedSnapshot
+          ? SnapshotRanked
           : SnapshotFlamegraph;
 
         content = (
