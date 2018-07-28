@@ -33,6 +33,7 @@ import SnapshotFlamegraph from './SnapshotFlamegraph';
 import SnapshotRanked from './SnapshotRanked';
 import ProfilerTabToolbar from './ProfilerTabToolbar';
 import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
+import ProfilerInteractionDetailPane from './ProfilerInteractionDetailPane';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
@@ -53,6 +54,7 @@ type State = {|
   selectedChart: Chart,
   selectedFiberID: string | null,
   selectedFiberName: string | null,
+  selectedInteraction: Interaction | null,
   showNativeNodes: boolean,
   snapshotIndex: number,
 |};
@@ -68,6 +70,7 @@ class ProfilerTab extends React.Component<Props, State> {
     selectedChart: 'flamegraph',
     selectedFiberID: null,
     selectedFiberName: null,
+    selectedInteraction: null,
     showNativeNodes: false,
     snapshotIndex: 0,
   };
@@ -79,6 +82,7 @@ class ProfilerTab extends React.Component<Props, State> {
         selectedChart: 'flamegraph',
         selectedFiberID: null,
         selectedFiberName: null,
+        selectedInteraction: null,
         snapshotIndex: 0,
       };
     }
@@ -127,13 +131,9 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberName: name,
     });
 
-  selectInteractionSnapshot = (snapshot: Snapshot) =>
+  selectInteraction = (interaction: Interaction) =>
     this.setState({
-      isInspectingSelectedFiber: false,
-      selectedChart: 'flamegraph',
-      selectedFiberID: null,
-      selectedFiberName: null,
-      snapshotIndex: this.props.snapshots.indexOf(snapshot),
+      selectedInteraction: interaction,
     });
 
   selectSnapshot = (snapshot: Snapshot) =>
@@ -149,6 +149,15 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberName: null,
       showNativeNodes: !prevState.showNativeNodes,
     }));
+
+  viewSnapshot = (snapshot: Snapshot) =>
+    this.setState({
+      isInspectingSelectedFiber: false,
+      selectedChart: 'flamegraph',
+      selectedFiberID: null,
+      selectedFiberName: null,
+      snapshotIndex: this.props.snapshots.indexOf(snapshot),
+    });
 
   render() {
     const { theme } = this.context;
@@ -169,6 +178,7 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedChart,
       selectedFiberID,
       selectedFiberName,
+      selectedInteraction,
       showNativeNodes,
       snapshotIndex,
     } = this.state;
@@ -213,10 +223,12 @@ class ProfilerTab extends React.Component<Props, State> {
             cacheInteractionData={cacheInteractionData}
             getCachedInteractionData={getCachedInteractionData}
             interactionsToSnapshots={interactionsToSnapshots}
+            selectedInteraction={selectedInteraction}
             selectedSnapshot={snapshot}
-            selectSnapshot={this.selectInteractionSnapshot}
+            selectInteraction={this.selectInteraction}
             theme={theme}
             timestampsToInteractions={timestampsToInteractions}
+            viewSnapshot={this.viewSnapshot}
           />
         );
       } else {
@@ -241,6 +253,45 @@ class ProfilerTab extends React.Component<Props, State> {
     } else {
       content = (
         <InactiveNoData startRecording={toggleIsRecording} theme={theme} />
+      );
+    }
+
+    let details;
+    if (selectedChart === 'interactions' && selectedInteraction !== null) {
+      details = (
+        <ProfilerInteractionDetailPane
+          interaction={((selectedInteraction: any): Interaction)}
+          selectedSnapshot={snapshot}
+          snapshots={((interactionsToSnapshots.get(((selectedInteraction: any): Interaction)): any): Set<Snapshot>)}
+          theme={theme}
+          viewSnapshot={this.viewSnapshot}
+        />
+      );
+    } else if (selectedChart !== 'interactions' && selectedFiberName !== null) {
+      details = (
+        <ProfilerFiberDetailPane
+          inspect={this.inspect}
+          isInspectingSelectedFiber={isInspectingSelectedFiber}
+          name={selectedFiberName}
+          snapshot={snapshot}
+          snapshotFiber={snapshotFiber}
+          theme={theme}
+        />
+      );
+    } else {
+      details = (
+        <div style={{
+          color: theme.base04,
+          fontSize: sansSerif.sizes.large,
+          height: '100%',
+          flex: 1,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '0.25rem',
+        }}>
+          Nothing selected
+        </div>
       );
     }
 
@@ -299,30 +350,7 @@ class ProfilerTab extends React.Component<Props, State> {
           borderLeft: `1px solid ${theme.base03}`,
           boxSizing: 'border-box',
         }}>
-          {selectedFiberName && (
-            <ProfilerFiberDetailPane
-              inspect={this.inspect}
-              isInspectingSelectedFiber={isInspectingSelectedFiber}
-              name={selectedFiberName}
-              snapshot={snapshot}
-              snapshotFiber={snapshotFiber}
-              theme={theme}
-            />
-          )}
-          {!selectedFiberName && (
-            <div style={{
-              color: theme.base04,
-              fontSize: sansSerif.sizes.large,
-              height: '100%',
-              flex: 1,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              padding: '0.25rem',
-            }}>
-              Nothing selected
-            </div>
-          )}
+          {details}
         </div>
       </div>
     );
