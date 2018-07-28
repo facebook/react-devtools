@@ -78,6 +78,7 @@ class ProfilerTab extends React.Component<Props, State> {
   static getDerivedStateFromProps(props: Props, state: State): $Shape<State> {
     if (props.isRecording !== state.prevIsRecording) {
       return {
+        isInspectingSelectedFiber: false,
         prevIsRecording: props.isRecording,
         selectedChart: 'flamegraph',
         selectedFiberID: null,
