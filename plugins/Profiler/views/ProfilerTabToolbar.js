@@ -32,10 +32,12 @@ type Props = {|
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
   selectedChart: Chart,
+  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
+  toggleShowNativeNodes: Function,
 |};
 
 export default (props: Props) => (
@@ -55,10 +57,12 @@ type ProfilerTabToolbarProps = {
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
   selectedChart: Chart,
+  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
+  toggleShowNativeNodes: Function,
   width: number,
 };
 
@@ -71,10 +75,12 @@ const ProfilerTabToolbar = ({
   selectNextSnapshotIndex,
   selectPreviousSnapshotIndex,
   selectedChart,
+  showNativeNodes,
   snapshotIndex,
   snapshots,
   theme,
   toggleIsRecording,
+  toggleShowNativeNodes,
   width,
 }: ProfilerTabToolbarProps) => (
   <div style={{
@@ -127,22 +133,21 @@ const ProfilerTabToolbar = ({
 
         <div style={{flex: 1}} />
 
-        {/* Re-introduce this toggle if we want to support this functionality...
-          <label
-            style={{
-              opacity: isInspectingSelectedFiber ? 0.5 : 1,
-            }}
-          >
-            <input
-              type="checkbox"
-              disabled={isInspectingSelectedFiber}
-              checked={showNativeNodes}
-              onChange={toggleShowNativeNodes}
-            /> Show native?
-          </label>
-
-          <div style={{flex: 1}} />
-        */}
+        <label
+          style={{
+            opacity: isInspectingSelectedFiber ? 0.5 : 1,
+          }}
+        >
+          <IconButton
+            disabled={isInspectingSelectedFiber}
+            icon={Icons.DOM_ELEMENT}
+            isActive={showNativeNodes}
+            isTransparent={true}
+            onClick={toggleShowNativeNodes}
+            theme={theme}
+            title="Show native elements?"
+          />
+        </label>
 
         <HRule theme={theme} />
 

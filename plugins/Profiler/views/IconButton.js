@@ -26,7 +26,7 @@ const IconButton = Hoverable(
         border: 'none',
         outline: 'none',
         cursor: disabled ? 'default' : 'pointer',
-        color: isHovered ? theme.state06 : theme.base05,
+        color: isActive ? theme.state00 : (isHovered ? theme.state06 : theme.base05),
         opacity: disabled ? 0.5 : 1,
         padding: '4px',
       }}

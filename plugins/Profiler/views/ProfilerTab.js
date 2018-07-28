@@ -326,10 +326,12 @@ class ProfilerTab extends React.Component<Props, State> {
               selectNextSnapshotIndex={this.selectNextSnapshotIndex}
               selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
               selectedChart={selectedChart}
+              showNativeNodes={showNativeNodes}
               snapshotIndex={snapshotIndex}
               snapshots={snapshots}
               theme={theme}
               toggleIsRecording={toggleIsRecording}
+              toggleShowNativeNodes={this.toggleShowNativeNodes}
             />
           </div>
           <div style={{
