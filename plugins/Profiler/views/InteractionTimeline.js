@@ -170,8 +170,6 @@ class ListItem extends PureComponent<any, void> {
     const item: ChartItem = items[itemIndex];
     const { interaction, lastSnapshotCommitTime } = item;
 
-    // TODO (bvaughn) Split selectInteraction (click) and viewSnapshot (double click) actions.
-
     return (
       <div
         style={{
