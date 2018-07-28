@@ -46,6 +46,10 @@ class ProfilerStore extends EventEmitter {
     this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] = data;
   }
 
+  cacheInteractionData(rootID: string, data: any): void {
+    this.cachedData[`${rootID}-interactions`] = data;
+  }
+
   clearSnapshots = () => {
     this.cachedData = {};
     this.processedInteractions = {};
@@ -55,6 +59,10 @@ class ProfilerStore extends EventEmitter {
 
   getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
     return this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] || null;
+  }
+
+  getCachedInteractionData(rootID: string): any {
+    return this.cachedData[`${rootID}-interactions`] || null;
   }
 
   processInteraction(interaction: Interaction): Interaction {

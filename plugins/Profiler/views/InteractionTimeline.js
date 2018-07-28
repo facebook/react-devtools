@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Interaction, Snapshot} from '../ProfilerTypes';
+import type {CacheInteractionData, GetCachedInteractionData, Interaction, Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
@@ -48,6 +48,8 @@ type ItemData = {|
 |};
 
 type Props = {|
+  cacheInteractionData: CacheInteractionData,
+  getCachedInteractionData: GetCachedInteractionData,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
@@ -56,23 +58,26 @@ type Props = {|
 |};
 
 const InteractionTimeline = ({
+  cacheInteractionData,
+  getCachedInteractionData,
   interactionsToSnapshots,
   selectedSnapshot,
   selectSnapshot,
   theme,
   timestampsToInteractions,
 }: Props) => {
-  // TODO (bvaughn) Cache data in ProfilerStore so we only have to compute it the first time
-  const chartData = getChartData(
-    interactionsToSnapshots,
-    timestampsToInteractions,
-  );
+  // Cache data in ProfilerStore so we only have to compute it the first time the interactions tab is shown
+  let chartData = getCachedInteractionData(selectedSnapshot.root);
+  if (chartData === null) {
+    chartData = getChartData(interactionsToSnapshots, timestampsToInteractions);
+    cacheInteractionData(selectedSnapshot.root, chartData);
+  }
 
   return (
     <AutoSizer>
       {({ height, width }) => (
         <InteractionsList
-          chartData={chartData}
+          chartData={((chartData: any): ChartData)}
           height={height}
           selectedSnapshot={selectedSnapshot}
           selectSnapshot={selectSnapshot}
@@ -149,9 +154,6 @@ class ListItem extends PureComponent<any, void> {
     const item: ChartItem = items[itemIndex];
     const { interaction, lastSnapshotCommitTime } = item;
 
-    // TODO Maybe wrap with <Fragment> instead of extra <div>
-    // TODO Highlight current interaction and snapshot somehow
-    // TODO Should we tight fit Interactions (like we currently do) or all Snapshots?
     return (
       <div style={{
         ...style,

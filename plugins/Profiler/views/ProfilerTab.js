@@ -11,8 +11,16 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-
-import type {Chart} from './ViewTypes';import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Interaction, RootProfilerData, Snapshot} from '../ProfilerTypes';
+import type {
+  CacheDataForSnapshot,
+  CacheInteractionData,
+  GetCachedDataForSnapshot,
+  GetCachedInteractionData,
+  Interaction,
+  RootProfilerData,
+  Snapshot,
+} from '../ProfilerTypes';
+import type {Chart} from './ViewTypes';
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -29,7 +37,9 @@ import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
+  cacheInteractionData: CacheInteractionData,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
+  getCachedInteractionData: GetCachedInteractionData,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   selectedRootID: string | null,
@@ -143,8 +153,26 @@ class ProfilerTab extends React.Component<Props, State> {
 
   render() {
     const { theme } = this.context;
-    const { cacheDataForSnapshot, getCachedDataForSnapshot, interactionsToSnapshots, isRecording, selectedRootID, snapshots, timestampsToInteractions, toggleIsRecording } = this.props;
-    const { isInspectingSelectedFiber, selectedChart, selectedFiberID, selectedFiberName, showNativeNodes, snapshotIndex } = this.state;
+    const {
+      cacheDataForSnapshot,
+      cacheInteractionData,
+      getCachedDataForSnapshot,
+      getCachedInteractionData,
+      interactionsToSnapshots,
+      isRecording,
+      selectedRootID,
+      snapshots,
+      timestampsToInteractions,
+      toggleIsRecording,
+    } = this.props;
+    const {
+      isInspectingSelectedFiber,
+      selectedChart,
+      selectedFiberID,
+      selectedFiberName,
+      showNativeNodes,
+      snapshotIndex,
+    } = this.state;
 
     const snapshot = snapshots[snapshotIndex];
     const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
@@ -170,6 +198,8 @@ class ProfilerTab extends React.Component<Props, State> {
       } else if (selectedChart === 'interactions') {
         content = (
           <InteractionTimeline
+            cacheInteractionData={cacheInteractionData}
+            getCachedInteractionData={getCachedInteractionData}
             interactionsToSnapshots={interactionsToSnapshots}
             selectedSnapshot={snapshot}
             selectSnapshot={this.selectInteractionSnapshot}
@@ -383,7 +413,9 @@ export default decorate({
 
     return {
       cacheDataForSnapshot: (...args) => store.cacheDataForSnapshot(...args),
+      cacheInteractionData: (...args) => store.cacheInteractionData(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
+      getCachedInteractionData: (...args) => store.getCachedInteractionData(...args),
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
         : new Set(),

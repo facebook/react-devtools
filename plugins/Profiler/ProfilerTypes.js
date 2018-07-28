@@ -17,13 +17,22 @@ export type CacheDataForSnapshot = (
   snapshotIndex: number,
   snapshotRootID: string,
   key: string,
-  data: any
+  data: any,
+) => void;
+
+export type CacheInteractionData = (
+  rootID: string,
+  data: any,
 ) => void;
 
 export type GetCachedDataForSnapshot = (
   snapshotIndex: number,
   snapshotRootID: string,
-  key: string
+  key: string,
+) => any | null;
+
+export type GetCachedInteractionData = (
+  rootID: string,
 ) => any | null;
 
 export type Interaction = {|
