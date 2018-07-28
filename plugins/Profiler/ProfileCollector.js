@@ -26,6 +26,7 @@ class ProfileCollector {
   _agent: Agent;
   _committedNodes: Set<string> = new Set();
   _isRecording: boolean = false;
+  _recordingStartTime: number = 0;
 
   constructor(agent: Agent) {
     this._agent = agent;
@@ -43,7 +44,7 @@ class ProfileCollector {
     const storeSnapshot: StoreSnapshot = {
       memoizedInteractions: memoizedInteractions !== null ? Array.from(memoizedInteractions) : [],
       committedNodes: Array.from(this._committedNodes),
-      commitTime: performance.now(),
+      commitTime: performance.now() - this._recordingStartTime,
       root: id,
     };
 
@@ -53,6 +54,7 @@ class ProfileCollector {
   _onIsRecording = isRecording => {
     this._committedNodes = new Set();
     this._isRecording = isRecording;
+    this._recordingStartTime = isRecording ? performance.now() : 0;
 
     if (isRecording) {
       // Maybe in the future, we'll allow collecting multiple profiles and stepping through them.

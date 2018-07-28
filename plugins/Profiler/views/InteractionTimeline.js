@@ -248,7 +248,7 @@ const getChartData = memoize((
   timestampsToInteractions: Map<number, Set<Interaction>>,
 ): ChartData => {
   const items: Array<ChartItem> = [];
-  let stopTime: number = 0;
+  let stopTime: number = Number.MIN_VALUE;
 
   // eslint-disable-next-line no-unused-vars
   for (const [timestamp, interactions] of timestampsToInteractions) {
