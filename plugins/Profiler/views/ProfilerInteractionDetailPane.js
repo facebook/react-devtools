@@ -57,7 +57,11 @@ const ProfilerInteractionDetailPane = ({
     }}>
       <div><strong>Time</strong>: {formatTime(interaction.timestamp)}ms</div>
       <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
-      <ul style={{margin: 0}}>
+      <ul style={{
+        listStyle: 'none',
+        margin: 0,
+        padding: 0,
+      }}>
         {Array.from(snapshots).map((snapshot, index) => {
           let duration = 0;
           snapshot.committedNodes.forEach(nodeID => {
@@ -93,7 +97,7 @@ const SnapshotLink = Hoverable(
         marginBottom: '0.5rem',
       }}
     >
-      Rendered for {formatDuration(duration)}ms (at {formatTime(snapshot.commitTime)}ms)
+      Duration: {formatDuration(duration)}ms, at {formatTime(snapshot.commitTime)}ms
     </li>
   )
 );

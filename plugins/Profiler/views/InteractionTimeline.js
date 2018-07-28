@@ -237,6 +237,7 @@ const InteractionLink = Hoverable(
         textDecoration: isHovered ? 'underline' : 'none',
         cursor: 'pointer',
       }}
+      title={interaction.name}
     >
       {interaction.name}
     </div>
