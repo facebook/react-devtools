@@ -10,7 +10,6 @@
  */
 'use strict';
 
-import type {Theme} from '../../../frontend/types';
 import type {
   CacheDataForSnapshot,
   CacheInteractionData,
@@ -179,7 +178,20 @@ class ProfilerTab extends React.Component<Props, State> {
 
     let content;
     if (selectedRootID === null) {
-      content = 'Selected a root in the Elements tab to continue'; // TODO (bvaughn) Center align
+      content = (
+        <div
+          style={{
+            height: '100%',
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          Selected a root in the Elements tab to continue
+        </div>
+      );
     } else if (isRecording) {
       content = (
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
@@ -233,9 +245,27 @@ class ProfilerTab extends React.Component<Props, State> {
     }
 
     return (
-      <div style={styles.container(theme)}>
-        <div style={styles.Left}>
-          <div style={styles.Toolbar(theme)}>
+      <div style={{
+        width: '100%',
+        flex: 1,
+        display: 'flex',
+        alignItems: 'stretch',
+        justifyContent: 'stretch',
+        flexDirection: 'row',
+        color: theme.base05,
+        fontFamily: sansSerif.family,
+        fontSize: sansSerif.sizes.normal,
+      }}>
+        <div style={{
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+        }}>
+          <div style={{
+            position: 'relative',
+            backgroundColor: theme.base01,
+            borderBottom: `1px solid ${theme.base03}`,
+          }}>
             <ProfilerTabToolbar
               handleSnapshotSliderChange={this.handleSnapshotSliderChange}
               interactionsCount={interactionsToSnapshots.size}
@@ -251,11 +281,24 @@ class ProfilerTab extends React.Component<Props, State> {
               toggleIsRecording={toggleIsRecording}
             />
           </div>
-          <div style={styles.Content}>
+          <div style={{
+            flex: 1,
+            padding: '0.5rem',
+            boxSizing: 'border-box',
+          }}>
             {content}
           </div>
         </div>
-        <div style={styles.Right(theme)}>
+        <div style={{
+          flex: '0 1 300px',
+          maxWidth: '300px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'stretch',
+          justifyContent: 'stretch',
+          borderLeft: `1px solid ${theme.base03}`,
+          boxSizing: 'border-box',
+        }}>
           {selectedFiberName && (
             <ProfilerFiberDetailPane
               inspect={this.inspect}
@@ -267,8 +310,17 @@ class ProfilerTab extends React.Component<Props, State> {
             />
           )}
           {!selectedFiberName && (
-            <div style={styles.FiberDetailPaneEmpty(theme)}>
-              Nothing select
+            <div style={{
+              color: theme.base04,
+              fontSize: sansSerif.sizes.large,
+              height: '100%',
+              flex: 1,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: '0.25rem',
+            }}>
+              Nothing selected
             </div>
           )}
         </div>
@@ -278,13 +330,31 @@ class ProfilerTab extends React.Component<Props, State> {
 }
 
 const InactiveNoData = ({startRecording, theme}) => (
-  <div style={styles.InactiveNoData}>
+  <div
+    style={{
+      height: '100%',
+      flex: 1,
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      justifyContent: 'center',
+    }}
+  >
     <p><strong>No data has been recorded for the selected root.</strong></p>
     <p>
       Click the record button
       <button
         onClick={startRecording}
-        style={styles.startRecordingButtonStyle(theme)}
+        style={{
+          display: 'inline-block',
+          background: theme.base01,
+          outline: 'none',
+          cursor: 'pointer',
+          color: theme.base05,
+          padding: '.5rem',
+          margin: '0 0.25rem',
+          border: `1px solid ${theme.base03}`,
+        }}
         title="Start recording"
       >
         <SvgIcon
@@ -305,102 +375,33 @@ const InactiveNoData = ({startRecording, theme}) => (
 );
 
 const RecordingInProgress = ({stopRecording, theme}) => (
-  <span style={styles.RecordingInProgress}>
+  <span style={{
+    height: '100%',
+    flex: 1,
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    justifyContent: 'center',
+  }}>
     Recording profiling data...
     <button
       onClick={stopRecording}
-      style={styles.stopRecordingButtonStyle(theme)}
+      style={{
+        display: 'flex',
+        background: theme.state00,
+        border: 'none',
+        outline: 'none',
+        cursor: 'pointer',
+        color: theme.base00,
+        padding: '.5rem 0.75rem',
+        marginTop: '0.5rem',
+      }}
       title="Stop recording"
     >
       Stop
     </button>
   </span>
 );
-
-var styles = {
-  container: (theme: Theme) => ({
-    width: '100%',
-    flex: 1,
-    display: 'flex',
-    alignItems: 'stretch',
-    justifyContent: 'stretch',
-    flexDirection: 'row',
-    color: theme.base05,
-    fontFamily: sansSerif.family,
-    fontSize: sansSerif.sizes.normal,
-  }),
-  InactiveNoData: {
-    height: '100%',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  RecordingInProgress: {
-    height: '100%',
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  FiberDetailPaneEmpty: (theme: Theme) => ({
-    color: theme.base04,
-    fontSize: sansSerif.sizes.large,
-    height: '100%',
-    flex: 1,
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: '0.25rem',
-  }),
-  Toolbar: (theme: Theme) => ({
-    position: 'relative',
-    backgroundColor: theme.base01,
-    borderBottom: `1px solid ${theme.base03}`,
-  }),
-  Content: {
-    flex: 1,
-    padding: '0.5rem',
-    boxSizing: 'border-box',
-  },
-  Left: {
-    flex: 1,
-    display: 'flex',
-    flexDirection: 'column',
-  },
-  Right: (theme: Theme) => ({
-    flex: '0 1 300px',
-    maxWidth: '300px',
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'stretch',
-    justifyContent: 'stretch',
-    borderLeft: `1px solid ${theme.base03}`,
-    boxSizing: 'border-box',
-  }),
-  stopRecordingButtonStyle: (theme: Theme) => ({
-    display: 'flex',
-    background: theme.state00,
-    border: 'none',
-    outline: 'none',
-    cursor: 'pointer',
-    color: theme.base00,
-    padding: '.5rem 0.75rem',
-    marginTop: '0.5rem',
-  }),
-  startRecordingButtonStyle: (theme: Theme) => ({
-    display: 'inline-block',
-    background: theme.base01,
-    outline: 'none',
-    cursor: 'pointer',
-    color: theme.base05,
-    padding: '.5rem',
-    margin: '0 0.25rem',
-    border: `1px solid ${theme.base03}`,
-  }),
-};
 
 export default decorate({
   store: 'profilerStore',
