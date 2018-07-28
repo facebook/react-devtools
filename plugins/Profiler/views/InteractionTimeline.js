@@ -157,7 +157,7 @@ class ListItem extends PureComponent<any, void> {
         ...style,
         display: 'flex',
         alignItems: 'center',
-        backgroundColor: item.snapshots.includes(selectedSnapshot) ? theme.base01 : 'none',
+        backgroundColor: item.snapshots.includes(selectedSnapshot) ? theme.base01 : 'transparent',
         borderBottom: `1px solid ${theme.base01}`,
       }}>
         <div style={{
@@ -191,7 +191,9 @@ class ListItem extends PureComponent<any, void> {
               width: `${SNAPSHOT_SIZE}px`,
               height: `${SNAPSHOT_SIZE}px`,
               borderRadius: `${SNAPSHOT_SIZE}px`,
-              backgroundColor: selectedSnapshot === snapshot ? theme.state06 : theme.state00,
+              backgroundColor: selectedSnapshot === snapshot ? theme.state00 : theme.base00,
+              border: `2px solid ${theme.state00}`,
+              boxSizing: 'border-box',
               cursor: 'pointer',
             }}
           />
