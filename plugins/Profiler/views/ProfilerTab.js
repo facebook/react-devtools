@@ -18,6 +18,8 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import decorate from '../../../frontend/decorate';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
+import SvgIcon from '../../../frontend/SvgIcon';
+import Icons from '../../../frontend/Icons';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
@@ -248,7 +250,27 @@ class ProfilerTab extends React.Component<Props, State> {
 const InactiveNoData = ({startRecording, theme}) => (
   <div style={styles.InactiveNoData}>
     <p><strong>No data has been recorded for the selected root.</strong></p>
-    <p>Click the record button to start a new recording.</p>
+    <p>
+      Click the record button
+      <button
+        onClick={startRecording}
+        style={styles.startRecordingButtonStyle(theme)}
+        title="Start recording"
+      >
+        <SvgIcon
+          path={Icons.RECORD}
+          style={{
+            flex: '0 0 1rem',
+            width: '1rem',
+            height: '1rem',
+            fill: 'currentColor',
+            display: 'inline',
+            verticalAlign: 'sub',
+          }}
+        />
+      </button>
+      to start a new recording.
+    </p>
   </div>
 );
 
@@ -337,6 +359,16 @@ var styles = {
     color: theme.base00,
     padding: '.5rem 0.75rem',
     marginTop: '0.5rem',
+  }),
+  startRecordingButtonStyle: (theme: Theme) => ({
+    display: 'inline-block',
+    background: theme.base01,
+    outline: 'none',
+    cursor: 'pointer',
+    color: theme.base05,
+    padding: '.5rem',
+    margin: '0 0.25rem',
+    border: `1px solid ${theme.base03}`,
   }),
 };
 
