@@ -35,7 +35,6 @@ type ChartItem = {|
 
 type ChartData = {|
   items: Array<ChartItem>,
-  startTime: number,
   stopTime: number,
 |};
 
@@ -165,7 +164,7 @@ class ListItem extends PureComponent<any, void> {
   render() {
     const { data: itemData, index: itemIndex, style } = this.props;
     const { chartData, labelColumnWidth, scaleX, selectedInteraction, selectedSnapshot, theme } = itemData;
-    const { items, startTime } = chartData;
+    const { items } = chartData;
 
     const item: ChartItem = items[itemIndex];
     const { interaction, lastSnapshotCommitTime } = item;
@@ -190,7 +189,7 @@ class ListItem extends PureComponent<any, void> {
           style={{
             position: 'absolute',
             left: `${labelColumnWidth + scaleX(interaction.timestamp)}px`,
-            width: `${scaleX(startTime + lastSnapshotCommitTime - interaction.timestamp) + SNAPSHOT_SIZE}px`,
+            width: `${scaleX(lastSnapshotCommitTime - interaction.timestamp) + SNAPSHOT_SIZE}px`,
             height: `${INTERACTION_SIZE}px`,
             backgroundColor: theme.base03,
             borderRadius: '0.125rem',
@@ -249,15 +248,14 @@ const getChartData = memoize((
   timestampsToInteractions: Map<number, Set<Interaction>>,
 ): ChartData => {
   const items: Array<ChartItem> = [];
-  let startTime: number = Number.MAX_VALUE;
-  let stopTime: number = Number.MIN_VALUE;
+  let stopTime: number = 0;
 
+  // eslint-disable-next-line no-unused-vars
   for (const [timestamp, interactions] of timestampsToInteractions) {
     for (const interaction of interactions) {
       const snapshots = Array.from(((interactionsToSnapshots.get(interaction): any): Set<Snapshot>));
       const lastSnapshotCommitTime = Math.max(stopTime, snapshots[snapshots.length - 1].commitTime);
 
-      startTime = Math.min(startTime, timestamp);
       stopTime = lastSnapshotCommitTime;
 
       items.push({
@@ -270,7 +268,6 @@ const getChartData = memoize((
 
   return {
     items,
-    startTime,
     stopTime,
   };
 });
@@ -291,7 +288,7 @@ const getItemData = memoize((
     chartData,
     graphColumnWidth,
     labelColumnWidth,
-    scaleX: scale(chartData.startTime, chartData.stopTime, 0, graphColumnWidth),
+    scaleX: scale(0, chartData.stopTime, 0, graphColumnWidth),
     selectedInteraction,
     selectedSnapshot,
     selectInteraction,
