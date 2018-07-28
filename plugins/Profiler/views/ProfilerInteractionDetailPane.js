@@ -97,7 +97,7 @@ const SnapshotLink = Hoverable(
         marginBottom: '0.5rem',
       }}
     >
-      Duration: {formatDuration(duration)}ms, at {formatTime(snapshot.commitTime)}ms
+      Duration: {formatDuration(duration)}ms, at {formatTime(snapshot.commitTime)}s
     </li>
   )
 );
