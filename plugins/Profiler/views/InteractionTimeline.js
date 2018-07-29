@@ -18,7 +18,6 @@ import React, { PureComponent } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { scale } from './constants';
-import Hoverable from '../../../frontend/Hoverable';
 
 const INTERACTION_SIZE = 4;
 const ITEM_SIZE = 25;
@@ -160,31 +159,71 @@ const InteractionsList = ({
   );
 };
 
-class ListItem extends PureComponent<any, void> {
+type ListItemProps = {|
+  data: ItemData,
+  index: number,
+  style: Object,
+|};
+type ListItemState = {|
+  isHovered: boolean,
+  hoveredSnapshot: Snapshot | null,
+|};
+
+class ListItem extends PureComponent<ListItemProps, ListItemState> {
+  state = {
+    isHovered: false,
+    hoveredSnapshot: null,
+  };
+
+  handleMouseEnter = (snapshot: Snapshot | null) => this.setState({
+    isHovered: true,
+    hoveredSnapshot: snapshot,
+  });
+  handleMouseLeave = () => this.setState({isHovered: false});
+
   render() {
     const { data: itemData, index: itemIndex, style } = this.props;
+    const { isHovered, hoveredSnapshot } = this.state;
+
     const { chartData, labelColumnWidth, scaleX, selectedInteraction, selectedSnapshot, theme } = itemData;
     const { items } = chartData;
 
     const item: ChartItem = items[itemIndex];
     const { interaction, lastSnapshotCommitTime } = item;
 
+    const showRowHover = isHovered && hoveredSnapshot === null;
+
     return (
       <div
+        onClick={() => itemData.selectInteraction(interaction)}
+        onMouseEnter={() => this.handleMouseEnter(null)}
+        onMouseLeave={this.handleMouseLeave}
         style={{
           ...style,
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: selectedInteraction === interaction ? theme.base01 : 'transparent',
+          backgroundColor: showRowHover ? theme.state03 : (selectedInteraction === interaction ? theme.base01 : 'transparent'),
           borderBottom: `1px solid ${theme.base01}`,
+          cursor: 'pointer',
         }}
       >
-        <InteractionLink
-          onClick={() => itemData.selectInteraction(interaction)}
-          interaction={interaction}
-          theme={theme}
-          width={labelColumnWidth}
-        />
+        <div
+          style={{
+            width: labelColumnWidth,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            lineHeight: `${ITEM_SIZE}px`,
+            boxSizing: 'border-box',
+            padding: '0 0.25rem',
+            color: showRowHover ? theme.state00 : theme.base05,
+            textDecoration: showRowHover ? 'underline' : 'none',
+            userSelect: 'none',
+          }}
+          title={interaction.name}
+        >
+          {interaction.name}
+        </div>
         <div
           style={{
             position: 'absolute',
@@ -195,53 +234,43 @@ class ListItem extends PureComponent<any, void> {
             borderRadius: '0.125rem',
           }}
         />
-        {item.snapshots.map((snapshot, snapshotIndex) => (
-          <div
-            key={snapshotIndex}
-            onClick={() => itemData.selectInteraction(interaction)}
-            onDoubleClick={() => itemData.viewSnapshot(snapshot)}
-            style={{
-              position: 'absolute',
-              left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
-              width: `${SNAPSHOT_SIZE}px`,
-              height: `${SNAPSHOT_SIZE}px`,
-              borderRadius: `${SNAPSHOT_SIZE}px`,
-              backgroundColor: selectedSnapshot === snapshot ? theme.state00 : theme.base00,
-              border: `2px solid ${theme.state00}`,
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-            }}
-          />
-        ))}
+        {item.snapshots.map((snapshot, snapshotIndex) => {
+          let backgroundColor, borderColor;
+          if (hoveredSnapshot === snapshot) {
+            backgroundColor = theme.state00;
+            borderColor = 'transparent';
+          } else if (selectedSnapshot === snapshot) {
+            backgroundColor = theme.state06;
+            borderColor = 'transparent';
+          } else {
+            backgroundColor = theme.base00;
+            borderColor = theme.state00;
+          }
+
+          return (
+            <div
+              key={snapshotIndex}
+              onClick={() => itemData.viewSnapshot(snapshot)}
+              onMouseEnter={() => this.handleMouseEnter(snapshot)}
+              onMouseLeave={() => this.handleMouseEnter(null)}
+              style={{
+                position: 'absolute',
+                left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
+                width: `${SNAPSHOT_SIZE}px`,
+                height: `${SNAPSHOT_SIZE}px`,
+                borderRadius: `${SNAPSHOT_SIZE}px`,
+                backgroundColor: backgroundColor,
+                border: `2px solid ${borderColor}`,
+                boxSizing: 'border-box',
+                cursor: 'pointer',
+              }}
+            />
+          );
+        })}
       </div>
     );
   }
 }
-
-const InteractionLink = Hoverable(
-  ({ isHovered, interaction, onClick, onMouseEnter, onMouseLeave, theme, width }) => (
-    <div
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={{
-        width,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-        lineHeight: `${ITEM_SIZE}px`,
-        boxSizing: 'border-box',
-        padding: '0 0.25rem',
-        color: isHovered ? theme.state00 : theme.base05,
-        textDecoration: isHovered ? 'underline' : 'none',
-        cursor: 'pointer',
-      }}
-      title={interaction.name}
-    >
-      {interaction.name}
-    </div>
-  )
-);
 
 const getChartData = memoize((
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
