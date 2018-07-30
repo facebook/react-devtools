@@ -44,12 +44,12 @@ type Props = {|
   isRecording: boolean,
   selectedChartType: ChartType,
   selectedRootID: string | null,
+  setSelectedChartType: (chartType: ChartType) => void,
   showNativeNodes: boolean,
   snapshots: Array<Snapshot>,
   timestampsToInteractions: Map<number, Set<Interaction>>,
   toggleIsRecording: () => void,
   toggleShowNativeNodes: () => void,
-  updateSelectedChartType: (chartType: ChartType) => void,
 |};
 
 type State = {|
@@ -161,7 +161,7 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberID: null,
       selectedFiberName: null,
       snapshotIndex: this.props.snapshots.indexOf(snapshot),
-    });
+    }, () => this.props.setSelectedChartType('flamegraph'));
 
   render() {
     const { theme } = this.context;
@@ -326,7 +326,7 @@ class ProfilerTab extends React.Component<Props, State> {
               interactionsCount={interactionsToSnapshots.size}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
-              selectChart={this.props.updateSelectedChartType}
+              selectChart={this.props.setSelectedChartType}
               selectNextSnapshotIndex={this.selectNextSnapshotIndex}
               selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
               selectedChartType={selectedChartType}
@@ -462,6 +462,7 @@ export default decorate({
         : new Set(),
       isRecording: !!store.isRecording,
       selectedChartType: store.selectedChartType,
+      setSelectedChartType: (chartType: ChartType) => store.setSelectedChartType(chartType),
       showNativeNodes: store.showNativeNodes,
       snapshots: profilerData !== null
         ? profilerData.snapshots
@@ -471,7 +472,6 @@ export default decorate({
         : new Set(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
       toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
-      updateSelectedChartType: (chartType: ChartType) => store.setSelectedChartType(chartType),
     };
   },
 }, ProfilerTab);
