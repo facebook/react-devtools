@@ -11,6 +11,7 @@
 'use strict';
 
 export const isStorageApiAvailable =
+  typeof chrome !== 'undefined' &&
   chrome !== null &&
   typeof chrome === 'object' &&
   chrome.storage !== null &&
