@@ -312,7 +312,7 @@ class ProfilerTab extends React.Component<Props, State> {
         fontSize: sansSerif.sizes.normal,
       }}>
         <div style={{
-          flex: 1,
+          flex: '1 1 200px',
           display: 'flex',
           flexDirection: 'column',
         }}>
@@ -347,7 +347,7 @@ class ProfilerTab extends React.Component<Props, State> {
           </div>
         </div>
         <div style={{
-          flex: '0 1 300px',
+          flex: '1 1 100px',
           maxWidth: '300px',
           display: 'flex',
           flexDirection: 'column',

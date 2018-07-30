@@ -102,32 +102,32 @@ const ProfilerTabToolbar = ({
 
     {!isRecording && snapshots.length > 0 && (
       <Fragment>
-         <RadioOption
-           icon={Icons.INTERACTION}
-           isChecked={!isInspectingSelectedFiber && selectedChartType === 'interactions'}
-           label="Interactions"
-           onChange={() => selectChart('interactions')}
-           theme={theme}
-           width={width}
-         />
+        <RadioOption
+          icon={Icons.FLAME_CHART}
+          isChecked={!isInspectingSelectedFiber && selectedChartType === 'flamegraph'}
+          label="Flamegraph"
+          onChange={() => selectChart('flamegraph')}
+          theme={theme}
+          width={width}
+        />
         &nbsp;
-         <RadioOption
-           icon={Icons.FLAME_CHART}
-           isChecked={!isInspectingSelectedFiber && selectedChartType === 'flamegraph'}
-           label="Flamegraph"
-           onChange={() => selectChart('flamegraph')}
-           theme={theme}
-           width={width}
-         />
+        <RadioOption
+          icon={Icons.RANKED_CHART}
+          isChecked={!isInspectingSelectedFiber && selectedChartType === 'ranked'}
+          label="Ranked"
+          onChange={() => selectChart('ranked')}
+          theme={theme}
+          width={width}
+        />
         &nbsp;
-         <RadioOption
-           icon={Icons.RANKED_CHART}
-           isChecked={!isInspectingSelectedFiber && selectedChartType === 'ranked'}
-           label="Ranked"
-           onChange={() => selectChart('ranked')}
-           theme={theme}
-           width={width}
-         />
+        <RadioOption
+          icon={Icons.INTERACTION}
+          isChecked={!isInspectingSelectedFiber && selectedChartType === 'interactions'}
+          label={`Interactions (${interactionsCount})`}
+          onChange={() => selectChart('interactions')}
+          theme={theme}
+          width={width}
+        />
 
         <div style={{flex: 1}} />
 
