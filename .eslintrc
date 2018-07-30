@@ -8,6 +8,7 @@ plugins:
   - react
 
 globals:
+  chrome: false
   React$Element: false
 
 rules:

@@ -122,7 +122,8 @@ const InteractionsList = ({
   if (chartData.items.length === 0) {
     return (
       <div style={{
-        height: '100%',
+        height,
+        width,
         flex: 1,
         display: 'flex',
         flexDirection: 'column',

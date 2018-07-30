@@ -11,8 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {Chart} from './ViewTypes';
-import type {Snapshot} from '../ProfilerTypes';
+import type {ChartType, Snapshot} from '../ProfilerTypes';
 
 import React, { Fragment } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
@@ -28,10 +27,10 @@ type Props = {|
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
-  selectChart: (chart: Chart) => void,
+  selectChart: (chart: ChartType) => void,
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
-  selectedChart: Chart,
+  selectedChartType: ChartType,
   showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
@@ -53,10 +52,10 @@ type ProfilerTabToolbarProps = {
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
-  selectChart: (chart: Chart) => void,
+  selectChart: (chart: ChartType) => void,
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
-  selectedChart: Chart,
+  selectedChartType: ChartType,
   showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
@@ -74,7 +73,7 @@ const ProfilerTabToolbar = ({
   selectChart,
   selectNextSnapshotIndex,
   selectPreviousSnapshotIndex,
-  selectedChart,
+  selectedChartType,
   showNativeNodes,
   snapshotIndex,
   snapshots,
@@ -103,31 +102,30 @@ const ProfilerTabToolbar = ({
 
     {!isRecording && snapshots.length > 0 && (
       <Fragment>
-         {/* TODO (bvaughn) Disable if there are no interactions */}
          <RadioOption
            icon={Icons.INTERACTION}
-           isChecked={!isInspectingSelectedFiber && selectedChart === 'interactions'}
-           isDisabled={interactionsCount === 0}
+           isChecked={!isInspectingSelectedFiber && selectedChartType === 'interactions'}
            label="Interactions"
            onChange={() => selectChart('interactions')}
+           theme={theme}
            width={width}
          />
         &nbsp;
          <RadioOption
            icon={Icons.FLAME_CHART}
-           isChecked={!isInspectingSelectedFiber && selectedChart === 'flamegraph'}
-           isDisabled={false}
+           isChecked={!isInspectingSelectedFiber && selectedChartType === 'flamegraph'}
            label="Flamegraph"
            onChange={() => selectChart('flamegraph')}
+           theme={theme}
            width={width}
          />
         &nbsp;
          <RadioOption
            icon={Icons.RANKED_CHART}
-           isChecked={!isInspectingSelectedFiber && selectedChart === 'ranked'}
-           isDisabled={false}
+           isChecked={!isInspectingSelectedFiber && selectedChartType === 'ranked'}
            label="Ranked"
            onChange={() => selectChart('ranked')}
+           theme={theme}
            width={width}
          />
 
@@ -190,8 +188,41 @@ const HRule = ({ theme }) => (
   }} />
 );
 
-const RadioOption = ({ icon, isChecked, isDisabled, label, onChange, width }) => (
-  <label style={{marginRight: '0.5rem'}}>
+type RadioOptionProps = {|
+  icon: string,
+  isChecked: boolean,
+  isDisabled?: boolean,
+  label: string,
+  isHovered: boolean,
+  onChange: Function,
+  onMouseEnter: Function,
+  onMouseLeave: Function,
+  theme: Theme,
+  width: number,
+|};
+
+const RadioOption = Hoverable(({
+  icon,
+  isChecked,
+  isDisabled = false,
+  isHovered,
+  label,
+  onChange,
+  onMouseEnter,
+  onMouseLeave,
+  theme,
+  width,
+}: RadioOptionProps) => (
+  <label
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    style={{
+      color: isHovered ? theme.state06 : 'inherit',
+      marginRight: '0.5rem',
+      cursor: 'pointer',
+      opacity: isDisabled ? 0.5 : 1,
+    }}
+  >
     <input
       disabled={isDisabled}
       type="radio"
@@ -208,7 +239,6 @@ const RadioOption = ({ icon, isChecked, isDisabled, label, onChange, width }) =>
         display: 'inline',
         verticalAlign: 'sub',
         margin: '0 0.25rem',
-        opacity: isDisabled ? 0.5 : 1,
         pointerEvents: isDisabled ? 'none' : 'auto',
       }}
      />
@@ -216,7 +246,7 @@ const RadioOption = ({ icon, isChecked, isDisabled, label, onChange, width }) =>
       <span>{label}</span>
     )}
   </label>
-);
+));
 
 const RecordButton = Hoverable(
   ({ isActive, isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (

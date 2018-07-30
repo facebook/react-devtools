@@ -11,10 +11,11 @@
 'use strict';
 
 import type Bridge from '../../agent/Bridge';
-import type {Interaction, RootProfilerData, Snapshot} from './ProfilerTypes';
+import type {ChartType, Interaction, RootProfilerData, Snapshot} from './ProfilerTypes';
 
 const {List} = require('immutable');
 const {EventEmitter} = require('events');
+const {get, isStorageApiAvailable, set} = require('../../utils/storage');
 
 class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
@@ -25,7 +26,9 @@ class ProfilerStore extends EventEmitter {
   processedInteractions: {[id: string]: Interaction} = {};
   rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
+  selectedChartType: ChartType = 'flamegraph';
   selectedRoot: string | null = null;
+  showNativeNodes: boolean = false;
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -36,6 +39,16 @@ class ProfilerStore extends EventEmitter {
     this._mainStore.on('roots', this.saveRoots);
     this._mainStore.on('selected', this.updateSelected);
     this._mainStore.on('storeSnapshot', this.storeSnapshot);
+
+    // Restore the user's last selected values if they've been persisted.
+    if (isStorageApiAvailable) {
+      get('profiler:selectedChartType', 'flamegraph').then(selectedChartType => {
+        this.selectedChartType = selectedChartType;
+      });
+      get('profiler:showNativeNodes', false).then(showNativeNodes => {
+        this.showNativeNodes = showNativeNodes;
+      });
+    }
   }
 
   off() {
@@ -79,6 +92,18 @@ class ProfilerStore extends EventEmitter {
     this.roots = this._mainStore.roots;
     this.emit('roots', this._mainStore.roots);
   };
+
+  setSelectedChartType(selectedChartType: ChartType) {
+    this.selectedChartType = selectedChartType;
+    this.emit('selectedChartType', selectedChartType);
+    set('profiler:selectedChartType', selectedChartType);
+  }
+
+  setShowNativeNodes(showNativeNodes: boolean) {
+    this.showNativeNodes = showNativeNodes;
+    this.emit('showNativeNodes', showNativeNodes);
+    set('profiler:showNativeNodes', showNativeNodes);
+  }
 
   setIsRecording(isRecording: boolean): void {
     this.isRecording = isRecording;

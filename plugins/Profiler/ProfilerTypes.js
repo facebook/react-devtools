@@ -13,6 +13,8 @@
 
 const {Map} = require('immutable');
 
+export type ChartType = 'flamegraph' | 'interactions' | 'ranked';
+
 export type CacheDataForSnapshot = (
   snapshotIndex: number,
   snapshotRootID: string,

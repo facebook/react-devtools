@@ -38,4 +38,7 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
   // Also while the first root(s) may not be capable of profiling, later ones might.
   agent.on('root', checkIfProfilingIsSupported);
   agent.on('rootUnmounted', checkIfProfilingIsSupported);
+
+  // Check once in case some roots have already been registered:
+  checkIfProfilingIsSupported();
 };

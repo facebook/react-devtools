@@ -13,13 +13,13 @@
 import type {
   CacheDataForSnapshot,
   CacheInteractionData,
+  ChartType,
   GetCachedDataForSnapshot,
   GetCachedInteractionData,
   Interaction,
   RootProfilerData,
   Snapshot,
 } from '../ProfilerTypes';
-import type {Chart} from './ViewTypes';
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -42,20 +42,24 @@ type Props = {|
   getCachedInteractionData: GetCachedInteractionData,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
+  selectedChartType: ChartType,
   selectedRootID: string | null,
+  showNativeNodes: boolean,
   snapshots: Array<Snapshot>,
   timestampsToInteractions: Map<number, Set<Interaction>>,
-  toggleIsRecording: (value: boolean) => void,
+  toggleIsRecording: () => void,
+  toggleShowNativeNodes: () => void,
+  updateSelectedChartType: (chartType: ChartType) => void,
 |};
 
 type State = {|
   isInspectingSelectedFiber: boolean,
   prevIsRecording: boolean,
-  selectedChart: Chart,
+  prevSelectedChartType: ChartType,
+  prevShowNativeNodes: boolean,
   selectedFiberID: string | null,
   selectedFiberName: string | null,
   selectedInteraction: Interaction | null,
-  showNativeNodes: boolean,
   snapshotIndex: number,
 |};
 
@@ -67,11 +71,11 @@ class ProfilerTab extends React.Component<Props, State> {
   state: State = {
     isInspectingSelectedFiber: false,
     prevIsRecording: this.props.isRecording,
-    selectedChart: 'flamegraph',
+    prevSelectedChartType: this.props.selectedChartType,
+    prevShowNativeNodes: this.props.showNativeNodes,
     selectedFiberID: null,
     selectedFiberName: null,
     selectedInteraction: null,
-    showNativeNodes: false,
     snapshotIndex: 0,
   };
 
@@ -80,11 +84,26 @@ class ProfilerTab extends React.Component<Props, State> {
       return {
         isInspectingSelectedFiber: false,
         prevIsRecording: props.isRecording,
-        selectedChart: 'flamegraph',
         selectedFiberID: null,
         selectedFiberName: null,
         selectedInteraction: null,
         snapshotIndex: 0,
+      };
+    }
+    if (props.selectedChartType !== state.prevSelectedChartType) {
+      return {
+        isInspectingSelectedFiber: false,
+        prevSelectedChartType: props.selectedChartType,
+        selectedFiberID: null,
+        selectedFiberName: null,
+      };
+    }
+    if (props.showNativeNodes !== state.prevShowNativeNodes) {
+      return {
+        isInspectingSelectedFiber: false,
+        prevShowNativeNodes: props.showNativeNodes,
+        selectedFiberID: null,
+        selectedFiberName: null,
       };
     }
     return null;
@@ -107,14 +126,6 @@ class ProfilerTab extends React.Component<Props, State> {
       isInspectingSelectedFiber: true,
       selectedFiberID: id,
       selectedFiberName: name,
-    });
-
-  selectChart = (chart: Chart) =>
-    this.setState({
-      isInspectingSelectedFiber: false,
-      selectedChart: chart,
-      selectedFiberID: null,
-      selectedFiberName: null,
     });
 
   selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
@@ -144,17 +155,9 @@ class ProfilerTab extends React.Component<Props, State> {
 
   stopInspecting = () => this.setState({ isInspectingSelectedFiber: false });
 
-  toggleShowNativeNodes = () =>
-    this.setState(prevState => ({
-      selectedFiberID: null,
-      selectedFiberName: null,
-      showNativeNodes: !prevState.showNativeNodes,
-    }));
-
   viewSnapshot = (snapshot: Snapshot) =>
     this.setState({
       isInspectingSelectedFiber: false,
-      selectedChart: 'flamegraph',
       selectedFiberID: null,
       selectedFiberName: null,
       snapshotIndex: this.props.snapshots.indexOf(snapshot),
@@ -169,18 +172,18 @@ class ProfilerTab extends React.Component<Props, State> {
       getCachedInteractionData,
       interactionsToSnapshots,
       isRecording,
+      selectedChartType,
       selectedRootID,
+      showNativeNodes,
       snapshots,
       timestampsToInteractions,
       toggleIsRecording,
     } = this.props;
     const {
       isInspectingSelectedFiber,
-      selectedChart,
       selectedFiberID,
       selectedFiberName,
       selectedInteraction,
-      showNativeNodes,
       snapshotIndex,
     } = this.state;
 
@@ -218,7 +221,7 @@ class ProfilerTab extends React.Component<Props, State> {
             theme={theme}
           />
         );
-      } else if (selectedChart === 'interactions') {
+      } else if (selectedChartType === 'interactions') {
         content = (
           <InteractionTimeline
             cacheInteractionData={cacheInteractionData}
@@ -233,7 +236,7 @@ class ProfilerTab extends React.Component<Props, State> {
           />
         );
       } else {
-        const ChartComponent = selectedChart === 'ranked'
+        const ChartComponent = selectedChartType === 'ranked'
           ? SnapshotRanked
           : SnapshotFlamegraph;
 
@@ -258,7 +261,7 @@ class ProfilerTab extends React.Component<Props, State> {
     }
 
     let details;
-    if (selectedChart === 'interactions' && selectedInteraction !== null) {
+    if (selectedChartType === 'interactions' && selectedInteraction !== null) {
       details = (
         <ProfilerInteractionDetailPane
           interaction={((selectedInteraction: any): Interaction)}
@@ -268,7 +271,7 @@ class ProfilerTab extends React.Component<Props, State> {
           viewSnapshot={this.viewSnapshot}
         />
       );
-    } else if (selectedChart !== 'interactions' && selectedFiberName !== null) {
+    } else if (selectedChartType !== 'interactions' && selectedFiberName !== null) {
       details = (
         <ProfilerFiberDetailPane
           inspect={this.inspect}
@@ -323,16 +326,16 @@ class ProfilerTab extends React.Component<Props, State> {
               interactionsCount={interactionsToSnapshots.size}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
-              selectChart={this.selectChart}
+              selectChart={this.props.updateSelectedChartType}
               selectNextSnapshotIndex={this.selectNextSnapshotIndex}
               selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
-              selectedChart={selectedChart}
-              showNativeNodes={showNativeNodes}
+              selectedChartType={selectedChartType}
+              showNativeNodes={this.props.showNativeNodes}
               snapshotIndex={snapshotIndex}
               snapshots={snapshots}
               theme={theme}
               toggleIsRecording={toggleIsRecording}
-              toggleShowNativeNodes={this.toggleShowNativeNodes}
+              toggleShowNativeNodes={this.props.toggleShowNativeNodes}
             />
           </div>
           <div style={{
@@ -436,7 +439,13 @@ const RecordingInProgress = ({stopRecording, theme}) => (
 
 export default decorate({
   store: 'profilerStore',
-  listeners: () => ['isRecording', 'selectedRoot', 'profilerData'],
+  listeners: () => [
+    'isRecording',
+    'profilerData',
+    'selectedChartType',
+    'selectedRoot',
+    'showNativeNodes',
+  ],
   props(store) {
     const profilerData: RootProfilerData | null =
       store.rootsToProfilerData.has(store.selectedRoot)
@@ -452,6 +461,8 @@ export default decorate({
         ? profilerData.interactionsToSnapshots
         : new Set(),
       isRecording: !!store.isRecording,
+      selectedChartType: store.selectedChartType,
+      showNativeNodes: store.showNativeNodes,
       snapshots: profilerData !== null
         ? profilerData.snapshots
         : [],
@@ -459,6 +470,8 @@ export default decorate({
         ? profilerData.timestampsToInteractions
         : new Set(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
+      toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
+      updateSelectedChartType: (chartType: ChartType) => store.setSelectedChartType(chartType),
     };
   },
 }, ProfilerTab);
