@@ -13,21 +13,29 @@
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+const emptyFunction = () => {};
+
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
-  bridge.onCall('profiler:check', () => {
-    let shouldEnable = false;
+  const checkIfProfilingIsSupported = () => {
+    let profilingIsSupported = false;
 
     // Feature detection for profiling mode.
     // The presence of an "actualDuration" field signifies:
     // 1) This is a new enough version of React
     // 2) This is a profiling capable bundle (e.g. DEV or PROFILING)
-    agent.roots.forEach(id => {
-      const root = agent.internalInstancesById.get(id);
+    agent.roots.forEach((rootId: string) => {
+      const root = agent.internalInstancesById.get(rootId);
       if ((root: any).hasOwnProperty('actualDuration')) {
-        shouldEnable = true;
+        profilingIsSupported = true;
       }
     });
 
-    return shouldEnable;
-  });
+    bridge.call('profiler:update', [profilingIsSupported], emptyFunction);
+  };
+
+  // Wait for roots to be registered.
+  // They might not yet exist at the time the plugin is initialized.
+  // Also while the first root(s) may not be capable of profiling, later ones might.
+  agent.on('root', checkIfProfilingIsSupported);
+  agent.on('rootUnmounted', checkIfProfilingIsSupported);
 };

@@ -434,7 +434,10 @@ class Agent extends EventEmitter {
   onUnmounted(component: OpaqueNodeHandle) {
     var id = this.getId(component);
     this.elementData.delete(id);
-    this.roots.delete(id);
+    if (this.roots.has(id)) {
+      this.roots.delete(id);
+      this.emit('rootUnmounted', id);
+    }
     this.renderers.delete(id);
     this.emit('unmount', id);
     this.idsByInternalInstances.delete(component);

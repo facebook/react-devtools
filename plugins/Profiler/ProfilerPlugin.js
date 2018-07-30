@@ -20,27 +20,25 @@ const ProfilerTab = require('./views/ProfilerTab').default;
 const StoreWrapper = provideStore('profilerStore');
 
 class ProfilerPlugin {
-  hasProfiler: bool;
   bridge: Bridge;
+  profilingIsSupported: boolean;
   store: Store;
   profilerStore: ProfilerStore;
 
   constructor(store: Store, bridge: Bridge, refresh: () => void) {
     this.bridge = bridge;
     this.store = store;
-    this.hasProfiler = false;
+    this.profilingIsSupported = false;
     this.profilerStore = new ProfilerStore(bridge, store);
 
-    // Wait until roots have been initialized...
-    // The 1s delay follows the precedent used by the Relay plug-in.
-    setTimeout(() => {
-      bridge.call('profiler:check', [], hasProfiler => {
-        this.hasProfiler = hasProfiler;
-        if (hasProfiler) {
-          refresh();
-        }
-      });
-    }, 1000);
+    // The Profiler backend will notify us if/when it detects a profiling capable React build.
+    // This is an async check, because roots may not have been registered yet at this time.
+    bridge.onCall('profiler:update', (profilingIsSupported: boolean) => {
+      if (this.profilingIsSupported !== profilingIsSupported) {
+        this.profilingIsSupported = profilingIsSupported;
+        refresh();
+      }
+    });
   }
 
   panes(): Array<(node: Object, id: string) => React$Element<any>> {
@@ -51,7 +49,7 @@ class ProfilerPlugin {
   }
 
   tabs(): ?{[key: string]: () => React$Element<any>} {
-    if (!this.hasProfiler) {
+    if (!this.profilingIsSupported) {
       return null;
     }
 
