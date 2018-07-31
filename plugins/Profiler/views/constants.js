@@ -28,7 +28,11 @@ export const scale = (minValue: number, maxValue: number, minRange: number, maxR
   (value: number) =>
     ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
 
-export const getGradientColor = (value: number) => gradient[Math.round(value * (gradient.length - 1))];
+const gradientMaxIndex = gradient.length - 1;
+export const getGradientColor = (value: number) => {
+  value = Math.max(0, Math.min(gradientMaxIndex, value)); // Guard against invalid indices
+  return gradient[Math.round(value * gradientMaxIndex)];
+};
 
 export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
 export const formatDuration = (duration: number) => Math.round(duration * 10) / 10;
