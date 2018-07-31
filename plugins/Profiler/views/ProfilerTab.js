@@ -42,6 +42,7 @@ type Props = {|
   getCachedInteractionData: GetCachedInteractionData,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
+  profilerData: RootProfilerData,
   selectedChartType: ChartType,
   selectedRootID: string | null,
   setSelectedChartType: (chartType: ChartType) => void,
@@ -172,6 +173,7 @@ class ProfilerTab extends React.Component<Props, State> {
       getCachedInteractionData,
       interactionsToSnapshots,
       isRecording,
+      profilerData,
       selectedChartType,
       selectedRootID,
       showNativeNodes,
@@ -191,24 +193,15 @@ class ProfilerTab extends React.Component<Props, State> {
     const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
 
     let content;
-    if (selectedRootID === null) {
-      content = (
-        <div
-          style={{
-            height: '100%',
-            flex: 1,
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            justifyContent: 'center',
-          }}
-        >
-          Selected a root in the Elements tab to continue
-        </div>
-      );
-    } else if (isRecording) {
+    if (isRecording) {
       content = (
         <RecordingInProgress theme={theme} stopRecording={toggleIsRecording} />
+      );
+    } else if (selectedRootID === null || profilerData === null) {
+      // Edge case where keyboard up/down arrows change selected root in the Elements tab.
+      // This is a bug that should be fixed separately from the Profiler plug-in.
+      content = (
+        <ContentNoData startRecording={toggleIsRecording} theme={theme} />
       );
     } else if (snapshots.length > 0) {
       if (isInspectingSelectedFiber && selectedFiberID !== null) {
@@ -256,12 +249,18 @@ class ProfilerTab extends React.Component<Props, State> {
       }
     } else {
       content = (
-        <InactiveNoData startRecording={toggleIsRecording} theme={theme} />
+        <ContentNoData startRecording={toggleIsRecording} theme={theme} />
       );
     }
 
     let details;
-    if (selectedChartType === 'interactions' && selectedInteraction !== null) {
+    if (selectedRootID === null || profilerData === null) {
+      // Edge case where keyboard up/down arrows change selected root in the Elements tab.
+      // This is a bug that should be fixed separately from the Profiler plug-in.
+      details = (
+        <DetailsNoData theme={theme} />
+      );
+    } else if (selectedChartType === 'interactions' && selectedInteraction !== null) {
       details = (
         <ProfilerInteractionDetailPane
           interaction={((selectedInteraction: any): Interaction)}
@@ -284,18 +283,7 @@ class ProfilerTab extends React.Component<Props, State> {
       );
     } else {
       details = (
-        <div style={{
-          color: theme.base04,
-          fontSize: sansSerif.sizes.large,
-          height: '100%',
-          flex: 1,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          padding: '0.25rem',
-        }}>
-          Nothing selected
-        </div>
+        <DetailsNoData theme={theme} />
       );
     }
 
@@ -363,7 +351,22 @@ class ProfilerTab extends React.Component<Props, State> {
   }
 }
 
-const InactiveNoData = ({startRecording, theme}) => (
+const DetailsNoData = ({ theme }) => (
+  <div style={{
+    color: theme.base04,
+    fontSize: sansSerif.sizes.large,
+    height: '100%',
+    flex: 1,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: '0.25rem',
+  }}>
+    Nothing selected
+  </div>
+);
+
+const ContentNoData = ({startRecording, theme}) => (
   <div
     style={{
       height: '100%',
@@ -374,9 +377,13 @@ const InactiveNoData = ({startRecording, theme}) => (
       justifyContent: 'center',
     }}
   >
-    <p><strong>No data has been recorded for the selected root.</strong></p>
+    <p style={{
+      fontSize: sansSerif.sizes.large,
+    }}>
+      No data has been recorded for the selected root.
+    </p>
     <p>
-      Click the record button
+      Select a different root, or click the record button
       <button
         onClick={startRecording}
         style={{
@@ -459,8 +466,9 @@ export default decorate({
       getCachedInteractionData: (...args) => store.getCachedInteractionData(...args),
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
-        : new Set(),
+        : new Map(),
       isRecording: !!store.isRecording,
+      profilerData,
       selectedChartType: store.selectedChartType,
       setSelectedChartType: (chartType: ChartType) => store.setSelectedChartType(chartType),
       showNativeNodes: store.showNativeNodes,
@@ -469,7 +477,7 @@ export default decorate({
         : [],
       timestampsToInteractions: profilerData !== null
         ? profilerData.timestampsToInteractions
-        : new Set(),
+        : new Map(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
       toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
     };
