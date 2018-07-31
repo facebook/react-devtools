@@ -235,39 +235,25 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
             borderRadius: '0.125rem',
           }}
         />
-        {item.snapshots.map((snapshot, snapshotIndex) => {
-          let backgroundColor, borderColor;
-          if (hoveredSnapshot === snapshot) {
-            backgroundColor = theme.state00;
-            borderColor = 'transparent';
-          } else if (selectedSnapshot === snapshot) {
-            backgroundColor = theme.state06;
-            borderColor = 'transparent';
-          } else {
-            backgroundColor = theme.base00;
-            borderColor = theme.state00;
-          }
-
-          return (
-            <div
-              key={snapshotIndex}
-              onClick={() => itemData.viewSnapshot(snapshot)}
-              onMouseEnter={() => this.handleMouseEnter(snapshot)}
-              onMouseLeave={() => this.handleMouseEnter(null)}
-              style={{
-                position: 'absolute',
-                left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
-                width: `${SNAPSHOT_SIZE}px`,
-                height: `${SNAPSHOT_SIZE}px`,
-                borderRadius: `${SNAPSHOT_SIZE}px`,
-                backgroundColor: backgroundColor,
-                border: `2px solid ${borderColor}`,
-                boxSizing: 'border-box',
-                cursor: 'pointer',
-              }}
-            />
-          );
-        })}
+        {item.snapshots.map((snapshot, snapshotIndex) => (
+          <div
+            key={snapshotIndex}
+            onClick={() => itemData.viewSnapshot(snapshot)}
+            onMouseEnter={() => this.handleMouseEnter(snapshot)}
+            onMouseLeave={() => this.handleMouseEnter(null)}
+            style={{
+              position: 'absolute',
+              left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
+              width: `${SNAPSHOT_SIZE}px`,
+              height: `${SNAPSHOT_SIZE}px`,
+              borderRadius: `${SNAPSHOT_SIZE}px`,
+              backgroundColor: hoveredSnapshot === snapshot || selectedSnapshot === snapshot ? theme.state00 : theme.base00,
+              border: `2px solid ${theme.state00}`,
+              boxSizing: 'border-box',
+              cursor: 'pointer',
+            }}
+          />
+        ))}
       </div>
     );
   }

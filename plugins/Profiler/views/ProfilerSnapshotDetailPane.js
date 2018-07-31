@@ -89,7 +89,7 @@ const InteractionLink = Hoverable(({
       color: isHovered ? theme.state00 : theme.base05,
       textDecoration: isHovered ? 'underline' : 'none',
       cursor: 'pointer',
-      padding: '0.5rem 0',
+      padding: '0.5rem',
       borderBottom: `1px solid ${theme.base01}`,
     }}
   >

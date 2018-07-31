@@ -120,7 +120,7 @@ const SnapshotLink = Hoverable(({
         cursor: 'pointer',
         display: 'flex',
         alignItems: 'center',
-        padding: '0.5rem 0',
+        padding: '0.5rem',
         borderBottom: `1px solid ${theme.base01}`,
       }}
     >
