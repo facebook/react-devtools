@@ -105,7 +105,7 @@ const SnapshotLink = Hoverable(({
   theme,
   viewSnapshot,
 }) => {
-  const cpuPercentage = duration / (snapshot.commitTime - previousTimestamp);
+  const cpuPercentage = Math.max(0, Math.min(duration / (snapshot.commitTime - previousTimestamp)));
   const cpuSvg = CPU_SVGS[Math.round(cpuPercentage * (CPU_SVGS.length - 1))];
 
   return (
