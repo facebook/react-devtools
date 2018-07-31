@@ -13,7 +13,7 @@
 
 type Agent = any;
 
-import type {StoreSnapshot} from './ProfilerTypes';
+import type {Interaction, StoreSnapshot} from './ProfilerTypes';
 
 /**
  * The Profiler UI displays the entire React tree, with timing info, for each commit.
@@ -39,10 +39,18 @@ class ProfileCollector {
   }
 
   _takeCommitSnapshotForRoot(id: string, data: any) {
-    const {memoizedInteractions} = data.stateNode;
+    const interactionsArray = data.stateNode.memoizedInteractions !== null
+      ? Array.from(data.stateNode.memoizedInteractions)
+      : [];
+
+    // Map interaction start times to when we started profiling.
+    const memoizedInteractions = interactionsArray.map(({name, timestamp}: Interaction) => ({
+      name,
+      timestamp: timestamp - this._recordingStartTime,
+    }));
 
     const storeSnapshot: StoreSnapshot = {
-      memoizedInteractions: memoizedInteractions !== null ? Array.from(memoizedInteractions) : [],
+      memoizedInteractions,
       committedNodes: Array.from(this._committedNodes),
       commitTime: performance.now() - this._recordingStartTime,
       root: id,

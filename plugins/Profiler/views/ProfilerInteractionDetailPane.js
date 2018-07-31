@@ -55,7 +55,7 @@ const ProfilerInteractionDetailPane = ({
     <div style={{
       padding: '0.5rem',
     }}>
-      <div><strong>Time</strong>: {formatTime(interaction.timestamp)}ms</div>
+      <div><strong>Time</strong>: {formatTime(interaction.timestamp)}s</div>
       <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
       <ul style={{
         listStyle: 'none',
