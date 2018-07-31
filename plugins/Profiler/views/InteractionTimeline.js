@@ -278,15 +278,15 @@ const getChartData = memoize((
   timestampsToInteractions: Map<number, Set<Interaction>>,
 ): ChartData => {
   const items: Array<ChartItem> = [];
-  let stopTime: number = Number.MIN_VALUE;
+  let stopTime = Number.MIN_VALUE;
 
   // eslint-disable-next-line no-unused-vars
   for (const [timestamp, interactions] of timestampsToInteractions) {
     for (const interaction of interactions) {
       const snapshots = Array.from(((interactionsToSnapshots.get(interaction): any): Set<Snapshot>));
-      const lastSnapshotCommitTime = Math.max(stopTime, snapshots[snapshots.length - 1].commitTime);
+      const lastSnapshotCommitTime = snapshots[snapshots.length - 1].commitTime;
 
-      stopTime = lastSnapshotCommitTime;
+      stopTime = Math.max(stopTime, lastSnapshotCommitTime);
 
       items.push({
         interaction,
