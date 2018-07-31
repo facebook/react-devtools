@@ -10,33 +10,22 @@
  */
 'use strict';
 
-export const isStorageApiAvailable =
-  typeof chrome !== 'undefined' &&
-  chrome !== null &&
-  typeof chrome === 'object' &&
-  chrome.storage !== null &&
-  typeof chrome.storage === 'object';
-
-export function get(key: any, defaultValue: any = null): Promise<any> {
-  if (!isStorageApiAvailable) {
-    return Promise.resolve(defaultValue);
+export function get(key: any, defaultValue: any = null): any {
+  let value;
+  try {
+    value = localStorage.getItem(key);
+  } catch (error) {
+    console.error('Could not read from localStorage.', error);
   }
-
-  return new Promise(resolve =>
-    (chrome: any).storage.local.get([key], ({[key]: value}) =>
-      value === undefined
-        ? resolve(defaultValue)
-        : resolve(value)
-    )
-  );
+  return value !== null ? value : defaultValue;
 }
 
-export function set(key: any, value: any): Promise<any> {
-  if (!isStorageApiAvailable) {
-    return Promise.resolve();
+export function set(key: any, value: any): boolean {
+  try {
+    localStorage.setItem(key, value);
+    return true;
+  } catch (error) {
+    console.error('Could not write to localStorage.', error);
   }
-
-  return new Promise(resolve =>
-    (chrome: any).storage.local.set({[key]: value}, resolve)
-  );
+  return false;
 }

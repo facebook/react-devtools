@@ -15,7 +15,10 @@ import type {ChartType, Interaction, RootProfilerData, Snapshot} from './Profile
 
 const {List} = require('immutable');
 const {EventEmitter} = require('events');
-const {get, isStorageApiAvailable, set} = require('../../utils/storage');
+const {get, set} = require('../../utils/storage');
+
+const LOCAL_STORAGE_CHART_TYPE_KEY = 'profiler:selectedChartType';
+const LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY = 'profiler:showNativeNodes';
 
 class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
@@ -26,9 +29,9 @@ class ProfilerStore extends EventEmitter {
   processedInteractions: {[id: string]: Interaction} = {};
   rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
-  selectedChartType: ChartType = 'flamegraph';
+  selectedChartType: ChartType = ((get(LOCAL_STORAGE_CHART_TYPE_KEY, 'flamegraph'): any): ChartType);
   selectedRoot: string | null = null;
-  showNativeNodes: boolean = false;
+  showNativeNodes: boolean = ((get(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, false): any): boolean);
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -39,16 +42,6 @@ class ProfilerStore extends EventEmitter {
     this._mainStore.on('roots', this.saveRoots);
     this._mainStore.on('selected', this.updateSelected);
     this._mainStore.on('storeSnapshot', this.storeSnapshot);
-
-    // Restore the user's last selected values if they've been persisted.
-    if (isStorageApiAvailable) {
-      get('profiler:selectedChartType', 'flamegraph').then(selectedChartType => {
-        this.selectedChartType = selectedChartType;
-      });
-      get('profiler:showNativeNodes', false).then(showNativeNodes => {
-        this.showNativeNodes = showNativeNodes;
-      });
-    }
   }
 
   off() {
@@ -96,13 +89,13 @@ class ProfilerStore extends EventEmitter {
   setSelectedChartType(selectedChartType: ChartType) {
     this.selectedChartType = selectedChartType;
     this.emit('selectedChartType', selectedChartType);
-    set('profiler:selectedChartType', selectedChartType);
+    set(LOCAL_STORAGE_CHART_TYPE_KEY, selectedChartType);
   }
 
   setShowNativeNodes(showNativeNodes: boolean) {
     this.showNativeNodes = showNativeNodes;
     this.emit('showNativeNodes', showNativeNodes);
-    set('profiler:showNativeNodes', showNativeNodes);
+    set(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, showNativeNodes);
   }
 
   setIsRecording(isRecording: boolean): void {
