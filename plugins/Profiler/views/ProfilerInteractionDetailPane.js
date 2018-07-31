@@ -14,7 +14,7 @@ import type {Theme} from '../../../frontend/types';
 import type {Interaction, Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
-import { formatDuration, formatTime } from './constants';
+import { formatDuration, formatPercentage, formatTime } from './constants';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 import Hoverable from '../../../frontend/Hoverable';
 
@@ -34,58 +34,79 @@ const ProfilerInteractionDetailPane = ({
   snapshots,
   theme,
   viewSnapshot,
-}: Props) => (
-  <Fragment>
-    <div
-      style={{
-        height: '34px',
-        lineHeight: '34px',
-        padding: '0 0.5rem',
-        backgroundColor: theme.base01,
-        borderBottom: `1px solid ${theme.base03}`,
-        fontSize: sansSerif.sizes.large,
-        overflow: 'hidden',
-        textOverflow: 'ellipsis',
-        whiteSpace: 'nowrap',
-      }}
-      title={interaction.name}
-    >
-      {interaction.name}
-    </div>
-    <div style={{
-      padding: '0.5rem',
-    }}>
-      <div><strong>Time</strong>: {formatTime(interaction.timestamp)}s</div>
-      <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
-      <ul style={{
-        listStyle: 'none',
-        margin: 0,
-        padding: 0,
+}: Props) => {
+  let currentTimestamp = interaction.timestamp;
+
+  return (
+    <Fragment>
+      <div
+        style={{
+          height: '34px',
+          lineHeight: '34px',
+          padding: '0 0.5rem',
+          backgroundColor: theme.base01,
+          borderBottom: `1px solid ${theme.base03}`,
+          fontSize: sansSerif.sizes.large,
+          overflow: 'hidden',
+          textOverflow: 'ellipsis',
+          whiteSpace: 'nowrap',
+        }}
+        title={interaction.name}
+      >
+        {interaction.name}
+      </div>
+      <div style={{
+        padding: '0.5rem',
       }}>
-        {Array.from(snapshots).map((snapshot, index) => {
-          let duration = 0;
-          snapshot.committedNodes.forEach(nodeID => {
-            duration = Math.max(snapshot.nodes.getIn([nodeID, 'actualDuration'], duration));
-          });
+        <div><strong>Time</strong>: {formatTime(interaction.timestamp)}s</div>
+        <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
+        <ul style={{
+          listStyle: 'none',
+          margin: 0,
+          padding: 0,
+        }}>
+          {Array.from(snapshots).map((snapshot, index) => {
+            let duration = 0;
+            snapshot.committedNodes.forEach(nodeID => {
+              duration = Math.max(snapshot.nodes.getIn([nodeID, 'actualDuration'], duration));
+            });
 
-          return (
-            <SnapshotLink
-              duration={duration}
-              key={index}
-              onClick={() => viewSnapshot(snapshot)}
-              snapshot={snapshot}
-              theme={theme}
-              viewSnapshot={viewSnapshot}
-            />
-          );
-        })}
-      </ul>
-    </div>
-  </Fragment>
-);
+            const previousTimestamp = currentTimestamp;
+            currentTimestamp = snapshot.commitTime;
 
-const SnapshotLink = Hoverable(
-  ({ duration, isHovered, onClick, onMouseEnter, onMouseLeave, snapshot, theme, viewSnapshot }) => (
+            return (
+              <SnapshotLink
+                duration={duration}
+                key={index}
+                onClick={() => viewSnapshot(snapshot)}
+                previousTimestamp={previousTimestamp}
+                snapshot={snapshot}
+                theme={theme}
+                viewSnapshot={viewSnapshot}
+              />
+            );
+          })}
+        </ul>
+      </div>
+    </Fragment>
+  );
+};
+
+const SnapshotLink = Hoverable(({
+  duration,
+  isHovered,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  previousTimestamp,
+  snapshot,
+  theme,
+  viewSnapshot,
+}) => {
+  const cpuPercentage = duration / (snapshot.commitTime - previousTimestamp);
+  const cpuSvg = CPU_SVGS[Math.round(cpuPercentage * (CPU_SVGS.length - 1))];
+
+  return (
     <li
       onClick={onClick}
       onMouseEnter={onMouseEnter}
@@ -95,11 +116,62 @@ const SnapshotLink = Hoverable(
         textDecoration: isHovered ? 'underline' : 'none',
         cursor: 'pointer',
         marginBottom: '0.5rem',
+        display: 'flex',
+        alignItems: 'center',
+        paddingBottom: '0.5rem',
+        borderBottom: `1px solid ${theme.base01}`,
       }}
     >
-      Duration: {formatDuration(duration)}ms, at {formatTime(snapshot.commitTime)}s
+      {cpuSvg}
+      <ul style={{paddingLeft: '1.5rem'}}>
+        <li>Duration: {formatDuration(duration)}ms</li>
+        <li>Time: {formatTime(snapshot.commitTime)}s</li>
+        <li>CPU: {formatPercentage(cpuPercentage)}%</li>
+      </ul>
     </li>
-  )
+  );
+});
+
+const CPU_STYLE = {
+  width: '1.5rem',
+  height: '1.5rem',
+  fill: 'currentColor',
+  marginRight: '0.5rem',
+};
+
+const CPU_0 = (
+  <svg style={CPU_STYLE} viewBox="0 0 24 24">
+    <path fillOpacity=".3" d="M2 22h20V2z" />
+  </svg>
 );
+
+const CPU_25 = (
+  <svg style={CPU_STYLE} viewBox="0 0 24 24">
+    <path fillOpacity=".3" d="M2 22h20V2z" />
+    <path d="M12 12L2 22h10z" />
+  </svg>
+);
+
+const CPU_50 = (
+  <svg style={CPU_STYLE} viewBox="0 0 24 24">
+    <path fillOpacity=".3" d="M2 22h20V2z" />
+    <path d="M14 10L2 22h12z" />
+  </svg>
+);
+
+const CPU_75 = (
+  <svg style={CPU_STYLE} viewBox="0 0 24 24">
+    <path fillOpacity=".3" d="M2 22h20V2z" />
+    <path d="M17 7L2 22h15z" />
+  </svg>
+);
+
+const CPU_100 = (
+  <svg style={CPU_STYLE} viewBox="0 0 24 24">
+    <path d="M2 22h20V2z" />
+  </svg>
+);
+
+const CPU_SVGS = [CPU_0, CPU_25, CPU_50, CPU_75, CPU_100];
 
 export default ProfilerInteractionDetailPane;

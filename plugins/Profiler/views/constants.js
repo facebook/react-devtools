@@ -34,5 +34,6 @@ export const getGradientColor = (value: number) => {
   return gradient[Math.round(value * gradientMaxIndex)];
 };
 
-export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
 export const formatDuration = (duration: number) => Math.round(duration * 10) / 10;
+export const formatPercentage = (percentage: number) => Math.round(percentage * 100);
+export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
