@@ -80,6 +80,7 @@ const ProfilerInteractionDetailPane = ({
                 key={index}
                 onClick={() => viewSnapshot(snapshot)}
                 previousTimestamp={previousTimestamp}
+                selectedSnapshot={selectedSnapshot}
                 snapshot={snapshot}
                 theme={theme}
                 viewSnapshot={viewSnapshot}
@@ -99,6 +100,7 @@ const SnapshotLink = Hoverable(({
   onMouseEnter,
   onMouseLeave,
   previousTimestamp,
+  selectedSnapshot,
   snapshot,
   theme,
   viewSnapshot,
@@ -112,13 +114,13 @@ const SnapshotLink = Hoverable(({
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
+        backgroundColor: isHovered ? theme.state03 : (selectedSnapshot === snapshot ? theme.base01 : 'transparent'),
         color: isHovered ? theme.state00 : theme.base05,
         textDecoration: isHovered ? 'underline' : 'none',
         cursor: 'pointer',
-        marginBottom: '0.5rem',
         display: 'flex',
         alignItems: 'center',
-        paddingBottom: '0.5rem',
+        padding: '0.5rem 0',
         borderBottom: `1px solid ${theme.base01}`,
       }}
     >

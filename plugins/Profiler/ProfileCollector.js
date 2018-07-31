@@ -44,6 +44,8 @@ class ProfileCollector {
       : [];
 
     // Map interaction start times to when we started profiling.
+    // We clone (rather than mutate) the interactions in stateNode.memoizedInteractions,
+    // Because we don't want to affect user code that might be consuming these Interactions via Profiler.
     const memoizedInteractions = interactionsArray.map(({name, timestamp}: Interaction) => ({
       name,
       timestamp: timestamp - this._recordingStartTime,

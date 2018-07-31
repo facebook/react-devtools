@@ -127,9 +127,13 @@ class ProfilerStore extends EventEmitter {
 
       snapshots.push(snapshot);
 
-      snapshot.memoizedInteractions.forEach((interaction: Interaction) => {
-        interaction = this.processInteraction(interaction);
+      // Restore Interaction instance equality between commits,
+      // Since this will be lost due to Bridge serialization.
+      snapshot.memoizedInteractions = snapshot.memoizedInteractions.map(
+        (interaction: Interaction) => this.processInteraction(interaction)
+      );
 
+      snapshot.memoizedInteractions.forEach((interaction: Interaction) => {
         if (interactionsToSnapshots.has(interaction)) {
           ((interactionsToSnapshots.get(interaction): any): Set<Snapshot>).add(snapshot);
         } else {

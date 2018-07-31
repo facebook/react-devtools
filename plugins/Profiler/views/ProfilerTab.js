@@ -33,6 +33,7 @@ import SnapshotFlamegraph from './SnapshotFlamegraph';
 import SnapshotRanked from './SnapshotRanked';
 import ProfilerTabToolbar from './ProfilerTabToolbar';
 import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
+import ProfilerSnapshotDetailPane from './ProfilerSnapshotDetailPane';
 import ProfilerInteractionDetailPane from './ProfilerInteractionDetailPane';
 
 type Props = {|
@@ -156,6 +157,11 @@ class ProfilerTab extends React.Component<Props, State> {
 
   stopInspecting = () => this.setState({ isInspectingSelectedFiber: false });
 
+  viewInteraction = (interaction: Interaction) =>
+    this.setState({
+      selectedInteraction: interaction,
+    }, () => this.props.setSelectedChartType('interactions'));
+
   viewSnapshot = (snapshot: Snapshot) =>
     this.setState({
       isInspectingSelectedFiber: false,
@@ -254,11 +260,20 @@ class ProfilerTab extends React.Component<Props, State> {
     }
 
     let details;
-    if (selectedRootID === null || profilerData === null) {
+    if (isRecording || selectedRootID === null || profilerData === null) {
       // Edge case where keyboard up/down arrows change selected root in the Elements tab.
       // This is a bug that should be fixed separately from the Profiler plug-in.
       details = (
         <DetailsNoData theme={theme} />
+      );
+    } else if ((selectedChartType === 'flamegraph' || selectedChartType === 'ranked') && selectedFiberName === null) {
+      details = (
+        <ProfilerSnapshotDetailPane
+          selectedInteraction={selectedInteraction}
+          snapshot={snapshot}
+          theme={theme}
+          viewInteraction={this.viewInteraction}
+        />
       );
     } else if (selectedChartType === 'interactions' && selectedInteraction !== null) {
       details = (
