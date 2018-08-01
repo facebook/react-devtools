@@ -104,7 +104,8 @@ const ProfilerTabToolbar = ({
       <Fragment>
         <RadioOption
           icon={Icons.FLAME_CHART}
-          isChecked={!isInspectingSelectedFiber && selectedChartType === 'flamegraph'}
+          isChecked={selectedChartType === 'flamegraph'}
+          isDisabled={isInspectingSelectedFiber}
           label="Flamegraph"
           onChange={() => selectChart('flamegraph')}
           theme={theme}
@@ -113,7 +114,8 @@ const ProfilerTabToolbar = ({
         &nbsp;
         <RadioOption
           icon={Icons.RANKED_CHART}
-          isChecked={!isInspectingSelectedFiber && selectedChartType === 'ranked'}
+          isChecked={selectedChartType === 'ranked'}
+          isDisabled={isInspectingSelectedFiber}
           label="Ranked"
           onChange={() => selectChart('ranked')}
           theme={theme}
@@ -122,7 +124,8 @@ const ProfilerTabToolbar = ({
         &nbsp;
         <RadioOption
           icon={Icons.INTERACTION}
-          isChecked={!isInspectingSelectedFiber && selectedChartType === 'interactions'}
+          isChecked={selectedChartType === 'interactions'}
+          isDisabled={isInspectingSelectedFiber}
           label={`Interactions (${interactionsCount})`}
           onChange={() => selectChart('interactions')}
           theme={theme}
@@ -191,7 +194,7 @@ const HRule = ({ theme }) => (
 type RadioOptionProps = {|
   icon: string,
   isChecked: boolean,
-  isDisabled?: boolean,
+  isDisabled: boolean,
   label: string,
   isHovered: boolean,
   onChange: Function,

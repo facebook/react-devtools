@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {Snapshot} from '../ProfilerTypes';
+import type {ChartType, Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
 import {monospace} from '../../../frontend/Themes/Fonts';
@@ -27,18 +27,22 @@ type Props = {|
   inspect: (id: string, name: string) => void,
   isInspectingSelectedFiber: boolean,
   name?: string,
+  selectedChartType: ChartType,
   snapshot: Snapshot,
   snapshotFiber: any,
   theme: Theme,
+  toggleInspectingSelectedFiber: Function,
 |};
 
 const ProfilerFiberDetailPane = ({
   inspect,
   isInspectingSelectedFiber,
   name = 'Unknown',
+  selectedChartType,
   snapshot,
   snapshotFiber,
   theme,
+  toggleInspectingSelectedFiber,
 }: Props) => (
   <Fragment>
     <div style={{
@@ -65,9 +69,14 @@ const ProfilerFiberDetailPane = ({
         {name}
       </div>
       <IconButton
-        disabled={isInspectingSelectedFiber}
-        icon={Icons.BARS}
-        onClick={inspect}
+        icon={
+          isInspectingSelectedFiber
+            ? selectedChartType === 'flamegraph'
+              ? Icons.FLAME_CHART
+              : Icons.RANKED_CHART
+            : Icons.BARS
+        }
+        onClick={toggleInspectingSelectedFiber}
         theme={theme}
         title={`Inspect ${name}`}
       />

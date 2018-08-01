@@ -121,8 +121,6 @@ class ProfilerTab extends React.Component<Props, State> {
   handleSnapshotSliderChange = (event: SyntheticEvent<HTMLInputElement>) =>
     this.setState({ snapshotIndex: parseInt(event.currentTarget.value, 10) });
 
-  inspect = () => this.setState({ isInspectingSelectedFiber: true });
-
   inspectFiber = (id: string, name: string) =>
     this.setState({
       isInspectingSelectedFiber: true,
@@ -156,6 +154,10 @@ class ProfilerTab extends React.Component<Props, State> {
     });
 
   stopInspecting = () => this.setState({ isInspectingSelectedFiber: false });
+
+  toggleInspectingSelectedFiber = () => this.setState(state => ({
+    isInspectingSelectedFiber: !state.isInspectingSelectedFiber,
+  }));
 
   viewInteraction = (interaction: Interaction) =>
     this.setState({
@@ -288,11 +290,12 @@ class ProfilerTab extends React.Component<Props, State> {
     } else if (selectedChartType !== 'interactions' && selectedFiberName !== null) {
       details = (
         <ProfilerFiberDetailPane
-          inspect={this.inspect}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           name={selectedFiberName}
+          selectedChartType={selectedChartType}
           snapshot={snapshot}
           snapshotFiber={snapshotFiber}
+          toggleInspectingSelectedFiber={this.toggleInspectingSelectedFiber}
           theme={theme}
         />
       );

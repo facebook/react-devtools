@@ -15,7 +15,7 @@ import Hoverable from '../../../frontend/Hoverable';
 import SvgIcon from '../../../frontend/SvgIcon';
 
 const IconButton = Hoverable(
-  ({ disabled, icon, isActive = false, isHovered, isTransparent = false, onClick, onMouseEnter, onMouseLeave, theme, title }) => (
+  ({ disabled, icon, isActive = false, isHovered, isTransparent = false, onClick, onMouseEnter, onMouseLeave, style, theme, title }) => (
     <button
       disabled={disabled}
       onClick={onClick}
@@ -29,6 +29,7 @@ const IconButton = Hoverable(
         color: isActive ? theme.state00 : (isHovered ? theme.state06 : theme.base05),
         opacity: disabled ? 0.5 : 1,
         padding: '4px',
+        ...style,
       }}
       title={title}
     >
