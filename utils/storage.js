@@ -13,7 +13,7 @@
 export function get(key: any, defaultValue: any = null): any {
   let value;
   try {
-    value = JSON.parse(localStorage.getItem(key));
+    value = JSON.parse((localStorage.getItem(key): any));
   } catch (error) {
     console.error('Could not read from localStorage.', error);
   }

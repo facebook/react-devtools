@@ -24,7 +24,6 @@ import IconButton from './IconButton';
 const emptyFunction = () => {};
 
 type Props = {|
-  inspect: (id: string, name: string) => void,
   isInspectingSelectedFiber: boolean,
   name?: string,
   selectedChartType: ChartType,
@@ -35,7 +34,6 @@ type Props = {|
 |};
 
 const ProfilerFiberDetailPane = ({
-  inspect,
   isInspectingSelectedFiber,
   name = 'Unknown',
   selectedChartType,
