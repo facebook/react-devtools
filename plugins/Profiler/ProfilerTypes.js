@@ -51,6 +51,7 @@ export type RootProfilerData = {|
 export type Snapshot = {|
   committedNodes: Array<string>,
   commitTime: number,
+  duration: number,
   memoizedInteractions: Array<Interaction>,
   nodes: Map,
   root: string,
@@ -59,6 +60,7 @@ export type Snapshot = {|
 export type StoreSnapshot = {|
   committedNodes: Array<string>,
   commitTime: number,
+  duration: number,
   memoizedInteractions: Array<Interaction>,
   root: string,
 |};

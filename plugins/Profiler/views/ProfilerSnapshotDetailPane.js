@@ -14,7 +14,7 @@ import type {Theme} from '../../../frontend/types';
 import type {Interaction, Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
-import { formatTime } from './constants';
+import {formatDuration, formatTime} from './constants';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 import Hoverable from '../../../frontend/Hoverable';
 
@@ -50,13 +50,19 @@ const ProfilerSnapshotDetailPane = ({
     <div style={{
       padding: '0.5rem',
     }}>
-      <div><strong>Time</strong>: {formatTime(snapshot.commitTime)}s</div>
+      <div><strong>Commit time</strong>: {formatTime(snapshot.commitTime)}s</div>
+      <div style={{marginTop: '0.5rem'}}><strong>Render duration</strong>: {formatDuration(snapshot.duration)}s</div>
       <div style={{margin: '0.5rem 0'}}><strong>Interactions</strong>:</div>
       <ul style={{
         listStyle: 'none',
         margin: 0,
         padding: 0,
       }}>
+        {snapshot.memoizedInteractions.length === 0 && (
+          <li style={{padding: '0.5rem'}}>
+            None
+          </li>
+        )}
         {snapshot.memoizedInteractions.map((interaction, index) => (
           <InteractionLink
             interaction={interaction}
@@ -86,7 +92,7 @@ const InteractionLink = Hoverable(({
     onMouseLeave={onMouseLeave}
     style={{
       backgroundColor: isHovered ? theme.state03 : (selectedInteraction === interaction ? theme.base01 : 'transparent'),
-      color: isHovered ? theme.state00 : theme.base05,
+      color: isHovered ? theme.state00 : 'inherit',
       textDecoration: isHovered ? 'underline' : 'none',
       cursor: 'pointer',
       padding: '0.5rem',

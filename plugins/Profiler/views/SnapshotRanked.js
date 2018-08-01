@@ -217,8 +217,6 @@ const getNodeIndex = memoize((rankedData: RankedData, id: string | null): number
 });
 
 const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean): RankedData => {
-  let maxValue = 0;
-
   const nodes = snapshot.committedNodes
     .filter(nodeID => {
       const node = snapshot.nodes.get(nodeID);
@@ -232,8 +230,6 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
       const node = snapshot.nodes.get(nodeID).toJSON();
       const name = node.name || 'Unknown';
 
-      maxValue = Math.max(node.actualDuration, maxValue);
-
       return {
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
@@ -244,8 +240,8 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
     .sort((a, b) => b.value - a.value);
 
   return {
+    maxValue: snapshot.duration,
     nodes,
-    maxValue,
   };
 };
 

@@ -66,17 +66,11 @@ const ProfilerInteractionDetailPane = ({
           padding: 0,
         }}>
           {Array.from(snapshots).map((snapshot, index) => {
-            let duration = 0;
-            snapshot.committedNodes.forEach(nodeID => {
-              duration = Math.max(snapshot.nodes.getIn([nodeID, 'actualDuration'], duration));
-            });
-
             const previousTimestamp = currentTimestamp;
             currentTimestamp = snapshot.commitTime;
 
             return (
               <SnapshotLink
-                duration={duration}
                 key={index}
                 onClick={() => viewSnapshot(snapshot)}
                 previousTimestamp={previousTimestamp}
@@ -94,7 +88,6 @@ const ProfilerInteractionDetailPane = ({
 };
 
 const SnapshotLink = Hoverable(({
-  duration,
   isHovered,
   onClick,
   onMouseEnter,
@@ -105,7 +98,7 @@ const SnapshotLink = Hoverable(({
   theme,
   viewSnapshot,
 }) => {
-  const cpuPercentage = Math.max(0, Math.min(duration / (snapshot.commitTime - previousTimestamp)));
+  const cpuPercentage = Math.max(0, Math.min(snapshot.duration / (snapshot.commitTime - previousTimestamp)));
   const cpuSvg = CPU_SVGS[Math.round(cpuPercentage * (CPU_SVGS.length - 1))];
 
   return (
@@ -115,7 +108,7 @@ const SnapshotLink = Hoverable(({
       onMouseLeave={onMouseLeave}
       style={{
         backgroundColor: isHovered ? theme.state03 : (selectedSnapshot === snapshot ? theme.base01 : 'transparent'),
-        color: isHovered ? theme.state00 : theme.base05,
+        color: isHovered ? theme.state00 : 'inherit',
         textDecoration: isHovered ? 'underline' : 'none',
         cursor: 'pointer',
         display: 'flex',
@@ -126,7 +119,7 @@ const SnapshotLink = Hoverable(({
     >
       {cpuSvg}
       <ul style={{paddingLeft: '1.5rem'}}>
-        <li>Duration: {formatDuration(duration)}ms</li>
+        <li>Duration: {formatDuration(snapshot.duration)}ms</li>
         <li>Time: {formatTime(snapshot.commitTime)}s</li>
         <li>CPU: {formatPercentage(cpuPercentage)}%</li>
       </ul>

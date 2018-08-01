@@ -26,6 +26,7 @@ class ProfileCollector {
   _agent: Agent;
   _committedNodes: Set<string> = new Set();
   _isRecording: boolean = false;
+  _maxActualDuration: number = 0;
   _recordingStartTime: number = 0;
 
   constructor(agent: Agent) {
@@ -55,6 +56,7 @@ class ProfileCollector {
       memoizedInteractions,
       committedNodes: Array.from(this._committedNodes),
       commitTime: performance.now() - this._recordingStartTime,
+      duration: this._maxActualDuration,
       root: id,
     };
 
@@ -82,6 +84,7 @@ class ProfileCollector {
     }
 
     this._committedNodes.add(data.id);
+    this._maxActualDuration = Math.max(this._maxActualDuration, data.actualDuration);
   };
 
   _onRootCommitted = (id: string, data: any) => {
@@ -92,7 +95,10 @@ class ProfileCollector {
     // Once all roots have been committed,
     // Take a snapshot of the current tree.
     this._takeCommitSnapshotForRoot(id, data);
+
+    // Then reset data for the next snapshot.
     this._committedNodes = new Set();
+    this._maxActualDuration = 0;
   }
 
   _onUnmount = (id: string) => {

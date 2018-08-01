@@ -263,14 +263,12 @@ const convertSnapshotToChartData = (
   showNativeNodes: boolean,
   snapshot: Snapshot,
 ): FlamegraphData => {
-  const maxDuration = getMaxDurationForSnapshot(snapshot);
-
   const flamegraphData: FlamegraphData = {
     flameGraphDepth: calculateFlameGraphDepth(showNativeNodes, snapshot),
     lazyIDToDepthMap: {},
     lazyIDToXMap: {},
     lazyIDsByDepth: [],
-    maxDuration,
+    maxDuration: snapshot.duration,
     showNativeNodes,
   };
 
@@ -337,17 +335,6 @@ const getItemData = memoize((
     width,
   };
 });
-
-const getMaxDurationForSnapshot = (snapshot: Snapshot): number => {
-  let maxDuration = 0;
-  snapshot.committedNodes.forEach(nodeID => {
-    const duration = snapshot.nodes.getIn([nodeID, 'actualDuration']);
-    if (duration > 0) {
-      maxDuration = Math.max(maxDuration, duration);
-    }
-  });
-  return maxDuration;
-};
 
 const getMaxTreeBaseDuration = (
   flamegraphData: FlamegraphData,
