@@ -13,7 +13,7 @@
 export function get(key: any, defaultValue: any = null): any {
   let value;
   try {
-    value = localStorage.getItem(key);
+    value = JSON.parse(localStorage.getItem(key));
   } catch (error) {
     console.error('Could not read from localStorage.', error);
   }
@@ -22,7 +22,7 @@ export function get(key: any, defaultValue: any = null): any {
 
 export function set(key: any, value: any): boolean {
   try {
-    localStorage.setItem(key, value);
+    localStorage.setItem(key, JSON.stringify(value));
     return true;
   } catch (error) {
     console.error('Could not write to localStorage.', error);
