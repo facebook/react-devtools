@@ -108,57 +108,104 @@ type InteractionsListProps = {|
   width: number,
 |};
 
-const InteractionsList = ({
-  chartData,
-  height,
-  selectedInteraction,
-  selectedSnapshot,
-  selectInteraction,
-  theme,
-  viewSnapshot,
-  width,
-}: InteractionsListProps) => {
-  // If a commit contains no interactions, display a fallback message.
-  if (chartData.items.length === 0) {
+class InteractionsList extends PureComponent<InteractionsListProps, void> {
+  handleKeyDown = event => {
+    if (event.keyCode === UP_ARROW || event.keyCode === DOWN_ARROW) {
+      // Don't let the main Elements tab change root selection for keyboard arrows.
+      event.preventDefault();
+
+      const {
+        chartData,
+        selectedInteraction,
+        selectInteraction,
+      } = this.props;
+
+      const items = chartData.items;
+      const index = items.findIndex(({ interaction }) => selectedInteraction === interaction);
+
+      // Select a new interaction...
+      let newIndex = 0;
+      if (event.keyCode === UP_ARROW) {
+        newIndex = index > 0
+          ? index - 1
+          : items.length - 1;
+      } else {
+        newIndex = index < items.length - 1
+          ? index + 1
+          : 0;
+      }
+
+      selectInteraction(items[newIndex].interaction);
+    }
+  };
+
+  render() {
+    const {
+      chartData,
+      height,
+      selectedInteraction,
+      selectedSnapshot,
+      selectInteraction,
+      theme,
+      viewSnapshot,
+      width,
+    } = this.props;
+
+    // If a commit contains no interactions, display a fallback message.
+    if (chartData.items.length === 0) {
+      return (
+        <div style={{
+          height,
+          width,
+          flex: 1,
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          No interactions were recorded for the current root.
+        </div>
+      );
+    }
+
+    // The following conversion methods are memoized,
+    // So it's okay to call them on every render.
+    const itemData = getItemData(
+      chartData,
+      selectedInteraction,
+      selectedSnapshot,
+      selectInteraction,
+      theme,
+      viewSnapshot,
+      width,
+    );
+
     return (
-      <div style={{
-        height,
-        width,
-        flex: 1,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        No interactions were recorded for the current root.
+      <div
+        onKeyDown={this.handleKeyDown}
+        style={{
+          outline: 'none',
+          height,
+          width,
+        }}
+        tabIndex={0}
+      >
+        <List
+          height={height}
+          itemCount={chartData.items.length}
+          itemData={itemData}
+          itemSize={ITEM_SIZE}
+          width={width}
+        >
+          {ListItem}
+        </List>
       </div>
     );
   }
+}
 
-  // The following conversion methods are memoized,
-  // So it's okay to call them on every render.
-  const itemData = getItemData(
-    chartData,
-    selectedInteraction,
-    selectedSnapshot,
-    selectInteraction,
-    theme,
-    viewSnapshot,
-    width,
-  );
-
-  return (
-    <List
-      height={height}
-      itemCount={chartData.items.length}
-      itemData={itemData}
-      itemSize={ITEM_SIZE}
-      width={width}
-    >
-      {ListItem}
-    </List>
-  );
-};
+const UP_ARROW = 38;
+const DOWN_ARROW = 40;
 
 type ListItemProps = {|
   data: ItemData,
@@ -180,6 +227,7 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
     isHovered: true,
     hoveredSnapshot: snapshot,
   });
+
   handleMouseLeave = () => this.setState({isHovered: false});
 
   render() {
