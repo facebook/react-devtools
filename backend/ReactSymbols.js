@@ -25,6 +25,6 @@ module.exports = {
   PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
   STRICT_MODE_NUMBER: 0xeacc,
   STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
-  TIMEOUT_NUMBER: 0xead1,
-  TIMEOUT_SYMBOL_STRING: 'Symbol(react.timeout)',
+  PLACEHOLDER_NUMBER: 0xead1,
+  PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
 };
