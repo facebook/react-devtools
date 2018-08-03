@@ -57,8 +57,6 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var text = null;
 
   // Profiler data
-  // TODO (bvaughn) Maybe we only need to store treeBaseDuration.
-  // We don't actually use the duration or start times.
   var actualDuration = null;
   var actualStartTime = null;
   var treeBaseDuration = null;

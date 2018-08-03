@@ -70,9 +70,6 @@ type RenderDurationsProps = {|
   width: number,
 |};
 
-// TODO (bvaughn) Horizontally window and used a fixed size.
-// If too little data, then center align.
-// Verify that horizontal scroling works properly within DevTools first.
 const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, width }: RenderDurationsProps) => {
   const { maxValue, nodes } = data;
 
