@@ -22,10 +22,6 @@ module.exports = {
     filename: '[name].js',
   },
 
-  alias: {
-    'react-dom': 'react-dom/cjs/react-dom.development.js',
-  },
-
   module: {
     loaders: [{
       test: /\.js$/,
