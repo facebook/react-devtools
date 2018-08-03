@@ -1,6 +1,5 @@
 {
   "dependencies": {
-    "dagre": "^0.7.3",
-    "react-virtualized-auto-sizer": "^1.0.1"
+    "dagre": "^0.7.3"
   }
 }

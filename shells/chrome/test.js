@@ -4,7 +4,7 @@ const chromeLaunch = require('chrome-launch'); // eslint-disable-line import/no-
 const {resolve} = require('path');
 
 const EXTENSION_PATH = resolve('shells/chrome/build/unpacked');
-const START_URL = 'http://localhost:3000';
+const START_URL = 'https://facebook.github.io/react/';
 
 chromeLaunch(START_URL, {
   args: [`--load-extension=${EXTENSION_PATH}`],
