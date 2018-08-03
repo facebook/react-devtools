@@ -29,5 +29,5 @@ module.exports = {
   ContextProvider: 13,
   ForwardRef: 14,
   Profiler: 15,
-  TimeoutComponent: 16,
+  Placeholder: 16,
 };
