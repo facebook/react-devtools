@@ -40,7 +40,7 @@ class ProfileCollector {
   }
 
   _takeCommitSnapshotForRoot(id: string, data: any) {
-    const interactionsArray = data.stateNode.memoizedInteractions !== null
+    const interactionsArray = data.stateNode.memoizedInteractions != null
       ? Array.from(data.stateNode.memoizedInteractions)
       : [];
 
