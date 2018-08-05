@@ -33,6 +33,7 @@
     "react-color": "^2.11.7",
     "react-dom": "^16.4.1",
     "react-portal": "^3.1.0",
+    "scroll-into-view-if-needed": "^2.2.16",
     "webpack": "1.12.9"
   },
   "license": "BSD-3-Clause",
