@@ -18,6 +18,7 @@ var SearchUtils = require('./SearchUtils');
 
 var decorate = require('./decorate');
 var {monospace, sansSerif} = require('./Themes/Fonts');
+const scrollIntoView = require('scroll-into-view-if-needed');
 
 import type {List} from 'immutable';
 import type {Theme} from './types';
@@ -44,20 +45,18 @@ class TreeView extends React.Component<Props> {
     if (!this.node) {
       return;
     }
-    var val = 0;
-    var height = toNode.offsetHeight;
-    while (toNode && this.node.contains(toNode)) {
-      val += toNode.offsetTop;
-      toNode = toNode.offsetParent;
-    }
-    var top = this.node.scrollTop;
-    var rel = val - this.node.offsetTop;
-    var margin = 40;
-    if (top > rel - margin) {
-      this.node.scrollTop = rel - margin;
-    } else if (top + this.node.offsetHeight < rel + height + margin) {
-      this.node.scrollTop = rel - this.node.offsetHeight + height + margin;
-    }
+    // @TODO timeout used to workaround for breadcrumbs affecting scrollview height
+    clearTimeout(this.pendingScroll);
+
+    const target = toNode.children[0] || toNode;
+    this.pendingScroll = setTimeout(() => {
+      scrollIntoView(target, {
+        scrollMode: 'if-needed',
+        block: 'nearest',
+        inline: 'nearest',
+        boundary: parent => this.node.contains(parent),
+      });
+    }, 1);
   }
 
   render() {
