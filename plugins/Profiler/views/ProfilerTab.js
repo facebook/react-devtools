@@ -328,7 +328,6 @@ class ProfilerTab extends React.Component<Props, State> {
             borderBottom: `1px solid ${theme.base03}`,
           }}>
             <ProfilerTabToolbar
-              handleSnapshotSliderChange={this.handleSnapshotSliderChange}
               interactionsCount={interactionsToSnapshots.size}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
@@ -336,6 +335,8 @@ class ProfilerTab extends React.Component<Props, State> {
               selectNextSnapshotIndex={this.selectNextSnapshotIndex}
               selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
               selectedChartType={selectedChartType}
+              selectedSnapshot={snapshot}
+              selectSnapshot={this.selectSnapshot}
               showNativeNodes={this.props.showNativeNodes}
               snapshotIndex={snapshotIndex}
               snapshots={snapshots}

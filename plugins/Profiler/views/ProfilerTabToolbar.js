@@ -19,11 +19,13 @@ import Hoverable from '../../../frontend/Hoverable';
 import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
 import IconButton from './IconButton';
+import SnapshotSelector from './SnapshotSelector';
 
 const CHART_LABEL_WIDTH_THRESHOLD = 615;
 
+type SelectSnapshot = (snapshot: Snapshot) => void;
+
 type Props = {|
-  handleSnapshotSliderChange: Function,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
@@ -31,6 +33,8 @@ type Props = {|
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedSnapshot: Snapshot,
+  selectSnapshot: SelectSnapshot,
   showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
@@ -48,7 +52,6 @@ export default (props: Props) => (
 );
 
 type ProfilerTabToolbarProps = {
-  handleSnapshotSliderChange: Function,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
@@ -56,6 +59,8 @@ type ProfilerTabToolbarProps = {
   selectNextSnapshotIndex: Function,
   selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedSnapshot: Snapshot,
+  selectSnapshot: SelectSnapshot,
   showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
@@ -66,7 +71,6 @@ type ProfilerTabToolbarProps = {
 };
 
 const ProfilerTabToolbar = ({
-  handleSnapshotSliderChange,
   interactionsCount,
   isInspectingSelectedFiber,
   isRecording,
@@ -74,6 +78,8 @@ const ProfilerTabToolbar = ({
   selectNextSnapshotIndex,
   selectPreviousSnapshotIndex,
   selectedChartType,
+  selectedSnapshot,
+  selectSnapshot,
   showNativeNodes,
   snapshotIndex,
   snapshots,
@@ -161,13 +167,11 @@ const ProfilerTabToolbar = ({
           theme={theme}
           title="Previous render"
         />
-        <input
+        <SnapshotSelector
           disabled={isInspectingSelectedFiber}
-          type="range"
-          min={0}
-          max={snapshots.length - 1}
-          value={snapshotIndex}
-          onChange={handleSnapshotSliderChange}
+          selectedSnapshot={selectedSnapshot}
+          selectSnapshot={selectSnapshot}
+          snapshots={snapshots}
         />
         <IconButton
           disabled={snapshotIndex === snapshots.length - 1 || isInspectingSelectedFiber}
