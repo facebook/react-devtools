@@ -698,7 +698,6 @@ class Store extends EventEmitter {
     if (!node) {
       return;
     }
-    data.renders = node.get('renders') + 1;
     this._nodes = this._nodes.mergeIn([data.id], Map(data));
     this.emit(data.id);
   }

@@ -84,6 +84,13 @@ const ProfilerFiberDetailPane = ({
         flex: 1,
         overflow: 'auto',
       }}>
+        <div style={{
+          padding: '0.25rem',
+          fontSize: monospace.sizes.normal,
+          fontFamily: monospace.family,
+        }}>
+          <strong>Render count</strong>: {snapshotFiber.get('renders')}
+        </div>
         <DetailPane theme={theme}>
           <DetailPaneSection title="Props">
             <DataView
