@@ -14,10 +14,11 @@ import type {Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
-import React from 'react';
+import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import { barWidth, minBarHeight, getGradientColor, scale } from './constants';
+import { minBarHeight, minBarWidth, getGradientColor, scale } from './constants';
 
 type Node = {|
   maxCommitValue: number,
@@ -26,8 +27,18 @@ type Node = {|
 |};
 
 type ChartData = {|
+  itemSize: number,
   maxValue: number,
   nodes: Array<Node>,
+|};
+
+type ItemData = {|
+  height: number,
+  nodes: Array<Node>,
+  scaleY: (value: number) => number,
+  selectSnapshot: SelectSnapshot,
+  stopInspecting: Function,
+  theme: Theme,
 |};
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
@@ -40,76 +51,135 @@ type Props = {|
   theme: Theme,
 |};
 
-const FiberRenderDurations = ({selectedFiberID, selectSnapshot, snapshots, stopInspecting, theme}: Props) => {
-  // The following conversion methods are memoized,
-  // So it's okay to call them on every render.
-  const data = convertSnapshotToChartData(selectedFiberID, snapshots);
-
-  return (
-    <AutoSizer>
-      {({ height, width }) => (
-        <RenderDurations
-          data={data}
-          height={height}
-          selectSnapshot={selectSnapshot}
-          stopInspecting={stopInspecting}
-          theme={theme}
-          width={width}
-        />
-      )}
-    </AutoSizer>
-  );
-};
+export default ({
+  selectedFiberID,
+  selectSnapshot,
+  snapshots,
+  stopInspecting,
+  theme,
+}: Props) => (
+  <AutoSizer>
+    {({ height, width }) => (
+      <RenderDurations
+        height={height}
+        selectedFiberID={selectedFiberID}
+        selectSnapshot={selectSnapshot}
+        snapshots={snapshots}
+        stopInspecting={stopInspecting}
+        theme={theme}
+        width={width}
+      />
+    )}
+  </AutoSizer>
+);
 
 type RenderDurationsProps = {|
-  data: ChartData,
   height: number,
+  selectedFiberID: string,
   selectSnapshot: SelectSnapshot,
+  snapshots: Array<Snapshot>,
   stopInspecting: Function,
   theme: Theme,
   width: number,
 |};
 
-const RenderDurations = ({ data, height, selectSnapshot, stopInspecting, theme, width }: RenderDurationsProps) => {
-  const { maxValue, nodes } = data;
+const RenderDurations = ({
+  height,
+  selectedFiberID,
+  selectSnapshot,
+  snapshots,
+  stopInspecting,
+  theme,
+  width,
+}: RenderDurationsProps) => {
+  // getChartData() is memoized so it's okay to call them on every render.
+  const chartData = getChartData(
+    selectedFiberID,
+    snapshots,
+    width,
+  );
+
+  const { itemSize, maxValue, nodes } = chartData;
 
   if (maxValue === 0) {
     return (
-      <div style={{ height, width, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+      <div style={{
+        height,
+        width,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}>
         <button onClick={stopInspecting}>No render times recorded</button>
       </div>
     );
   }
 
-  const scaleX = scale(0, nodes.length * barWidth, 0, width);
-  const scaleY = scale(0, maxValue, 0, height);
+  // Pass required contextual data down to the ListItem renderer.
+  // getItemData() is memoized so it's okay to call them on every render.
+  const itemData = getItemData(
+    height,
+    maxValue,
+    nodes,
+    selectSnapshot,
+    stopInspecting,
+    theme,
+  );
 
   return (
-    <div style={{ height, width, overflow: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg height={height} width={width}>
-        {nodes.map((node, index) => {
-          const safeHeight = Math.max(minBarHeight, scaleY(node.value));
-          return (
-            <ChartNode
-              color={getGradientColor(node.value / node.maxCommitValue)}
-              height={safeHeight}
-              key={index}
-              label={`${node.value.toFixed(2)}ms`}
-              onClick={() => selectSnapshot(node.parentSnapshot)}
-              onDoubleClick={stopInspecting}
-              theme={theme}
-              width={scaleX(barWidth)}
-              x={scaleX(barWidth * index)}
-              y={height - safeHeight}
-            />
-          );
-        })}
-      </svg>
-    </div>
+    <List
+      direction="horizontal"
+      height={height}
+      innerTagName="svg"
+      itemCount={nodes.length}
+      itemData={itemData}
+      itemSize={itemSize}
+      width={width}
+    >
+      {ListItem}
+    </List>
   );
 };
 
-const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Snapshot>): ChartData => {
+class ListItem extends PureComponent<any, void> {
+  render() {
+    const { index, style } = this.props;
+    const itemData: ItemData = ((this.props.data: any): ItemData);
+
+    const { height, nodes, scaleY, selectSnapshot, stopInspecting, theme } = itemData;
+
+    const node = nodes[index];
+    const safeHeight = Math.max(minBarHeight, scaleY(node.value));
+
+    // List items are absolutely positioned using the CSS "left" attribute.
+    // The "top" value will always be 0.
+    // Since the height is based on the node's duration, we can ignore it also.
+    const left = parseInt(style.left, 10);
+    const width = parseInt(style.width, 10);
+
+    return (
+      <ChartNode
+        color={getGradientColor(node.maxCommitValue === 0 ? 0 : node.value / node.maxCommitValue)}
+        height={safeHeight}
+        key={index}
+        label={`${node.value.toFixed(2)}ms`}
+        onClick={() => selectSnapshot(node.parentSnapshot)}
+        onDoubleClick={stopInspecting}
+        theme={theme}
+        width={width}
+        x={left}
+        y={height - safeHeight}
+      />
+    );
+  }
+}
+
+const getChartData = memoize((
+  nodeID: string,
+  snapshots: Array<Snapshot>,
+  width: number
+): ChartData => {
   let maxValue = 0;
 
   const nodes: Array<Node> = snapshots
@@ -127,10 +197,27 @@ const convertSnapshotToChartData = memoize((nodeID: string, snapshots: Array<Sna
       return { maxCommitValue, parentSnapshot: snapshot, value };
     });
 
+  const itemSize = Math.max(minBarWidth, width / nodes.length);
+
   return {
+    itemSize,
     maxValue,
     nodes,
   };
 });
 
-export default FiberRenderDurations;
+const getItemData = memoize((
+  height: number,
+  maxValue: number,
+  nodes: Array<Node>,
+  selectSnapshot: SelectSnapshot,
+  stopInspecting: Function,
+  theme: Theme,
+): ItemData => ({
+  height,
+  nodes,
+  scaleY: scale(0, maxValue, 0, height),
+  selectSnapshot,
+  stopInspecting,
+  theme,
+}));
