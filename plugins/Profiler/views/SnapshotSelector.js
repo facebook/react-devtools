@@ -11,6 +11,7 @@
 'use strict';
 
 import type {Snapshot} from '../ProfilerTypes';
+import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
 import React, {PureComponent} from 'react';
@@ -28,6 +29,8 @@ type ListData = {|
 |};
 
 type ItemData = {|
+  disabled: boolean,
+  isMouseDown: boolean,
   maxDuration: number,
   selectSnapshot: SelectSnapshot,
   selectedSnapshot: Snapshot,
@@ -39,6 +42,7 @@ type Props = {|
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
+  theme: Theme,
 |};
 
 export default ({
@@ -46,6 +50,7 @@ export default ({
   selectedSnapshot,
   selectSnapshot,
   snapshots,
+  theme,
 }: Props) => {
   return (
     <div style={{
@@ -56,6 +61,7 @@ export default ({
       alignitems: 'flex-end',
       gridGap: '1px',
       gridAutoFlow: 'column',
+      backgroundColor: theme.base00,
     }}>
       <AutoSizer disableHeight={true}>
         {({ height, width }) => (
@@ -82,47 +88,78 @@ type SnapshotSelectorProps = {|
   width: number,
 |};
 
-// TODO (bvaughn) Use disabled prop
+type SnapshotSelectorState = {|
+  isMouseDown: boolean,
+|};
 
-const SnapshotSelector = ({
-  disabled,
-  height,
-  selectedSnapshot,
-  selectSnapshot,
-  snapshots,
-  width,
-}: SnapshotSelectorProps) => {
-  const listData = getListData(snapshots, width);
+class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSelectorState> {
+  state: SnapshotSelectorState = {
+    isMouseDown: false,
+  };
 
-  // Pass required contextual data down to the ListItem renderer.
-  // (This method is memoized so it's safe to call on every render.)
-  const itemData = getItemData(
-    listData.maxDuration,
-    selectSnapshot,
-    selectedSnapshot,
-    snapshots,
-  );
+  handleMouseDown = event => this.setState({ isMouseDown: true });
+  handleMouseLeave = event => this.setState({ isMouseDown: false });
+  handleMouseUp = event => this.setState({ isMouseDown: false });
 
-  return (
-    <List
-      direction="horizontal"
-      height={height}
-      itemCount={snapshots.length}
-      itemData={itemData}
-      itemSize={listData.itemSize}
-      width={width}
-    >
-      {ListItem}
-    </List>
-  );
-};
+  render() {
+    const {
+      disabled,
+      height,
+      selectedSnapshot,
+      selectSnapshot,
+      snapshots,
+      width,
+    } = this.props;
+    const {isMouseDown} = this.state;
+
+    const listData = getListData(snapshots, width);
+
+    // Pass required contextual data down to the ListItem renderer.
+    // (This method is memoized so it's safe to call on every render.)
+    const itemData = getItemData(
+      disabled,
+      isMouseDown,
+      listData.maxDuration,
+      selectSnapshot,
+      selectedSnapshot,
+      snapshots,
+    );
+
+    return (
+      <div
+        onMouseDown={this.handleMouseDown}
+        onMouseLeave={this.handleMouseLeave}
+        onMouseUp={this.handleMouseUp}
+        style={{height, width}}
+      >
+        <List
+          direction="horizontal"
+          height={height}
+          itemCount={snapshots.length}
+          itemData={itemData}
+          itemSize={listData.itemSize}
+          width={width}
+        >
+          {ListItem}
+        </List>
+      </div>
+    );
+  }
+}
 
 class ListItem extends PureComponent<any, void> {
+  handleMouseEnter = () => {
+    const itemData: ItemData = ((this.props.data: any): ItemData);
+    if (itemData.isMouseDown) {
+      itemData.selectSnapshot(itemData.snapshots[this.props.index]);
+    }
+  }
+
   render() {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { maxDuration, selectedSnapshot, selectSnapshot, snapshots } = itemData;
+    const { disabled, maxDuration, selectedSnapshot, selectSnapshot, snapshots } = itemData;
 
     const snapshot = snapshots[index];
     const percentage = snapshot.duration / maxDuration;
@@ -130,11 +167,12 @@ class ListItem extends PureComponent<any, void> {
 
     return (
       <div
-        onClick={() => selectSnapshot(snapshot)}
+        onClick={disabled ? undefined : () => selectSnapshot(snapshot)}
+        onMouseEnter={disabled ? undefined : this.handleMouseEnter}
         style={{
           ...style,
-          opacity: isSelected ? 0.5 : 1,
-          cursor: isSelected ? 'default' : 'pointer',
+          opacity: isSelected || disabled ? 0.5 : 1,
+          cursor: disabled ? 'default' : 'pointer',
         }}
       >
         <div style={{
@@ -159,11 +197,15 @@ const getListData = memoize((
 }));
 
 const getItemData = memoize((
+  disabled: boolean,
+  isMouseDown: boolean,
   maxDuration: number,
   selectSnapshot: SelectSnapshot,
   selectedSnapshot: Snapshot,
   snapshots: Array<Snapshot>,
 ): ItemData => ({
+  disabled,
+  isMouseDown,
   maxDuration,
   selectSnapshot,
   selectedSnapshot,
