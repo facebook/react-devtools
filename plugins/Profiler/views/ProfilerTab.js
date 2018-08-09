@@ -221,6 +221,7 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <FiberRenderDurations
             selectedFiberID={selectedFiberID}
+            selectedSnapshot={snapshot}
             selectSnapshot={this.selectSnapshot}
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}

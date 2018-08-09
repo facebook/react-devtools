@@ -36,6 +36,7 @@ type ItemData = {|
   height: number,
   nodes: Array<Node>,
   scaleY: (value: number) => number,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   stopInspecting: Function,
   theme: Theme,
@@ -45,6 +46,7 @@ type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
   selectedFiberID: string,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
   stopInspecting: Function,
@@ -53,6 +55,7 @@ type Props = {|
 
 export default ({
   selectedFiberID,
+  selectedSnapshot,
   selectSnapshot,
   snapshots,
   stopInspecting,
@@ -63,6 +66,7 @@ export default ({
       <RenderDurations
         height={height}
         selectedFiberID={selectedFiberID}
+        selectedSnapshot={selectedSnapshot}
         selectSnapshot={selectSnapshot}
         snapshots={snapshots}
         stopInspecting={stopInspecting}
@@ -76,6 +80,7 @@ export default ({
 type RenderDurationsProps = {|
   height: number,
   selectedFiberID: string,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
   stopInspecting: Function,
@@ -86,6 +91,7 @@ type RenderDurationsProps = {|
 const RenderDurations = ({
   height,
   selectedFiberID,
+  selectedSnapshot,
   selectSnapshot,
   snapshots,
   stopInspecting,
@@ -122,6 +128,7 @@ const RenderDurations = ({
     height,
     maxValue,
     nodes,
+    selectedSnapshot,
     selectSnapshot,
     stopInspecting,
     theme,
@@ -147,7 +154,7 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { height, nodes, scaleY, selectSnapshot, stopInspecting, theme } = itemData;
+    const { height, nodes, scaleY, selectedSnapshot, selectSnapshot, stopInspecting, theme } = itemData;
 
     const node = nodes[index];
     const safeHeight = Math.max(minBarHeight, scaleY(node.value));
@@ -162,6 +169,7 @@ class ListItem extends PureComponent<any, void> {
       <ChartNode
         color={getGradientColor(node.maxCommitValue === 0 ? 0 : node.value / node.maxCommitValue)}
         height={safeHeight}
+        isDimmed={node.parentSnapshot === selectedSnapshot}
         key={index}
         label={`${node.value.toFixed(2)}ms`}
         onClick={() => selectSnapshot(node.parentSnapshot)}
@@ -210,6 +218,7 @@ const getItemData = memoize((
   height: number,
   maxValue: number,
   nodes: Array<Node>,
+  selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   stopInspecting: Function,
   theme: Theme,
@@ -217,6 +226,7 @@ const getItemData = memoize((
   height,
   nodes,
   scaleY: scale(0, maxValue, 0, height),
+  selectedSnapshot,
   selectSnapshot,
   stopInspecting,
   theme,
