@@ -21,7 +21,8 @@ import Icons from '../../../frontend/Icons';
 import IconButton from './IconButton';
 import SnapshotSelector from './SnapshotSelector';
 
-const CHART_LABEL_WIDTH_THRESHOLD = 615;
+const CHART_RADIO_LABEL_WIDTH_THRESHOLD = 650;
+const CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD = 800;
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
@@ -140,25 +141,23 @@ const ProfilerTabToolbar = ({
 
         <div style={{flex: 1}} />
 
-        <label
+        <ShowNativeNodesButton
+          isActive={showNativeNodes}
+          isDisabled={isInspectingSelectedFiber}
+          onClick={toggleShowNativeNodes}
+          theme={theme}
+          width={width}
+        />
+
+        <HRule theme={theme} />
+
+        <span
           style={{
             opacity: isInspectingSelectedFiber ? 0.5 : 1,
           }}
         >
-          <IconButton
-            disabled={isInspectingSelectedFiber}
-            icon={Icons.DOM_ELEMENT}
-            isActive={showNativeNodes}
-            isTransparent={true}
-            onClick={toggleShowNativeNodes}
-            theme={theme}
-            title="Show native elements?"
-          />
-        </label>
-
-        <HRule theme={theme} />
-
-        <span>{snapshotIndex + 1} / {snapshots.length}</span>
+          {snapshotIndex + 1} / {snapshots.length}
+        </span>
         <IconButton
           disabled={snapshotIndex === 0 || isInspectingSelectedFiber}
           icon={Icons.BACK}
@@ -229,7 +228,9 @@ const RadioOption = Hoverable(({
       marginRight: '0.5rem',
       cursor: 'pointer',
       opacity: isDisabled ? 0.5 : 1,
+      pointerEvents: isDisabled ? 'none' : 'auto',
     }}
+    title={label}
   >
     <input
       disabled={isDisabled}
@@ -247,10 +248,9 @@ const RadioOption = Hoverable(({
         display: 'inline',
         verticalAlign: 'sub',
         margin: '0 0.25rem',
-        pointerEvents: isDisabled ? 'none' : 'auto',
       }}
      />
-    {width >= CHART_LABEL_WIDTH_THRESHOLD && (
+    {width >= CHART_RADIO_LABEL_WIDTH_THRESHOLD && (
       <span>{label}</span>
     )}
   </label>
@@ -291,3 +291,59 @@ const RecordButton = Hoverable(
     </button>
   )
 );
+
+type ShowNativeNodesButtonProps = {|
+  isActive: boolean,
+  isDisabled: boolean,
+  isHovered: boolean,
+  onClick: Function,
+  onMouseEnter: Function,
+  onMouseLeave: Function,
+  theme: Theme,
+  width: number,
+|};
+
+const ShowNativeNodesButton = Hoverable(({
+  isActive,
+  isDisabled,
+  isHovered,
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+  theme,
+  width,
+}: ShowNativeNodesButtonProps) => (
+  <label
+    onMouseEnter={onMouseEnter}
+    onMouseLeave={onMouseLeave}
+    style={{
+      display: 'flex',
+      alignItems: 'center',
+      color: isHovered ? theme.state06 : 'inherit',
+      cursor: 'pointer',
+      opacity: isDisabled ? 0.5 : 1,
+        pointerEvents: isDisabled ? 'none' : 'auto',
+    }}
+    title="Show native elements?"
+  >
+    <input
+      disabled={isDisabled}
+      type="checkbox"
+      checked={isActive}
+      onChange={onClick}
+    />
+    <SvgIcon
+      path={Icons.DOM_ELEMENT}
+      style={{
+        flex: '0 0 1rem',
+        width: '1rem',
+        height: '1rem',
+        fill: 'currentColor',
+        display: 'inline',
+        verticalAlign: 'sub',
+        margin: '0 0.25rem',
+      }}
+     />
+     {width >= CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD ? 'Show native nodes?' : ''}
+  </label>
+));

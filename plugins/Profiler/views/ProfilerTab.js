@@ -263,7 +263,11 @@ class ProfilerTab extends React.Component<Props, State> {
       }
     } else {
       content = (
-        <NoProfilingDataMessage startRecording={toggleIsRecording} theme={theme} />
+        <NoProfilingDataMessage
+          hasMultipleRoots={hasMultipleRoots}
+          startRecording={toggleIsRecording}
+          theme={theme}
+        />
       );
     }
 
