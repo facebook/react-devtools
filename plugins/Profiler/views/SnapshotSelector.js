@@ -17,7 +17,7 @@ import memoize from 'memoize-one';
 import React, {PureComponent} from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
-import { getGradientColor, minBarHeight, minBarWidth } from './constants';
+import { didNotRender, getGradientColor, minBarHeight, minBarWidth } from './constants';
 
 const HEIGHT = 20;
 
@@ -181,7 +181,7 @@ class ListItem extends PureComponent<any, void> {
           left: 0,
           right: 1,
           height: Math.max(minBarHeight, percentage * HEIGHT),
-          backgroundColor: getGradientColor(percentage),
+          backgroundColor: percentage === 0 ? didNotRender : getGradientColor(percentage),
         }} />
       </div>
     );
