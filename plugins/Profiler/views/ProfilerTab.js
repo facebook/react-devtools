@@ -40,6 +40,7 @@ type Props = {|
   cacheInteractionData: CacheInteractionData,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   getCachedInteractionData: GetCachedInteractionData,
+  hasMultipleRoots: boolean,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   profilerData: RootProfilerData,
@@ -178,6 +179,7 @@ class ProfilerTab extends React.Component<Props, State> {
       cacheInteractionData,
       getCachedDataForSnapshot,
       getCachedInteractionData,
+      hasMultipleRoots,
       interactionsToSnapshots,
       isRecording,
       profilerData,
@@ -208,7 +210,11 @@ class ProfilerTab extends React.Component<Props, State> {
       // Edge case where keyboard up/down arrows change selected root in the Elements tab.
       // This is a bug that should be fixed separately from the Profiler plug-in.
       content = (
-        <NoProfilingDataMessage startRecording={toggleIsRecording} theme={theme} />
+        <NoProfilingDataMessage
+          hasMultipleRoots={hasMultipleRoots}
+          startRecording={toggleIsRecording}
+          theme={theme}
+        />
       );
     } else if (snapshots.length > 0) {
       if (isInspectingSelectedFiber && selectedFiberID !== null) {
@@ -226,6 +232,7 @@ class ProfilerTab extends React.Component<Props, State> {
           <InteractionTimeline
             cacheInteractionData={cacheInteractionData}
             getCachedInteractionData={getCachedInteractionData}
+            hasMultipleRoots={hasMultipleRoots}
             interactionsToSnapshots={interactionsToSnapshots}
             selectedInteraction={selectedInteraction}
             selectedSnapshot={snapshot}
@@ -433,6 +440,7 @@ export default decorate({
       cacheInteractionData: (...args) => store.cacheInteractionData(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       getCachedInteractionData: (...args) => store.getCachedInteractionData(...args),
+      hasMultipleRoots: store.roots.size > 1,
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
         : new Map(),

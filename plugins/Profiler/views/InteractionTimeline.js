@@ -17,6 +17,7 @@ import memoize from 'memoize-one';
 import React, { PureComponent } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
+import NoInteractionsMessage from './NoInteractionsMessage';
 import { scale } from './constants';
 
 const INTERACTION_SIZE = 4;
@@ -52,6 +53,7 @@ type ItemData = {|
 type Props = {|
   cacheInteractionData: CacheInteractionData,
   getCachedInteractionData: GetCachedInteractionData,
+  hasMultipleRoots: boolean,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   selectedInteraction: Interaction | null,
   selectedSnapshot: Snapshot,
@@ -64,6 +66,7 @@ type Props = {|
 const InteractionTimeline = ({
   cacheInteractionData,
   getCachedInteractionData,
+  hasMultipleRoots,
   interactionsToSnapshots,
   selectedInteraction,
   selectedSnapshot,
@@ -84,6 +87,7 @@ const InteractionTimeline = ({
       {({ height, width }) => (
         <InteractionsList
           chartData={((chartData: any): ChartData)}
+          hasMultipleRoots={hasMultipleRoots}
           height={height}
           selectedInteraction={selectedInteraction}
           selectedSnapshot={selectedSnapshot}
@@ -99,6 +103,7 @@ const InteractionTimeline = ({
 
 type InteractionsListProps = {|
   chartData: ChartData,
+  hasMultipleRoots: boolean,
   height: number,
   selectedInteraction: Interaction | null,
   selectedSnapshot: Snapshot,
@@ -142,6 +147,7 @@ class InteractionsList extends PureComponent<InteractionsListProps, void> {
   render() {
     const {
       chartData,
+      hasMultipleRoots,
       height,
       selectedInteraction,
       selectedSnapshot,
@@ -154,17 +160,11 @@ class InteractionsList extends PureComponent<InteractionsListProps, void> {
     // If a commit contains no interactions, display a fallback message.
     if (chartData.items.length === 0) {
       return (
-        <div style={{
-          height,
-          width,
-          flex: 1,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}>
-          No interactions were recorded for the current root.
-        </div>
+        <NoInteractionsMessage
+          hasMultipleRoots={hasMultipleRoots}
+          height={height}
+          width={width}
+        />
       );
     }
 

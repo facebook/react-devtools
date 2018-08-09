@@ -12,61 +12,82 @@
 
 import type {Theme} from '../../../frontend/types';
 
-import React from 'react';
+import React, {Fragment} from 'react';
 import Icons from '../../../frontend/Icons';
 import SvgIcon from '../../../frontend/SvgIcon';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 
 type Props = {|
+  hasMultipleRoots: boolean,
   startRecording: Function,
   theme: Theme,
 |};
 
-export default ({ startRecording, theme }: Props) => (
-  <div
-    style={{
-      height: '100%',
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-  >
-    <p style={{
-      fontSize: sansSerif.sizes.large,
-    }}>
-      No profiling data has been recorded for the selected root.
-    </p>
-    <p>
-      Select a different root in the <strong>Elements</strong> panel, or click the record button
-      <button
-        onClick={startRecording}
-        style={{
-          display: 'inline-block',
-          background: theme.base01,
-          outline: 'none',
-          cursor: 'pointer',
-          color: theme.base05,
-          padding: '.5rem',
-          margin: '0 0.25rem',
-          border: `1px solid ${theme.base03}`,
-        }}
-        title="Start recording"
-      >
-        <SvgIcon
-          path={Icons.RECORD}
+export default ({ hasMultipleRoots, startRecording, theme }: Props) => {
+  let buttonPreMessage;
+  let headerText;
+  if (hasMultipleRoots) {
+    buttonPreMessage = (
+      <Fragment>
+        Select a different root in the <strong>Elements</strong> panel, or click the record button
+      </Fragment>
+    );
+    headerText = 'No profiling data has been recorded for the selected root.';
+  } else {
+    buttonPreMessage = (
+      <Fragment>
+        Click the record button
+      </Fragment>
+    );
+    headerText = 'No profiling data has been recorded.';
+  }
+
+  return (
+    <div
+      style={{
+        height: '100%',
+        flex: 1,
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
+      }}
+    >
+      <p style={{
+        fontSize: sansSerif.sizes.large,
+      }}>
+        {headerText}
+      </p>
+      <p>
+        {buttonPreMessage}
+        <button
+          onClick={startRecording}
           style={{
-            flex: '0 0 1rem',
-            width: '1rem',
-            height: '1rem',
-            fill: 'currentColor',
-            display: 'inline',
-            verticalAlign: 'sub',
+            display: 'inline-block',
+            background: theme.base01,
+            outline: 'none',
+            cursor: 'pointer',
+            color: theme.base05,
+            padding: '.5rem',
+            margin: '0 0.25rem',
+            border: `1px solid ${theme.base03}`,
           }}
-        />
-      </button>
-      to start a new recording.
-    </p>
-  </div>
-);
+          title="Start recording"
+        >
+          <SvgIcon
+            path={Icons.RECORD}
+            style={{
+              flex: '0 0 1rem',
+              width: '1rem',
+              height: '1rem',
+              fill: 'currentColor',
+              display: 'inline',
+              verticalAlign: 'sub',
+            }}
+          />
+        </button>
+        to start a new recording.
+      </p>
+    </div>
+  );
+};
