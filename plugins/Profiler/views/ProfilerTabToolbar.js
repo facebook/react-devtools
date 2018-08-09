@@ -322,7 +322,7 @@ const ShowNativeNodesButton = Hoverable(({
       color: isHovered ? theme.state06 : 'inherit',
       cursor: 'pointer',
       opacity: isDisabled ? 0.5 : 1,
-        pointerEvents: isDisabled ? 'none' : 'auto',
+      pointerEvents: isDisabled ? 'none' : 'auto',
     }}
     title="Show native elements?"
   >

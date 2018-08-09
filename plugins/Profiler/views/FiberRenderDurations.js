@@ -19,6 +19,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import { minBarHeight, minBarWidth, getGradientColor, scale } from './constants';
+import NoRenderTimesMessage from './NoRenderTimesMessage';
 
 type Node = {|
   maxCommitValue: number,
@@ -109,16 +110,11 @@ const RenderDurations = ({
 
   if (maxValue === 0) {
     return (
-      <div style={{
-        height,
-        width,
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-      }}>
-        <button onClick={stopInspecting}>No render times recorded</button>
-      </div>
+      <NoRenderTimesMessage
+        height={height}
+        stopInspecting={stopInspecting}
+        width={width}
+      />
     );
   }
 
