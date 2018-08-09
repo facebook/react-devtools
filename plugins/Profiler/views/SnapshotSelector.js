@@ -17,7 +17,7 @@ import memoize from 'memoize-one';
 import React, {PureComponent} from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
-import { didNotRender, getGradientColor, minBarHeight, minBarWidth } from './constants';
+import { didNotRender, formatDuration, formatTime, getGradientColor, minBarHeight, minBarWidth } from './constants';
 
 const HEIGHT = 20;
 
@@ -174,6 +174,7 @@ class ListItem extends PureComponent<any, void> {
           opacity: isSelected || disabled ? 0.5 : 1,
           cursor: disabled ? 'default' : 'pointer',
         }}
+        title={`Duration ${formatDuration(snapshot.duration)}ms at ${formatTime(snapshot.commitTime)}s`}
       >
         <div style={{
           position: 'absolute',

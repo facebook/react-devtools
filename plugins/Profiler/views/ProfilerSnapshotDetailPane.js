@@ -51,7 +51,7 @@ const ProfilerSnapshotDetailPane = ({
       padding: '0.5rem',
     }}>
       <div><strong>Commit time</strong>: {formatTime(snapshot.commitTime)}s</div>
-      <div style={{marginTop: '0.5rem'}}><strong>Render duration</strong>: {formatDuration(snapshot.duration)}s</div>
+      <div style={{marginTop: '0.5rem'}}><strong>Render duration</strong>: {formatDuration(snapshot.duration)}ms</div>
       <div style={{margin: '0.5rem 0'}}><strong>Interactions</strong>:</div>
       <ul style={{
         listStyle: 'none',

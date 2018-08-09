@@ -18,7 +18,7 @@ import React, { Fragment, PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import NoDataMessage from './NoDataMessage';
+import NoSnapshotDataMessage from './NoSnapshotDataMessage';
 import { barHeight, barWidthThreshold, didNotRender, getGradientColor, scale } from './constants';
 
 // Mapping of depth (i.e. List row index) to flame graph Nodes.
@@ -170,7 +170,7 @@ const Flamegraph = ({
   // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
   // In this case, we could only display an empty graph.
   if (flameGraphDepth === 0 || itemData.maxTreeBaseDuration === 0) {
-    return <NoDataMessage height={height} width={width} />;
+    return <NoSnapshotDataMessage height={height} width={width} />;
   }
 
   return (

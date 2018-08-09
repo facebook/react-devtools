@@ -25,10 +25,9 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import decorate from '../../../frontend/decorate';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
-import SvgIcon from '../../../frontend/SvgIcon';
-import Icons from '../../../frontend/Icons';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
+import NoProfilingDataMessage from './NoProfilingDataMessage';
 import SnapshotFlamegraph from './SnapshotFlamegraph';
 import SnapshotRanked from './SnapshotRanked';
 import ProfilerTabToolbar from './ProfilerTabToolbar';
@@ -209,7 +208,7 @@ class ProfilerTab extends React.Component<Props, State> {
       // Edge case where keyboard up/down arrows change selected root in the Elements tab.
       // This is a bug that should be fixed separately from the Profiler plug-in.
       content = (
-        <ContentNoData startRecording={toggleIsRecording} theme={theme} />
+        <NoProfilingDataMessage startRecording={toggleIsRecording} theme={theme} />
       );
     } else if (snapshots.length > 0) {
       if (isInspectingSelectedFiber && selectedFiberID !== null) {
@@ -257,7 +256,7 @@ class ProfilerTab extends React.Component<Props, State> {
       }
     } else {
       content = (
-        <ContentNoData startRecording={toggleIsRecording} theme={theme} />
+        <NoProfilingDataMessage startRecording={toggleIsRecording} theme={theme} />
       );
     }
 
@@ -382,55 +381,6 @@ const DetailsNoData = ({ theme }) => (
     padding: '0.25rem',
   }}>
     Nothing selected
-  </div>
-);
-
-const ContentNoData = ({startRecording, theme}) => (
-  <div
-    style={{
-      height: '100%',
-      flex: 1,
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-    }}
-  >
-    <p style={{
-      fontSize: sansSerif.sizes.large,
-    }}>
-      No data has been recorded for the selected root.
-    </p>
-    <p>
-      Select a different root, or click the record button
-      <button
-        onClick={startRecording}
-        style={{
-          display: 'inline-block',
-          background: theme.base01,
-          outline: 'none',
-          cursor: 'pointer',
-          color: theme.base05,
-          padding: '.5rem',
-          margin: '0 0.25rem',
-          border: `1px solid ${theme.base03}`,
-        }}
-        title="Start recording"
-      >
-        <SvgIcon
-          path={Icons.RECORD}
-          style={{
-            flex: '0 0 1rem',
-            width: '1rem',
-            height: '1rem',
-            fill: 'currentColor',
-            display: 'inline',
-            verticalAlign: 'sub',
-          }}
-        />
-      </button>
-      to start a new recording.
-    </p>
   </div>
 );
 

@@ -18,7 +18,7 @@ import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import NoDataMessage from './NoDataMessage';
+import NoSnapshotDataMessage from './NoSnapshotDataMessage';
 import { barHeight, getGradientColor, minBarWidth, scale } from './constants';
 
 type Node = {|
@@ -120,7 +120,7 @@ const SnapshotRankedInner = ({
   // If a commit contains no fibers with an actualDuration > 0,
   // Display a fallback message.
   if (rankedData.nodes.length === 0) {
-    return <NoDataMessage height={height} width={width} />;
+    return <NoSnapshotDataMessage height={height} width={width} />;
   }
 
   const focusedNodeIndex = getNodeIndex(rankedData, selectedFiberID);

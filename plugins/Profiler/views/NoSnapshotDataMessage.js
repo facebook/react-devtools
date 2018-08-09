@@ -11,6 +11,7 @@
 'use strict';
 
 import React from 'react';
+import {sansSerif} from '../../../frontend/Themes/Fonts';
 
 type Props = {|
   height: number,
@@ -27,8 +28,13 @@ export default ({ height, width }: Props) => (
     height,
     width,
   }}>
-    <strong>There is no data to display for the current selection.</strong>
-    <br/>
-    This can indicate that a render occurred too quickly for the timing API to measure.
+    <p style={{
+      fontSize: sansSerif.sizes.large,
+    }}>
+      There is no timing data to display for the currently selected commit.
+    </p>
+    <p>
+      This can indicate that a render occurred too quickly for the timing API to measure.
+    </p>
   </div>
 );
