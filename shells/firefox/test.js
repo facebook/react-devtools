@@ -28,13 +28,25 @@ const main = async () => {
     });
   });
 
-  const path = await findPathPromise;
-  const trimmedPath = path.replace(' ', '\\ ');
+  const options = [
+    `--source-dir=${EXTENSION_PATH}`,
+    `--start-url=${START_URL}`,
+    '--browser-console',
+  ];
 
-  await exec(
-    `web-ext run --start-url=${START_URL} --firefox-profile=${trimmedPath} --browser-console`,
-    {cwd: EXTENSION_PATH}
-  );
+  try {
+    const path = await findPathPromise;
+    const trimmedPath = path.replace(' ', '\\ ');
+    options.push(`--firefox-profile=${trimmedPath}`);
+  } catch (err) {
+    console.warn('Could not find default profile, using temporary profile.');
+  }
+
+  try {
+    await exec(`web-ext run ${options.join(' ')}`);
+  } catch (err) {
+    console.error('`web-ext run` failed', err.stdout, err.stderr);
+  }
 };
 
 main();
