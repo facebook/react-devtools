@@ -626,7 +626,6 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     borderLeft: `1px solid ${borderLeftColor}`,
     top: 16,
     bottom: 0,
-    willChange: 'opacity',
     left: calcPaddingLeft(depth) - 7,
     // Bring it in front of the hovered children, but make sure
     // hovering over parents doesn't draw on top of selected
