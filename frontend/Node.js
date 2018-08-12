@@ -373,6 +373,13 @@ class Node extends React.Component<PropsType, StateType> {
         <div style={{
           paddingLeft: '1rem',
           color: theme.special07,
+
+          // Ensure children wrap correctly and viewport boundary for narrow trees,
+          // But expand to fill the available width for deep trees.
+          display: 'inline-flex',
+          flexDirection: 'column',
+          minWidth: '100%',
+          boxSizing: 'border-box',
         }}>
           {children.map(id => <WrappedNode key={id} depth={depth + 1} id={id}/>)}
         </div>
@@ -505,7 +512,6 @@ const tagTextStyle = (inverted: boolean, theme: Theme) => ({
 });
 
 const wrapperStyle = (depth: number, inverted: boolean, theme: Theme) => ({
-  flexShrink: 0,
   position: 'relative',
   color: inverted ? getInvertedWeak(theme.state02) : theme.special07,
 });
