@@ -51,6 +51,7 @@
     "test": "jest",
     "test:chrome": "node ./shells/chrome/test",
     "test:firefox": "node ./shells/firefox/test",
+    "test:plain": "cd ./shells/plain && ./build.sh --watch",
     "test:standalone": "cd packages/react-devtools && yarn start",
     "typecheck": "flow check"
   },

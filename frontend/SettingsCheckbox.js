@@ -84,7 +84,7 @@ var styles = {
     WebkitUserSelect: 'none',
     cursor: 'default',
     display: 'inline-block',
-    fontSize: sansSerif.sizes.normal,
+    fontSize: sansSerif.sizes.small,
     outline: 'none',
     fontFamily: sansSerif.family,
     userSelect: 'none',

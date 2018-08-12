@@ -10,7 +10,6 @@
  */
 'use strict';
 
-var Breadcrumb = require('./Breadcrumb');
 var Node = require('./Node');
 const PropTypes = require('prop-types');
 var React = require('react');
@@ -127,7 +126,6 @@ class TreeView extends React.Component<Props> {
             )).toJS()}
           </div>
         </div>
-        <Breadcrumb />
       </div>
     );
   }
@@ -153,11 +151,12 @@ var styles = {
   container: {
     fontFamily: monospace.family,
     fontSize: monospace.sizes.normal,
-    lineHeight: 1.3,
+    lineHeight: 1.5,
     flex: 1,
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
+    padding: '0.5rem 0.25rem',
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
@@ -177,6 +176,7 @@ var styles = {
     flex: 1,
     display: 'flex',
     alignItems: 'stretch',
+    width: '100%',
   },
 };
 
