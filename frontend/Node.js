@@ -278,6 +278,10 @@ class Node extends React.Component<PropsType, StateType> {
       name = pieces;
     }
 
+    const dollarRStyle = {
+      color: isWindowFocused ? getInvertedWeak(theme.state02) : 'inherit',
+    };
+
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
       const jsxSingleLineTagStyle = jsxTagStyle(inverted, nodeType, theme);
@@ -305,7 +309,7 @@ class Node extends React.Component<PropsType, StateType> {
                 &gt;
               </span>,
             ]}
-            {selected && <span style={jsxSingleLineTagStyle}>&nbsp;== $r</span>}
+            {selected && <span style={dollarRStyle}>&nbsp;== $r</span>}
           </div>
         </div>
       );
@@ -318,7 +322,7 @@ class Node extends React.Component<PropsType, StateType> {
         <span style={jsxCloseTagStyle}>{name}</span>
         &gt;
         {selected && ((collapsed && !this.props.isBottomTagSelected) || this.props.isBottomTagSelected) &&
-          <span style={jsxCloseTagStyle}> == $r</span>
+          <span style={dollarRStyle}>&nbsp;== $r</span>
         }
       </Fragment>
     );
@@ -345,7 +349,7 @@ class Node extends React.Component<PropsType, StateType> {
         }
         &gt;
         {selected && !collapsed && !this.props.isBottomTagSelected &&
-            <span style={jsxOpenTagStyle}> == $r</span>
+          <span style={dollarRStyle}> == $r</span>
         }
         {collapsed && '…'}
         {collapsed && closeTag}
