@@ -288,12 +288,12 @@ const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
 });
 
 const baseInputStyle = (theme: Theme) => ({
-  fontSize: sansSerif.sizes.small,
-  padding: '0.75rem',
+  fontSize: sansSerif.sizes.normal,
+  padding: '0.5rem',
+  paddingLeft: '2rem',
   backgroundColor: 'transparent',
   border: 'none',
   outline: 'none',
-  paddingLeft: '2rem',
   width: '100%',
 });
 
