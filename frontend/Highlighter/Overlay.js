@@ -58,7 +58,7 @@ class Overlay {
       fontWeight: 'bold',
       padding: '3px 5px',
       position: 'fixed',
-      fontSize: monospace.sizes.normal,
+      fontSize: monospace.sizes.normal + 'px',
     });
 
     this.nameSpan = doc.createElement('span');
