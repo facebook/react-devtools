@@ -328,14 +328,14 @@ const previewStyle = (theme: Theme) => ({
 });
 
 const emptyStyle = (theme: Theme) => ({
-  lineHeight: '1.5rem',
+  lineHeight: '1.25rem',
   color: theme.base04,
   paddingLeft: '1rem',
 });
 
 const missingStyle = (theme: Theme) => ({
   fontWeight: 'bold',
-  lineHeight: '1.5rem',
+  lineHeight: '1.25rem',
   color: theme.base03,
   paddingLeft: '1rem',
 });
@@ -388,7 +388,7 @@ var styles = {
   head: {
     display: 'flex',
     position: 'relative',
-    lineHeight: '1.5rem',
+    lineHeight: '1.25rem',
   },
 
   value: {
