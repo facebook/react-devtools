@@ -10,25 +10,26 @@
  */
 'use strict';
 
-var Node = require('./Node');
+const Node = require('./Node');
 const PropTypes = require('prop-types');
-var React = require('react');
-var SearchUtils = require('./SearchUtils');
+const React = require('react');
+const SearchUtils = require('./SearchUtils');
+const Breadcrumb = require('./Breadcrumb');
 
-var decorate = require('./decorate');
-var {monospace, sansSerif} = require('./Themes/Fonts');
+const decorate = require('./decorate');
+const {monospace, sansSerif} = require('./Themes/Fonts');
 
 import type {List} from 'immutable';
 import type {Theme} from './types';
 
-var MAX_SEARCH_ROOTS = 200;
+const MAX_SEARCH_ROOTS = 200;
 
 type Props = {
   reload?: () => void,
   roots: List,
   searching: boolean,
   searchText: string,
-}
+};
 
 class TreeView extends React.Component<Props> {
   node: ?HTMLElement;
@@ -43,15 +44,15 @@ class TreeView extends React.Component<Props> {
     if (!this.node) {
       return;
     }
-    var val = 0;
-    var height = toNode.offsetHeight;
+    let val = 0;
+    const height = toNode.offsetHeight;
     while (toNode && this.node.contains(toNode)) {
       val += toNode.offsetTop;
       toNode = toNode.offsetParent;
     }
-    var top = this.node.scrollTop;
-    var rel = val - this.node.offsetTop;
-    var margin = 40;
+    const top = this.node.scrollTop;
+    const rel = val - this.node.offsetTop;
+    const margin = 40;
     if (top > rel - margin) {
       this.node.scrollTop = rel - margin;
     } else if (top + this.node.offsetHeight < rel + height + margin) {
@@ -87,8 +88,8 @@ class TreeView extends React.Component<Props> {
     }
 
     // Convert search text into a case-insensitive regex for match-highlighting.
-    var searchText = this.props.searchText;
-    var searchRegExp = SearchUtils.isValidRegex(searchText)
+    const searchText = this.props.searchText;
+    const searchRegExp = SearchUtils.isValidRegex(searchText)
       ? SearchUtils.searchTextToRegExp(searchText)
       : null;
 
@@ -126,6 +127,7 @@ class TreeView extends React.Component<Props> {
             )).toJS()}
           </div>
         </div>
+        <Breadcrumb />
       </div>
     );
   }
@@ -147,7 +149,7 @@ const noSearchResultsStyle = (theme: Theme) => ({
   padding: '0.5rem',
 });
 
-var styles = {
+const styles = {
   container: {
     fontFamily: monospace.family,
     fontSize: monospace.sizes.normal,
@@ -156,7 +158,6 @@ var styles = {
     display: 'flex',
     flexDirection: 'column',
     minHeight: 0,
-    padding: '0.5rem 0.25rem',
 
     WebkitUserSelect: 'none',
     MozUserSelect: 'none',
@@ -168,7 +169,9 @@ var styles = {
     minHeight: 0,
     flex: 1,
     display: 'flex',
+    flexDirection: 'column',
     alignItems: 'flex-start',
+    padding: '0.5rem 0.25rem',
   },
 
   scrollContents: {
@@ -180,7 +183,7 @@ var styles = {
   },
 };
 
-var WrappedTreeView = decorate({
+const WrappedTreeView = decorate({
   listeners(props) {
     return ['searchRoots', 'roots'];
   },

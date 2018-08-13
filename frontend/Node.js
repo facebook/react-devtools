@@ -157,10 +157,15 @@ class Node extends React.Component<PropsType, StateType> {
 
   ensureInView() {
     var node = this.props.isBottomTagSelected ? this._tail : this._head;
-    if (!node) {
-      return;
+    if (node != null) {
+      if (typeof node.scrollIntoView === 'function') {
+        node.scrollIntoView({
+          // $FlowFixMe Flow does not realize block:"nearest" is a valid option
+          block: 'nearest',
+          inline: 'start',
+        });
+      }
     }
-    this.context.scrollTo(node);
   }
 
   render() {
@@ -484,6 +489,7 @@ const headStyle = ({
     borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
+    flexShrink: 0,
     flexWrap: 'wrap',
     borderRadius: '0.125rem',
     paddingLeft: '1rem',
