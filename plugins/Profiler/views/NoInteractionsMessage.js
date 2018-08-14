@@ -48,7 +48,7 @@ export default ({ hasMultipleRoots, height, width }: Props) => {
         </p>
       )}
       <p>
-        <a href="https://reactjs.org/docs/interaction-tracking.html" target="_blank">
+        <a href="https://fb.me/react-interaction-tracking" target="_blank">
           Learn more about the interaction-tracking API here
         </a>.
       </p>
