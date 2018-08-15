@@ -296,8 +296,9 @@ const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
 
 const baseInputStyle = (theme: Theme) => ({
   fontSize: sansSerif.sizes.normal,
-  padding: '0.5rem',
-  paddingLeft: '2rem',
+  padding: '0.25rem',
+  margin: '0.25rem',
+  marginLeft: '1.75rem',
   backgroundColor: 'transparent',
   border: 'none',
   outline: 'none',
@@ -306,6 +307,7 @@ const baseInputStyle = (theme: Theme) => ({
 
 const highlightedInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
+  backgroundColor: theme.base00,
 });
 
 const errorInputStyle = (theme: Theme) => ({
