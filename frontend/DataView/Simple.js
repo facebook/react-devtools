@@ -10,16 +10,15 @@
  */
 'use strict';
 
-const PropTypes = require('prop-types');
-
-var React = require('react');
-var ReactDOM = require('react-dom');
-
-var Input = require('../Input');
-var flash = require('../flash');
-var {monospace} = require('../Themes/Fonts');
-
 import type {Theme, DOMEvent, DOMNode} from '../types';
+
+const PropTypes = require('prop-types');
+const React = require('react');
+const ReactDOM = require('react-dom');
+
+const Input = require('../Input');
+const flash = require('../flash');
+const {monospace} = require('../Themes/Fonts');
 
 type Props = {
   data: any,

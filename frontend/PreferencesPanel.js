@@ -11,7 +11,6 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
 const React = require('react');
 
 const decorate = require('./decorate');
@@ -21,6 +20,8 @@ const Icons = require('./Icons');
 const SvgIcon = require('./SvgIcon');
 const ThemeEditor = require('./Themes/Editor/Editor');
 const Hoverable = require('./Hoverable');
+const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
+const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 
 import type {Theme} from './types';
 
@@ -88,6 +89,13 @@ class PreferencesPanel extends React.Component<Props, State> {
 
       content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
+          <h4 style={styles.header}>Preferences</h4>
+          <div style={styles.preference}>
+            <TraceUpdatesFrontendControl />
+          </div>
+          <div style={styles.preference}>
+            <ColorizerFrontendControl />
+          </div>
           <h4 style={styles.header}>Theme</h4>
           <div style={styles.selectAndPreviewRow}>
             <select
@@ -250,7 +258,7 @@ const styles = {
     backgroundColor: 'rgba(0,0,0,0)',
   },
   header: {
-    margin: '0 0 0.25rem',
+    margin: '0 0 0.5rem',
   },
   buttonBar: {
     flexDirection: 'row',
@@ -259,6 +267,10 @@ const styles = {
     marginTop: '0.5rem',
     marginRight: '0.25rem',
     padding: '0.25rem',
+  },
+  preference: {
+    margin: '0 0 0.5rem',
+    fontSize: sansSerif.sizes.normal,
   },
   selectAndPreviewRow: {
     display: 'flex',

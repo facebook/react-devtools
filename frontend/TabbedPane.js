@@ -11,10 +11,9 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
-var React = require('react');
-var decorate = require('./decorate');
-var {sansSerif} = require('./Themes/Fonts');
+const React = require('react');
+const decorate = require('./decorate');
+const {sansSerif} = require('./Themes/Fonts');
 
 import type {Theme} from './types';
 
@@ -65,24 +64,21 @@ const tabsStyle = (theme: Theme) => ({
   flexShrink: 0,
   listStyle: 'none',
   margin: 0,
-  backgroundColor: theme.base00,
+  backgroundColor: theme.base01,
   borderBottom: `1px solid ${theme.base03}`,
-  padding: '0.25rem 0.25rem 0 0.25rem',
+  padding: '0 0.25rem',
 });
 
 const tabStyle = (isSelected: boolean, theme: Theme) => {
-  const border = isSelected ? `1px solid ${theme.base03}` : 'none';
-
   return {
-    padding: '0.25rem 0.5rem',
+    padding: '0.25rem 0.75rem',
     lineHeight: '15px',
     fontSize: sansSerif.sizes.normal,
     fontFamily: sansSerif.family,
     cursor: 'pointer',
-    backgroundColor: isSelected ? theme.base01 : 'transparent',
-    borderLeft: border,
-    borderRight: border,
-    borderTop: border,
+    borderTop: '1px solid transparent',
+    borderBottom: isSelected ? `2px solid ${theme.state00}` : 'none',
+    marginBottom: isSelected ? '-1px' : '1px',
   };
 };
 

@@ -9,8 +9,6 @@
  */
 'use strict';
 
-const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
-const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 const PropTypes = require('prop-types');
 const React = require('react');
 const ReactDOM = require('react-dom');
@@ -22,7 +20,6 @@ const Input = require('./Input');
 const Hoverable = require('./Hoverable');
 
 const decorate = require('./decorate');
-const {hexToRgba} = require('./Themes/utils');
 
 import type {Theme} from './types';
 
@@ -119,17 +116,6 @@ class SettingsPane extends React.Component {
           />
         )}
 
-        <SettingsMenuButton
-          onClick={this.props.showPreferencesPanel}
-          theme={theme}
-        />
-
-        <TraceUpdatesFrontendControl {...this.props} />
-
-        <div style={styles.growToFill}>
-          <ColorizerFrontendControl {...this.props} />
-        </div>
-
         <div style={styles.searchInputWrapper}>
           <Input
             style={inputStyle}
@@ -150,6 +136,11 @@ class SettingsPane extends React.Component {
             />
           )}
         </div>
+
+        <SettingsMenuButton
+          onClick={this.props.showPreferencesPanel}
+          theme={theme}
+        />
       </div>
     );
   }
@@ -160,18 +151,23 @@ SettingsPane.contextTypes = {
   theme: PropTypes.object.isRequired,
 };
 SettingsPane.propTypes = {
+  isInspectEnabled: PropTypes.bool,
+  isRecording: PropTypes.bool,
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
+  toggleRecord: PropTypes.func,
   onChangeSearch: PropTypes.func,
+  toggleInspectEnabled: PropTypes.func,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'searchText'];
+    return ['isInspectEnabled', 'isRecording', 'searchText'];
   },
   props(store) {
     return {
       isInspectEnabled: store.isInspectEnabled,
+      isRecording: store.isRecording,
       onChangeSearch: text => store.changeSearch(text),
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
@@ -179,6 +175,7 @@ var Wrapped = decorate({
         store.showPreferencesPanel();
       },
       toggleInspectEnabled: () => store.setInspectEnabled(!store.isInspectEnabled),
+      toggleRecord: () => store.setIsRecording(!store.isRecording),
     };
   },
 }, SettingsPane);
@@ -234,7 +231,6 @@ function SearchIcon({ theme }) {
 }
 
 const settingsPaneStyle = (theme: Theme) => ({
-  padding: '0.25rem',
   display: 'flex',
   flexWrap: 'wrap',
   flexShrink: 0,
@@ -269,6 +265,7 @@ const inspectMenuButtonStyle = (isInspectEnabled: boolean, isHovered: boolean, t
     background: 'none',
     border: 'none',
     outline: 'none', // Use custom active highlight instead
+    marginLeft: '0.25rem',
     color,
   };
 };
@@ -277,13 +274,13 @@ const searchIconStyle = (theme: Theme) => ({
   position: 'absolute',
   display: 'inline-block',
   pointerEvents: 'none',
-  left: '0.25rem',
+  left: '0.5rem',
   top: 0,
   width: '1em',
   height: '100%',
   strokeWidth: 0,
-  stroke: theme.base02,
-  fill: theme.base02,
+  stroke: theme.base03,
+  fill: theme.base03,
   lineHeight: '28px',
   fontSize: sansSerif.sizes.normal,
 });
@@ -292,6 +289,7 @@ const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
   display: 'flex',
   background: 'none',
   border: 'none',
+  outline: 'none',
   marginRight: '0.5rem',
   color: isHovered ? theme.state06 : 'inherit',
 });
@@ -299,22 +297,21 @@ const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
 const baseInputStyle = (theme: Theme) => ({
   fontSize: sansSerif.sizes.normal,
   padding: '0.25rem',
-  border: `1px solid ${theme.base02}`,
+  margin: '0.25rem',
+  marginLeft: '1.75rem',
+  backgroundColor: 'transparent',
+  border: 'none',
   outline: 'none',
-  borderRadius: '0.25rem',
-  paddingLeft: '1.25rem',
-  width: '150px',
+  width: '100%',
 });
 
 const highlightedInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
-  border: `1px solid ${hexToRgba(theme.state00, 0.75)}`,
+  backgroundColor: theme.base00,
 });
 
 const errorInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
-  backgroundColor: hexToRgba(theme.special03, 0.1),
-  border: `1px solid ${theme.special03}`,
 });
 
 var styles = {
@@ -324,6 +321,7 @@ var styles = {
   searchInputWrapper: {
     display: 'flex',
     alignItems: 'center',
+    flexGrow: 1,
     flexShrink: 0,
     position: 'relative',
   },

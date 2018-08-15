@@ -64,6 +64,18 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
+  function haveProfilerTimesChanged(prevFiber, nextFiber) {
+    return (
+      prevFiber.actualDuration !== undefined && // Short-circuit check for non-profiling builds
+      (
+        prevFiber.actualDuration !== nextFiber.actualDuration ||
+        prevFiber.actualStartTime !== nextFiber.actualStartTime ||
+        prevFiber.selfBaseDuration !== nextFiber.selfBaseDuration ||
+        prevFiber.treeBaseDuration !== nextFiber.treeBaseDuration
+      )
+    );
+  }
+
   let pendingEvents = [];
 
   function flushPendingEvents() {
@@ -94,7 +106,22 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
-    if (!hasChildOrderChanged && !hasDataChanged(fiber.alternate, fiber)) {
+    if (
+      !hasChildOrderChanged &&
+      !hasDataChanged(fiber.alternate, fiber)
+    ) {
+      // If only timing information has changed, we still need to update the nodes.
+      // But we can do it in a faster way since we know it's safe to skip the children.
+      // It's also important to avoid emitting an "update" signal for the node in this case,
+      // Since that would indicate to the Profiler that it was part of the "commit" when it wasn't.
+      if (haveProfilerTimesChanged(fiber.alternate, fiber)) {
+        pendingEvents.push({
+          internalInstance: getOpaqueNode(fiber),
+          data: getDataFiber(fiber, getOpaqueNode),
+          renderer: rid,
+          type: 'updateProfileTimes',
+        });
+      }
       return;
     }
     pendingEvents.push({
@@ -123,6 +150,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       pendingEvents.unshift(event);
     }
     opaqueNodes.delete(opaqueNode);
+  }
+
+  function markRootCommitted(fiber) {
+    pendingEvents.push({
+      internalInstance: getOpaqueNode(fiber),
+      renderer: rid,
+      type: 'rootCommitted',
+    });
   }
 
   function mountFiber(fiber) {
@@ -207,6 +242,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     hook.getFiberRoots(rid).forEach(root => {
       // Hydrate all the roots for the first time.
       mountFiber(root.current);
+      markRootCommitted(root.current);
     });
     flushPendingEvents();
   }
@@ -226,6 +262,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function handleCommitFiberRoot(root) {
     const current = root.current;
     const alternate = current.alternate;
+
     if (alternate) {
       // TODO: relying on this seems a bit fishy.
       const wasMounted = alternate.memoizedState != null && alternate.memoizedState.element != null;
@@ -244,6 +281,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       // Mount a new root.
       mountFiber(current);
     }
+    markRootCommitted(current);
     // We're done here.
     flushPendingEvents();
   }

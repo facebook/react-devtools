@@ -13,22 +13,22 @@
 /* globals chrome */
 
 const PropTypes = require('prop-types');
+const React = require('react');
+const Container = require('./Container');
+const Store = require('./Store');
+const keyboardNav = require('./keyboardNav');
+const invariant = require('./invariant');
+const assign = require('object-assign');
 
-var React = require('react');
-var Container = require('./Container');
-var Store = require('./Store');
-var keyboardNav = require('./keyboardNav');
-var invariant = require('./invariant');
-var assign = require('object-assign');
+const Bridge = require('../agent/Bridge');
+const {sansSerif} = require('./Themes/Fonts');
+const NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
+const ProfilerPlugin = require('../plugins/Profiler/ProfilerPlugin');
+const RelayPlugin = require('../plugins/Relay/RelayPlugin');
+const Themes = require('./Themes/Themes');
+const ThemeStore = require('./Themes/Store');
 
-var Bridge = require('../agent/Bridge');
-var {sansSerif} = require('./Themes/Fonts');
-var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
-var RelayPlugin = require('../plugins/Relay/RelayPlugin');
-var Themes = require('./Themes/Themes');
-var ThemeStore = require('./Themes/Store');
-
-var consts = require('../agent/consts');
+const consts = require('../agent/consts');
 
 import type {Theme} from './types';
 import type {DOMEvent} from './types';
@@ -244,7 +244,9 @@ class Panel extends React.Component<Props, State> {
       var refresh = () => this.forceUpdate();
       this.plugins = [
         new RelayPlugin(this._store, this._bridge, refresh),
+        new ProfilerPlugin(this._store, this._bridge, refresh),
       ];
+
       this._keyListener = keyboardNav(this._store, window);
 
       window.addEventListener('keydown', this._keyListener);

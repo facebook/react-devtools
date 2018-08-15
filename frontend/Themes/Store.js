@@ -13,6 +13,7 @@
 const {deserialize, serialize} = require('./Serializer');
 const Themes = require('./Themes');
 const {CUSTOM_THEME_NAME} = require('./constants');
+const {get, set} = require('../../utils/storage');
 
 const LOCAL_STORAGE_CUSTOM_THEME_KEY = 'customTheme';
 const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
@@ -31,7 +32,7 @@ class Store {
 
     // Load previous custom theme from localStorage.
     // If there isn't one in local storage, start by cloning the default theme.
-    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
+    const customTheme = get(LOCAL_STORAGE_CUSTOM_THEME_KEY);
     if (customTheme) {
       this.customTheme = deserialize(customTheme);
     }
@@ -46,7 +47,7 @@ class Store {
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
     const themeName = getSafeThemeName(
-      getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY),
+      get(LOCAL_STORAGE_THEME_NAME_KEY),
       this.defaultThemeName,
     );
 
@@ -69,25 +70,15 @@ class Store {
     }
 
     // But allow users to restore "default" mode by selecting an empty theme.
-    setInLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+    set(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
   }
 
   saveCustomTheme(theme: Theme) {
     this.customTheme = theme;
     this.theme = theme;
 
-    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
+    set(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
   }
-}
-
-function getFromLocalStorage(key: string): any {
-  let value;
-  try {
-    value = localStorage.getItem(key);
-  } catch (error) {
-    console.error('Could not read from localStorage.', error);
-  }
-  return value || null;
 }
 
 function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
@@ -106,16 +97,6 @@ function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): strin
   } else {
     return 'ChromeDefault';
   }
-}
-
-function setInLocalStorage(key: string, value: any): boolean {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch (error) {
-    console.error('Could not write to localStorage.', error);
-  }
-  return false;
 }
 
 module.exports = Store;

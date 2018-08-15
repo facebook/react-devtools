@@ -161,6 +161,7 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('isRecording', isRecording => this.emit('isRecording', isRecording));
     bridge.on('setInspectEnabled', enabled => {
       this._inspectEnabled = enabled;
       this.emit('stopInspecting');
@@ -210,6 +211,7 @@ class Agent extends EventEmitter {
     this.on('root', id => bridge.send('root', id));
     this.on('mount', data => bridge.send('mount', data));
     this.on('update', data => bridge.send('update', data));
+    this.on('updateProfileTimes', data => bridge.send('updateProfileTimes', data));
     this.on('unmount', id => {
       bridge.send('unmount', id);
       // once an element has been unmounted, the bridge doesn't need to be
@@ -218,6 +220,9 @@ class Agent extends EventEmitter {
     });
     this.on('setSelection', data => bridge.send('select', data));
     this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
+    this.on('isRecording', isRecording => bridge.send('isRecording', isRecording));
+    this.on('storeSnapshot', (data) => bridge.send('storeSnapshot', data));
+    this.on('clearSnapshots', () => bridge.send('clearSnapshots'));
   }
 
   scrollToNode(id: ElementID): void {
@@ -375,6 +380,11 @@ class Agent extends EventEmitter {
     this.emit('root', id);
   }
 
+  rootCommitted(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
+    var id = this.getId(internalInstance);
+    this.emit('rootCommitted', id, internalInstance);
+  }
+
   onMounted(renderer: RendererID, component: OpaqueNodeHandle, data: DataType) {
     var id = this.getId(component);
     this.renderers.set(id, renderer);
@@ -406,10 +416,28 @@ class Agent extends EventEmitter {
     this.emit('update', send);
   }
 
+  onUpdatedProfileTimes(component: OpaqueNodeHandle, data: DataType) {
+    var id = this.getId(component);
+    this.elementData.set(id, data);
+
+    var send = assign({}, data);
+    if (send.children && send.children.map) {
+      send.children = send.children.map(c => this.getId(c));
+    }
+    send.id = id;
+    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    delete send.type;
+    delete send.updater;
+    this.emit('updateProfileTimes', send);
+  }
+
   onUnmounted(component: OpaqueNodeHandle) {
     var id = this.getId(component);
     this.elementData.delete(id);
-    this.roots.delete(id);
+    if (this.roots.has(id)) {
+      this.roots.delete(id);
+      this.emit('rootUnmounted', id);
+    }
     this.renderers.delete(id);
     this.emit('unmount', id);
     this.idsByInternalInstances.delete(component);

@@ -14,10 +14,10 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Theme} from './types';
 
-var {sansSerif} = require('./Themes/Fonts');
+const {sansSerif} = require('./Themes/Fonts');
 const PropTypes = require('prop-types');
-var React = require('react');
-var decorate = require('./decorate');
+const React = require('react');
+const decorate = require('./decorate');
 
 type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
 
@@ -34,10 +34,24 @@ type State ={
 
 class Breadcrumb extends React.Component<Props, State> {
   context: {theme: Theme};
+  // $FlowFixMe createRef()
+  selectedListItem = React.createRef();
 
   constructor(props) {
     super(props);
     this.state = { hovered: null };
+  }
+
+  componentDidMount() {
+    if (this.props.selected) {
+      this.ensureInView();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.selected !== prevProps.selected) {
+      this.ensureInView();
+    }
   }
 
   handleCrumbMouseOver(id) {
@@ -51,11 +65,13 @@ class Breadcrumb extends React.Component<Props, State> {
   }
 
   render() {
-    var theme = this.context.theme;
+    const {theme} = this.context;
+    const {path, selected} = this.props;
+
     return (
       <ul style={containerStyle(theme)}>
-        {this.props.path.map(({ id, node }) => {
-          const isSelected = id === this.props.selected;
+        {path.map(({ id, node }) => {
+          const isSelected = id === selected;
           const style = itemStyle(
             isSelected,
             node.get('nodeType'),
@@ -69,6 +85,7 @@ class Breadcrumb extends React.Component<Props, State> {
               onMouseOver={() => this.handleCrumbMouseOver(id)}
               onMouseOut={() => this.handleCrumbMouseOut(id)}
               onClick={isSelected ? null : () => this.props.select(id)}
+              ref={isSelected ? this.selectedListItem : undefined}
             >
               {node.get('name') || '"' + node.get('text') + '"'}
             </li>
@@ -76,6 +93,21 @@ class Breadcrumb extends React.Component<Props, State> {
         })}
       </ul>
     );
+  }
+
+  ensureInView() {
+    const selectedListItem = this.selectedListItem.current;
+    if (selectedListItem != null) {
+      if (typeof selectedListItem.scrollIntoViewIfNeeded === 'function') {
+        selectedListItem.scrollIntoViewIfNeeded({
+          inline: 'nearest',
+        });
+      } else if (typeof selectedListItem.scrollIntoView === 'function') {
+        selectedListItem.scrollIntoView({
+          inline: 'nearest',
+        });
+      }
+    }
   }
 }
 
@@ -86,13 +118,13 @@ Breadcrumb.contextTypes = {
 const containerStyle = (theme: Theme) => ({
   fontFamily: sansSerif.family,
   listStyle: 'none',
-  padding: 0,
+  padding: '0 0.5rem',
   margin: 0,
   maxHeight: '80px',
-  overflow: 'auto',
-  marginTop: '2px',
   backgroundColor: theme.base01,
   borderTop: `1px solid ${theme.base03}`,
+  whiteSpace: 'nowrap',
+  overflow: 'auto',
 });
 
 const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {
@@ -114,7 +146,6 @@ const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {
     MozUserSelect: 'none',
     userSelect: 'none',
     display: 'inline-block',
-    marginRight: '2px',
   };
 };
 

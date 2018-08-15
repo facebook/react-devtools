@@ -10,17 +10,17 @@
  */
 'use strict';
 
-var BlurInput = require('./BlurInput');
-var DataView = require('./DataView/DataView');
-var DetailPane = require('./detail_pane/DetailPane');
-var DetailPaneSection = require('./detail_pane/DetailPaneSection');
-var {sansSerif} = require('./Themes/Fonts');
-var PropVal = require('./PropVal');
+const BlurInput = require('./BlurInput');
+const DataView = require('./DataView/DataView');
+const DetailPane = require('./detail_pane/DetailPane');
+const DetailPaneSection = require('./detail_pane/DetailPaneSection');
+const {sansSerif} = require('./Themes/Fonts');
+const PropVal = require('./PropVal');
 const PropTypes = require('prop-types');
-var React = require('react');
+const React = require('react');
 
-var decorate = require('./decorate');
-var invariant = require('./invariant');
+const decorate = require('./decorate');
+const invariant = require('./invariant');
 
 import type {Theme} from './types';
 

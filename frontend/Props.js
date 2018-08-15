@@ -11,17 +11,17 @@
 'use strict';
 
 const PropTypes = require('prop-types');
+const React = require('react');
+const {getInvertedMid, getInvertedWeak} = require('./Themes/utils');
 
-var React = require('react');
-var PropVal = require('./PropVal');
-var {getInvertedMid} = require('./Themes/utils');
+const {Fragment} = React;
 
 import type {Theme} from './types';
 
 type PropsProps = {
   props: any,
   inverted: boolean,
-}
+};
 
 class Props extends React.Component<PropsProps> {
   context: {
@@ -36,47 +36,61 @@ class Props extends React.Component<PropsProps> {
     var theme = this.context.theme;
     var {inverted, props} = this.props;
     if (!props || typeof props !== 'object') {
-      return <span/>;
+      return null;
     }
 
-    var names = Object.keys(props).filter(name => {
-      return name[0] !== '_' && name !== 'children';
+    const propKeys = Object.keys(props);
+    var names = propKeys.filter(name => {
+      const value = props[name];
+      return name[0] !== '_' && name !== 'children' && (
+        typeof value === 'boolean' ||
+        typeof value === 'string' ||
+        typeof value === 'number' ||
+        value == null
+      );
     });
 
     var items = [];
 
-    names.slice(0, 3).forEach(name => {
+    names.forEach(name => {
+      const valueIsString = typeof props[name] === 'string';
+
+      let displayValue = props[name];
+      if (displayValue === undefined) {
+        displayValue = 'undefined';
+      } else if (displayValue === null) {
+        displayValue = 'null';
+      } else if (typeof displayValue === 'boolean') {
+        displayValue = displayValue ? 'true' : 'false';
+      } else if (valueIsString && displayValue.length > 50) {
+        displayValue = displayValue.slice(0, 50) + '…';
+      }
+
       items.push(
-        <span key={'prop-' + name} style={propStype(inverted, theme)}>
-          <span style={attributeNameStyle(inverted, theme)}>{name}</span>
-          =
-          <PropVal val={props[name]} inverted={inverted}/>
-        </span>
+        <Fragment key={'prop-' + name}>
+          &nbsp;
+          <span style={{
+            color: inverted ? getInvertedMid(theme.state02) : theme.special06,
+          }}>
+            {name}
+          </span>
+          {valueIsString ? '="' : '={'}
+          <span style={{
+            color: inverted ? getInvertedWeak(theme.state02) : theme.special02,
+          }}>
+            {displayValue}
+          </span>
+          {valueIsString ? '"' : '}'}
+        </Fragment>
       );
     });
 
-    if (names.length > 3) {
-      items.push(<span key="ellipsis" style={ellipsisStyle(inverted, theme)}>…</span>);
-    }
-    return <span>{items}</span>;
+    return items;
   }
 }
 
 Props.contextTypes = {
   theme: PropTypes.object.isRequired,
 };
-
-const attributeNameStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
-});
-
-const ellipsisStyle = (isInverted: boolean, theme: Theme) => ({
-  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
-});
-
-const propStype = (isInverted: boolean, theme: Theme) => ({
-  paddingLeft: 5,
-  color: isInverted ? getInvertedMid(theme.state02) : theme.special06,
-});
 
 module.exports = Props;
