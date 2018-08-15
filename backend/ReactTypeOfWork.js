@@ -28,4 +28,6 @@ module.exports = {
   ContextConsumer: 12,
   ContextProvider: 13,
   ForwardRef: 14,
+  Profiler: 15,
+  Placeholder: 16,
 };

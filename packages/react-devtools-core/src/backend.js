@@ -25,6 +25,7 @@ var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
 var invariant = require('assert');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+var setupProfiler = require('../../../plugins/Profiler/backend');
 var setupRelay = require('../../../plugins/Relay/backend');
 
 installGlobalHook(window);
@@ -139,6 +140,7 @@ function setupBackend(wall, resolveRNStyle) {
     setupRNStyle(bridge, agent, resolveRNStyle);
   }
 
+  setupProfiler(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
   setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
 
   var _connectTimeout = setTimeout(() => {

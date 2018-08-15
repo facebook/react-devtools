@@ -14,10 +14,10 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Theme} from './types';
 
-var {sansSerif} = require('./Themes/Fonts');
+const {sansSerif} = require('./Themes/Fonts');
 const PropTypes = require('prop-types');
-var React = require('react');
-var decorate = require('./decorate');
+const React = require('react');
+const decorate = require('./decorate');
 
 type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
 

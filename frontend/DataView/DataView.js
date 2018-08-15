@@ -13,12 +13,12 @@
 import type {Theme, DOMEvent} from '../types';
 
 const PropTypes = require('prop-types');
-var React = require('react');
-var Simple = require('./Simple');
-var nullthrows = require('nullthrows').default;
+const React = require('react');
+const Simple = require('./Simple');
+const nullthrows = require('nullthrows').default;
 
-var consts = require('../../agent/consts');
-var previewComplex = require('./previewComplex');
+const consts = require('../../agent/consts');
+const previewComplex = require('./previewComplex');
 
 type Inspect = (path: Array<string>, cb: () => void) => void;
 type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;

@@ -11,9 +11,8 @@
 'use strict';
 
 const PropTypes = require('prop-types');
-
-var React = require('react');
-var {getInvertedMid, getInvertedWeak} = require('./Themes/utils');
+const React = require('react');
+const {getInvertedMid, getInvertedWeak} = require('./Themes/utils');
 
 const {Fragment} = React;
 
