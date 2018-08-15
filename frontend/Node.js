@@ -587,7 +587,6 @@ const guidelineStyle = (depth: number, isSelected: boolean, isHovered: boolean, 
     top: '1rem',
     bottom: 0,
     left: '0.5rem',
-    willChange: 'opacity',
     // Bring it in front of the hovered children, but make sure
     // hovering over parents doesn't draw on top of selected
     // guideline even when we've selected the closing tag.
