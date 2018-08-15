@@ -160,18 +160,23 @@ SettingsPane.contextTypes = {
   theme: PropTypes.object.isRequired,
 };
 SettingsPane.propTypes = {
+  isInspectEnabled: PropTypes.bool,
+  isRecording: PropTypes.bool,
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
+  toggleRecord: PropTypes.func,
   onChangeSearch: PropTypes.func,
+  toggleInspectEnabled: PropTypes.func,
 };
 
 var Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'searchText'];
+    return ['isInspectEnabled', 'isRecording', 'searchText'];
   },
   props(store) {
     return {
       isInspectEnabled: store.isInspectEnabled,
+      isRecording: store.isRecording,
       onChangeSearch: text => store.changeSearch(text),
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
@@ -179,6 +184,7 @@ var Wrapped = decorate({
         store.showPreferencesPanel();
       },
       toggleInspectEnabled: () => store.setInspectEnabled(!store.isInspectEnabled),
+      toggleRecord: () => store.setIsRecording(!store.isRecording),
     };
   },
 }, SettingsPane);
@@ -292,6 +298,7 @@ const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
   display: 'flex',
   background: 'none',
   border: 'none',
+  outline: 'none',
   marginRight: '0.5rem',
   color: isHovered ? theme.state06 : 'inherit',
 });

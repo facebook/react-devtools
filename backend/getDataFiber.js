@@ -56,6 +56,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
   var name = null;
   var text = null;
 
+  // Profiler data
+  var actualDuration = null;
+  var actualStartTime = null;
+  var treeBaseDuration = null;
+
   switch (fiber.tag) {
     case FunctionalComponent:
     case ClassComponent:
@@ -185,7 +190,7 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
         case PROFILER_SYMBOL_STRING:
           nodeType = 'Special';
           props = fiber.memoizedProps;
-          name = 'Profiler';
+          name = `Profiler(${fiber.memoizedProps.id})`;
           children = [];
           break;
         default:
@@ -206,6 +211,12 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     }
   }
 
+  if (fiber.actualDuration !== undefined) {
+    actualDuration = fiber.actualDuration;
+    actualStartTime = fiber.actualStartTime;
+    treeBaseDuration = fiber.treeBaseDuration;
+  }
+
   // $FlowFixMe
   return {
     nodeType,
@@ -221,6 +232,11 @@ function getDataFiber(fiber: Object, getOpaqueNode: (fiber: Object) => Object): 
     text,
     updater,
     publicInstance,
+
+    // Profiler data
+    actualDuration,
+    actualStartTime,
+    treeBaseDuration,
   };
 }
 

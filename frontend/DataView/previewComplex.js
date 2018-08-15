@@ -10,11 +10,11 @@
  */
 'use strict';
 
+import type {Theme} from '../types';
+
 var React = require('react');
 
 var consts = require('../../agent/consts');
-
-import type {Theme} from '../types';
 
 function previewComplex(data: Object, theme: Theme) {
   const style={ color: theme.special04 };

@@ -11,13 +11,12 @@
 'use strict';
 
 const PropTypes = require('prop-types');
+const React = require('react');
+const nullthrows = require('nullthrows').default;
+const {sansSerif} = require('./Themes/Fonts');
+const HighlightHover = require('./HighlightHover');
 
-var React = require('react');
-var nullthrows = require('nullthrows').default;
-var {sansSerif} = require('./Themes/Fonts');
-var HighlightHover = require('./HighlightHover');
-
-var decorate = require('./decorate');
+const decorate = require('./decorate');
 
 import type {Theme} from './types';
 

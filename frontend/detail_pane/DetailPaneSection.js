@@ -10,11 +10,10 @@
  */
 'use strict';
 
-const PropTypes = require('prop-types');
-
-var React = require('react');
-
 import type {Theme} from '../types';
+
+const PropTypes = require('prop-types');
+const React = require('react');
 
 type Props = {
   title: string,

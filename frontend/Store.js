@@ -23,6 +23,7 @@ var ThemeStore = require('./Themes/Store');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
+import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
 type DataType = Map;
@@ -108,6 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
+  snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
   capabilities: {
     scroll?: boolean,
@@ -161,6 +163,7 @@ class Store extends EventEmitter {
     });
     this._bridge.on('mount', (data) => this._mountComponent(data));
     this._bridge.on('update', (data) => this._updateComponent(data));
+    this._bridge.on('updateProfileTimes', (data) => this._updateComponentProfileTimes(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
     this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
@@ -177,6 +180,19 @@ class Store extends EventEmitter {
       this._revealDeep(id);
       this.selectTop(this.skipWrapper(id), quiet);
       this.setSelectedTab('Elements');
+    });
+    this._bridge.on('storeSnapshot', storeSnapshot => {
+      // Store snapshot data for ProfilerStore to process later.
+      // It's important to store it as a queue, because events may be batched.
+      this.snapshotQueue.push({
+        ...storeSnapshot,
+        nodes: this._nodes,
+      });
+      this.emit('storeSnapshot');
+    });
+    this._bridge.on('clearSnapshots', () => {
+      this.snapshotQueue.length = 0;
+      this.emit('clearSnapshots');
     });
 
     this._establishConnection();
@@ -572,6 +588,10 @@ class Store extends EventEmitter {
     this._bridge.send('setInspectEnabled', isInspectEnabled);
   }
 
+  setIsRecording(isRecording: boolean) {
+    this._bridge.send('isRecording', isRecording);
+  }
+
   // Private stuff
   _establishConnection() {
     var tries = 0;
@@ -670,6 +690,15 @@ class Store extends EventEmitter {
         }
       });
     }
+    this.emit(data.id);
+  }
+
+  _updateComponentProfileTimes(data: DataType) {
+    var node = this.get(data.id);
+    if (!node) {
+      return;
+    }
+    this._nodes = this._nodes.mergeIn([data.id], Map(data));
     this.emit(data.id);
   }
 
