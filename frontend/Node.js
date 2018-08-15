@@ -333,7 +333,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     const headInverted = inverted && !isBottomTagSelected;
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && !isBottomTagSelected, nodeType, theme);
+    const jsxOpenTagStyle = jsxTagStyle(inverted && (!isBottomTagSelected || collapsed), nodeType, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
         <span style={{
@@ -480,7 +480,7 @@ const headStyle = ({
     backgroundColor = theme.state03;
   }
 
-  const isInverted = isSelected && isWindowFocused && !isBottomTagSelected;
+  const isInverted = isSelected && isWindowFocused && (isCollapsed || !isBottomTagSelected);
   const color = isInverted ? theme.state02 : undefined;
 
   return {
