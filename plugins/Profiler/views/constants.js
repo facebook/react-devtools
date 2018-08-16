@@ -30,8 +30,16 @@ export const scale = (minValue: number, maxValue: number, minRange: number, maxR
 
 const gradientMaxIndex = gradient.length - 1;
 export const getGradientColor = (value: number) => {
-  value = Math.max(0, Math.min(gradientMaxIndex, value)); // Guard against invalid indices
-  return gradient[Math.round(value * gradientMaxIndex)];
+  let index;
+  // Guard against commits with duration 0
+  if (Number.isNaN(value)) {
+    index = 0;
+  } else if (!Number.isFinite(value)) {
+    index = gradient.length - 1;
+  } else {
+    index = Math.max(0, Math.min(gradientMaxIndex, value)) * gradientMaxIndex;
+  }
+  return gradient[Math.round(index)];
 };
 
 export const formatDuration = (duration: number) => Math.round(duration * 10) / 10;
