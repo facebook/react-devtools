@@ -331,7 +331,7 @@ class Node extends React.Component<PropsType, StateType> {
       </Fragment>
     );
 
-    const headInverted = inverted && !isBottomTagSelected;
+    const headInverted = inverted && (!isBottomTagSelected || collapsed);
 
     const jsxOpenTagStyle = jsxTagStyle(inverted && (!isBottomTagSelected || collapsed), nodeType, theme);
     const head = (

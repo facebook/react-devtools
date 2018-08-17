@@ -162,7 +162,8 @@ class ListItem extends PureComponent<any, void> {
     const { disabled, maxDuration, selectedSnapshot, selectSnapshot, snapshots } = itemData;
 
     const snapshot = snapshots[index];
-    const percentage = snapshot.duration / maxDuration;
+    // Guard against commits with duration 0
+    const percentage = Math.min(1, Math.max(0, snapshot.duration / maxDuration)) || 0;
     const isSelected = selectedSnapshot === snapshot;
 
     return (
@@ -173,6 +174,7 @@ class ListItem extends PureComponent<any, void> {
           ...style,
           opacity: isSelected || disabled ? 0.5 : 1,
           cursor: disabled ? 'default' : 'pointer',
+          userSelect: 'none',
         }}
         title={`Duration ${formatDuration(snapshot.duration)}ms at ${formatTime(snapshot.commitTime)}s`}
       >
