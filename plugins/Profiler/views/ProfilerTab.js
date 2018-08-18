@@ -251,6 +251,7 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <ChartComponent
             cacheDataForSnapshot={cacheDataForSnapshot}
+            deselectFiber={this.deselectFiber}
             getCachedDataForSnapshot={getCachedDataForSnapshot}
             inspectFiber={this.inspectFiber}
             selectedFiberID={selectedFiberID}

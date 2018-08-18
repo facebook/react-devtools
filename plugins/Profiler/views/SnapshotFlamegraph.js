@@ -72,6 +72,7 @@ type ItemData = {|
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
+  deselectFiber: Function,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
@@ -84,6 +85,7 @@ type Props = {|
 
 const SnapshotFlamegraph = ({
   cacheDataForSnapshot,
+  deselectFiber,
   getCachedDataForSnapshot,
   inspectFiber,
   selectedFiberID,
@@ -105,6 +107,7 @@ const SnapshotFlamegraph = ({
     <AutoSizer>
       {({ height, width }) => (
         <Flamegraph
+          deselectFiber={deselectFiber}
           flamegraphData={((flamegraphData: any): FlamegraphData)}
           height={height}
           inspectFiber={inspectFiber}
@@ -121,6 +124,7 @@ const SnapshotFlamegraph = ({
 };
 
 type FlamegraphProps = {|
+  deselectFiber: Function,
   flamegraphData: FlamegraphData,
   height: number,
   inspectFiber: SelectOrInspectFiber,
@@ -133,6 +137,7 @@ type FlamegraphProps = {|
 |};
 
 const Flamegraph = ({
+  deselectFiber,
   flamegraphData,
   height,
   inspectFiber,
@@ -174,20 +179,37 @@ const Flamegraph = ({
   }
 
   return (
-    <List
-      height={height}
-      innerTagName="svg"
-      itemCount={flameGraphDepth}
-      itemData={itemData}
-      itemSize={barHeight}
-      width={width}
+    <div
+      onClick={deselectFiber}
+      style={{height, width}}
     >
-      {ListItem}
-    </List>
+      <List
+        height={height}
+        innerTagName="svg"
+        itemCount={flameGraphDepth}
+        itemData={itemData}
+        itemSize={barHeight}
+        width={width}
+      >
+        {ListItem}
+      </List>
+    </div>
   );
 };
 
 class ListItem extends PureComponent<any, void> {
+  handleClick = (id, name, event) => {
+    event.stopPropagation();
+    const itemData: ItemData = ((this.props.data: any): ItemData);
+    itemData.selectFiber(id, name);
+  };
+
+  handleDoubleClick = (id, name, event) => {
+    event.stopPropagation();
+    const itemData: ItemData = ((this.props.data: any): ItemData);
+    itemData.inspectFiber(id, name);
+  };
+
   render() {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
@@ -245,8 +267,8 @@ class ListItem extends PureComponent<any, void> {
               isDimmed={index < focusedNodeIndex}
               key={id}
               label={didRender ? `${name} (${actualDuration.toFixed(2)}ms)` : name}
-              onClick={() => itemData.selectFiber(id, name)}
-              onDoubleClick={() => itemData.inspectFiber(id, name)}
+              onClick={this.handleClick.bind(this, id, name)}
+              onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
