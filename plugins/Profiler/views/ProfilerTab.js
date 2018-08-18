@@ -302,9 +302,9 @@ class ProfilerTab extends React.Component<Props, State> {
     } else if (selectedChartType !== 'interactions' && selectedFiberName !== null) {
       details = (
         <ProfilerFiberDetailPane
+          deselectFiber={this.deselectFiber}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           name={selectedFiberName}
-          selectedChartType={selectedChartType}
           snapshot={snapshot}
           snapshotFiber={snapshotFiber}
           toggleInspectingSelectedFiber={this.toggleInspectingSelectedFiber}

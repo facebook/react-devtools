@@ -17,22 +17,23 @@ type Props = {
   style?: Object,
 };
 
-const SvgIcon = ({ path, style = styles.svgIcon }: Props) => (
+const SvgIcon = ({ path, style }: Props) => (
   <svg
-    style={style}
+    style={{
+      ...DEFAULT_STYLE,
+      ...style,
+    }}
     viewBox="0 0 24 24"
   >
     <path d={path}></path>
   </svg>
 );
 
-const styles = {
-  svgIcon: {
-    flex: '0 0 1rem',
-    width: '1rem',
-    height: '1rem',
-    fill: 'currentColor',
-  },
+const DEFAULT_STYLE = {
+  flex: '0 0 1rem',
+  width: '1rem',
+  height: '1rem',
+  fill: 'currentColor',
 };
 
 module.exports = SvgIcon;

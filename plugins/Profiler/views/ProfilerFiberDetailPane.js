@@ -11,7 +11,7 @@
 'use strict';
 
 import type {Theme} from '../../../frontend/types';
-import type {ChartType, Snapshot} from '../ProfilerTypes';
+import type {Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
 import {monospace} from '../../../frontend/Themes/Fonts';
@@ -24,9 +24,9 @@ import IconButton from './IconButton';
 const emptyFunction = () => {};
 
 type Props = {|
+  deselectFiber: Function,
   isInspectingSelectedFiber: boolean,
   name?: string,
-  selectedChartType: ChartType,
   snapshot: Snapshot,
   snapshotFiber: any,
   theme: Theme,
@@ -34,9 +34,9 @@ type Props = {|
 |};
 
 const ProfilerFiberDetailPane = ({
+  deselectFiber,
   isInspectingSelectedFiber,
   name = 'Unknown',
-  selectedChartType,
   snapshot,
   snapshotFiber,
   theme,
@@ -66,18 +66,30 @@ const ProfilerFiberDetailPane = ({
       >
         {name}
       </div>
-      <IconButton
-        icon={
-          isInspectingSelectedFiber
-            ? selectedChartType === 'flamegraph'
-              ? Icons.FLAME_CHART
-              : Icons.RANKED_CHART
-            : Icons.BARS
-        }
-        onClick={toggleInspectingSelectedFiber}
-        theme={theme}
-        title={`Inspect ${name}`}
-      />
+      <div>
+        <IconButton
+          disabled={isInspectingSelectedFiber}
+          icon={Icons.BARS}
+          onClick={toggleInspectingSelectedFiber}
+          style={{
+            backgroundColor: theme.state00,
+            color: theme.base00,
+          }}
+          theme={theme}
+          title={`Inspect ${name}`}
+        />
+        <IconButton
+          icon={Icons.CLOSE}
+          onClick={isInspectingSelectedFiber ? toggleInspectingSelectedFiber : deselectFiber}
+          style={{
+            marginLeft: '0.25rem',
+            backgroundColor: theme.base03,
+            color: theme.base05,
+          }}
+          theme={theme}
+          title="Close"
+        />
+      </div>
     </div>
     {snapshotFiber !== null && (
       <div style={{

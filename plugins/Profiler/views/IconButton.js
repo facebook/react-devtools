@@ -22,18 +22,29 @@ const IconButton = Hoverable(
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
+        position: 'relative',
+        width: '1.5rem',
+        height: '1.5rem',
         background: isTransparent ? 'none' : theme.base00,
         border: 'none',
+        borderRadius: '0.125rem',
         outline: 'none',
         cursor: disabled ? 'default' : 'pointer',
         color: isActive ? theme.state00 : (isHovered ? theme.state06 : theme.base05),
         opacity: disabled ? 0.5 : 1,
-        padding: '4px',
         ...style,
       }}
       title={title}
     >
-      <SvgIcon path={icon} />
+      <SvgIcon
+        path={icon}
+        style={{
+          position: 'absolute',
+          top: '50%',
+          bottom: '50%',
+          transform: 'translate(-50%, -50%)',
+        }}
+      />
     </button>
   )
 );
