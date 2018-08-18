@@ -342,7 +342,7 @@ class ListItem extends PureComponent<any, void> {
           width,
           height: Math.max(minBarHeight, percentage * HEIGHT),
           backgroundColor: isSelected
-            ? theme.state00
+            ? theme.state06
             : percentage === 0
               ? didNotRender
               : getGradientColor(percentage),
