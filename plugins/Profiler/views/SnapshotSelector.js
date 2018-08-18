@@ -35,6 +35,7 @@ type ItemData = {|
   selectSnapshot: SelectSnapshot,
   selectedSnapshot: Snapshot,
   snapshots: Array<Snapshot>,
+  theme: Theme,
 |};
 
 type Props = {|
@@ -71,6 +72,7 @@ export default ({
             selectedSnapshot={selectedSnapshot}
             selectSnapshot={selectSnapshot}
             snapshots={snapshots}
+            theme={theme}
             width={width}
           />
         )}
@@ -85,6 +87,7 @@ type SnapshotSelectorProps = {|
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
+  theme: Theme,
   width: number,
 |};
 
@@ -108,6 +111,7 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
       selectedSnapshot,
       selectSnapshot,
       snapshots,
+      theme,
       width,
     } = this.props;
     const {isMouseDown} = this.state;
@@ -123,6 +127,7 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
       selectSnapshot,
       selectedSnapshot,
       snapshots,
+      theme,
     );
 
     return (
@@ -159,12 +164,14 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { disabled, maxDuration, selectedSnapshot, selectSnapshot, snapshots } = itemData;
+    const { disabled, maxDuration, selectedSnapshot, selectSnapshot, snapshots, theme } = itemData;
 
     const snapshot = snapshots[index];
     // Guard against commits with duration 0
     const percentage = Math.min(1, Math.max(0, snapshot.duration / maxDuration)) || 0;
     const isSelected = selectedSnapshot === snapshot;
+
+    const width = parseFloat(style.width) - 1;
 
     return (
       <div
@@ -172,19 +179,24 @@ class ListItem extends PureComponent<any, void> {
         onMouseEnter={disabled ? undefined : this.handleMouseEnter}
         style={{
           ...style,
-          opacity: isSelected || disabled ? 0.5 : 1,
+          width,
+          opacity: disabled ? 0.5 : 1,
           cursor: disabled ? 'default' : 'pointer',
           userSelect: 'none',
+          backgroundColor: isSelected ? theme.base01 : 'transparent',
         }}
         title={`Duration ${formatDuration(snapshot.duration)}ms at ${formatTime(snapshot.commitTime)}s`}
       >
         <div style={{
           position: 'absolute',
           bottom: 0,
-          left: 0,
-          right: 1,
+          width,
           height: Math.max(minBarHeight, percentage * HEIGHT),
-          backgroundColor: percentage === 0 ? didNotRender : getGradientColor(percentage),
+          backgroundColor: isSelected
+            ? theme.state00
+            : percentage === 0
+              ? didNotRender
+              : getGradientColor(percentage),
         }} />
       </div>
     );
@@ -206,6 +218,7 @@ const getItemData = memoize((
   selectSnapshot: SelectSnapshot,
   selectedSnapshot: Snapshot,
   snapshots: Array<Snapshot>,
+  theme: Theme,
 ): ItemData => ({
   disabled,
   isMouseDown,
@@ -213,4 +226,5 @@ const getItemData = memoize((
   selectSnapshot,
   selectedSnapshot,
   snapshots,
+  theme,
 }));
