@@ -171,6 +171,7 @@ class ListItem extends PureComponent<any, void> {
         onClick={() => selectSnapshot(node.parentSnapshot)}
         onDoubleClick={stopInspecting}
         theme={theme}
+        title={`${node.value}ms`}
         width={width}
         x={left}
         y={height - safeHeight}

@@ -270,6 +270,7 @@ class ListItem extends PureComponent<any, void> {
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
+              title={didRender ? `${name} (${actualDuration}ms)` : name}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
               y={top}

@@ -24,6 +24,7 @@ type Props = {|
   onDoubleClick?: Function,
   placeLabelAboveNode?: boolean,
   theme: Theme,
+  title: string,
   width: number,
   x: number,
   y: number,
@@ -31,12 +32,24 @@ type Props = {|
 
 const minWidthToDisplay = 35;
 
-const ChartNode = ({ color, height, isDimmed = false, label, onClick, onDoubleClick, theme, width, x, y }: Props) => (
+const ChartNode = ({
+  color,
+  height,
+  isDimmed = false,
+  label,
+  onClick,
+  onDoubleClick,
+  theme,
+  title,
+  width,
+  x,
+  y,
+}: Props) => (
   <g
     style={ChartAnimatedNode}
     transform={`translate(${x},${y})`}
   >
-    <title>{label}</title>
+    <title>{title}</title>
     <rect
       width={width}
       height={height}

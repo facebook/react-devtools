@@ -25,6 +25,7 @@ type Node = {|
   id: any,
   label: string,
   name: string,
+  title: string,
   value: number,
 |};
 
@@ -199,6 +200,7 @@ class ListItem extends PureComponent<any, void> {
         onClick={this.handleClick}
         onDoubleClick={this.handleDoubleClick}
         theme={data.theme}
+        title={node.title}
         width={Math.max(minBarWidth, scaleX(node.value))}
         x={0}
         y={top}
@@ -258,6 +260,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
         name,
+        title: `${name} (${node.actualDuration}ms)`,
         value: node.actualDuration,
       };
     })
