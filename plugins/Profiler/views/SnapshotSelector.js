@@ -103,6 +103,16 @@ type SnapshotSelectorState = {|
 |};
 
 class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSelectorState> {
+  // $FlowFixMe createRef()
+  listRef = React.createRef();
+
+  componentDidUpdate(prevProps) {
+    // Make sure any newly selected snapshot is visible within the list.
+    if (this.props.snapshotIndex !== prevProps.snapshotIndex) {
+      this.listRef.current.scrollToItem(this.props.snapshotIndex);
+    }
+  }
+
   state: SnapshotSelectorState = {
     isMouseDown: false,
   };
@@ -186,6 +196,7 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
           itemCount={snapshots.length}
           itemData={itemData}
           itemSize={listData.itemSize}
+          ref={this.listRef}
           width={width}
         >
           {ListItem}
