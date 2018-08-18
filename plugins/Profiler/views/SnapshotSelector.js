@@ -18,10 +18,17 @@ import React, {PureComponent} from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import { didNotRender, formatDuration, formatTime, getGradientColor, minBarHeight, minBarWidth } from './constants';
+import Icons from '../../../frontend/Icons';
+import IconButton from './IconButton';
 
 const HEIGHT = 20;
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
+
+type FilteredSnapshotData = {|
+  snapshotIndex: number,
+  snapshots: Array<Snapshot>,
+|};
 
 type ListData = {|
   itemSize: number,
@@ -29,7 +36,6 @@ type ListData = {|
 |};
 
 type ItemData = {|
-  disabled: boolean,
   isMouseDown: boolean,
   maxDuration: number,
   selectSnapshot: SelectSnapshot,
@@ -39,7 +45,8 @@ type ItemData = {|
 |};
 
 type Props = {|
-  disabled: boolean,
+  isInspectingSelectedFiber: boolean,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshotIndex: number,
@@ -48,48 +55,169 @@ type Props = {|
 |};
 
 export default ({
-  disabled,
+  isInspectingSelectedFiber,
+  selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
   snapshotIndex,
   snapshots,
   theme,
 }: Props) => {
+  const filteredData = getFilteredSnapshotData(
+    isInspectingSelectedFiber,
+    selectedFiberID,
+    selectedSnapshot,
+    snapshotIndex,
+    snapshots,
+  );
+
   return (
-    <div style={{
-      flex: '1 1 100px',
-      maxWidth: 250,
-      height: HEIGHT,
-      display: 'grid',
-      alignitems: 'flex-end',
-      gridGap: '1px',
-      gridAutoFlow: 'column',
-      backgroundColor: theme.base00,
-    }}>
-      <AutoSizer disableHeight={true}>
-        {({ height, width }) => (
-          <SnapshotSelector
-            disabled={disabled}
-            height={HEIGHT}
-            selectedSnapshot={selectedSnapshot}
-            selectSnapshot={selectSnapshot}
-            snapshotIndex={snapshotIndex}
-            snapshots={snapshots}
-            theme={theme}
-            width={width}
-          />
-        )}
-      </AutoSizer>
-    </div>
+    <SnapshotSelectorWrapper
+      isInspectingSelectedFiber={isInspectingSelectedFiber}
+      selectedFiberID={selectedFiberID}
+      selectedSnapshot={selectedSnapshot}
+      selectSnapshot={selectSnapshot}
+      snapshotIndex={filteredData.snapshotIndex}
+      snapshots={filteredData.snapshots}
+      theme={theme}
+    />
   );
 };
+
+class SnapshotSelectorWrapper extends PureComponent<Props, void> {
+  handleKeyDown = event => {
+    if (event.keyCode === LEFT_ARROW || event.keyCode === RIGHT_ARROW) {
+      event.preventDefault();
+
+      if (event.keyCode === LEFT_ARROW) {
+        this.selectPreviousSnapshotIndex();
+      } else {
+        this.selectNextSnapshotIndex();
+      }
+    }
+  };
+
+  selectNextSnapshotIndex = () => {
+    const {
+      selectSnapshot,
+      snapshotIndex,
+      snapshots,
+    } = this.props;
+    const newIndex = snapshotIndex < snapshots.length - 1
+      ? snapshotIndex + 1
+      : 0;
+
+    selectSnapshot(snapshots[newIndex]);
+  };
+
+  selectPreviousSnapshotIndex = () => {
+    const {
+      selectSnapshot,
+      snapshotIndex,
+      snapshots,
+    } = this.props;
+    const newIndex = snapshotIndex > 0
+      ? snapshotIndex - 1
+      : snapshots.length - 1;
+
+    selectSnapshot(snapshots[newIndex]);
+  };
+
+  render() {
+    const {
+      isInspectingSelectedFiber,
+      selectedFiberID,
+      selectedSnapshot,
+      selectSnapshot,
+      snapshotIndex,
+      snapshots,
+      theme,
+    } = this.props;
+
+    return (
+      <div
+        onKeyDown={this.handleKeyDown}
+        style={{
+          display: 'flex',
+          flex: '1 0 auto',
+          alignItems: 'center',
+          outline: 'none',
+        }}
+        tabIndex={0}
+      >
+        <span>
+          {snapshotIndex + 1} / {snapshots.length}
+        </span>
+        <IconButton
+          icon={Icons.BACK}
+          isTransparent={true}
+          onClick={this.selectPreviousSnapshotIndex}
+          theme={theme}
+          title="Previous render"
+        />
+        <AutoSizedSnapshotSelector
+          isInspectingSelectedFiber={isInspectingSelectedFiber}
+          selectedFiberID={selectedFiberID}
+          selectedSnapshot={selectedSnapshot}
+          selectSnapshot={selectSnapshot}
+          snapshotIndex={snapshotIndex}
+          snapshots={snapshots}
+          theme={theme}
+        />
+        <IconButton
+          icon={Icons.FORWARD}
+          isTransparent={true}
+          onClick={this.selectNextSnapshotIndex}
+          theme={theme}
+          title="Next render"
+        />
+      </div>
+    );
+  }
+}
+
+const AutoSizedSnapshotSelector = ({
+  isInspectingSelectedFiber,
+  selectedFiberID,
+  selectedSnapshot,
+  selectSnapshot,
+  snapshotIndex,
+  snapshots,
+  theme,
+}: Props) => (
+  <div style={{
+    flex: '1 1 100px',
+    maxWidth: 250,
+    height: HEIGHT,
+    display: 'grid',
+    alignitems: 'flex-end',
+    gridGap: '1px',
+    gridAutoFlow: 'column',
+    backgroundColor: theme.base00,
+  }}>
+    <AutoSizer disableHeight={true}>
+      {({ height, width }) => (
+        <SnapshotSelector
+          height={HEIGHT}
+          selectedFiberID={selectedFiberID}
+          selectedSnapshot={selectedSnapshot}
+          selectSnapshot={selectSnapshot}
+          snapshotIndex={snapshotIndex}
+          snapshots={snapshots}
+          theme={theme}
+          width={width}
+        />
+      )}
+    </AutoSizer>
+  </div>
+);
 
 const LEFT_ARROW = 37;
 const RIGHT_ARROW = 39;
 
 type SnapshotSelectorProps = {|
-  disabled: boolean,
   height: number,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   snapshotIndex: number,
@@ -117,43 +245,12 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
     isMouseDown: false,
   };
 
-  handleKeyDown = event => {
-    const {
-      disabled,
-      snapshotIndex,
-      selectSnapshot,
-      snapshots,
-    } = this.props;
-
-    if (disabled) {
-      return;
-    }
-
-    if (event.keyCode === LEFT_ARROW || event.keyCode === RIGHT_ARROW) {
-      event.preventDefault();
-
-      let newIndex = 0;
-      if (event.keyCode === LEFT_ARROW) {
-        newIndex = snapshotIndex > 0
-          ? snapshotIndex - 1
-          : snapshots.length - 1;
-      } else {
-        newIndex = snapshotIndex < snapshots.length - 1
-          ? snapshotIndex + 1
-          : 0;
-      }
-
-      selectSnapshot(snapshots[newIndex]);
-    }
-  };
-
   handleMouseDown = event => this.setState({ isMouseDown: true });
   handleMouseLeave = event => this.setState({ isMouseDown: false });
   handleMouseUp = event => this.setState({ isMouseDown: false });
 
   render() {
     const {
-      disabled,
       height,
       selectedSnapshot,
       selectSnapshot,
@@ -168,7 +265,6 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
     // Pass required contextual data down to the ListItem renderer.
     // (This method is memoized so it's safe to call on every render.)
     const itemData = getItemData(
-      disabled,
       isMouseDown,
       listData.maxDuration,
       selectSnapshot,
@@ -179,16 +275,10 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
 
     return (
       <div
-        onKeyDown={this.handleKeyDown}
         onMouseDown={this.handleMouseDown}
         onMouseLeave={this.handleMouseLeave}
         onMouseUp={this.handleMouseUp}
-        style={{
-          height,
-          width,
-          outline: '0',
-        }}
-        tabIndex={0}
+        style={{ height, width }}
       >
         <List
           direction="horizontal"
@@ -218,7 +308,13 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { disabled, maxDuration, selectedSnapshot, selectSnapshot, snapshots, theme } = itemData;
+    const {
+      maxDuration,
+      selectedSnapshot,
+      selectSnapshot,
+      snapshots,
+      theme,
+    } = itemData;
 
     const snapshot = snapshots[index];
     // Guard against commits with duration 0
@@ -229,15 +325,14 @@ class ListItem extends PureComponent<any, void> {
 
     return (
       <div
-        onClick={disabled ? undefined : () => selectSnapshot(snapshot)}
-        onMouseEnter={disabled ? undefined : this.handleMouseEnter}
+        onClick={() => selectSnapshot(snapshot)}
+        onMouseEnter={this.handleMouseEnter}
         style={{
           ...style,
           width,
-          opacity: disabled ? 0.5 : 1,
-          cursor: disabled ? 'default' : 'pointer',
-          userSelect: 'none',
           backgroundColor: isSelected ? theme.base01 : 'transparent',
+          userSelect: 'none',
+          cursor: 'pointer',
         }}
         title={`Duration ${formatDuration(snapshot.duration)}ms at ${formatTime(snapshot.commitTime)}s`}
       >
@@ -257,6 +352,28 @@ class ListItem extends PureComponent<any, void> {
   }
 }
 
+const getFilteredSnapshotData = memoize((
+  isInspectingSelectedFiber: boolean,
+  selectedFiberID: string | null,
+  selectedSnapshot: Snapshot,
+  snapshotIndex: number,
+  snapshots: Array<Snapshot>,
+): FilteredSnapshotData => {
+  if (isInspectingSelectedFiber) {
+    const filteredSnapshots = snapshots.filter(snapshot => snapshot.committedNodes.includes(selectedFiberID));
+    const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
+    return {
+      snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
+      snapshots: filteredSnapshots,
+    };
+  } else {
+    return {
+      snapshotIndex,
+      snapshots,
+    };
+  }
+});
+
 const getListData = memoize((
   snapshots: Array<Snapshot>,
   width: number,
@@ -266,7 +383,6 @@ const getListData = memoize((
 }));
 
 const getItemData = memoize((
-  disabled: boolean,
   isMouseDown: boolean,
   maxDuration: number,
   selectSnapshot: SelectSnapshot,
@@ -274,7 +390,6 @@ const getItemData = memoize((
   snapshots: Array<Snapshot>,
   theme: Theme,
 ): ItemData => ({
-  disabled,
   isMouseDown,
   maxDuration,
   selectSnapshot,

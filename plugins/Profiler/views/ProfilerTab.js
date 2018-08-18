@@ -128,12 +128,6 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberName: name,
     });
 
-  selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
-    this.setState(prevState => ({ snapshotIndex: prevState.snapshotIndex + 1 }));
-
-  selectPreviousSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
-    this.setState(prevState => ({ snapshotIndex: prevState.snapshotIndex - 1 }));
-
   // We store the ID and name separately,
   // Because a Fiber may not exist in all snapshots.
   // In that case, it's still important to show the selected fiber (name) in the details pane.
@@ -344,9 +338,8 @@ class ProfilerTab extends React.Component<Props, State> {
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
               selectChart={this.props.setSelectedChartType}
-              selectNextSnapshotIndex={this.selectNextSnapshotIndex}
-              selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
               selectedChartType={selectedChartType}
+              selectedFiberID={selectedFiberID}
               selectedSnapshot={snapshot}
               selectSnapshot={this.selectSnapshot}
               showNativeNodes={this.props.showNativeNodes}

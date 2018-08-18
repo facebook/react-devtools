@@ -18,7 +18,6 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import Hoverable from '../../../frontend/Hoverable';
 import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
-import IconButton from './IconButton';
 import SnapshotSelector from './SnapshotSelector';
 
 const CHART_RADIO_LABEL_WIDTH_THRESHOLD = 650;
@@ -31,9 +30,8 @@ type Props = {|
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
   selectChart: (chart: ChartType) => void,
-  selectNextSnapshotIndex: Function,
-  selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   showNativeNodes: boolean,
@@ -57,9 +55,8 @@ type ProfilerTabToolbarProps = {
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
   selectChart: (chart: ChartType) => void,
-  selectNextSnapshotIndex: Function,
-  selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   showNativeNodes: boolean,
@@ -76,9 +73,8 @@ const ProfilerTabToolbar = ({
   isInspectingSelectedFiber,
   isRecording,
   selectChart,
-  selectNextSnapshotIndex,
-  selectPreviousSnapshotIndex,
   selectedChartType,
+  selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
   showNativeNodes,
@@ -143,7 +139,6 @@ const ProfilerTabToolbar = ({
 
         <ShowNativeNodesButton
           isActive={showNativeNodes}
-          isDisabled={isInspectingSelectedFiber}
           onClick={toggleShowNativeNodes}
           theme={theme}
           width={width}
@@ -151,36 +146,14 @@ const ProfilerTabToolbar = ({
 
         <HRule theme={theme} />
 
-        <span
-          style={{
-            opacity: isInspectingSelectedFiber ? 0.5 : 1,
-          }}
-        >
-          {snapshotIndex + 1} / {snapshots.length}
-        </span>
-        <IconButton
-          disabled={snapshotIndex === 0 || isInspectingSelectedFiber}
-          icon={Icons.BACK}
-          isTransparent={true}
-          onClick={selectPreviousSnapshotIndex}
-          theme={theme}
-          title="Previous render"
-        />
         <SnapshotSelector
-          disabled={isInspectingSelectedFiber}
+          isInspectingSelectedFiber={isInspectingSelectedFiber}
+          selectedFiberID={selectedFiberID}
           selectedSnapshot={selectedSnapshot}
           selectSnapshot={selectSnapshot}
           snapshotIndex={snapshotIndex}
           snapshots={snapshots}
           theme={theme}
-        />
-        <IconButton
-          disabled={snapshotIndex === snapshots.length - 1 || isInspectingSelectedFiber}
-          icon={Icons.FORWARD}
-          isTransparent={true}
-          onClick={selectNextSnapshotIndex}
-          theme={theme}
-          title="Next render"
         />
       </Fragment>
     )}
@@ -295,7 +268,6 @@ const RecordButton = Hoverable(
 
 type ShowNativeNodesButtonProps = {|
   isActive: boolean,
-  isDisabled: boolean,
   isHovered: boolean,
   onClick: Function,
   onMouseEnter: Function,
@@ -322,13 +294,10 @@ const ShowNativeNodesButton = Hoverable(({
       alignItems: 'center',
       color: isHovered ? theme.state06 : 'inherit',
       cursor: 'pointer',
-      opacity: isDisabled ? 0.5 : 1,
-      pointerEvents: isDisabled ? 'none' : 'auto',
     }}
     title="Show native elements?"
   >
     <input
-      disabled={isDisabled}
       type="checkbox"
       checked={isActive}
       onChange={onClick}
