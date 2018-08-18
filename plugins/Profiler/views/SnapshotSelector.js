@@ -42,6 +42,7 @@ type Props = {|
   disabled: boolean,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
+  snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
 |};
@@ -50,6 +51,7 @@ export default ({
   disabled,
   selectedSnapshot,
   selectSnapshot,
+  snapshotIndex,
   snapshots,
   theme,
 }: Props) => {
@@ -71,6 +73,7 @@ export default ({
             height={HEIGHT}
             selectedSnapshot={selectedSnapshot}
             selectSnapshot={selectSnapshot}
+            snapshotIndex={snapshotIndex}
             snapshots={snapshots}
             theme={theme}
             width={width}
@@ -81,11 +84,15 @@ export default ({
   );
 };
 
+const LEFT_ARROW = 37;
+const RIGHT_ARROW = 39;
+
 type SnapshotSelectorProps = {|
   disabled: boolean,
   height: number,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
+  snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   width: number,
@@ -98,6 +105,36 @@ type SnapshotSelectorState = {|
 class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSelectorState> {
   state: SnapshotSelectorState = {
     isMouseDown: false,
+  };
+
+  handleKeyDown = event => {
+    const {
+      disabled,
+      snapshotIndex,
+      selectSnapshot,
+      snapshots,
+    } = this.props;
+
+    if (disabled) {
+      return;
+    }
+
+    if (event.keyCode === LEFT_ARROW || event.keyCode === RIGHT_ARROW) {
+      event.preventDefault();
+
+      let newIndex = 0;
+      if (event.keyCode === LEFT_ARROW) {
+        newIndex = snapshotIndex > 0
+          ? snapshotIndex - 1
+          : snapshots.length - 1;
+      } else {
+        newIndex = snapshotIndex < snapshots.length - 1
+          ? snapshotIndex + 1
+          : 0;
+      }
+
+      selectSnapshot(snapshots[newIndex]);
+    }
   };
 
   handleMouseDown = event => this.setState({ isMouseDown: true });
@@ -132,10 +169,16 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
 
     return (
       <div
+        onKeyDown={this.handleKeyDown}
         onMouseDown={this.handleMouseDown}
         onMouseLeave={this.handleMouseLeave}
         onMouseUp={this.handleMouseUp}
-        style={{height, width}}
+        style={{
+          height,
+          width,
+          outline: '0',
+        }}
+        tabIndex={0}
       >
         <List
           direction="horizontal"

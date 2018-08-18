@@ -170,6 +170,7 @@ const ProfilerTabToolbar = ({
           disabled={isInspectingSelectedFiber}
           selectedSnapshot={selectedSnapshot}
           selectSnapshot={selectSnapshot}
+          snapshotIndex={snapshotIndex}
           snapshots={snapshots}
           theme={theme}
         />
