@@ -26,6 +26,8 @@ const CHART_RADIO_LABEL_WIDTH_THRESHOLD = 650;
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
@@ -50,6 +52,8 @@ export default (props: Props) => (
 );
 
 type ProfilerTabToolbarProps = {
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
@@ -67,6 +71,8 @@ type ProfilerTabToolbarProps = {
 };
 
 const ProfilerTabToolbar = ({
+  commitThreshold,
+  hideCommitsBelowThreshold,
   interactionsCount,
   isInspectingSelectedFiber,
   isRecording,
@@ -159,6 +165,8 @@ const ProfilerTabToolbar = ({
         <HRule theme={theme} />
 
         <SnapshotSelector
+          commitThreshold={commitThreshold}
+          hideCommitsBelowThreshold={hideCommitsBelowThreshold}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           selectedFiberID={selectedFiberID}
           selectedSnapshot={selectedSnapshot}

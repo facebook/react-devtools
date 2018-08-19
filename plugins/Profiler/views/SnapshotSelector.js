@@ -45,6 +45,8 @@ type ItemData = {|
 |};
 
 type Props = {|
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   isInspectingSelectedFiber: boolean,
   selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
@@ -55,6 +57,8 @@ type Props = {|
 |};
 
 export default ({
+  commitThreshold,
+  hideCommitsBelowThreshold,
   isInspectingSelectedFiber,
   selectedFiberID,
   selectedSnapshot,
@@ -64,6 +68,8 @@ export default ({
   theme,
 }: Props) => {
   const filteredData = getFilteredSnapshotData(
+    commitThreshold,
+    hideCommitsBelowThreshold,
     isInspectingSelectedFiber,
     selectedFiberID,
     selectedSnapshot,
@@ -73,6 +79,8 @@ export default ({
 
   return (
     <SnapshotSelectorWrapper
+      commitThreshold={commitThreshold}
+      hideCommitsBelowThreshold={hideCommitsBelowThreshold}
       isInspectingSelectedFiber={isInspectingSelectedFiber}
       selectedFiberID={selectedFiberID}
       selectedSnapshot={selectedSnapshot}
@@ -103,11 +111,14 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
       snapshotIndex,
       snapshots,
     } = this.props;
-    const newIndex = snapshotIndex < snapshots.length - 1
-      ? snapshotIndex + 1
-      : 0;
 
-    selectSnapshot(snapshots[newIndex]);
+    if (snapshots.length > 0) {
+      const newIndex = snapshotIndex < snapshots.length - 1
+        ? snapshotIndex + 1
+        : 0;
+
+      selectSnapshot(snapshots[newIndex]);
+    }
   };
 
   selectPreviousSnapshotIndex = () => {
@@ -116,15 +127,20 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
       snapshotIndex,
       snapshots,
     } = this.props;
-    const newIndex = snapshotIndex > 0
-      ? snapshotIndex - 1
-      : snapshots.length - 1;
 
-    selectSnapshot(snapshots[newIndex]);
+    if (snapshots.length > 0) {
+      const newIndex = snapshotIndex > 0
+        ? snapshotIndex - 1
+        : snapshots.length - 1;
+
+      selectSnapshot(snapshots[newIndex]);
+    }
   };
 
   render() {
     const {
+      commitThreshold,
+      hideCommitsBelowThreshold,
       isInspectingSelectedFiber,
       selectedFiberID,
       selectedSnapshot,
@@ -133,6 +149,8 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
       snapshots,
       theme,
     } = this.props;
+
+    const numSnapshots = snapshots.length;
 
     return (
       <div
@@ -145,10 +163,18 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
         }}
         tabIndex={0}
       >
-        <span style={{whiteSpace: 'nowrap'}}>
-          {`${snapshotIndex + 1}`.padStart(`${snapshots.length}`.length, '0')} / {snapshots.length}
-        </span>
+        {numSnapshots === 0 && (
+          <span style={{whiteSpace: 'nowrap'}}>
+            0 / 0
+          </span>
+        )}
+        {numSnapshots > 0 && (
+          <span style={{whiteSpace: 'nowrap'}}>
+            {`${snapshotIndex + 1}`.padStart(`${numSnapshots}`.length, '0')} / {numSnapshots}
+          </span>
+        )}
         <IconButton
+          disabled={numSnapshots === 0}
           icon={Icons.BACK}
           isTransparent={true}
           onClick={this.selectPreviousSnapshotIndex}
@@ -156,6 +182,8 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
           title="Previous render"
         />
         <AutoSizedSnapshotSelector
+          commitThreshold={commitThreshold}
+          hideCommitsBelowThreshold={hideCommitsBelowThreshold}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           selectedFiberID={selectedFiberID}
           selectedSnapshot={selectedSnapshot}
@@ -165,6 +193,7 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
           theme={theme}
         />
         <IconButton
+          disabled={numSnapshots === 0}
           icon={Icons.FORWARD}
           isTransparent={true}
           onClick={this.selectNextSnapshotIndex}
@@ -277,23 +306,27 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
       theme,
     );
 
+    const numSnapshots = snapshots.length;
+
     return (
       <div
         onMouseDown={this.handleMouseDown}
         onMouseUp={this.handleMouseUp}
         style={{ height, width }}
       >
-        <List
-          direction="horizontal"
-          height={height}
-          itemCount={snapshots.length}
-          itemData={itemData}
-          itemSize={listData.itemSize}
-          ref={this.listRef}
-          width={width}
-        >
-          {ListItem}
-        </List>
+        {numSnapshots > 0 && (
+          <List
+            direction="horizontal"
+            height={height}
+            itemCount={snapshots.length}
+            itemData={itemData}
+            itemSize={listData.itemSize}
+            ref={this.listRef}
+            width={width}
+          >
+            {ListItem}
+          </List>
+        )}
       </div>
     );
   }
@@ -356,25 +389,28 @@ class ListItem extends PureComponent<any, void> {
 }
 
 const getFilteredSnapshotData = memoize((
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   isInspectingSelectedFiber: boolean,
   selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
 ): FilteredSnapshotData => {
+  let filteredSnapshots = snapshots;
   if (isInspectingSelectedFiber) {
-    const filteredSnapshots = snapshots.filter(snapshot => snapshot.committedNodes.includes(selectedFiberID));
-    const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
-    return {
-      snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
-      snapshots: filteredSnapshots,
-    };
-  } else {
-    return {
-      snapshotIndex,
-      snapshots,
-    };
+    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.committedNodes.includes(selectedFiberID));
   }
+  if (hideCommitsBelowThreshold) {
+    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.duration >= commitThreshold);
+  }
+
+  const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
+
+  return {
+    snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
+    snapshots: filteredSnapshots,
+  };
 });
 
 const getListData = memoize((

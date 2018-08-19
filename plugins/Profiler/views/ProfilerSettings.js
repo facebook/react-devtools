@@ -15,8 +15,12 @@ import decorate from '../../../frontend/decorate';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 
 type Props = {|
+  commitThreshold: number,
   isSettingsPanelActive: boolean,
+  hideCommitsBelowThreshold: boolean,
+  setCommitThrehsold: (value: number) => void,
   showNativeNodes: boolean,
+  toggleHideCommitsBelowThreshold: Function,
   toggleIsSettingsPanelActive: Function,
   toggleShowNativeNodes: Function,
 |};
@@ -26,11 +30,34 @@ class ProfilerSettings extends PureComponent<Props, void> {
     theme: PropTypes.object.isRequired,
   };
 
+  handleCommitThresholdChange = event => {
+    const { hideCommitsBelowThreshold, setCommitThrehsold, toggleHideCommitsBelowThreshold } = this.props;
+
+    const commitThreshold = parseFloat(event.currentTarget.value);
+    if (!Number.isNaN(commitThreshold)) {
+      setCommitThrehsold(commitThreshold);
+
+      // For convenience, enable the hide-commits feature if the threshold is being changed.
+      // This seems likely to be what the user wants.
+      if (!hideCommitsBelowThreshold) {
+        toggleHideCommitsBelowThreshold();
+      }
+    }
+  };
+
   stopClickEventFromBubbling = event => event.stopPropagation();
 
   render() {
     const { theme } = this.context;
-    const { isSettingsPanelActive, toggleShowNativeNodes, showNativeNodes } = this.props;
+    const {
+      commitThreshold,
+      hideCommitsBelowThreshold,
+      isSettingsPanelActive,
+      toggleHideCommitsBelowThreshold,
+      toggleIsSettingsPanelActive,
+      toggleShowNativeNodes,
+      showNativeNodes,
+    } = this.props;
 
     if (!isSettingsPanelActive) {
       return null;
@@ -38,7 +65,7 @@ class ProfilerSettings extends PureComponent<Props, void> {
 
     return (
       <div
-        onClick={this.props.toggleIsSettingsPanelActive}
+        onClick={toggleIsSettingsPanelActive}
         style={{
           position: 'absolute',
           top: 0,
@@ -59,6 +86,7 @@ class ProfilerSettings extends PureComponent<Props, void> {
             color: theme.base05,
             borderRadius: '0.25rem',
             maxWidth: '100%',
+            minWidth: '250px',
             padding: '0.5rem',
             margin: '0.5rem',
           }}
@@ -66,19 +94,44 @@ class ProfilerSettings extends PureComponent<Props, void> {
           <h4 style={{margin: '0 0 0.5rem'}}>
             Profiler settings
           </h4>
+
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              marginBottom: '0.25rem',
+            }}
+            title="Show native elements"
+          >
+            <input
+              type="checkbox"
+              checked={showNativeNodes}
+              onChange={toggleShowNativeNodes}
+            /> Show native elements
+          </label>
+
           <label
             style={{
               display: 'flex',
               alignItems: 'center',
               cursor: 'pointer',
             }}
-            title="Show native elements?"
+            title="Hide commits below threshold"
           >
             <input
               type="checkbox"
-              checked={showNativeNodes}
-              onChange={toggleShowNativeNodes}
-            /> Show native elements?
+              checked={hideCommitsBelowThreshold}
+              onChange={toggleHideCommitsBelowThreshold}
+            /> Hide commits below <input
+              type="number"
+              style={{
+                width: '3rem',
+              }}
+              defaultValue={commitThreshold}
+              min={1}
+              onChange={this.handleCommitThresholdChange}
+            /> ms
           </label>
         </div>
       </div>
@@ -89,13 +142,19 @@ class ProfilerSettings extends PureComponent<Props, void> {
 export default decorate({
   store: 'profilerStore',
   listeners: () => [
+    'commitThreshold',
+    'hideCommitsBelowThreshold',
     'isSettingsPanelActive',
     'showNativeNodes',
   ],
   props(store) {
     return {
+      commitThreshold: store.commitThreshold,
+      hideCommitsBelowThreshold: store.hideCommitsBelowThreshold,
       isSettingsPanelActive: store.isSettingsPanelActive,
       showNativeNodes: store.showNativeNodes,
+      setCommitThrehsold: store.setCommitThrehsold,
+      toggleHideCommitsBelowThreshold: () => store.setHideCommitsBelowThreshold(!store.hideCommitsBelowThreshold),
       toggleIsSettingsPanelActive: () => store.setIsSettingsPanelActive(!store.isSettingsPanelActive),
       toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
     };

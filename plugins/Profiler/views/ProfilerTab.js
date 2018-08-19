@@ -39,9 +39,11 @@ import ProfilerSettings from './ProfilerSettings';
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   cacheInteractionData: CacheInteractionData,
+  commitThreshold: number,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   getCachedInteractionData: GetCachedInteractionData,
   hasMultipleRoots: boolean,
+  hideCommitsBelowThreshold: boolean,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   profilerData: RootProfilerData,
@@ -172,9 +174,11 @@ class ProfilerTab extends React.Component<Props, State> {
     const {
       cacheDataForSnapshot,
       cacheInteractionData,
+      commitThreshold,
       getCachedDataForSnapshot,
       getCachedInteractionData,
       hasMultipleRoots,
+      hideCommitsBelowThreshold,
       interactionsToSnapshots,
       isRecording,
       profilerData,
@@ -336,6 +340,8 @@ class ProfilerTab extends React.Component<Props, State> {
             borderBottom: `1px solid ${theme.base03}`,
           }}>
             <ProfilerTabToolbar
+              commitThreshold={commitThreshold}
+              hideCommitsBelowThreshold={hideCommitsBelowThreshold}
               interactionsCount={interactionsToSnapshots.size}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
@@ -426,6 +432,8 @@ const RecordingInProgress = ({stopRecording, theme}) => (
 export default decorate({
   store: 'profilerStore',
   listeners: () => [
+    'commitThreshold',
+    'hideCommitsBelowThreshold',
     'isRecording',
     'profilerData',
     'selectedChartType',
@@ -443,7 +451,9 @@ export default decorate({
       cacheInteractionData: (...args) => store.cacheInteractionData(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       getCachedInteractionData: (...args) => store.getCachedInteractionData(...args),
+      commitThreshold: store.commitThreshold,
       hasMultipleRoots: store.roots.size > 1,
+      hideCommitsBelowThreshold: store.hideCommitsBelowThreshold,
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
         : new Map(),

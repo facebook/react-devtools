@@ -18,6 +18,8 @@ const {EventEmitter} = require('events');
 const {get, set} = require('../../utils/storage');
 
 const LOCAL_STORAGE_CHART_TYPE_KEY = 'profiler:selectedChartType';
+const LOCAL_STORAGE_COMMIT_THRESHOLD = 'profiler:commitThreshold';
+const LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD = 'profiler:hideCommitsBelowThreshold';
 const LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY = 'profiler:showNativeNodes';
 
 class ProfilerStore extends EventEmitter {
@@ -25,6 +27,8 @@ class ProfilerStore extends EventEmitter {
   _mainStore: Object;
 
   cachedData = {};
+  commitThreshold: number = ((get(LOCAL_STORAGE_COMMIT_THRESHOLD, 0): any): number);
+  hideCommitsBelowThreshold: boolean = ((get(LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD, false): any): boolean);
   isRecording: boolean = false;
   isSettingsPanelActive: boolean = false;
   processedInteractions: {[id: string]: Interaction} = {};
@@ -87,16 +91,16 @@ class ProfilerStore extends EventEmitter {
     this.emit('roots', this._mainStore.roots);
   };
 
-  setSelectedChartType(selectedChartType: ChartType) {
-    this.selectedChartType = selectedChartType;
-    this.emit('selectedChartType', selectedChartType);
-    set(LOCAL_STORAGE_CHART_TYPE_KEY, selectedChartType);
-  }
+  setCommitThrehsold = (commitThreshold: number) => {
+    this.commitThreshold = commitThreshold;
+    this.emit('commitThreshold', commitThreshold);
+    set(LOCAL_STORAGE_COMMIT_THRESHOLD, commitThreshold);
+  };
 
-  setShowNativeNodes(showNativeNodes: boolean) {
-    this.showNativeNodes = showNativeNodes;
-    this.emit('showNativeNodes', showNativeNodes);
-    set(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, showNativeNodes);
+  setHideCommitsBelowThreshold(hideCommitsBelowThreshold: boolean): void {
+    this.hideCommitsBelowThreshold = hideCommitsBelowThreshold;
+    this.emit('hideCommitsBelowThreshold', hideCommitsBelowThreshold);
+    set(LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD, hideCommitsBelowThreshold);
   }
 
   setIsRecording(isRecording: boolean): void {
@@ -108,6 +112,18 @@ class ProfilerStore extends EventEmitter {
   setIsSettingsPanelActive(isSettingsPanelActive: boolean): void {
     this.isSettingsPanelActive = isSettingsPanelActive;
     this.emit('isSettingsPanelActive', isSettingsPanelActive);
+  }
+
+  setSelectedChartType(selectedChartType: ChartType) {
+    this.selectedChartType = selectedChartType;
+    this.emit('selectedChartType', selectedChartType);
+    set(LOCAL_STORAGE_CHART_TYPE_KEY, selectedChartType);
+  }
+
+  setShowNativeNodes(showNativeNodes: boolean) {
+    this.showNativeNodes = showNativeNodes;
+    this.emit('showNativeNodes', showNativeNodes);
+    set(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, showNativeNodes);
   }
 
   storeSnapshot = () => {
