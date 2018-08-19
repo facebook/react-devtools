@@ -233,6 +233,10 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
   // $FlowFixMe createRef()
   listRef = React.createRef();
 
+  state: SnapshotSelectorState = {
+    isMouseDown: false,
+  };
+
   componentDidUpdate(prevProps) {
     // Make sure any newly selected snapshot is visible within the list.
     if (this.props.snapshotIndex !== prevProps.snapshotIndex) {
@@ -240,12 +244,13 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
     }
   }
 
-  state: SnapshotSelectorState = {
-    isMouseDown: false,
-  };
+  componentWillUnmount() {
+    window.removeEventListener('mouseup', this.handleMouseUp);
+  }
 
-  handleMouseDown = event => this.setState({ isMouseDown: true });
-  handleMouseLeave = event => this.setState({ isMouseDown: false });
+  handleMouseDown = event => this.setState({ isMouseDown: true }, () => {
+    window.addEventListener('mouseup', this.handleMouseUp);
+  });
   handleMouseUp = event => this.setState({ isMouseDown: false });
 
   render() {
@@ -275,7 +280,6 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
     return (
       <div
         onMouseDown={this.handleMouseDown}
-        onMouseLeave={this.handleMouseLeave}
         onMouseUp={this.handleMouseUp}
         style={{ height, width }}
       >
