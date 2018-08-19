@@ -18,10 +18,10 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import Hoverable from '../../../frontend/Hoverable';
 import SvgIcon from '../../../frontend/SvgIcon';
 import Icons from '../../../frontend/Icons';
+import IconButton from './IconButton';
 import SnapshotSelector from './SnapshotSelector';
 
 const CHART_RADIO_LABEL_WIDTH_THRESHOLD = 650;
-const CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD = 800;
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
@@ -34,12 +34,11 @@ type Props = {|
   selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
-  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
-  toggleShowNativeNodes: Function,
+  toggleIsSettingsPanelActive: Function,
 |};
 
 export default (props: Props) => (
@@ -59,12 +58,11 @@ type ProfilerTabToolbarProps = {
   selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
-  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
-  toggleShowNativeNodes: Function,
+  toggleIsSettingsPanelActive: Function,
   width: number,
 };
 
@@ -77,12 +75,11 @@ const ProfilerTabToolbar = ({
   selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
-  showNativeNodes,
   snapshotIndex,
   snapshots,
   theme,
   toggleIsRecording,
-  toggleShowNativeNodes,
+  toggleIsSettingsPanelActive,
   width,
 }: ProfilerTabToolbarProps) => (
   <div style={{
@@ -102,6 +99,20 @@ const ProfilerTabToolbar = ({
     />
 
     <HRule theme={theme} />
+
+    {isRecording || snapshots.length === 0 && (
+      <Fragment>
+        <div style={{flex: 1}} />
+
+        <IconButton
+          icon={Icons.SETTINGS}
+          isTransparent={true}
+          label="Profiler settings"
+          onClick={toggleIsSettingsPanelActive}
+          theme={theme}
+        />
+      </Fragment>
+    )}
 
     {!isRecording && snapshots.length > 0 && (
       <Fragment>
@@ -137,11 +148,12 @@ const ProfilerTabToolbar = ({
 
         <div style={{flex: 1}} />
 
-        <ShowNativeNodesButton
-          isActive={showNativeNodes}
-          onClick={toggleShowNativeNodes}
+        <IconButton
+          icon={Icons.SETTINGS}
+          isTransparent={true}
+          label="Profiler settings"
+          onClick={toggleIsSettingsPanelActive}
           theme={theme}
-          width={width}
         />
 
         <HRule theme={theme} />
@@ -265,55 +277,3 @@ const RecordButton = Hoverable(
     </button>
   )
 );
-
-type ShowNativeNodesButtonProps = {|
-  isActive: boolean,
-  isHovered: boolean,
-  onClick: Function,
-  onMouseEnter: Function,
-  onMouseLeave: Function,
-  theme: Theme,
-  width: number,
-|};
-
-const ShowNativeNodesButton = Hoverable(({
-  isActive,
-  isDisabled,
-  isHovered,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  theme,
-  width,
-}: ShowNativeNodesButtonProps) => (
-  <label
-    onMouseEnter={onMouseEnter}
-    onMouseLeave={onMouseLeave}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      color: isHovered ? theme.state06 : 'inherit',
-      cursor: 'pointer',
-    }}
-    title="Show native elements?"
-  >
-    <input
-      type="checkbox"
-      checked={isActive}
-      onChange={onClick}
-    />
-    <SvgIcon
-      path={Icons.DOM_ELEMENT}
-      style={{
-        flex: '0 0 1rem',
-        width: '1rem',
-        height: '1rem',
-        fill: 'currentColor',
-        display: 'inline',
-        verticalAlign: 'sub',
-        margin: '0 0.25rem',
-      }}
-     />
-     {width >= CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD ? 'Show native nodes?' : ''}
-  </label>
-));

@@ -26,6 +26,7 @@ class ProfilerStore extends EventEmitter {
 
   cachedData = {};
   isRecording: boolean = false;
+  isSettingsPanelActive: boolean = false;
   processedInteractions: {[id: string]: Interaction} = {};
   rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
@@ -102,6 +103,11 @@ class ProfilerStore extends EventEmitter {
     this.isRecording = isRecording;
     this.emit('isRecording', isRecording);
     this._mainStore.setIsRecording(isRecording);
+  }
+
+  setIsSettingsPanelActive(isSettingsPanelActive: boolean): void {
+    this.isSettingsPanelActive = isSettingsPanelActive;
+    this.emit('isSettingsPanelActive', isSettingsPanelActive);
   }
 
   storeSnapshot = () => {

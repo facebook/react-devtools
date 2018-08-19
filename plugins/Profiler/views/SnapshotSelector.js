@@ -145,7 +145,7 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
         }}
         tabIndex={0}
       >
-        <span>
+        <span style={{whiteSpace: 'nowrap'}}>
           {snapshotIndex + 1} / {snapshots.length}
         </span>
         <IconButton
@@ -187,7 +187,6 @@ const AutoSizedSnapshotSelector = ({
 }: Props) => (
   <div style={{
     flex: '1 1 100px',
-    maxWidth: 250,
     height: HEIGHT,
     display: 'grid',
     alignitems: 'flex-end',

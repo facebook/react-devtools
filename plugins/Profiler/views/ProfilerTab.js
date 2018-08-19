@@ -34,6 +34,7 @@ import ProfilerTabToolbar from './ProfilerTabToolbar';
 import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
 import ProfilerSnapshotDetailPane from './ProfilerSnapshotDetailPane';
 import ProfilerInteractionDetailPane from './ProfilerInteractionDetailPane';
+import ProfilerSettings from './ProfilerSettings';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
@@ -50,8 +51,8 @@ type Props = {|
   showNativeNodes: boolean,
   snapshots: Array<Snapshot>,
   timestampsToInteractions: Map<number, Set<Interaction>>,
-  toggleIsRecording: () => void,
-  toggleShowNativeNodes: () => void,
+  toggleIsRecording: Function,
+  toggleIsSettingsPanelActive: Function,
 |};
 
 type State = {|
@@ -183,6 +184,7 @@ class ProfilerTab extends React.Component<Props, State> {
       snapshots,
       timestampsToInteractions,
       toggleIsRecording,
+      toggleIsSettingsPanelActive,
     } = this.props;
     const {
       isInspectingSelectedFiber,
@@ -342,20 +344,22 @@ class ProfilerTab extends React.Component<Props, State> {
               selectedFiberID={selectedFiberID}
               selectedSnapshot={snapshot}
               selectSnapshot={this.selectSnapshot}
-              showNativeNodes={this.props.showNativeNodes}
               snapshotIndex={snapshotIndex}
               snapshots={snapshots}
               theme={theme}
               toggleIsRecording={toggleIsRecording}
-              toggleShowNativeNodes={this.props.toggleShowNativeNodes}
+              toggleIsSettingsPanelActive={toggleIsSettingsPanelActive}
             />
           </div>
           <div style={{
             flex: 1,
             padding: '0.5rem',
             boxSizing: 'border-box',
+            position: 'relative',
           }}>
             {content}
+
+            <ProfilerSettings />
           </div>
         </div>
         <div style={{
@@ -455,7 +459,7 @@ export default decorate({
         ? profilerData.timestampsToInteractions
         : new Map(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
-      toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
+      toggleIsSettingsPanelActive: () => store.setIsSettingsPanelActive(!store.isSettingsPanelActive),
     };
   },
 }, ProfilerTab);
