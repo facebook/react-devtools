@@ -146,7 +146,7 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
         tabIndex={0}
       >
         <span style={{whiteSpace: 'nowrap'}}>
-          {snapshotIndex + 1} / {snapshots.length}
+          {`${snapshotIndex + 1}`.padStart(`${snapshots.length}`.length, '0')} / {snapshots.length}
         </span>
         <IconButton
           icon={Icons.BACK}
