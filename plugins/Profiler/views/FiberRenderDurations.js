@@ -18,7 +18,7 @@ import React, { PureComponent } from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
-import { minBarHeight, minBarWidth, getGradientColor, scale } from './constants';
+import { getFilteredSnapshotData, getGradientColor, minBarHeight, minBarWidth, scale } from './constants';
 import NoRenderTimesMessage from './NoRenderTimesMessage';
 
 type Node = {|
@@ -46,40 +46,62 @@ type ItemData = {|
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   selectedFiberID: string,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
+  snapshotIndex: number,
   snapshots: Array<Snapshot>,
   stopInspecting: Function,
   theme: Theme,
 |};
 
 export default ({
+  commitThreshold,
+  hideCommitsBelowThreshold,
   selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
+  snapshotIndex,
   snapshots,
   stopInspecting,
   theme,
-}: Props) => (
-  <AutoSizer>
-    {({ height, width }) => (
-      <RenderDurations
-        height={height}
-        selectedFiberID={selectedFiberID}
-        selectedSnapshot={selectedSnapshot}
-        selectSnapshot={selectSnapshot}
-        snapshots={snapshots}
-        stopInspecting={stopInspecting}
-        theme={theme}
-        width={width}
-      />
-    )}
-  </AutoSizer>
-);
+}: Props) => {
+  const filteredData = getFilteredSnapshotData(
+    commitThreshold,
+    hideCommitsBelowThreshold,
+    true, // If we're viewing this component
+    selectedFiberID,
+    selectedSnapshot,
+    snapshotIndex,
+    snapshots,
+  );
+
+  return (
+    <AutoSizer>
+      {({ height, width }) => (
+        <RenderDurations
+          commitThreshold={commitThreshold}
+          height={height}
+          hideCommitsBelowThreshold={hideCommitsBelowThreshold}
+          selectedFiberID={selectedFiberID}
+          selectedSnapshot={selectedSnapshot}
+          selectSnapshot={selectSnapshot}
+          snapshots={filteredData.snapshots}
+          stopInspecting={stopInspecting}
+          theme={theme}
+          width={width}
+        />
+      )}
+    </AutoSizer>
+  );
+};
 
 type RenderDurationsProps = {|
+  commitThreshold: number,
   height: number,
+  hideCommitsBelowThreshold: boolean,
   selectedFiberID: string,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
@@ -90,7 +112,9 @@ type RenderDurationsProps = {|
 |};
 
 const RenderDurations = ({
+  commitThreshold,
   height,
+  hideCommitsBelowThreshold,
   selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
@@ -111,7 +135,9 @@ const RenderDurations = ({
   if (maxValue === 0) {
     return (
       <NoRenderTimesMessage
+        commitThreshold={commitThreshold}
         height={height}
+        hideCommitsBelowThreshold={hideCommitsBelowThreshold}
         stopInspecting={stopInspecting}
         width={width}
       />

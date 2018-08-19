@@ -10,6 +10,10 @@
  */
 'use strict';
 
+import type {Snapshot} from '../ProfilerTypes';
+
+import memoize from 'memoize-one';
+
 // http://gka.github.io/palettes/#colors=#37AFA9,#FEBC38|steps=10|bez=0|coL=0
 export const gradient = [
   '#37afa9', '#63b19e', '#80b393', '#97b488', '#abb67d', '#beb771', '#cfb965', '#dfba57', '#efbb49', '#febc38',
@@ -45,3 +49,37 @@ export const getGradientColor = (value: number) => {
 export const formatDuration = (duration: number) => Math.round(duration * 10) / 10;
 export const formatPercentage = (percentage: number) => Math.round(percentage * 100);
 export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
+
+type FilteredSnapshotData = {|
+  snapshotIndex: number,
+  snapshots: Array<Snapshot>,
+|};
+
+/**
+ * Helper method to filter snapshots based on the current store state.
+ * This is a helper util so that its calculations are memoized and shared between multiple components.
+ */
+export const getFilteredSnapshotData = memoize((
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
+  isInspectingSelectedFiber: boolean,
+  selectedFiberID: string | null,
+  selectedSnapshot: Snapshot,
+  snapshotIndex: number,
+  snapshots: Array<Snapshot>,
+): FilteredSnapshotData => {
+  let filteredSnapshots = snapshots;
+  if (isInspectingSelectedFiber) {
+    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.committedNodes.includes(selectedFiberID));
+  }
+  if (hideCommitsBelowThreshold) {
+    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.duration >= commitThreshold);
+  }
+
+  const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
+
+  return {
+    snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
+    snapshots: filteredSnapshots,
+  };
+});

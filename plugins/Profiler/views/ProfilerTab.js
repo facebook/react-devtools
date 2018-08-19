@@ -220,9 +220,12 @@ class ProfilerTab extends React.Component<Props, State> {
       if (isInspectingSelectedFiber && selectedFiberID !== null) {
         content = (
           <FiberRenderDurations
+            commitThreshold={commitThreshold}
+            hideCommitsBelowThreshold={hideCommitsBelowThreshold}
             selectedFiberID={selectedFiberID}
             selectedSnapshot={snapshot}
             selectSnapshot={this.selectSnapshot}
+            snapshotIndex={snapshotIndex}
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}
             theme={theme}

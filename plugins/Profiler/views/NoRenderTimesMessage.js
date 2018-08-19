@@ -14,12 +14,20 @@ import React from 'react';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 
 type Props = {|
+  commitThreshold: number,
   height: number,
+  hideCommitsBelowThreshold: boolean,
   stopInspecting: Function,
   width: number,
 |};
 
-export default ({ height, stopInspecting, width }: Props) => (
+export default ({
+  commitThreshold,
+  height,
+  hideCommitsBelowThreshold,
+  stopInspecting,
+  width,
+}: Props) => (
   <div style={{
     display: 'flex',
     flexDirection: 'column',
@@ -29,11 +37,16 @@ export default ({ height, stopInspecting, width }: Props) => (
     height,
     width,
   }}>
-    <p style={{
-      fontSize: sansSerif.sizes.large,
-    }}>
-      No render times were recorded for the selected element
-    </p>
+    {!hideCommitsBelowThreshold && (
+      <p style={{ fontSize: sansSerif.sizes.large}}>
+        No render times were recorded for the selected element.
+      </p>
+    )}
+    {hideCommitsBelowThreshold && (
+      <p style={{ fontSize: sansSerif.sizes.large}}>
+        No render times were recorded for the selected element based on the current commit threshold.
+      </p>
+    )}
     <p>
       <button onClick={stopInspecting}>Return to the previous view</button>
     </p>

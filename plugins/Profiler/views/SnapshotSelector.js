@@ -17,18 +17,21 @@ import memoize from 'memoize-one';
 import React, {PureComponent} from 'react';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
-import { didNotRender, formatDuration, formatTime, getGradientColor, minBarHeight, minBarWidth } from './constants';
+import {
+  didNotRender,
+  formatDuration,
+  formatTime,
+  getGradientColor,
+  getFilteredSnapshotData,
+  minBarHeight,
+  minBarWidth,
+} from './constants';
 import Icons from '../../../frontend/Icons';
 import IconButton from './IconButton';
 
 const HEIGHT = 20;
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
-
-type FilteredSnapshotData = {|
-  snapshotIndex: number,
-  snapshots: Array<Snapshot>,
-|};
 
 type ListData = {|
   itemSize: number,
@@ -387,31 +390,6 @@ class ListItem extends PureComponent<any, void> {
     );
   }
 }
-
-const getFilteredSnapshotData = memoize((
-  commitThreshold: number,
-  hideCommitsBelowThreshold: boolean,
-  isInspectingSelectedFiber: boolean,
-  selectedFiberID: string | null,
-  selectedSnapshot: Snapshot,
-  snapshotIndex: number,
-  snapshots: Array<Snapshot>,
-): FilteredSnapshotData => {
-  let filteredSnapshots = snapshots;
-  if (isInspectingSelectedFiber) {
-    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.committedNodes.includes(selectedFiberID));
-  }
-  if (hideCommitsBelowThreshold) {
-    filteredSnapshots = filteredSnapshots.filter(snapshot => snapshot.duration >= commitThreshold);
-  }
-
-  const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
-
-  return {
-    snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
-    snapshots: filteredSnapshots,
-  };
-});
 
 const getListData = memoize((
   snapshots: Array<Snapshot>,
