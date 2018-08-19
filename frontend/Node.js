@@ -516,7 +516,7 @@ const jsxTagStyle = (inverted: boolean, nodeType: string, theme: Theme) => {
     color = theme.state02;
   } else if (nodeType === 'Special') {
     color = theme.special01;
-  } else if (nodeType === 'Composite') {
+  } else if (nodeType === 'Composite' || nodeType === 'ContextProvider' || nodeType === 'ContextConsumer') {
     color = theme.special00;
   } else {
     color = theme.special07;

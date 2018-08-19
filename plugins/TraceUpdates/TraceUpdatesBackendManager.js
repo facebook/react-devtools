@@ -26,7 +26,7 @@ import type {
 import type {ControlState} from '../../frontend/types.js';
 
 const NODE_TYPE_COMPOSITE = 'Composite';
-const NODE_TYPE_SPECIAL = 'Special';
+const NODE_TYPE_CONTEXT_CONSUMER = 'ContextConsumer';
 
 class TraceUpdatesBackendManager {
   _onMeasureNode: () => void;
@@ -62,10 +62,8 @@ class TraceUpdatesBackendManager {
     // We highlight user components and context consumers
     // (without consumers, a context update that renders
     // only host nodes directly wouldn't highlight at all).
-    const shouldHighlight = obj.nodeType === NODE_TYPE_COMPOSITE || (
-      obj.nodeType === NODE_TYPE_SPECIAL &&
-      obj.name === 'Context.Consumer'
-    );
+    const shouldHighlight = obj.nodeType === NODE_TYPE_COMPOSITE || obj.nodeType === NODE_TYPE_CONTEXT_CONSUMER;
+
     if (!shouldHighlight) {
       return;
     }

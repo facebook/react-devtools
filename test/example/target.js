@@ -20,6 +20,36 @@ const guid = require('../../utils/guid');
 
 const { unstable_trace: trace } = ScheduleTracing;
 
+const themes = {
+  light: {
+    container: {
+      color: '#000000',
+      background: '#eeeeee',
+    },
+    addButton: {
+      color: '#000000',
+    },
+  },
+  dark: {
+    container: {
+      color: '#ffffff',
+      background: '#222222',
+    },
+    addButton: {
+      color: '#ffffff',
+    },
+    filterButton: {
+      color: '#ffffff',
+    },
+    filterButtonActive: {
+      backgroundColor: 'crimson',
+    },
+  },
+};
+const ThemeContext = React.createContext();
+ThemeContext.Provider.displayName = 'ThemeContext.Provider';
+ThemeContext.Consumer.displayName = 'ThemeContext.Consumer';
+
 class Todos extends React.Component {
   constructor(props) {
     super(props);
@@ -95,16 +125,26 @@ class Todos extends React.Component {
 
   render() {
     return (
-      <div style={styles.container}>
-        <h1 style={styles.title}>Things to do</h1>
-        <NewTodo onAdd={this.onAdd.bind(this)} />
-        <TodoItems
-          todos={this.state.todos}
-          filter={this.state.filter}
-          onToggleComplete={this.toggleComplete.bind(this)}
-        />
-        <Filter onSort={this.sort.bind(this)} onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
-      </div>
+      <ThemeContext.Consumer>
+        {theme => {
+          const mergedStyles = {
+            container: { ...styles.container, ...theme.container },
+            title: { ...styles.title, ...theme.title },
+          };
+          return (
+            <div style={mergedStyles.container}>
+              <h1 style={mergedStyles.title}>Things to do</h1>
+              <NewTodo onAdd={this.onAdd.bind(this)} />
+              <TodoItems
+                todos={this.state.todos}
+                filter={this.state.filter}
+                onToggleComplete={this.toggleComplete.bind(this)}
+              />
+              <Filter onSort={this.sort.bind(this)} onFilter={this.changeFilter.bind(this)} filter={this.state.filter} />
+            </div>
+          );
+        }}
+      </ThemeContext.Consumer>
     );
   }
 }
@@ -132,18 +172,27 @@ class NewTodo extends React.Component {
 
   render() {
     return (
-      <div style={styles.newContainer}>
-        <input
-          style={styles.newInput}
-          value={this.state.text}
-          placeholder="Add new item"
-          onKeyDown={e => this.checkEnter(e)}
-          onChange={e => this.setState({text: e.target.value})}
-        />
-        <button onClick={this.submit.bind(this)} style={styles.addButton}>
-          +
-        </button>
-      </div>
+      <ThemeContext.Consumer>
+        {theme => {
+          const mergedStyles = {
+            newContainer: { ...styles.newContainer, ...theme.newContainer },
+            newInput: { ...styles.newInput, ...theme.newInput },
+            addButton: { ...styles.addButton, ...theme.addButton },
+          };
+          return (
+            <div style={mergedStyles.newContainer}>
+              <input
+                style={mergedStyles.newInput}
+                value={this.state.text}
+                placeholder="Add new item"
+                onKeyDown={e => this.checkEnter(e)}
+                onChange={e => this.setState({text: e.target.value})}
+              />
+              <button onClick={this.submit.bind(this)} style={mergedStyles.addButton}>+</button>
+            </div>
+          );
+        }}
+      </ThemeContext.Consumer>
     );
   }
 }
@@ -198,9 +247,7 @@ class HoverHighlight extends React.Component {
       <div
         onMouseOver={() => this.setState({hover: true})}
         onMouseOut={() => this.setState({hover: false})}
-        style={assign({}, this.props.style, {
-          backgroundColor: this.state.hover ? '#eee' : 'transparent',
-        })}>
+        style={assign({}, this.props.style)}>
         {this.props.children}
       </div>
     );
@@ -209,17 +256,28 @@ class HoverHighlight extends React.Component {
 
 function Filter(props) {
   var options = ['All', 'Completed', 'Remaining'];
+
   return (
-    <div style={styles.filter}>
-      {options.map(text => (
-        <button
-          key={text}
-          style={assign({}, styles.filterButton, text === props.filter && styles.filterButtonActive)}
-          onClick={props.onFilter.bind(null, text)}
-        >{text}</button>
-      ))}
-      {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
-    </div>
+    <ThemeContext.Consumer>
+      {theme => {
+        const mergedStyles = {
+          filterButton: { ...styles.filterButton, ...theme.filterButton },
+          filterButtonActive: { ...styles.filterButtonActive, ...theme.filterButtonActive },
+        };
+        return (
+          <div style={styles.filter}>
+            {options.map(text => (
+              <button
+                key={text}
+                style={assign({}, mergedStyles.filterButton, text === props.filter && mergedStyles.filterButtonActive)}
+                onClick={props.onFilter.bind(null, text)}
+              >{text}</button>
+            ))}
+            {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
+          </div>
+        );
+      }}
+    </ThemeContext.Consumer>
   );
 }
 
@@ -287,8 +345,8 @@ var styles = {
 
   iframeWatermark: {
     position: 'absolute',
-    top: 20,
-    left: 20,
+    top: 30,
+    left: 10,
     fontSize: 25,
     color: '#ccc',
     fontFamily: 'sans-serif',
@@ -406,29 +464,47 @@ for (var mCount = 200; mCount--;) {
 
 
 class Wrap extends React.Component {
+  constructor(props, context) {
+    super(props, context);
+    this.state = { theme: themes.light };
+    this.handleToggleButtonClick = this.handleToggleButtonClick.bind(this);
+  }
+
+  handleToggleButtonClick() {
+    const { theme } = this.state;
+    this.setState({
+      theme: theme === themes.dark
+        ? themes.light
+        : themes.dark,
+    });
+  }
+
   render() {
+    const { theme } = this.state;
+    const themeButtonLabel = `Switch to ${theme === themes.dark ? 'light' : 'dark'} theme`;
     return (
-      <div>
-        <div style={styles.iframeWatermark}>
-          this is an iframe
+      <ThemeContext.Provider value={this.state.theme}>
+        <div>
+          <button onClick={this.handleToggleButtonClick}>{themeButtonLabel}</button>
+          <div style={styles.iframeWatermark}>this is an iframe</div>
+          {/* for testing highlighing in the presence of multiple scrolls
+          {long(long(long()))} {/* */}
+          <Todos/>
+          {/*<span thing={someVal}/>
+          <Target count={1}/>
+          <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
+          <span val={null}/>
+          <span val={undefined}/>
+          <div>&lt;</div>*/}
+          <DeeplyNested />
+          <PropTester awesome={2}/>
+          <PropTester {...emptyProps}/>
+          <PropTester {...primitiveProps}/>
+          <PropTester {...complexProps}/>
+          <PropTester {...uninspectableProps}/>
+          <PropTester massiveMap={massiveMap}/>
         </div>
-        {/* for testing highlighing in the presence of multiple scrolls
-        {long(long(long()))} {/* */}
-        <Todos/>
-        {/*<span thing={someVal}/>
-        <Target count={1}/>
-        <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
-        <span val={null}/>
-        <span val={undefined}/>
-        <div>&lt;</div>*/}
-        <DeeplyNested />
-        <PropTester awesome={2}/>
-        <PropTester {...emptyProps}/>
-        <PropTester {...primitiveProps}/>
-        <PropTester {...complexProps}/>
-        <PropTester {...uninspectableProps}/>
-        <PropTester massiveMap={massiveMap}/>
-      </div>
+      </ThemeContext.Provider>
     );
   }
 }
