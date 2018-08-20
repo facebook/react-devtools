@@ -12,55 +12,92 @@
 
 import type {Hook, ReactRenderer, DataType, Helpers} from './types';
 
+var semver = require('semver');
+
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
 
-// **********************************************************
-// The section below is copy-pasted from files in React repo.
-// **********************************************************
-var ReactTypeOfWork = {
-  IndeterminateComponent: 0, // Before we know whether it is functional or class
-  FunctionalComponent: 1,
-  ClassComponent: 2,
-  HostRoot: 3, // Root of a host tree. Could be nested inside another node.
-  HostPortal: 4, // A subtree. Could be an entry point to a different renderer.
-  HostComponent: 5,
-  HostText: 6,
-  CoroutineComponent: 7,
-  CoroutineHandlerPhase: 8,
-  YieldComponent: 9,
-  Fragment: 10,
-  Mode: 11,
-  ContextConsumer: 12,
-  ContextProvider: 13,
-  ForwardRef: 14,
-  Profiler: 15,
-  Placeholder: 16,
-};
-var ReactSymbols = {
-  ASYNC_MODE_NUMBER: 0xeacf,
-  ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
-  CONTEXT_CONSUMER_NUMBER: 0xeace,
-  CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
-  CONTEXT_PROVIDER_NUMBER: 0xeacd,
-  CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
-  FORWARD_REF_NUMBER: 0xead0,
-  FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
-  PROFILER_NUMBER: 0xead2,
-  PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
-  STRICT_MODE_NUMBER: 0xeacc,
-  STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
-  PLACEHOLDER_NUMBER: 0xead1,
-  PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
-};
-var ReactTypeOfSideEffect = {
-  PerformedWork: 1,
-};
-// **********************************************************
-// End of copy paste.
-// **********************************************************
+function getInternalReactConstants(version) {
+  var ReactTypeOfWork;
+  var ReactSymbols;
+  var ReactTypeOfSideEffect;
+
+  // **********************************************************
+  // The section below is copy-pasted from files in React repo.
+  // Keep it in sync, and add version guards if it changes.
+  // **********************************************************
+  if (semver.gte(version, '16.4.3')) {
+    ReactTypeOfWork = {
+      IndeterminateComponent: 0,
+      FunctionalComponent: 1,
+      FunctionalComponentLazy: 2,
+      ClassComponent: 3,
+      ClassComponentLazy: 4,
+      HostRoot: 5,
+      HostPortal: 6,
+      HostComponent: 7,
+      HostText: 8,
+      Fragment: 9,
+      Mode: 10,
+      ContextConsumer: 11,
+      ContextProvider: 12,
+      ForwardRef: 13,
+      ForwardRefLazy: 14,
+      Profiler: 15,
+      PlaceholderComponent: 16,
+    };
+  } else {
+    ReactTypeOfWork = {
+      IndeterminateComponent: 0,
+      FunctionalComponent: 1,
+      ClassComponent: 2,
+      HostRoot: 3,
+      HostPortal: 4,
+      HostComponent: 5,
+      HostText: 6,
+      CoroutineComponent: 7,
+      CoroutineHandlerPhase: 8,
+      YieldComponent: 9,
+      Fragment: 10,
+      Mode: 11,
+      ContextConsumer: 12,
+      ContextProvider: 13,
+      ForwardRef: 14,
+      Profiler: 15,
+      Placeholder: 16,
+    };
+  }
+  ReactSymbols = {
+    ASYNC_MODE_NUMBER: 0xeacf,
+    ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
+    CONTEXT_CONSUMER_NUMBER: 0xeace,
+    CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
+    CONTEXT_PROVIDER_NUMBER: 0xeacd,
+    CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
+    FORWARD_REF_NUMBER: 0xead0,
+    FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
+    PROFILER_NUMBER: 0xead2,
+    PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
+    STRICT_MODE_NUMBER: 0xeacc,
+    STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
+    PLACEHOLDER_NUMBER: 0xead1,
+    PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
+  };
+  ReactTypeOfSideEffect = {
+    PerformedWork: 1,
+  };
+  // **********************************************************
+  // End of copy paste.
+  // **********************************************************
+  return {
+    ReactTypeOfWork,
+    ReactSymbols,
+    ReactTypeOfSideEffect,
+  };
+}
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
+  var {ReactTypeOfWork, ReactSymbols, ReactTypeOfSideEffect} = getInternalReactConstants(renderer.version);
   var {PerformedWork} = ReactTypeOfSideEffect;
   var {
     FunctionalComponent,
