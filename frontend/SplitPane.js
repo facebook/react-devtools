@@ -140,6 +140,7 @@ const styles = {
   rightPane: {
     display: 'flex',
     width: '100%',
+    overflow: 'auto',
   },
   leftPane: {
     display: 'flex',

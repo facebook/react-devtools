@@ -356,7 +356,7 @@ class Node extends React.Component<PropsType, StateType> {
         }
         &gt;
         {selected && !collapsed && !this.props.isBottomTagSelected &&
-          <span style={dollarRStyle}> == $r</span>
+          <span style={dollarRStyle}>&nbsp;== $r</span>
         }
         {collapsed && '…'}
         {collapsed && closeTag}
