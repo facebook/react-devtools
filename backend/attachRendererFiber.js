@@ -10,19 +10,318 @@
  */
 'use strict';
 
-import type {Hook, ReactRenderer, Helpers} from './types';
-var getDataFiber = require('./getDataFiber');
-var {
-  ClassComponent,
-  FunctionalComponent,
-  ContextConsumer,
-  HostRoot,
-} = require('./ReactTypeOfWork');
+import type {Hook, ReactRenderer, DataType, Helpers} from './types';
 
-// Inlined from ReactTypeOfSideEffect
-var PerformedWork = 1;
+var copyWithSet = require('./copyWithSet');
+var getDisplayName = require('./getDisplayName');
+
+// **********************************************************
+// The section below is copy-pasted from files in React repo.
+// **********************************************************
+var ReactTypeOfWork = {
+  IndeterminateComponent: 0, // Before we know whether it is functional or class
+  FunctionalComponent: 1,
+  ClassComponent: 2,
+  HostRoot: 3, // Root of a host tree. Could be nested inside another node.
+  HostPortal: 4, // A subtree. Could be an entry point to a different renderer.
+  HostComponent: 5,
+  HostText: 6,
+  CoroutineComponent: 7,
+  CoroutineHandlerPhase: 8,
+  YieldComponent: 9,
+  Fragment: 10,
+  Mode: 11,
+  ContextConsumer: 12,
+  ContextProvider: 13,
+  ForwardRef: 14,
+  Profiler: 15,
+  Placeholder: 16,
+};
+var ReactSymbols = {
+  ASYNC_MODE_NUMBER: 0xeacf,
+  ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
+  CONTEXT_CONSUMER_NUMBER: 0xeace,
+  CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
+  CONTEXT_PROVIDER_NUMBER: 0xeacd,
+  CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
+  FORWARD_REF_NUMBER: 0xead0,
+  FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
+  PROFILER_NUMBER: 0xead2,
+  PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
+  STRICT_MODE_NUMBER: 0xeacc,
+  STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
+  PLACEHOLDER_NUMBER: 0xead1,
+  PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
+};
+var ReactTypeOfSideEffect = {
+  PerformedWork: 1,
+};
+// **********************************************************
+// End of copy paste.
+// **********************************************************
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
+  var {PerformedWork} = ReactTypeOfSideEffect;
+  var {
+    FunctionalComponent,
+    ClassComponent,
+    ContextConsumer,
+    HostRoot,
+    HostPortal,
+    HostComponent,
+    HostText,
+    Fragment,
+  } = ReactTypeOfWork;
+  var {
+    ASYNC_MODE_NUMBER,
+    ASYNC_MODE_SYMBOL_STRING,
+    CONTEXT_CONSUMER_NUMBER,
+    CONTEXT_CONSUMER_SYMBOL_STRING,
+    CONTEXT_PROVIDER_NUMBER,
+    CONTEXT_PROVIDER_SYMBOL_STRING,
+    FORWARD_REF_NUMBER,
+    FORWARD_REF_SYMBOL_STRING,
+    PROFILER_NUMBER,
+    PROFILER_SYMBOL_STRING,
+    STRICT_MODE_NUMBER,
+    STRICT_MODE_SYMBOL_STRING,
+    PLACEHOLDER_NUMBER,
+    PLACEHOLDER_SYMBOL_STRING,
+  } = ReactSymbols;
+
+  // TODO: we might want to change the data structure
+  // once we no longer suppport Stack versions of `getData`.
+  function getDataFiber(fiber: Object): DataType {
+    var type = fiber.type;
+    var key = fiber.key;
+    var ref = fiber.ref;
+    var source = fiber._debugSource;
+    var publicInstance = null;
+    var props = null;
+    var state = null;
+    var children = null;
+    var context = null;
+    var updater = null;
+    var nodeType = null;
+    var name = null;
+    var text = null;
+
+    // Profiler data
+    var actualDuration = null;
+    var actualStartTime = null;
+    var treeBaseDuration = null;
+
+    switch (fiber.tag) {
+      case FunctionalComponent:
+      case ClassComponent:
+        nodeType = 'Composite';
+        name = getDisplayName(fiber.type);
+        publicInstance = fiber.stateNode;
+        props = fiber.memoizedProps;
+        state = fiber.memoizedState;
+        if (publicInstance != null) {
+          context = publicInstance.context;
+          if (context && Object.keys(context).length === 0) {
+            context = null;
+          }
+        }
+        const inst = publicInstance;
+        if (inst) {
+          updater = {
+            setState: inst.setState && inst.setState.bind(inst),
+            forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
+            setInProps: inst.forceUpdate && setInProps.bind(null, fiber),
+            setInState: inst.forceUpdate && setInState.bind(null, inst),
+            setInContext: inst.forceUpdate && setInContext.bind(null, inst),
+          };
+        }
+        children = [];
+        break;
+      case HostRoot:
+        nodeType = 'Wrapper';
+        children = [];
+        break;
+      case HostPortal:
+        nodeType = 'Portal';
+        name = 'ReactPortal';
+        props = {
+          target: fiber.stateNode.containerInfo,
+        };
+        children = [];
+        break;
+      case HostComponent:
+        nodeType = 'Native';
+        name = fiber.type;
+
+        // TODO (bvaughn) we plan to remove this prefix anyway.
+        // We can cut this special case out when it's gone.
+        name = name.replace('topsecret-', '');
+
+        publicInstance = fiber.stateNode;
+        props = fiber.memoizedProps;
+        if (
+          typeof props.children === 'string' ||
+          typeof props.children === 'number'
+        ) {
+          children = props.children.toString();
+        } else {
+          children = [];
+        }
+        if (typeof fiber.stateNode.setNativeProps === 'function') {
+          // For editing styles in RN
+          updater = {
+            setNativeProps(nativeProps) {
+              fiber.stateNode.setNativeProps(nativeProps);
+            },
+          };
+        }
+        break;
+      case HostText:
+        nodeType = 'Text';
+        text = fiber.memoizedProps;
+        break;
+      case Fragment:
+        nodeType = 'Wrapper';
+        children = [];
+        break;
+      default: // Coroutines and yields
+        const symbolOrNumber = typeof type === 'object' && type !== null
+          ? type.$$typeof
+          : type;
+        // $FlowFixMe facebook/flow/issues/2362
+        const switchValue = typeof symbolOrNumber === 'symbol'
+          ? symbolOrNumber.toString()
+          : symbolOrNumber;
+
+        switch (switchValue) {
+          case ASYNC_MODE_NUMBER:
+          case ASYNC_MODE_SYMBOL_STRING:
+            nodeType = 'Special';
+            name = 'AsyncMode';
+            children = [];
+            break;
+          case CONTEXT_PROVIDER_NUMBER:
+          case CONTEXT_PROVIDER_SYMBOL_STRING:
+            nodeType = 'Special';
+            props = fiber.memoizedProps;
+            name = 'Context.Provider';
+            children = [];
+            break;
+          case CONTEXT_CONSUMER_NUMBER:
+          case CONTEXT_CONSUMER_SYMBOL_STRING:
+            nodeType = 'Special';
+            props = fiber.memoizedProps;
+            // TODO: TraceUpdatesBackendManager currently depends on this.
+            // If you change .name, figure out a more resilient way to detect it.
+            name = 'Context.Consumer';
+            children = [];
+            break;
+          case STRICT_MODE_NUMBER:
+          case STRICT_MODE_SYMBOL_STRING:
+            nodeType = 'Special';
+            name = 'StrictMode';
+            children = [];
+            break;
+          case FORWARD_REF_NUMBER:
+          case FORWARD_REF_SYMBOL_STRING:
+            const functionName = getDisplayName(fiber.type.render, '');
+            nodeType = 'Special';
+            name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
+            children = [];
+            break;
+          case PLACEHOLDER_NUMBER:
+          case PLACEHOLDER_SYMBOL_STRING:
+            nodeType = 'Special';
+            name = 'Placeholder';
+            props = fiber.memoizedProps;
+            children = [];
+            break;
+          case PROFILER_NUMBER:
+          case PROFILER_SYMBOL_STRING:
+            nodeType = 'Special';
+            props = fiber.memoizedProps;
+            name = `Profiler(${fiber.memoizedProps.id})`;
+            children = [];
+            break;
+          default:
+            nodeType = 'Native';
+            props = fiber.memoizedProps;
+            name = 'TODO_NOT_IMPLEMENTED_YET';
+            children = [];
+            break;
+        }
+        break;
+    }
+
+    if (Array.isArray(children)) {
+      let child = fiber.child;
+      while (child) {
+        children.push(getOpaqueNode(child));
+        child = child.sibling;
+      }
+    }
+
+    if (fiber.actualDuration !== undefined) {
+      actualDuration = fiber.actualDuration;
+      actualStartTime = fiber.actualStartTime;
+      treeBaseDuration = fiber.treeBaseDuration;
+    }
+
+    // $FlowFixMe
+    return {
+      nodeType,
+      type,
+      key,
+      ref,
+      source,
+      name,
+      props,
+      state,
+      context,
+      children,
+      text,
+      updater,
+      publicInstance,
+
+      // Profiler data
+      actualDuration,
+      actualStartTime,
+      treeBaseDuration,
+    };
+  }
+
+  function setInProps(fiber, path: Array<string | number>, value: any) {
+    const inst = fiber.stateNode;
+    fiber.pendingProps = copyWithSet(inst.props, path, value);
+    if (fiber.alternate) {
+      // We don't know which fiber is the current one because DevTools may bail out of getDataFiber() call,
+      // and so the data object may refer to another version of the fiber. Therefore we update pendingProps
+      // on both. I hope that this is safe.
+      fiber.alternate.pendingProps = fiber.pendingProps;
+    }
+    fiber.stateNode.forceUpdate();
+  }
+
+  function setInState(inst, path: Array<string | number>, value: any) {
+    setIn(inst.state, path, value);
+    inst.forceUpdate();
+  }
+
+  function setInContext(inst, path: Array<string | number>, value: any) {
+    setIn(inst.context, path, value);
+    inst.forceUpdate();
+  }
+
+  function setIn(obj: Object, path: Array<string | number>, value: any) {
+    var last = path.pop();
+    var parent = path.reduce((obj_, attr) => obj_ ? obj_[attr] : null, obj);
+    if (parent) {
+      parent[last] = value;
+    }
+  }
+
+
+
   // This is a slightly annoying indirection.
   // It is currently necessary because DevTools wants
   // to use unique objects as keys for instances.
@@ -90,7 +389,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function enqueueMount(fiber) {
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber, getOpaqueNode),
+      data: getDataFiber(fiber),
       renderer: rid,
       type: 'mount',
     });
@@ -117,7 +416,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       if (haveProfilerTimesChanged(fiber.alternate, fiber)) {
         pendingEvents.push({
           internalInstance: getOpaqueNode(fiber),
-          data: getDataFiber(fiber, getOpaqueNode),
+          data: getDataFiber(fiber),
           renderer: rid,
           type: 'updateProfileTimes',
         });
@@ -126,7 +425,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber, getOpaqueNode),
+      data: getDataFiber(fiber),
       renderer: rid,
       type: 'update',
     });

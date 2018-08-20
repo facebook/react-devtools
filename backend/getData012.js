@@ -10,6 +10,11 @@
  */
 'use strict';
 
+// ----------------------------------------------------
+// This is Stack-only version.
+// The Fiber version is inlined in attachRendererFiber.
+// ----------------------------------------------------
+
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 
