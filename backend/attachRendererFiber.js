@@ -26,7 +26,7 @@ function getInternalReactConstants(version) {
   // The section below is copy-pasted from files in React repo.
   // Keep it in sync, and add version guards if it changes.
   // **********************************************************
-  if (semver.gte(version, '16.4.3')) {
+  if (semver.gte(version, '16.4.3-alpha')) {
     ReactTypeOfWork = {
       FunctionalComponent: 0,
       FunctionalComponentLazy: 1,
