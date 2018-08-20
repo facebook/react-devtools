@@ -28,11 +28,11 @@ function getInternalReactConstants(version) {
   // **********************************************************
   if (semver.gte(version, '16.4.3')) {
     ReactTypeOfWork = {
-      IndeterminateComponent: 0,
-      FunctionalComponent: 1,
-      FunctionalComponentLazy: 2,
-      ClassComponent: 3,
-      ClassComponentLazy: 4,
+      FunctionalComponent: 0,
+      FunctionalComponentLazy: 1,
+      ClassComponent: 2,
+      ClassComponentLazy: 3,
+      IndeterminateComponent: 4,
       HostRoot: 5,
       HostPortal: 6,
       HostComponent: 7,
