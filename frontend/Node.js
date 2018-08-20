@@ -336,11 +336,14 @@ class Node extends React.Component<PropsType, StateType> {
     const jsxOpenTagStyle = jsxTagStyle(inverted && (!isBottomTagSelected || collapsed), nodeType, theme);
     const head = (
       <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
-        <span style={{
-          width: '1rem',
-          textAlign: 'center',
-          marginLeft: '-1rem',
-        }}>
+        <span
+          onClick={onToggleCollapse}
+          style={{
+            width: '1rem',
+            textAlign: 'center',
+            marginLeft: '-1rem',
+          }}
+        >
           {collapsed ? '▶' : '▼'}
         </span>
         &lt;

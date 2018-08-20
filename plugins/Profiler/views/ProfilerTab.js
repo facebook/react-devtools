@@ -34,13 +34,16 @@ import ProfilerTabToolbar from './ProfilerTabToolbar';
 import ProfilerFiberDetailPane from './ProfilerFiberDetailPane';
 import ProfilerSnapshotDetailPane from './ProfilerSnapshotDetailPane';
 import ProfilerInteractionDetailPane from './ProfilerInteractionDetailPane';
+import ProfilerSettings from './ProfilerSettings';
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
   cacheInteractionData: CacheInteractionData,
+  commitThreshold: number,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   getCachedInteractionData: GetCachedInteractionData,
   hasMultipleRoots: boolean,
+  hideCommitsBelowThreshold: boolean,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   profilerData: RootProfilerData,
@@ -50,8 +53,8 @@ type Props = {|
   showNativeNodes: boolean,
   snapshots: Array<Snapshot>,
   timestampsToInteractions: Map<number, Set<Interaction>>,
-  toggleIsRecording: () => void,
-  toggleShowNativeNodes: () => void,
+  toggleIsRecording: Function,
+  toggleIsSettingsPanelActive: Function,
 |};
 
 type State = {|
@@ -128,12 +131,6 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberName: name,
     });
 
-  selectNextSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
-    this.setState(prevState => ({ snapshotIndex: prevState.snapshotIndex + 1 }));
-
-  selectPreviousSnapshotIndex = (event: SyntheticEvent<HTMLButtonElement>) =>
-    this.setState(prevState => ({ snapshotIndex: prevState.snapshotIndex - 1 }));
-
   // We store the ID and name separately,
   // Because a Fiber may not exist in all snapshots.
   // In that case, it's still important to show the selected fiber (name) in the details pane.
@@ -177,9 +174,11 @@ class ProfilerTab extends React.Component<Props, State> {
     const {
       cacheDataForSnapshot,
       cacheInteractionData,
+      commitThreshold,
       getCachedDataForSnapshot,
       getCachedInteractionData,
       hasMultipleRoots,
+      hideCommitsBelowThreshold,
       interactionsToSnapshots,
       isRecording,
       profilerData,
@@ -189,6 +188,7 @@ class ProfilerTab extends React.Component<Props, State> {
       snapshots,
       timestampsToInteractions,
       toggleIsRecording,
+      toggleIsSettingsPanelActive,
     } = this.props;
     const {
       isInspectingSelectedFiber,
@@ -220,9 +220,12 @@ class ProfilerTab extends React.Component<Props, State> {
       if (isInspectingSelectedFiber && selectedFiberID !== null) {
         content = (
           <FiberRenderDurations
+            commitThreshold={commitThreshold}
+            hideCommitsBelowThreshold={hideCommitsBelowThreshold}
             selectedFiberID={selectedFiberID}
             selectedSnapshot={snapshot}
             selectSnapshot={this.selectSnapshot}
+            snapshotIndex={snapshotIndex}
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}
             theme={theme}
@@ -251,6 +254,7 @@ class ProfilerTab extends React.Component<Props, State> {
         content = (
           <ChartComponent
             cacheDataForSnapshot={cacheDataForSnapshot}
+            deselectFiber={this.deselectFiber}
             getCachedDataForSnapshot={getCachedDataForSnapshot}
             inspectFiber={this.inspectFiber}
             selectedFiberID={selectedFiberID}
@@ -301,9 +305,9 @@ class ProfilerTab extends React.Component<Props, State> {
     } else if (selectedChartType !== 'interactions' && selectedFiberName !== null) {
       details = (
         <ProfilerFiberDetailPane
+          deselectFiber={this.deselectFiber}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           name={selectedFiberName}
-          selectedChartType={selectedChartType}
           snapshot={snapshot}
           snapshotFiber={snapshotFiber}
           toggleInspectingSelectedFiber={this.toggleInspectingSelectedFiber}
@@ -339,29 +343,32 @@ class ProfilerTab extends React.Component<Props, State> {
             borderBottom: `1px solid ${theme.base03}`,
           }}>
             <ProfilerTabToolbar
+              commitThreshold={commitThreshold}
+              hideCommitsBelowThreshold={hideCommitsBelowThreshold}
               interactionsCount={interactionsToSnapshots.size}
               isInspectingSelectedFiber={isInspectingSelectedFiber}
               isRecording={isRecording}
               selectChart={this.props.setSelectedChartType}
-              selectNextSnapshotIndex={this.selectNextSnapshotIndex}
-              selectPreviousSnapshotIndex={this.selectPreviousSnapshotIndex}
               selectedChartType={selectedChartType}
+              selectedFiberID={selectedFiberID}
               selectedSnapshot={snapshot}
               selectSnapshot={this.selectSnapshot}
-              showNativeNodes={this.props.showNativeNodes}
               snapshotIndex={snapshotIndex}
               snapshots={snapshots}
               theme={theme}
               toggleIsRecording={toggleIsRecording}
-              toggleShowNativeNodes={this.props.toggleShowNativeNodes}
+              toggleIsSettingsPanelActive={toggleIsSettingsPanelActive}
             />
           </div>
           <div style={{
             flex: 1,
             padding: '0.5rem',
             boxSizing: 'border-box',
+            position: 'relative',
           }}>
             {content}
+
+            <ProfilerSettings />
           </div>
         </div>
         <div style={{
@@ -428,6 +435,8 @@ const RecordingInProgress = ({stopRecording, theme}) => (
 export default decorate({
   store: 'profilerStore',
   listeners: () => [
+    'commitThreshold',
+    'hideCommitsBelowThreshold',
     'isRecording',
     'profilerData',
     'selectedChartType',
@@ -445,7 +454,9 @@ export default decorate({
       cacheInteractionData: (...args) => store.cacheInteractionData(...args),
       getCachedDataForSnapshot: (...args) => store.getCachedDataForSnapshot(...args),
       getCachedInteractionData: (...args) => store.getCachedInteractionData(...args),
+      commitThreshold: store.commitThreshold,
       hasMultipleRoots: store.roots.size > 1,
+      hideCommitsBelowThreshold: store.hideCommitsBelowThreshold,
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
         : new Map(),
@@ -461,7 +472,7 @@ export default decorate({
         ? profilerData.timestampsToInteractions
         : new Map(),
       toggleIsRecording: () => store.setIsRecording(!store.isRecording),
-      toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
+      toggleIsSettingsPanelActive: () => store.setIsSettingsPanelActive(!store.isSettingsPanelActive),
     };
   },
 }, ProfilerTab);

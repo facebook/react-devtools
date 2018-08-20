@@ -25,6 +25,7 @@ type Node = {|
   id: any,
   label: string,
   name: string,
+  title: string,
   value: number,
 |};
 
@@ -44,6 +45,7 @@ type ItemData = {|
 
 type Props = {|
   cacheDataForSnapshot: CacheDataForSnapshot,
+  deselectFiber: Function,
   getCachedDataForSnapshot: GetCachedDataForSnapshot,
   inspectFiber: SelectOrInspectFiber,
   selectedFiberID: string | null,
@@ -56,6 +58,7 @@ type Props = {|
 
 const SnapshotRanked = ({
   cacheDataForSnapshot,
+  deselectFiber,
   getCachedDataForSnapshot,
   inspectFiber,
   selectedFiberID,
@@ -77,6 +80,7 @@ const SnapshotRanked = ({
     <AutoSizer>
       {({ height, width }) => (
         <SnapshotRankedInner
+          deselectFiber={deselectFiber}
           height={height}
           inspectFiber={inspectFiber}
           rankedData={((rankedData: any): RankedData)}
@@ -97,6 +101,7 @@ type RankedData = {|
 |};
 
 type SnapshotRankedInnerProps = {|
+  deselectFiber: Function,
   height: number,
   inspectFiber: SelectOrInspectFiber,
   rankedData: RankedData,
@@ -108,6 +113,7 @@ type SnapshotRankedInnerProps = {|
 |};
 
 const SnapshotRankedInner = ({
+  deselectFiber,
   height,
   inspectFiber,
   rankedData,
@@ -138,20 +144,39 @@ const SnapshotRankedInner = ({
   );
 
   return (
-    <List
-      height={height}
-      innerTagName="svg"
-      itemCount={rankedData.nodes.length}
-      itemData={itemData}
-      itemSize={barHeight}
-      width={width}
+    <div
+      onClick={deselectFiber}
+      style={{height, width}}
     >
-      {ListItem}
-    </List>
+      <List
+        height={height}
+        innerTagName="svg"
+        itemCount={rankedData.nodes.length}
+        itemData={itemData}
+        itemSize={barHeight}
+        width={width}
+      >
+        {ListItem}
+      </List>
+    </div>
   );
 };
 
 class ListItem extends PureComponent<any, void> {
+  handleClick = event => {
+    event.stopPropagation();
+    const { data, index } = this.props;
+    const node = data.nodes[index];
+    data.selectFiber(node.id, node.name, data.snapshot.root);
+  };
+
+  handleDoubleClick = event => {
+    event.stopPropagation();
+    const { data, index } = this.props;
+    const node = data.nodes[index];
+    data.inspectFiber(node.id, node.name, data.snapshot.root);
+  };
+
   render() {
     const { data, index, style } = this.props;
 
@@ -172,9 +197,10 @@ class ListItem extends PureComponent<any, void> {
         isDimmed={index < data.focusedNodeIndex}
         key={node.id}
         label={node.label}
-        onClick={() => data.selectFiber(node.id, node.name, data.snapshot.root)}
-        onDoubleClick={() => data.inspectFiber(node.id, node.name, data.snapshot.root)}
+        onClick={this.handleClick}
+        onDoubleClick={this.handleDoubleClick}
         theme={data.theme}
+        title={node.title}
         width={Math.max(minBarWidth, scaleX(node.value))}
         x={0}
         y={top}
@@ -234,6 +260,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
         id: node.id,
         label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
         name,
+        title: `${name} (${node.actualDuration}ms)`,
         value: node.actualDuration,
       };
     })

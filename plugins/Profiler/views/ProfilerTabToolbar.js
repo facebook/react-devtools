@@ -22,26 +22,25 @@ import IconButton from './IconButton';
 import SnapshotSelector from './SnapshotSelector';
 
 const CHART_RADIO_LABEL_WIDTH_THRESHOLD = 650;
-const CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD = 800;
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
   selectChart: (chart: ChartType) => void,
-  selectNextSnapshotIndex: Function,
-  selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
-  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
-  toggleShowNativeNodes: Function,
+  toggleIsSettingsPanelActive: Function,
 |};
 
 export default (props: Props) => (
@@ -53,40 +52,40 @@ export default (props: Props) => (
 );
 
 type ProfilerTabToolbarProps = {
+  commitThreshold: number,
+  hideCommitsBelowThreshold: boolean,
   interactionsCount: number,
   isInspectingSelectedFiber: boolean,
   isRecording: boolean,
   selectChart: (chart: ChartType) => void,
-  selectNextSnapshotIndex: Function,
-  selectPreviousSnapshotIndex: Function,
   selectedChartType: ChartType,
+  selectedFiberID: string | null,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
-  showNativeNodes: boolean,
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   theme: Theme,
   toggleIsRecording: Function,
-  toggleShowNativeNodes: Function,
+  toggleIsSettingsPanelActive: Function,
   width: number,
 };
 
 const ProfilerTabToolbar = ({
+  commitThreshold,
+  hideCommitsBelowThreshold,
   interactionsCount,
   isInspectingSelectedFiber,
   isRecording,
   selectChart,
-  selectNextSnapshotIndex,
-  selectPreviousSnapshotIndex,
   selectedChartType,
+  selectedFiberID,
   selectedSnapshot,
   selectSnapshot,
-  showNativeNodes,
   snapshotIndex,
   snapshots,
   theme,
   toggleIsRecording,
-  toggleShowNativeNodes,
+  toggleIsSettingsPanelActive,
   width,
 }: ProfilerTabToolbarProps) => (
   <div style={{
@@ -106,6 +105,20 @@ const ProfilerTabToolbar = ({
     />
 
     <HRule theme={theme} />
+
+    {isRecording || snapshots.length === 0 && (
+      <Fragment>
+        <div style={{flex: 1}} />
+
+        <IconButton
+          icon={Icons.SETTINGS}
+          isTransparent={true}
+          label="Profiler settings"
+          onClick={toggleIsSettingsPanelActive}
+          theme={theme}
+        />
+      </Fragment>
+    )}
 
     {!isRecording && snapshots.length > 0 && (
       <Fragment>
@@ -141,45 +154,26 @@ const ProfilerTabToolbar = ({
 
         <div style={{flex: 1}} />
 
-        <ShowNativeNodesButton
-          isActive={showNativeNodes}
-          isDisabled={isInspectingSelectedFiber}
-          onClick={toggleShowNativeNodes}
+        <IconButton
+          icon={Icons.SETTINGS}
+          isTransparent={true}
+          label="Profiler settings"
+          onClick={toggleIsSettingsPanelActive}
           theme={theme}
-          width={width}
         />
 
         <HRule theme={theme} />
 
-        <span
-          style={{
-            opacity: isInspectingSelectedFiber ? 0.5 : 1,
-          }}
-        >
-          {snapshotIndex + 1} / {snapshots.length}
-        </span>
-        <IconButton
-          disabled={snapshotIndex === 0 || isInspectingSelectedFiber}
-          icon={Icons.BACK}
-          isTransparent={true}
-          onClick={selectPreviousSnapshotIndex}
-          theme={theme}
-          title="Previous render"
-        />
         <SnapshotSelector
-          disabled={isInspectingSelectedFiber}
+          commitThreshold={commitThreshold}
+          hideCommitsBelowThreshold={hideCommitsBelowThreshold}
+          isInspectingSelectedFiber={isInspectingSelectedFiber}
+          selectedFiberID={selectedFiberID}
           selectedSnapshot={selectedSnapshot}
           selectSnapshot={selectSnapshot}
+          snapshotIndex={snapshotIndex}
           snapshots={snapshots}
           theme={theme}
-        />
-        <IconButton
-          disabled={snapshotIndex === snapshots.length - 1 || isInspectingSelectedFiber}
-          icon={Icons.FORWARD}
-          isTransparent={true}
-          onClick={selectNextSnapshotIndex}
-          theme={theme}
-          title="Next render"
         />
       </Fragment>
     )}
@@ -291,59 +285,3 @@ const RecordButton = Hoverable(
     </button>
   )
 );
-
-type ShowNativeNodesButtonProps = {|
-  isActive: boolean,
-  isDisabled: boolean,
-  isHovered: boolean,
-  onClick: Function,
-  onMouseEnter: Function,
-  onMouseLeave: Function,
-  theme: Theme,
-  width: number,
-|};
-
-const ShowNativeNodesButton = Hoverable(({
-  isActive,
-  isDisabled,
-  isHovered,
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-  theme,
-  width,
-}: ShowNativeNodesButtonProps) => (
-  <label
-    onMouseEnter={onMouseEnter}
-    onMouseLeave={onMouseLeave}
-    style={{
-      display: 'flex',
-      alignItems: 'center',
-      color: isHovered ? theme.state06 : 'inherit',
-      cursor: 'pointer',
-      opacity: isDisabled ? 0.5 : 1,
-      pointerEvents: isDisabled ? 'none' : 'auto',
-    }}
-    title="Show native elements?"
-  >
-    <input
-      disabled={isDisabled}
-      type="checkbox"
-      checked={isActive}
-      onChange={onClick}
-    />
-    <SvgIcon
-      path={Icons.DOM_ELEMENT}
-      style={{
-        flex: '0 0 1rem',
-        width: '1rem',
-        height: '1rem',
-        fill: 'currentColor',
-        display: 'inline',
-        verticalAlign: 'sub',
-        margin: '0 0.25rem',
-      }}
-     />
-     {width >= CHART_NATIVE_NODES_TOGGLE_LABEL_WIDTH_THRESHOLD ? 'Show native nodes?' : ''}
-  </label>
-));
