@@ -28,11 +28,11 @@ function getInternalReactConstants(version) {
   // **********************************************************
   if (semver.gte(version, '16.4.3')) {
     ReactTypeOfWork = {
-      IndeterminateComponent: 0,
-      FunctionalComponent: 1,
-      FunctionalComponentLazy: 2,
-      ClassComponent: 3,
-      ClassComponentLazy: 4,
+      FunctionalComponent: 0,
+      FunctionalComponentLazy: 1,
+      ClassComponent: 2,
+      ClassComponentLazy: 3,
+      IndeterminateComponent: 4,
       HostRoot: 5,
       HostPortal: 6,
       HostComponent: 7,
@@ -50,7 +50,9 @@ function getInternalReactConstants(version) {
     ReactTypeOfWork = {
       IndeterminateComponent: 0,
       FunctionalComponent: 1,
+      FunctionalComponentLazy: -1, // Doesn't exist yet
       ClassComponent: 2,
+      ClassComponentLazy: -1, // Doesn't exist yet
       HostRoot: 3,
       HostPortal: 4,
       HostComponent: 5,
@@ -63,6 +65,7 @@ function getInternalReactConstants(version) {
       ContextConsumer: 12,
       ContextProvider: 13,
       ForwardRef: 14,
+      ForwardRefLazy: -1, // Doesn't exist yet
       Profiler: 15,
       Placeholder: 16,
     };
@@ -101,13 +104,17 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   var {PerformedWork} = ReactTypeOfSideEffect;
   var {
     FunctionalComponent,
+    FunctionalComponentLazy,
     ClassComponent,
+    ClassComponentLazy,
     ContextConsumer,
     HostRoot,
     HostPortal,
     HostComponent,
     HostText,
     Fragment,
+    ForwardRef,
+    ForwardRefLazy,
   } = ReactTypeOfWork;
   var {
     ASYNC_MODE_NUMBER,
@@ -116,8 +123,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     CONTEXT_CONSUMER_SYMBOL_STRING,
     CONTEXT_PROVIDER_NUMBER,
     CONTEXT_PROVIDER_SYMBOL_STRING,
-    FORWARD_REF_NUMBER,
-    FORWARD_REF_SYMBOL_STRING,
     PROFILER_NUMBER,
     PROFILER_SYMBOL_STRING,
     STRICT_MODE_NUMBER,
@@ -148,11 +153,20 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var actualStartTime = null;
     var treeBaseDuration = null;
 
+    var resolvedType = type;
+    if (typeof type === 'object' && type !== null) {
+      if (typeof type.then === 'function') {
+        resolvedType = type._reactResult;
+      }
+    }
+
     switch (fiber.tag) {
       case FunctionalComponent:
+      case FunctionalComponentLazy:
       case ClassComponent:
+      case ClassComponentLazy:
         nodeType = 'Composite';
-        name = getDisplayName(fiber.type);
+        name = getDisplayName(resolvedType);
         publicInstance = fiber.stateNode;
         props = fiber.memoizedProps;
         state = fiber.memoizedState;
@@ -172,6 +186,13 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             setInContext: inst.forceUpdate && setInContext.bind(null, inst),
           };
         }
+        children = [];
+        break;
+      case ForwardRef:
+      case ForwardRefLazy:
+        const functionName = getDisplayName(resolvedType.render, '');
+        nodeType = 'Special';
+        name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
         children = [];
         break;
       case HostRoot:
@@ -221,7 +242,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         nodeType = 'Wrapper';
         children = [];
         break;
-      default: // Coroutines and yields
+      default:
         const symbolOrNumber = typeof type === 'object' && type !== null
           ? type.$$typeof
           : type;
@@ -257,13 +278,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           case STRICT_MODE_SYMBOL_STRING:
             nodeType = 'Special';
             name = 'StrictMode';
-            children = [];
-            break;
-          case FORWARD_REF_NUMBER:
-          case FORWARD_REF_SYMBOL_STRING:
-            const functionName = getDisplayName(fiber.type.render, '');
-            nodeType = 'Special';
-            name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
             children = [];
             break;
           case PLACEHOLDER_NUMBER:
@@ -356,8 +370,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       parent[last] = value;
     }
   }
-
-
 
   // This is a slightly annoying indirection.
   // It is currently necessary because DevTools wants
