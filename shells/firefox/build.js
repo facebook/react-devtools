@@ -23,7 +23,7 @@ const main = async () => {
   console.log('yarn run test:firefox');
   console.log(chalk.gray('\n# You can also test against upcoming Firefox releases.'));
   console.log(chalk.gray('# First download a release from https://www.mozilla.org/en-US/firefox/channel/desktop/'));
-  console.log(chalk.gray('# And then tell web-ext which release to use (eg firefoxdeveloperedition, nigthly, beta):'));
+  console.log(chalk.gray('# And then tell web-ext which release to use (eg firefoxdeveloperedition, nightly, beta):'));
   console.log('WEB_EXT_FIREFOX=nightly yarn run test:firefox');
   console.log(chalk.gray('\n# You can test against older versions too:'));
   console.log('WEB_EXT_FIREFOX=/Applications/Firefox52.app/Contents/MacOS/firefox-bin yarn run test:firefox');
