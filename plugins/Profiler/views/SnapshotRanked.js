@@ -258,9 +258,9 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
 
       return {
         id: node.id,
-        label: `${name} (${node.actualDuration.toFixed(2)}ms)`,
+        label: `${name} (${node.actualDuration.toFixed(1)}ms)`,
         name,
-        title: `${name} (${node.actualDuration}ms)`,
+        title: `${name} (${node.actualDuration.toFixed(3)}ms)`,
         value: node.actualDuration,
       };
     })

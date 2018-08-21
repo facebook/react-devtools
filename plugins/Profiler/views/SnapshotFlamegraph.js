@@ -266,11 +266,11 @@ class ListItem extends PureComponent<any, void> {
               height={barHeight}
               isDimmed={index < focusedNodeIndex}
               key={id}
-              label={didRender ? `${name} (${actualDuration.toFixed(2)}ms)` : name}
+              label={didRender ? `${name} (${actualDuration.toFixed(1)}ms)` : name}
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
-              title={didRender ? `${name} (${actualDuration}ms)` : name}
+              title={didRender ? `${name} (${actualDuration.toFixed(3)}ms)` : name}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
               y={top}

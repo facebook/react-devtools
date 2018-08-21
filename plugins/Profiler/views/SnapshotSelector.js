@@ -115,11 +115,11 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
       snapshots,
     } = this.props;
 
-    if (snapshots.length > 0) {
-      const newIndex = snapshotIndex < snapshots.length - 1
-        ? snapshotIndex + 1
-        : 0;
-
+    if (
+      snapshots.length > 0 &&
+      snapshotIndex < snapshots.length - 1
+    ) {
+      const newIndex = snapshotIndex + 1;
       selectSnapshot(snapshots[newIndex]);
     }
   };
@@ -131,11 +131,11 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
       snapshots,
     } = this.props;
 
-    if (snapshots.length > 0) {
-      const newIndex = snapshotIndex > 0
-        ? snapshotIndex - 1
-        : snapshots.length - 1;
-
+    if (
+      snapshots.length > 0 &&
+      snapshotIndex > 0
+    ) {
+      const newIndex = snapshotIndex - 1;
       selectSnapshot(snapshots[newIndex]);
     }
   };
@@ -173,11 +173,11 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
         )}
         {numSnapshots > 0 && (
           <span style={{whiteSpace: 'nowrap'}}>
-            {`${snapshotIndex + 1}`.padStart(`${numSnapshots}`.length, '0')} / {numSnapshots}
+            {`${snapshotIndex >= 0 ? snapshotIndex + 1 : '-'}`.padStart(`${numSnapshots}`.length, '0')} / {numSnapshots}
           </span>
         )}
         <IconButton
-          disabled={numSnapshots === 0}
+          disabled={snapshotIndex <= 0}
           icon={Icons.BACK}
           isTransparent={true}
           onClick={this.selectPreviousSnapshotIndex}
@@ -196,7 +196,7 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
           theme={theme}
         />
         <IconButton
-          disabled={numSnapshots === 0}
+          disabled={numSnapshots === 0 || snapshotIndex >= numSnapshots - 1}
           icon={Icons.FORWARD}
           isTransparent={true}
           onClick={this.selectNextSnapshotIndex}
@@ -271,7 +271,10 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
 
   componentDidUpdate(prevProps) {
     // Make sure any newly selected snapshot is visible within the list.
-    if (this.props.snapshotIndex !== prevProps.snapshotIndex) {
+    if (
+      this.props.snapshotIndex !== prevProps.snapshotIndex &&
+      this.listRef.current !== null
+    ) {
       this.listRef.current.scrollToItem(this.props.snapshotIndex);
     }
   }
