@@ -185,7 +185,7 @@ const HRule = ({ theme }) => (
     height: '18px',
     width: '1px',
     backgroundColor: theme.base03,
-    margin: '0 0.5rem',
+    margin: '0px 0.5rem 0 0.25rem',
   }} />
 );
 
