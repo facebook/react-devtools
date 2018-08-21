@@ -79,7 +79,7 @@ export const getFilteredSnapshotData = memoize((
   const filteredSnapshotIndex = filteredSnapshots.indexOf(selectedSnapshot);
 
   return {
-    snapshotIndex: filteredSnapshotIndex >= 0 ? filteredSnapshotIndex : 0,
+    snapshotIndex: filteredSnapshotIndex,
     snapshots: filteredSnapshots,
   };
 });

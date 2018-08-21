@@ -173,7 +173,7 @@ class SnapshotSelectorWrapper extends PureComponent<Props, void> {
         )}
         {numSnapshots > 0 && (
           <span style={{whiteSpace: 'nowrap'}}>
-            {`${snapshotIndex + 1}`.padStart(`${numSnapshots}`.length, '0')} / {numSnapshots}
+            {`${snapshotIndex >= 0 ? snapshotIndex + 1 : '-'}`.padStart(`${numSnapshots}`.length, '0')} / {numSnapshots}
           </span>
         )}
         <IconButton
