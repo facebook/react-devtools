@@ -58,7 +58,7 @@ const ProfilerInteractionDetailPane = ({
       <div style={{
         padding: '0.5rem',
       }}>
-        <div><strong>Time</strong>: {formatTime(interaction.timestamp)}s</div>
+        <div><strong>Timestamp</strong>: {formatTime(interaction.timestamp)}s</div>
         <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
         <ul style={{
           listStyle: 'none',
@@ -119,8 +119,8 @@ const SnapshotLink = Hoverable(({
     >
       {cpuSvg}
       <ul style={{paddingLeft: '1.5rem'}}>
+        <li>Timestamp: {formatTime(snapshot.commitTime)}s</li>
         <li>Duration: {formatDuration(snapshot.duration)}ms</li>
-        <li>Time: {formatTime(snapshot.commitTime)}s</li>
         <li>CPU: {formatPercentage(cpuPercentage)}%</li>
       </ul>
     </li>
