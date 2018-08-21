@@ -101,7 +101,7 @@ const ProfilerFiberDetailPane = ({
           fontSize: monospace.sizes.normal,
           fontFamily: monospace.family,
         }}>
-          <strong>Render count</strong>: {snapshotFiber.get('renders')}
+          <strong>Total renders</strong>: {snapshotFiber.get('renders')}
         </div>
         <DetailPane theme={theme}>
           <DetailPaneSection title="Props">
