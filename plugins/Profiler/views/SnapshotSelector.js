@@ -271,7 +271,10 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
 
   componentDidUpdate(prevProps) {
     // Make sure any newly selected snapshot is visible within the list.
-    if (this.props.snapshotIndex !== prevProps.snapshotIndex) {
+    if (
+      this.props.snapshotIndex !== prevProps.snapshotIndex &&
+      this.listRef.current !== null
+    ) {
       this.listRef.current.scrollToItem(this.props.snapshotIndex);
     }
   }
