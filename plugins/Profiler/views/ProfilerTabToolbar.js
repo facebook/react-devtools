@@ -162,19 +162,23 @@ const ProfilerTabToolbar = ({
           theme={theme}
         />
 
-        <HRule theme={theme} />
+        {selectedChartType !== 'interactions' && (
+          <Fragment>
+            <HRule theme={theme} />
 
-        <SnapshotSelector
-          commitThreshold={commitThreshold}
-          hideCommitsBelowThreshold={hideCommitsBelowThreshold}
-          isInspectingSelectedFiber={isInspectingSelectedFiber}
-          selectedFiberID={selectedFiberID}
-          selectedSnapshot={selectedSnapshot}
-          selectSnapshot={selectSnapshot}
-          snapshotIndex={snapshotIndex}
-          snapshots={snapshots}
-          theme={theme}
-        />
+            <SnapshotSelector
+              commitThreshold={commitThreshold}
+              hideCommitsBelowThreshold={hideCommitsBelowThreshold}
+              isInspectingSelectedFiber={isInspectingSelectedFiber}
+              selectedFiberID={selectedFiberID}
+              selectedSnapshot={selectedSnapshot}
+              selectSnapshot={selectSnapshot}
+              snapshotIndex={snapshotIndex}
+              snapshots={snapshots}
+              theme={theme}
+            />
+          </Fragment>
+        )}
       </Fragment>
     )}
   </div>
