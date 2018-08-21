@@ -193,11 +193,11 @@ class ListItem extends PureComponent<any, void> {
         height={safeHeight}
         isDimmed={node.parentSnapshot === selectedSnapshot}
         key={index}
-        label={`${node.value.toFixed(2)}ms`}
+        label={`${node.value.toFixed(1)}ms`}
         onClick={() => selectSnapshot(node.parentSnapshot)}
         onDoubleClick={stopInspecting}
         theme={theme}
-        title={`${node.value}ms`}
+        title={`${node.value.toFixed(3)}ms`}
         width={width}
         x={left}
         y={height - safeHeight}
