@@ -50,6 +50,10 @@ export const formatDuration = (duration: number) => Math.round(duration * 10) / 
 export const formatPercentage = (percentage: number) => Math.round(percentage * 100);
 export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
 
+export const getMaxDuration = (snapshots: Array<Snapshot>): number =>
+  snapshots.reduce((maxDuration: number, snapshot: Snapshot) =>
+    Math.max(maxDuration, snapshot.duration || 0), 0);
+
 type FilteredSnapshotData = {|
   snapshotIndex: number,
   snapshots: Array<Snapshot>,

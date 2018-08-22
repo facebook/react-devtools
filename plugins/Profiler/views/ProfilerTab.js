@@ -25,6 +25,7 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import decorate from '../../../frontend/decorate';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
+import { getMaxDuration } from './constants';
 import FiberRenderDurations from './FiberRenderDurations';
 import InteractionTimeline from './InteractionTimeline';
 import NoProfilingDataMessage from './NoProfilingDataMessage';
@@ -200,6 +201,7 @@ class ProfilerTab extends React.Component<Props, State> {
 
     const snapshot = snapshots[snapshotIndex];
     const snapshotFiber = selectedFiberID && snapshot.nodes.get(selectedFiberID) || null;
+    const maxDuration = getMaxDuration(snapshots);
 
     let content;
     if (isRecording) {
@@ -238,12 +240,12 @@ class ProfilerTab extends React.Component<Props, State> {
             getCachedInteractionData={getCachedInteractionData}
             hasMultipleRoots={hasMultipleRoots}
             interactionsToSnapshots={interactionsToSnapshots}
+            maxDuration={maxDuration}
             selectedInteraction={selectedInteraction}
             selectedSnapshot={snapshot}
             selectInteraction={this.selectInteraction}
             theme={theme}
             timestampsToInteractions={timestampsToInteractions}
-            viewSnapshot={this.viewSnapshot}
           />
         );
       } else {
@@ -296,6 +298,7 @@ class ProfilerTab extends React.Component<Props, State> {
       details = (
         <ProfilerInteractionDetailPane
           interaction={((selectedInteraction: any): Interaction)}
+          maxDuration={getMaxDuration(snapshots)}
           selectedSnapshot={snapshot}
           snapshots={((interactionsToSnapshots.get(((selectedInteraction: any): Interaction)): any): Set<Snapshot>)}
           theme={theme}
