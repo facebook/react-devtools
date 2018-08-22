@@ -111,6 +111,7 @@ const containerStyle = (isVertical: boolean) => ({
   minWidth: 0,
   flex: 1,
   flexDirection: isVertical ? 'column' : 'row',
+  maxWidth: '100vw',
 });
 
 const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
