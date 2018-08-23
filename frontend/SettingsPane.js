@@ -18,7 +18,7 @@ const SvgIcon = require('./SvgIcon');
 const Icons = require('./Icons');
 const Input = require('./Input');
 const Hoverable = require('./Hoverable');
-
+const storage = require('../utils/storage');
 const decorate = require('./decorate');
 
 import type {Theme} from './types';
@@ -48,9 +48,9 @@ class SettingsPane extends React.Component {
     // capture=true is needed to prevent chrome devtools console popping up
     doc.addEventListener('keydown', this._key, true);
 
-    const lastSearch = localStorage.getItem('searchText') || '';
-    if (lastSearch !== '') {
-      this.props.onChangeSearch(lastSearch);
+    const lastSearchedTerm = storage.get('searchText', '');
+    if (lastSearchedTerm) {
+      this.props.onChangeSearch(lastSearchedTerm);
     }
   }
 

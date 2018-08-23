@@ -20,6 +20,7 @@ var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
+var storage = require('../utils/storage');
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
@@ -307,7 +308,7 @@ class Store extends EventEmitter {
     this.refreshSearch = false;
 
     // Save the search text in local storage so we can use it after a refresh
-    localStorage.setItem('searchText', text);
+    storage.set('searchText', text);
 
     // Search input depends on this change being flushed synchronously.
     this.flush();
