@@ -123,7 +123,6 @@ const containerStyle = (theme: Theme) => ({
   maxHeight: '80px',
   backgroundColor: theme.base01,
   borderTop: `1px solid ${theme.base03}`,
-  whiteSpace: 'nowrap',
   overflow: 'auto',
 });
 
