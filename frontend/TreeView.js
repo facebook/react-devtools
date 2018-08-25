@@ -15,6 +15,7 @@ const PropTypes = require('prop-types');
 const React = require('react');
 const SearchUtils = require('./SearchUtils');
 const Breadcrumb = require('./Breadcrumb');
+const SplitPane = require('./SplitPane');
 
 const decorate = require('./decorate');
 const {monospace, sansSerif} = require('./Themes/Fonts');
@@ -115,19 +116,28 @@ class TreeView extends React.Component<Props> {
 
     return (
       <div style={styles.container}>
-        <div ref={n => this.node = n} style={styles.scroll}>
-          <div style={styles.scrollContents}>
-            {this.props.roots.map(id => (
-              <Node
-                depth={0}
-                id={id}
-                key={id}
-                searchRegExp={searchRegExp}
-              />
-            )).toJS()}
-          </div>
-        </div>
-        <Breadcrumb />
+        <SplitPane
+          initialWidth={10}
+          initialHeight={30}
+          left={() => (
+            <div ref={n => this.node = n} style={styles.scroll}>
+              <div style={styles.scrollContents}>
+                {this.props.roots.map(id => (
+                  <Node
+                    depth={0}
+                    id={id}
+                    key={id}
+                    searchRegExp={searchRegExp}
+                  />
+                )).toJS()}
+              </div>
+            </div>
+          )}
+          right={() => (
+            <Breadcrumb />
+          )}
+          isVertical={true}
+        />
       </div>
     );
   }

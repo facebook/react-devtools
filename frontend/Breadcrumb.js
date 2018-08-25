@@ -120,10 +120,11 @@ const containerStyle = (theme: Theme) => ({
   listStyle: 'none',
   padding: '0 0.5rem',
   margin: 0,
-  maxHeight: '80px',
   backgroundColor: theme.base01,
   borderTop: `1px solid ${theme.base03}`,
   overflow: 'auto',
+  width: '100%',
+  height: '100%',
 });
 
 const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {

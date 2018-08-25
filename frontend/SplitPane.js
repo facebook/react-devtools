@@ -82,7 +82,7 @@ class SplitPane extends React.Component<Props, State> {
 
     return (
       <div style={containerStyle(isVertical)}>
-        <div style={styles.leftPane}>
+        <div style={leftPaneStyle(isVertical)}>
           {this.props.left()}
         </div>
         <div style={rightStyle(isVertical, width, height)}>
@@ -112,6 +112,7 @@ const containerStyle = (isVertical: boolean) => ({
   flex: 1,
   flexDirection: isVertical ? 'column' : 'row',
   maxWidth: '100vw',
+  minHeight: isVertical ? 30 : null,
 });
 
 const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
@@ -133,22 +134,22 @@ const rightStyle = (isVertical: boolean, width: number, height: number) => ({
   width: isVertical ? null : width,
   height: isVertical ? height : null,
   flex: 'initial',
-  minHeight: 120,
-  minWidth: 150,
+});
+
+const leftPaneStyle = (isVertical: boolean) => ({
+  display: 'flex',
+  minWidth: '50%',
+  minHeight: isVertical ? '10%' : '50%',
+  flex: 1,
+  overflow: 'hidden',
 });
 
 const styles = {
   rightPane: {
     display: 'flex',
     width: '100%',
+    height: '100%',
     overflow: 'auto',
-  },
-  leftPane: {
-    display: 'flex',
-    minWidth: '50%',
-    minHeight: '50%',
-    flex: 1,
-    overflow: 'hidden',
   },
 };
 
