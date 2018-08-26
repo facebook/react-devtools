@@ -44,8 +44,9 @@ class SplitPane extends React.Component<Props, State> {
     super(props);
     this.state = {
       moving: false,
-      width: props.initialWidth,
-      height: props.initialHeight,
+      // actual size will be set in cDM
+      width: 10,
+      height: 10,
     };
   }
 
