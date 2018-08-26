@@ -26,8 +26,8 @@ type Props = {
   style?: {[key: string]: any},
   left: () => React.Node,
   right: () => React.Node,
-  initialWidth: number,
-  initialHeight: number,
+  initialWidth?: number,
+  initialHeight?: number,
   isVertical: bool,
 };
 
@@ -53,11 +53,13 @@ class SplitPane extends React.Component<Props, State> {
     // $FlowFixMe use a ref on the root
     var node: HTMLDivElement = nullthrows(ReactDOM.findDOMNode(this));
 
-    const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
+    const { initialWidth, initialHeight } = this.props;
 
+    // come up with a size when initial size values are not provided
+    const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
     this.setState({
-      width: Math.min(250, width),
-      height: Math.floor(node.offsetHeight * 0.3),
+      width: initialWidth || Math.min(250, width),
+      height: initialHeight || Math.floor(node.offsetHeight * 0.3),
     });
   }
 

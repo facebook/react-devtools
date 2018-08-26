@@ -117,7 +117,6 @@ class TreeView extends React.Component<Props> {
     return (
       <div style={styles.container}>
         <SplitPane
-          initialWidth={10}
           initialHeight={30}
           left={() => (
             <div ref={n => this.node = n} style={styles.scroll}>

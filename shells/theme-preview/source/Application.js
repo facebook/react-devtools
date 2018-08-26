@@ -61,8 +61,6 @@ class Application extends React.Component<Props> {
         </div>
         <div style={themeWrapper(theme)}>
           <SplitPane
-            initialWidth={10}
-            initialHeight={10}
             isVertical={false}
             left={() => <LeftPane />}
             right={() => <RightPane />}

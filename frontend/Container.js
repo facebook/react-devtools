@@ -101,8 +101,6 @@ class Container extends React.Component<Props, State> {
     var tabs = {
       Elements: () => (
         <SplitPane
-          initialWidth={10}
-          initialHeight={10}
           left={() => <LeftPane reload={this.props.reload} />}
           right={() => (
             <PropState
