@@ -78,11 +78,11 @@ class SplitPane extends React.Component<Props, State> {
   render() {
     const {theme} = this.context;
     const {isVertical} = this.props;
-    const {height, width} = this.state;
+    const {height, width, moving} = this.state;
 
     return (
       <div style={containerStyle(isVertical)}>
-        <div style={leftPaneStyle(isVertical)}>
+        <div style={leftPaneStyle(isVertical, moving)}>
           {this.props.left()}
         </div>
         <div style={rightStyle(isVertical, width, height)}>
@@ -93,7 +93,7 @@ class SplitPane extends React.Component<Props, State> {
             onStop={() => this.setState({moving: false})}>
             <div style={draggerInnerStyle(isVertical, theme)} />
           </Draggable>
-          <div style={styles.rightPane}>
+          <div style={rightPaneStyle(moving)}>
             {this.props.right()}
           </div>
         </div>
@@ -136,21 +136,21 @@ const rightStyle = (isVertical: boolean, width: number, height: number) => ({
   flex: 'initial',
 });
 
-const leftPaneStyle = (isVertical: boolean) => ({
+const leftPaneStyle = (isVertical: boolean, moving: boolean) => ({
   display: 'flex',
   minWidth: '50%',
   minHeight: isVertical ? '10%' : '50%',
   flex: 1,
   overflow: 'hidden',
+  pointerEvents: moving ? 'none' : null,
 });
 
-const styles = {
-  rightPane: {
-    display: 'flex',
-    width: '100%',
-    height: '100%',
-    overflow: 'auto',
-  },
-};
+const rightPaneStyle = (moving: boolean) => ({
+  display: 'flex',
+  width: '100%',
+  height: '100%',
+  overflow: 'auto',
+  pointerEvents: moving ? 'none' : null,
+});
 
 module.exports = SplitPane;
