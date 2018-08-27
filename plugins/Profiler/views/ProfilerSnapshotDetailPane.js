@@ -34,8 +34,8 @@ const ProfilerSnapshotDetailPane = ({
   <Fragment>
     <div
       style={{
-        height: '34px',
-        lineHeight: '34px',
+        height: '2rem',
+        lineHeight: '2rem',
         padding: '0 0.5rem',
         backgroundColor: theme.base01,
         borderBottom: `1px solid ${theme.base03}`,
