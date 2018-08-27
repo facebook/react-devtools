@@ -18,7 +18,6 @@ const {EventEmitter} = require('events');
 const {get, set} = require('../../utils/storage');
 const LRU = require('lru-cache');
 
-const LOCAL_STORAGE_CHART_TYPE_KEY = 'profiler:selectedChartType';
 const LOCAL_STORAGE_COMMIT_THRESHOLD = 'profiler:commitThreshold';
 const LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD = 'profiler:hideCommitsBelowThreshold';
 const LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY = 'profiler:showNativeNodes';
@@ -35,7 +34,7 @@ class ProfilerStore extends EventEmitter {
   processedInteractions: {[id: string]: Interaction} = {};
   rootsToProfilerData: Map<string, RootProfilerData> = new Map();
   roots: List = new List();
-  selectedChartType: ChartType = ((get(LOCAL_STORAGE_CHART_TYPE_KEY, 'flamegraph'): any): ChartType);
+  selectedChartType: ChartType = 'flamegraph';
   selectedRoot: string | null = null;
   showNativeNodes: boolean = ((get(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, false): any): boolean);
 
@@ -118,7 +117,6 @@ class ProfilerStore extends EventEmitter {
   setSelectedChartType(selectedChartType: ChartType) {
     this.selectedChartType = selectedChartType;
     this.emit('selectedChartType', selectedChartType);
-    set(LOCAL_STORAGE_CHART_TYPE_KEY, selectedChartType);
   }
 
   setShowNativeNodes(showNativeNodes: boolean) {
