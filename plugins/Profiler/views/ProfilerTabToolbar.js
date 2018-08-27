@@ -97,6 +97,7 @@ const ProfilerTabToolbar = ({
     position: 'relative',
     boxSizing: 'border-box',
     width,
+    userSelect: 'none',
   }}>
     <RecordButton
       isActive={isRecording}
