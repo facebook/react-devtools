@@ -29,8 +29,10 @@ export const minBarWidth = 5;
 export const textHeight = 18;
 
 export const scale = (minValue: number, maxValue: number, minRange: number, maxRange: number) =>
-  (value: number) =>
-    ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
+  (value: number, fallbackValue: number) =>
+    maxValue - minValue === 0
+      ? fallbackValue
+      : ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
 
 const gradientMaxIndex = gradient.length - 1;
 export const getGradientColor = (value: number) => {

@@ -36,7 +36,7 @@ type ChartData = {|
 type ItemData = {|
   height: number,
   nodes: Array<Node>,
-  scaleY: (value: number) => number,
+  scaleY: (value: number, fallbackValue: number) => number,
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   stopInspecting: Function,
@@ -179,7 +179,7 @@ class ListItem extends PureComponent<any, void> {
     const { height, nodes, scaleY, selectedSnapshot, selectSnapshot, stopInspecting, theme } = itemData;
 
     const node = nodes[index];
-    const safeHeight = Math.max(minBarHeight, scaleY(node.value));
+    const safeHeight = Math.max(minBarHeight, scaleY(node.value, minBarHeight));
 
     // List items are absolutely positioned using the CSS "left" attribute.
     // The "top" value will always be 0.

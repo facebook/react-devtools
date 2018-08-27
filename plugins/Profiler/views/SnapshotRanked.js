@@ -37,10 +37,11 @@ type ItemData = {|
   inspectFiber: SelectOrInspectFiber,
   nodes: Array<Node>,
   maxValue: number,
-  scaleX: (value: number) => number,
+  scaleX: (value: number, fallbackValue: number) => number,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
   theme: Theme,
+  width: number,
 |};
 
 type Props = {|
@@ -182,7 +183,7 @@ class ListItem extends PureComponent<any, void> {
 
     const node = data.nodes[index];
 
-    const { scaleX } = data;
+    const { scaleX, width } = data;
 
     // List items are absolutely positioned using the CSS "top" attribute.
     // The "left" value will always be 0.
@@ -201,7 +202,7 @@ class ListItem extends PureComponent<any, void> {
         onDoubleClick={this.handleDoubleClick}
         theme={data.theme}
         title={node.title}
-        width={Math.max(minBarWidth, scaleX(node.value))}
+        width={Math.max(minBarWidth, scaleX(node.value, width))}
         x={0}
         y={top}
       />
@@ -227,6 +228,7 @@ const getItemData = memoize((
   selectFiber,
   snapshot,
   theme,
+  width,
 }));
 
 const getNodeIndex = memoize((rankedData: RankedData, id: string | null): number => {
@@ -247,10 +249,7 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
     .filter(nodeID => {
       const node = snapshot.nodes.get(nodeID);
       const nodeType = node && node.get('nodeType');
-      return (
-        (nodeType === 'Composite' || (nodeType === 'Native' && showNativeNodes)) &&
-        node.get('actualDuration') > 0
-      );
+      return (nodeType === 'Composite' || (nodeType === 'Native' && showNativeNodes));
     })
     .map((nodeID, index) => {
       const node = snapshot.nodes.get(nodeID).toJSON();

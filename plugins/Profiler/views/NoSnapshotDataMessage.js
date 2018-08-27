@@ -35,6 +35,7 @@ export default ({ height, width }: Props) => (
     </p>
     <p>
       This can indicate that a render occurred too quickly for the timing API to measure.
+      Try selecting another commit in the upper, right-hand corner.
     </p>
   </div>
 );

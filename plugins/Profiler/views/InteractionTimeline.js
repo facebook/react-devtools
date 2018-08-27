@@ -42,7 +42,7 @@ type ItemData = {|
   chartData: ChartData,
   labelColumnWidth: number,
   graphColumnWidth: number,
-  scaleX: (value: number) => number,
+  scaleX: (value: number, fallbackValue: number) => number,
   selectedInteraction: Interaction | null,
   selectedSnapshot: Snapshot,
   selectInteraction: SelectInteraction,
@@ -263,8 +263,8 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
         <div
           style={{
             position: 'absolute',
-            left: `${labelColumnWidth + scaleX(interaction.timestamp)}px`,
-            width: `${scaleX(lastSnapshotCommitTime - interaction.timestamp) + SNAPSHOT_SIZE}px`,
+            left: `${labelColumnWidth + scaleX(interaction.timestamp, 0)}px`,
+            width: `${scaleX(lastSnapshotCommitTime - interaction.timestamp, 0) + SNAPSHOT_SIZE}px`,
             height: `${INTERACTION_SIZE}px`,
             backgroundColor: theme.base03,
             borderRadius: '0.125rem',
@@ -279,7 +279,7 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
               key={snapshotIndex}
               style={{
                 position: 'absolute',
-                left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
+                left: `${labelColumnWidth + scaleX(snapshot.commitTime, 0)}px`,
                 width: `${SNAPSHOT_SIZE}px`,
                 height: `${SNAPSHOT_SIZE}px`,
                 backgroundColor: selectedSnapshot === snapshot
