@@ -125,7 +125,9 @@ const SnapshotLink = Hoverable(({
         style={{
           width: '1rem',
           height: '1rem',
-          backgroundColor: getGradientColor(snapshot.duration / maxDuration),
+          backgroundColor: selectedSnapshot === snapshot
+            ? theme.state06
+            : getGradientColor(snapshot.duration / maxDuration),
         }}
       />
       <ul style={{paddingLeft: '1.5rem'}}>
