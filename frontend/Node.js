@@ -157,7 +157,9 @@ class Node extends React.Component<PropsType, StateType> {
   ensureInView() {
     var node = this.props.isBottomTagSelected ? this._tail : this._head;
     if (node != null) {
-      if (typeof node.scrollIntoView === 'function') {
+      if (typeof node.scrollIntoViewIfNeeded === 'function') {
+        node.scrollIntoViewIfNeeded();
+      } else if (typeof node.scrollIntoView === 'function') {
         node.scrollIntoView({
           // $FlowFixMe Flow does not realize block:"nearest" is a valid option
           block: 'nearest',
@@ -166,6 +168,13 @@ class Node extends React.Component<PropsType, StateType> {
       }
     }
   }
+
+  _setTailRef = tail => {
+    this._tail = tail;
+  };
+  _setHeadRef = head => {
+    this._head = head;
+  };
 
   render() {
     const {theme} = this.context;
@@ -251,7 +260,7 @@ class Node extends React.Component<PropsType, StateType> {
       }
       return (
         <div
-          ref={h => this._head = h}
+          ref={this._setHeadRef}
           style={sharedHeadStyle}
           {...headEvents}
         >
@@ -293,9 +302,9 @@ class Node extends React.Component<PropsType, StateType> {
       const isCollapsed = content === null || content === undefined;
       return (
         <div style={headWrapperStyle}>
-          <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
+          <div style={sharedHeadStyle} {...headEvents}>
             &lt;
-            <span style={jsxSingleLineTagStyle}>{name}</span>
+            <span ref={this._setHeadRef} style={jsxSingleLineTagStyle}>{name}</span>
             {node.get('key') &&
               <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
             }
@@ -323,7 +332,7 @@ class Node extends React.Component<PropsType, StateType> {
     const closeTag = (
       <Fragment>
         &lt;/
-        <span style={jsxCloseTagStyle}>{name}</span>
+        <span ref={this._setTailRef} style={jsxCloseTagStyle}>{name}</span>
         &gt;
         {selected && ((collapsed && !this.props.isBottomTagSelected) || this.props.isBottomTagSelected) &&
           <span style={dollarRStyle}>&nbsp;== $r</span>
@@ -335,7 +344,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     const jsxOpenTagStyle = jsxTagStyle(inverted && (!isBottomTagSelected || collapsed), nodeType, theme);
     const head = (
-      <div ref={h => this._head = h} style={sharedHeadStyle} {...headEvents}>
+      <div style={sharedHeadStyle} {...headEvents}>
         <span
           onClick={onToggleCollapse}
           style={{
@@ -347,7 +356,7 @@ class Node extends React.Component<PropsType, StateType> {
           {collapsed ? '▶' : '▼'}
         </span>
         &lt;
-        <span style={jsxOpenTagStyle}>{name}</span>
+        <span ref={this._setHeadRef} style={jsxOpenTagStyle}>{name}</span>
         {node.get('key') &&
           <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
         }
@@ -394,7 +403,7 @@ class Node extends React.Component<PropsType, StateType> {
         }}>
           {children.map(id => <WrappedNode key={id} depth={depth + 1} id={id}/>)}
         </div>
-        <div ref={t => this._tail = t} style={tailStyleActual} {...tailEvents}>
+        <div style={tailStyleActual} {...tailEvents}>
           {closeTag}
         </div>
       </div>
