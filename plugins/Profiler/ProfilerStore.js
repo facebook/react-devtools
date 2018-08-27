@@ -16,6 +16,7 @@ import type {ChartType, Interaction, RootProfilerData, Snapshot} from './Profile
 const {List} = require('immutable');
 const {EventEmitter} = require('events');
 const {get, set} = require('../../utils/storage');
+const LRU = require('lru-cache');
 
 const LOCAL_STORAGE_CHART_TYPE_KEY = 'profiler:selectedChartType';
 const LOCAL_STORAGE_COMMIT_THRESHOLD = 'profiler:commitThreshold';
@@ -26,7 +27,7 @@ class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
   _mainStore: Object;
 
-  cachedData = {};
+  cachedData = LRU(50); // Evict items from the cache after this number
   commitThreshold: number = ((get(LOCAL_STORAGE_COMMIT_THRESHOLD, 0): any): number);
   hideCommitsBelowThreshold: boolean = ((get(LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD, false): any): boolean);
   isRecording: boolean = false;
@@ -54,26 +55,26 @@ class ProfilerStore extends EventEmitter {
   }
 
   cacheDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string, data: any): void {
-    this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] = data;
+    this.cachedData.set(`${snapshotIndex}-${snapshotRootID}-${key}`, data);
   }
 
   cacheInteractionData(rootID: string, data: any): void {
-    this.cachedData[`${rootID}-interactions`] = data;
+    this.cachedData.set(`${rootID}-interactions`, data);
   }
 
   clearSnapshots = () => {
-    this.cachedData = {};
+    this.cachedData.reset();
     this.processedInteractions = {};
     this.rootsToProfilerData = new Map();
     this.emit('profilerData', this.rootsToProfilerData);
   };
 
   getCachedDataForSnapshot(snapshotIndex: number, snapshotRootID: string, key: string): any {
-    return this.cachedData[`${snapshotIndex}-${snapshotRootID}-${key}`] || null;
+    return this.cachedData.get(`${snapshotIndex}-${snapshotRootID}-${key}`) || null;
   }
 
   getCachedInteractionData(rootID: string): any {
-    return this.cachedData[`${rootID}-interactions`] || null;
+    return this.cachedData.get(`${rootID}-interactions`) || null;
   }
 
   processInteraction(interaction: Interaction): Interaction {
