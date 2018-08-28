@@ -75,7 +75,7 @@ function installRelayHook(window: Object) {
     requestNumber: number,
   ) {
     var id = Math.random().toString(16).substr(2);
-    request.then(
+    request.getPromise().then(
       response => {
         emit('relay:success', {
           id: id,
