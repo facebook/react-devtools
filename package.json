@@ -68,7 +68,7 @@
   "devDependencies": {
     "chrome-launch": "^1.1.4",
     "firefox-profile": "^1.0.2",
-    "lerna": "^2.8.0",
+    "lerna": "2.8.0",
     "web-ext": "^1.10.1"
   }
 }
