@@ -20,12 +20,12 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
     let profilingIsSupported = false;
 
     // Feature detection for profiling mode.
-    // The presence of an "actualDuration" field signifies:
-    // 1) This is a new enough version of React
+    // The presence of an "treeBaseDuration" field signifies:
+    // 1) This is a new enough version of React (e.g. > 16.4 which was the initial profiling release)
     // 2) This is a profiling capable bundle (e.g. DEV or PROFILING)
     agent.roots.forEach((rootId: string) => {
       const root = agent.internalInstancesById.get(rootId);
-      if ((root: any).hasOwnProperty('actualDuration')) {
+      if ((root: any).hasOwnProperty('treeBaseDuration')) {
         profilingIsSupported = true;
       }
     });
