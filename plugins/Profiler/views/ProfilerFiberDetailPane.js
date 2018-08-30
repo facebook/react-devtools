@@ -44,29 +44,33 @@ const ProfilerFiberDetailPane = ({
 }: Props) => (
   <Fragment>
     <div style={{
-      width: '100%',
-      display: 'flex',
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'space-between',
-      padding: '0.25rem',
+      height: '2rem',
+      lineHeight: '2rem',
       backgroundColor: theme.base01,
       borderBottom: `1px solid ${theme.base03}`,
-      boxSizing: 'border-box',
     }}>
-      <div
-        style={{
-          fontFamily: monospace.family,
-          fontSize: monospace.sizes.large,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-        }}
-        title={name}
-      >
-        {name}
-      </div>
-      <div>
+      <div style={{
+        width: '100%',
+        height: '100%',
+        display: 'flex',
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: '0.25rem',
+        boxSizing: 'border-box',
+      }}>
+        <div
+          style={{
+            fontFamily: monospace.family,
+            fontSize: monospace.sizes.large,
+            overflow: 'hidden',
+            textOverflow: 'ellipsis',
+            whiteSpace: 'nowrap',
+            flex: '1 1 auto',
+          }}
+          title={name}
+        >
+          {name}
+        </div>
         <IconButton
           disabled={isInspectingSelectedFiber}
           icon={Icons.BARS}
@@ -74,6 +78,7 @@ const ProfilerFiberDetailPane = ({
           style={{
             backgroundColor: theme.state00,
             color: theme.base00,
+            flex: '0 0 auto',
           }}
           theme={theme}
           title={`Inspect ${name}`}
@@ -85,6 +90,7 @@ const ProfilerFiberDetailPane = ({
             marginLeft: '0.25rem',
             backgroundColor: theme.base03,
             color: theme.base05,
+            flex: '0 0 auto',
           }}
           theme={theme}
           title="Close"

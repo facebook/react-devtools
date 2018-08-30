@@ -18,14 +18,13 @@ import React, { PureComponent } from 'react';
 import { FixedSizeList as List } from 'react-window';
 import AutoSizer from 'react-virtualized-auto-sizer';
 import NoInteractionsMessage from './NoInteractionsMessage';
-import { scale } from './constants';
+import { getGradientColor, scale } from './constants';
 
 const INTERACTION_SIZE = 4;
 const ITEM_SIZE = 25;
 const SNAPSHOT_SIZE = 10;
 
 type SelectInteraction = (interaction: Interaction) => void;
-type ViewSnapshot = (snapshot: Snapshot) => void;
 
 type ChartItem = {|
   interaction: Interaction,
@@ -35,6 +34,7 @@ type ChartItem = {|
 
 type ChartData = {|
   items: Array<ChartItem>,
+  maxDuration: number,
   stopTime: number,
 |};
 
@@ -42,12 +42,11 @@ type ItemData = {|
   chartData: ChartData,
   labelColumnWidth: number,
   graphColumnWidth: number,
-  scaleX: (value: number) => number,
+  scaleX: (value: number, fallbackValue: number) => number,
   selectedInteraction: Interaction | null,
   selectedSnapshot: Snapshot,
   selectInteraction: SelectInteraction,
   theme: Theme,
-  viewSnapshot: ViewSnapshot,
 |};
 
 type Props = {|
@@ -55,12 +54,12 @@ type Props = {|
   getCachedInteractionData: GetCachedInteractionData,
   hasMultipleRoots: boolean,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
+  maxDuration: number,
   selectedInteraction: Interaction | null,
   selectedSnapshot: Snapshot,
   selectInteraction: SelectInteraction,
   theme: Theme,
   timestampsToInteractions: Map<number, Set<Interaction>>,
-  viewSnapshot: ViewSnapshot,
 |};
 
 const InteractionTimeline = ({
@@ -68,17 +67,17 @@ const InteractionTimeline = ({
   getCachedInteractionData,
   hasMultipleRoots,
   interactionsToSnapshots,
+  maxDuration,
   selectedInteraction,
   selectedSnapshot,
   selectInteraction,
   theme,
   timestampsToInteractions,
-  viewSnapshot,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time the interactions tab is shown
   let chartData = getCachedInteractionData(selectedSnapshot.root);
   if (chartData === null) {
-    chartData = getChartData(interactionsToSnapshots, timestampsToInteractions);
+    chartData = getChartData(interactionsToSnapshots, maxDuration, timestampsToInteractions);
     cacheInteractionData(selectedSnapshot.root, chartData);
   }
 
@@ -94,7 +93,6 @@ const InteractionTimeline = ({
           selectInteraction={selectInteraction}
           theme={theme}
           width={width}
-          viewSnapshot={viewSnapshot}
         />
       )}
     </AutoSizer>
@@ -109,7 +107,6 @@ type InteractionsListProps = {|
   selectedSnapshot: Snapshot,
   selectInteraction: SelectInteraction,
   theme: Theme,
-  viewSnapshot: ViewSnapshot,
   width: number,
 |};
 
@@ -153,7 +150,6 @@ class InteractionsList extends PureComponent<InteractionsListProps, void> {
       selectedSnapshot,
       selectInteraction,
       theme,
-      viewSnapshot,
       width,
     } = this.props;
 
@@ -176,7 +172,6 @@ class InteractionsList extends PureComponent<InteractionsListProps, void> {
       selectedSnapshot,
       selectInteraction,
       theme,
-      viewSnapshot,
       width,
     );
 
@@ -214,44 +209,36 @@ type ListItemProps = {|
 |};
 type ListItemState = {|
   isHovered: boolean,
-  hoveredSnapshot: Snapshot | null,
 |};
 
 class ListItem extends PureComponent<ListItemProps, ListItemState> {
   state = {
     isHovered: false,
-    hoveredSnapshot: null,
   };
 
-  handleMouseEnter = (snapshot: Snapshot | null) => this.setState({
-    isHovered: true,
-    hoveredSnapshot: snapshot,
-  });
-
+  handleMouseEnter = () => this.setState({isHovered: true});
   handleMouseLeave = () => this.setState({isHovered: false});
 
   render() {
     const { data: itemData, index: itemIndex, style } = this.props;
-    const { isHovered, hoveredSnapshot } = this.state;
+    const { isHovered } = this.state;
 
     const { chartData, labelColumnWidth, scaleX, selectedInteraction, selectedSnapshot, theme } = itemData;
-    const { items } = chartData;
+    const { items, maxDuration } = chartData;
 
     const item: ChartItem = items[itemIndex];
     const { interaction, lastSnapshotCommitTime } = item;
 
-    const showRowHover = isHovered && hoveredSnapshot === null;
-
     return (
       <div
         onClick={() => itemData.selectInteraction(interaction)}
-        onMouseEnter={() => this.handleMouseEnter(null)}
+        onMouseEnter={this.handleMouseEnter}
         onMouseLeave={this.handleMouseLeave}
         style={{
           ...style,
           display: 'flex',
           alignItems: 'center',
-          backgroundColor: showRowHover ? theme.state03 : (selectedInteraction === interaction ? theme.base01 : 'transparent'),
+          backgroundColor: isHovered ? theme.state03 : (selectedInteraction === interaction ? theme.base01 : 'transparent'),
           borderBottom: `1px solid ${theme.base01}`,
           cursor: 'pointer',
         }}
@@ -265,8 +252,8 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
             lineHeight: `${ITEM_SIZE}px`,
             boxSizing: 'border-box',
             padding: '0 0.25rem',
-            color: showRowHover ? theme.state00 : theme.base05,
-            textDecoration: showRowHover ? 'underline' : 'none',
+            color: isHovered ? theme.state00 : theme.base05,
+            textDecoration: isHovered ? 'underline' : 'none',
             userSelect: 'none',
           }}
           title={interaction.name}
@@ -276,32 +263,34 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
         <div
           style={{
             position: 'absolute',
-            left: `${labelColumnWidth + scaleX(interaction.timestamp)}px`,
-            width: `${scaleX(lastSnapshotCommitTime - interaction.timestamp) + SNAPSHOT_SIZE}px`,
+            left: `${labelColumnWidth + scaleX(interaction.timestamp, 0)}px`,
+            width: `${scaleX(lastSnapshotCommitTime - interaction.timestamp, 0) + SNAPSHOT_SIZE}px`,
             height: `${INTERACTION_SIZE}px`,
             backgroundColor: theme.base03,
             borderRadius: '0.125rem',
           }}
         />
-        {item.snapshots.map((snapshot, snapshotIndex) => (
-          <div
-            key={snapshotIndex}
-            onClick={() => itemData.viewSnapshot(snapshot)}
-            onMouseEnter={() => this.handleMouseEnter(snapshot)}
-            onMouseLeave={() => this.handleMouseEnter(null)}
-            style={{
-              position: 'absolute',
-              left: `${labelColumnWidth + scaleX(snapshot.commitTime)}px`,
-              width: `${SNAPSHOT_SIZE}px`,
-              height: `${SNAPSHOT_SIZE}px`,
-              borderRadius: `${SNAPSHOT_SIZE}px`,
-              backgroundColor: hoveredSnapshot === snapshot || selectedSnapshot === snapshot ? theme.state00 : theme.base00,
-              border: `2px solid ${theme.state00}`,
-              boxSizing: 'border-box',
-              cursor: 'pointer',
-            }}
-          />
-        ))}
+        {item.snapshots.map((snapshot, snapshotIndex) => {
+          // Guard against commits with duration 0
+          const percentage = Math.min(1, Math.max(0, snapshot.duration / maxDuration)) || 0;
+
+          return (
+            <div
+              key={snapshotIndex}
+              style={{
+                position: 'absolute',
+                left: `${labelColumnWidth + scaleX(snapshot.commitTime, 0)}px`,
+                width: `${SNAPSHOT_SIZE}px`,
+                height: `${SNAPSHOT_SIZE}px`,
+                backgroundColor: selectedSnapshot === snapshot
+                  ? theme.state06
+                  : getGradientColor(percentage),
+                boxSizing: 'border-box',
+                cursor: 'pointer',
+              }}
+            />
+          );
+        })}
       </div>
     );
   }
@@ -309,6 +298,7 @@ class ListItem extends PureComponent<ListItemProps, ListItemState> {
 
 const getChartData = memoize((
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
+  maxDuration: number,
   timestampsToInteractions: Map<number, Set<Interaction>>,
 ): ChartData => {
   const items: Array<ChartItem> = [];
@@ -332,6 +322,7 @@ const getChartData = memoize((
 
   return {
     items,
+    maxDuration,
     stopTime,
   };
 });
@@ -342,7 +333,6 @@ const getItemData = memoize((
   selectedSnapshot: Snapshot,
   selectInteraction: SelectInteraction,
   theme: Theme,
-  viewSnapshot: ViewSnapshot,
   width: number,
 ): ItemData => {
   const labelColumnWidth = Math.min(200, width / 5);
@@ -357,7 +347,6 @@ const getItemData = memoize((
     selectedSnapshot,
     selectInteraction,
     theme,
-    viewSnapshot,
   };
 });
 

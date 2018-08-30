@@ -14,7 +14,7 @@ import type {Theme} from '../../../frontend/types';
 import type {Interaction, Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
-import { formatDuration, formatPercentage, formatTime } from './constants';
+import { getGradientColor, formatDuration, formatTime } from './constants';
 import {sansSerif} from '../../../frontend/Themes/Fonts';
 import Hoverable from '../../../frontend/Hoverable';
 
@@ -22,6 +22,7 @@ type ViewSnapshot = (snapshot: Snapshot) => void;
 
 type Props = {|
   interaction: Interaction,
+  maxDuration: number,
   selectedSnapshot: Snapshot | null,
   snapshots: Set<Snapshot>,
   theme: Theme,
@@ -30,6 +31,7 @@ type Props = {|
 
 const ProfilerInteractionDetailPane = ({
   interaction,
+  maxDuration,
   selectedSnapshot,
   snapshots,
   theme,
@@ -41,8 +43,8 @@ const ProfilerInteractionDetailPane = ({
     <Fragment>
       <div
         style={{
-          height: '34px',
-          lineHeight: '34px',
+          height: '2rem',
+          lineHeight: '2rem',
           padding: '0 0.5rem',
           backgroundColor: theme.base01,
           borderBottom: `1px solid ${theme.base03}`,
@@ -50,16 +52,19 @@ const ProfilerInteractionDetailPane = ({
           overflow: 'hidden',
           textOverflow: 'ellipsis',
           whiteSpace: 'nowrap',
+          display: 'flex',
+          justifyContent: 'space-between',
         }}
         title={interaction.name}
       >
-        {interaction.name}
+        {interaction.name} at {formatTime(interaction.timestamp)}s
       </div>
       <div style={{
         padding: '0.5rem',
       }}>
-        <div><strong>Timestamp</strong>: {formatTime(interaction.timestamp)}s</div>
-        <div style={{margin: '0.5rem 0'}}><strong>Renders</strong>:</div>
+        <div style={{marginBottom: '0.5rem'}}>
+          <strong>Commits</strong>:
+        </div>
         <ul style={{
           listStyle: 'none',
           margin: 0,
@@ -72,6 +77,7 @@ const ProfilerInteractionDetailPane = ({
             return (
               <SnapshotLink
                 key={index}
+                maxDuration={maxDuration}
                 onClick={() => viewSnapshot(snapshot)}
                 previousTimestamp={previousTimestamp}
                 selectedSnapshot={selectedSnapshot}
@@ -89,6 +95,7 @@ const ProfilerInteractionDetailPane = ({
 
 const SnapshotLink = Hoverable(({
   isHovered,
+  maxDuration,
   onClick,
   onMouseEnter,
   onMouseLeave,
@@ -98,9 +105,6 @@ const SnapshotLink = Hoverable(({
   theme,
   viewSnapshot,
 }) => {
-  const cpuPercentage = Math.max(0, Math.min(snapshot.duration / (snapshot.commitTime - previousTimestamp)));
-  const cpuSvg = CPU_SVGS[Math.round(cpuPercentage * (CPU_SVGS.length - 1))];
-
   return (
     <li
       onClick={onClick}
@@ -114,59 +118,28 @@ const SnapshotLink = Hoverable(({
         display: 'flex',
         alignItems: 'center',
         padding: '0.5rem',
-        borderBottom: `1px solid ${theme.base01}`,
+        borderTop: `1px solid ${theme.base01}`,
       }}
     >
-      {cpuSvg}
+      <div
+        style={{
+          width: '1rem',
+          height: '1rem',
+          backgroundColor: selectedSnapshot === snapshot
+            ? theme.state06
+            : getGradientColor(snapshot.duration / maxDuration),
+        }}
+      />
       <ul style={{paddingLeft: '1.5rem'}}>
-        <li>Timestamp: {formatTime(snapshot.commitTime)}s</li>
-        <li>Duration: {formatDuration(snapshot.duration)}ms</li>
-        <li>CPU: {formatPercentage(cpuPercentage)}%</li>
+        <li style={{marginBottom: '0.25rem'}}>
+          Timestamp: {formatTime(snapshot.commitTime)}s
+        </li>
+        <li>
+          Duration: {formatDuration(snapshot.duration)}ms
+        </li>
       </ul>
     </li>
   );
 });
-
-const CPU_STYLE = {
-  width: '1.5rem',
-  height: '1.5rem',
-  fill: 'currentColor',
-  marginRight: '0.5rem',
-};
-
-const CPU_0 = (
-  <svg style={CPU_STYLE} viewBox="0 0 24 24">
-    <path fillOpacity=".3" d="M2 22h20V2z" />
-  </svg>
-);
-
-const CPU_25 = (
-  <svg style={CPU_STYLE} viewBox="0 0 24 24">
-    <path fillOpacity=".3" d="M2 22h20V2z" />
-    <path d="M12 12L2 22h10z" />
-  </svg>
-);
-
-const CPU_50 = (
-  <svg style={CPU_STYLE} viewBox="0 0 24 24">
-    <path fillOpacity=".3" d="M2 22h20V2z" />
-    <path d="M14 10L2 22h12z" />
-  </svg>
-);
-
-const CPU_75 = (
-  <svg style={CPU_STYLE} viewBox="0 0 24 24">
-    <path fillOpacity=".3" d="M2 22h20V2z" />
-    <path d="M17 7L2 22h15z" />
-  </svg>
-);
-
-const CPU_100 = (
-  <svg style={CPU_STYLE} viewBox="0 0 24 24">
-    <path d="M2 22h20V2z" />
-  </svg>
-);
-
-const CPU_SVGS = [CPU_0, CPU_25, CPU_50, CPU_75, CPU_100];
 
 export default ProfilerInteractionDetailPane;

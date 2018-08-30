@@ -29,8 +29,10 @@ export const minBarWidth = 5;
 export const textHeight = 18;
 
 export const scale = (minValue: number, maxValue: number, minRange: number, maxRange: number) =>
-  (value: number) =>
-    ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
+  (value: number, fallbackValue: number) =>
+    maxValue - minValue === 0
+      ? fallbackValue
+      : ((value - minValue) / (maxValue - minValue)) * (maxRange - minRange);
 
 const gradientMaxIndex = gradient.length - 1;
 export const getGradientColor = (value: number) => {
@@ -49,6 +51,10 @@ export const getGradientColor = (value: number) => {
 export const formatDuration = (duration: number) => Math.round(duration * 10) / 10;
 export const formatPercentage = (percentage: number) => Math.round(percentage * 100);
 export const formatTime = (timestamp: number) => Math.round(Math.round(timestamp) / 100) / 10;
+
+export const getMaxDuration = (snapshots: Array<Snapshot>): number =>
+  snapshots.reduce((maxDuration: number, snapshot: Snapshot) =>
+    Math.max(maxDuration, snapshot.duration || 0), 0);
 
 type FilteredSnapshotData = {|
   snapshotIndex: number,

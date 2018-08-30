@@ -62,7 +62,7 @@ type ItemData = {|
   // Which in turn determines which fibers are rendered in the flamegraph.
   maxTreeBaseDuration: number,
   // Scales horizontal values (left offset and width) based on the selected fiber's tree base time.
-  scaleX: (value: number) => number,
+  scaleX: (value: number, fallbackValue: number) => number,
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
@@ -174,7 +174,7 @@ const Flamegraph = ({
 
   // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
   // In this case, we could only display an empty graph.
-  if (flameGraphDepth === 0 || itemData.maxTreeBaseDuration === 0) {
+  if (flameGraphDepth === 0) {
     return <NoSnapshotDataMessage height={height} width={width} />;
   }
 
@@ -214,7 +214,7 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { flamegraphData, scaleX, selectedFiberID, snapshot } = itemData;
+    const { flamegraphData, scaleX, selectedFiberID, snapshot, width } = itemData;
     const { lazyIDToDepthMap, lazyIDToXMap, maxDuration } = flamegraphData;
     const { committedNodes, nodes } = snapshot;
 
@@ -230,7 +230,7 @@ class ListItem extends PureComponent<any, void> {
     let focusedNodeX = 0;
     if (selectedFiberID !== null) {
       focusedNodeIndex = lazyIDToDepthMap[selectedFiberID] || 0;
-      focusedNodeX = scaleX(lazyIDToXMap[selectedFiberID]) || 0;
+      focusedNodeX = scaleX(lazyIDToXMap[selectedFiberID], 0) || 0;
     }
 
     return (
@@ -238,7 +238,7 @@ class ListItem extends PureComponent<any, void> {
         {ids.map(id => {
           const fiber = nodes.get(id);
           const treeBaseDuration = fiber.get('treeBaseDuration');
-          const nodeWidth = scaleX(treeBaseDuration);
+          const nodeWidth = scaleX(treeBaseDuration, width);
 
           // Filter out nodes that are too small to see or click.
           // This also helps render large trees faster.
@@ -246,12 +246,12 @@ class ListItem extends PureComponent<any, void> {
             return null;
           }
 
-          const nodeX = scaleX(lazyIDToXMap[id]);
+          const nodeX = scaleX(lazyIDToXMap[id], 0);
 
           // Filter out nodes that are outside of the horizontal window.
           if (
             nodeX + nodeWidth < focusedNodeX ||
-            nodeX > focusedNodeX + itemData.width
+            nodeX > focusedNodeX + width
           ) {
             return null;
           }
