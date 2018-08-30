@@ -1,6 +1,6 @@
 {
   "name": "react-devtools-core",
-  "version": "3.2.3",
+  "version": "3.3.2",
   "description": "Use react-devtools outside of the browser",
   "main": "./build/backend.js",
   "repository": {
