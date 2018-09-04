@@ -13,6 +13,8 @@
 import type Bridge from '../../agent/Bridge';
 import type Agent from '../../agent/Agent';
 
+const hasOwnProperty = Object.prototype.hasOwnProperty;
+
 const emptyFunction = () => {};
 
 module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
@@ -25,7 +27,7 @@ module.exports = (bridge: Bridge, agent: Agent, hook: Object) => {
     // 2) This is a profiling capable bundle (e.g. DEV or PROFILING)
     agent.roots.forEach((rootId: string) => {
       const root = agent.internalInstancesById.get(rootId);
-      if ((root: any).hasOwnProperty('treeBaseDuration')) {
+      if (root && hasOwnProperty.call((root: any), 'treeBaseDuration')) {
         profilingIsSupported = true;
       }
     });
