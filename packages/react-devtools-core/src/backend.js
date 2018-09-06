@@ -20,6 +20,7 @@ type ConnectOptions = {
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
+var ProfileCollector = require('../../../plugins/Profiler/ProfileCollector');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
@@ -154,6 +155,8 @@ function setupBackend(wall, resolveRNStyle) {
     inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
     clearTimeout(_connectTimeout);
   });
+
+  ProfileCollector.init(agent);
 }
 
 module.exports = { connectToDevTools };
