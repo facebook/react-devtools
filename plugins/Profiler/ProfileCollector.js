@@ -15,6 +15,16 @@ type Agent = any;
 
 import type {Interaction, StoreSnapshot} from './ProfilerTypes';
 
+let performanceNow;
+if (
+  typeof performance !== 'undefined' &&
+  typeof performance.now === 'function'
+) {
+  performanceNow = () => performance.now();
+} else {
+  performanceNow = () => Date.now();
+}
+
 /**
  * The Profiler UI displays the entire React tree, with timing info, for each commit.
  * The frontend store only has the latest tree at any given time though,
@@ -55,7 +65,7 @@ class ProfileCollector {
     const storeSnapshot: StoreSnapshot = {
       memoizedInteractions,
       committedNodes: Array.from(this._committedNodes),
-      commitTime: performance.now() - this._recordingStartTime,
+      commitTime: performanceNow() - this._recordingStartTime,
       duration: this._maxActualDuration,
       root: id,
     };
@@ -66,7 +76,7 @@ class ProfileCollector {
   _onIsRecording = isRecording => {
     this._committedNodes = new Set();
     this._isRecording = isRecording;
-    this._recordingStartTime = isRecording ? performance.now() : 0;
+    this._recordingStartTime = isRecording ? performanceNow() : 0;
 
     if (isRecording) {
       // Maybe in the future, we'll allow collecting multiple profiles and stepping through them.
