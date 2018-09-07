@@ -15,15 +15,13 @@ type Agent = any;
 
 import type {Interaction, StoreSnapshot} from './ProfilerTypes';
 
-let performanceNow;
-if (
-  typeof performance !== 'undefined' &&
-  typeof performance.now === 'function'
-) {
-  performanceNow = () => performance.now();
-} else {
-  performanceNow = () => Date.now();
-}
+const hasNativePerformanceNow =
+  typeof performance === 'object' &&
+  typeof performance.now === 'function';
+
+const now = hasNativePerformanceNow
+  ? () => performance.now()
+  : () => Date.now();
 
 /**
  * The Profiler UI displays the entire React tree, with timing info, for each commit.
@@ -65,7 +63,7 @@ class ProfileCollector {
     const storeSnapshot: StoreSnapshot = {
       memoizedInteractions,
       committedNodes: Array.from(this._committedNodes),
-      commitTime: performanceNow() - this._recordingStartTime,
+      commitTime: now() - this._recordingStartTime,
       duration: this._maxActualDuration,
       root: id,
     };
@@ -76,7 +74,7 @@ class ProfileCollector {
   _onIsRecording = isRecording => {
     this._committedNodes = new Set();
     this._isRecording = isRecording;
-    this._recordingStartTime = isRecording ? performanceNow() : 0;
+    this._recordingStartTime = isRecording ? now() : 0;
 
     if (isRecording) {
       // Maybe in the future, we'll allow collecting multiple profiles and stepping through them.
