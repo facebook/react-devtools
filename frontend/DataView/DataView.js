@@ -20,7 +20,7 @@ const nullthrows = require('nullthrows').default;
 const consts = require('../../agent/consts');
 const previewComplex = require('./previewComplex');
 
-type Inspect = (path: Array<string>, cb: () => void) => void;
+export type Inspect = (path: Array<string>, cb: () => void) => void;
 type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
 type DataViewProps = {

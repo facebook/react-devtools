@@ -10,6 +10,7 @@
  */
 'use strict';
 
+import type {Inspect} from '../../../frontend/DataView/DataView';
 import type {Theme} from '../../../frontend/types';
 import type {Snapshot} from '../ProfilerTypes';
 
@@ -25,6 +26,7 @@ const emptyFunction = () => {};
 
 type Props = {|
   deselectFiber: Function,
+  inspect: Inspect,
   isInspectingSelectedFiber: boolean,
   name?: string,
   snapshot: Snapshot,
@@ -35,6 +37,7 @@ type Props = {|
 
 const ProfilerFiberDetailPane = ({
   deselectFiber,
+  inspect,
   isInspectingSelectedFiber,
   name = 'Unknown',
   snapshot,
@@ -114,7 +117,7 @@ const ProfilerFiberDetailPane = ({
             <DataView
               path={['props']}
               readOnly={true}
-              inspect={emptyFunction}
+              inspect={inspect}
               showMenu={emptyFunction}
               data={snapshotFiber.get('props')}
             />
@@ -124,7 +127,7 @@ const ProfilerFiberDetailPane = ({
               <DataView
                 path={['state']}
                 readOnly={true}
-                inspect={emptyFunction}
+                inspect={inspect}
                 showMenu={emptyFunction}
                 data={snapshotFiber.get('state')}
               />

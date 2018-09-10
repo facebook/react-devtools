@@ -20,6 +20,7 @@ import type {
   RootProfilerData,
   Snapshot,
 } from '../ProfilerTypes';
+import type {Inspect} from '../../../frontend/Store';
 
 import PropTypes from 'prop-types';
 import React from 'react';
@@ -45,6 +46,7 @@ type Props = {|
   getCachedInteractionData: GetCachedInteractionData,
   hasMultipleRoots: boolean,
   hideCommitsBelowThreshold: boolean,
+  inspect: Inspect,
   interactionsToSnapshots: Map<Interaction, Set<Snapshot>>,
   isRecording: boolean,
   profilerData: RootProfilerData,
@@ -131,6 +133,13 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedFiberID: id,
       selectedFiberName: name,
     });
+
+  inspectPropsOrState = (path: Array<string>, cb: () => void) => {
+    const { inspect } = this.props;
+    const { selectedFiberID } = this.state;
+
+    inspect(((selectedFiberID: any): string), path, cb);
+  };
 
   // We store the ID and name separately,
   // Because a Fiber may not exist in all snapshots.
@@ -309,6 +318,7 @@ class ProfilerTab extends React.Component<Props, State> {
       details = (
         <ProfilerFiberDetailPane
           deselectFiber={this.deselectFiber}
+          inspect={this.inspectPropsOrState}
           isInspectingSelectedFiber={isInspectingSelectedFiber}
           name={selectedFiberName}
           snapshot={snapshot}
@@ -460,6 +470,7 @@ export default decorate({
       commitThreshold: store.commitThreshold,
       hasMultipleRoots: store.roots.size > 1,
       hideCommitsBelowThreshold: store.hideCommitsBelowThreshold,
+      inspect: (...args) => store.inspect(...args),
       interactionsToSnapshots: profilerData !== null
         ? profilerData.interactionsToSnapshots
         : new Map(),

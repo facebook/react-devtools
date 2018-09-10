@@ -25,6 +25,8 @@ import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
 import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
+export type Inspect = (id: ElementID, path: Array<string>, cb: () => void) => void;
+
 type ListenerFunction = () => void;
 type DataType = Map;
 type ContextMenu = {

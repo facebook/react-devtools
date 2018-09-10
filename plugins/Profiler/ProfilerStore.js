@@ -11,6 +11,7 @@
 'use strict';
 
 import type Bridge from '../../agent/Bridge';
+import type {ElementID} from '../../frontend/types';
 import type {ChartType, Interaction, RootProfilerData, Snapshot} from './ProfilerTypes';
 
 const {List} = require('immutable');
@@ -75,6 +76,9 @@ class ProfilerStore extends EventEmitter {
   getCachedInteractionData(rootID: string): any {
     return this.cachedData.get(`${rootID}-interactions`) || null;
   }
+
+  inspect = (id: ElementID, path: Array<string>, cb: () => void) =>
+    this._mainStore.inspect(id, path, cb);
 
   processInteraction(interaction: Interaction): Interaction {
     const key = `${interaction.name} at ${interaction.timestamp}`;
