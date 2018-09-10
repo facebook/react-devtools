@@ -4,6 +4,7 @@ install:
 language: node_js
 node_js:
   - '8'
+  - '10'
 script:
   - yarn run lint
   - yarn run typecheck
