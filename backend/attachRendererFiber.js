@@ -192,7 +192,11 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case ForwardRefLazy:
         const functionName = getDisplayName(resolvedType.render, '');
         nodeType = 'Special';
-        name = functionName !== '' ? `ForwardRef(${functionName})` : 'ForwardRef';
+        name = resolvedType.displayName || (
+          functionName !== ''
+            ? `ForwardRef(${functionName})`
+            : 'ForwardRef'
+        );
         children = [];
         break;
       case HostRoot:
