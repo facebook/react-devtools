@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "adm-zip": "^0.4.7",
+    "adm-zip": "^0.4.11",
     "babel-core": "6.3.21",
     "babel-eslint": "6.0.4",
     "babel-jest": "22.1.0",
