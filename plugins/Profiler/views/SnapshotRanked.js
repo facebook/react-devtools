@@ -255,19 +255,18 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
     .map((nodeID, index) => {
       const node = snapshot.nodes.get(nodeID).toJSON();
       const name = node.name || 'Unknown';
-
       return {
         id: node.id,
-        label: `${name} (${node.actualDuration.toFixed(1)}ms)`,
+        label: `${name} (${node.selfBaseDuration.toFixed(1)}ms)`,
         name,
-        title: `${name} (${node.actualDuration.toFixed(3)}ms)`,
-        value: node.actualDuration,
+        title: `${name} (${node.selfBaseDuration.toFixed(3)}ms)`,
+        value: node.selfBaseDuration,
       };
     })
     .sort((a, b) => b.value - a.value);
 
   return {
-    maxValue: snapshot.duration,
+    maxValue: snapshot.maxSelfBaseDuration,
     nodes,
   };
 };
