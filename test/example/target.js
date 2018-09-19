@@ -11,11 +11,14 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Immutable = require('immutable');
-var assign = require('object-assign');
-var guid = require('../../utils/guid');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const ScheduleTracing = require('schedule/tracing');
+const Immutable = require('immutable');
+const assign = require('object-assign');
+const guid = require('../../utils/guid');
+
+const { unstable_trace: trace } = ScheduleTracing;
 
 class Todos extends React.Component {
   constructor(props) {
@@ -46,25 +49,29 @@ class Todos extends React.Component {
     if (!text.trim().length) {
       return;
     }
-    this.setState({
-      todos: this.state.todos.concat([{
-        title: text,
-        completed: false,
-        id: this._nextid++,
-      }]),
-    });
+    trace(`Add "${text}"`, performance.now(), () =>
+      this.setState({
+        todos: this.state.todos.concat([{
+          title: text,
+          completed: false,
+          id: this._nextid++,
+        }]),
+      }));
   }
 
   toggleComplete(id, completed) {
     var todos = this.state.todos.slice();
+    let text;
     todos.some(item => {
       if (item.id === id) {
         item.completed = completed;
+        text = item.text;
         return true;
       }
       return false;
     });
-    this.setState({todos});
+    trace(`Toggle "${text}" ${completed ? 'complete' : 'incomplete'}`, performance.now(), () =>
+      this.setState({todos}));
   }
 
   sort() {
@@ -75,13 +82,15 @@ class Todos extends React.Component {
       }
       return a.title > b.title ? 1 : -1;
     });
-    this.setState({todos});
+    trace('Sorting items', performance.now(), () =>
+      this.setState({todos}));
   }
 
   changeFilter(val) {
-    this.setState({
-      filter: val,
-    });
+    trace(`Filter by "${val}"`, performance.now(), () =>
+      this.setState({
+        filter: val,
+      }));
   }
 
   render() {
@@ -519,6 +528,8 @@ class Target extends React.Component {
   }
 }
 
-var node = document.createElement('div');
-document.body.appendChild(node);
-ReactDOM.render(<Wrap />, node);
+trace('initial render', performance.now(), () => {
+  var node = document.createElement('div');
+  document.body.appendChild(node);
+  ReactDOM.render(<Wrap />, node);
+});
