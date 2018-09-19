@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, SelfDurations, Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
@@ -19,7 +19,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import NoSnapshotDataMessage from './NoSnapshotDataMessage';
-import { barHeight, barWidthThreshold, didNotRender, getGradientColor, scale } from './constants';
+import { barHeight, barWidthThreshold, computeSelfDurations, didNotRender, getGradientColor, scale } from './constants';
 
 // Mapping of depth (i.e. List row index) to flame graph Nodes.
 // Flamegraphs may contain a lot of data and pre-processing it all would be expensive.
@@ -46,6 +46,12 @@ type FlamegraphData = {|
   // Longest actual duration of all fibers in the current commit.
   // This determines the color of each node in the flamegram.
   maxDuration: number,
+  // Maximum self duration within the tree for this commit.
+  // Nodes are colored relatived to this value.
+  maxSelfDuration: number,
+  // Eagerly constructed map of id to actual duration excluding descendants.
+  // This value is used to determine the color of each node.
+  selfDurations: SelfDurations,
   // Native nodes (e.g. div, span) should be included in the flamegraph.
   // If this value is false, these nodes are filtered out of the flamegraph view.
   showNativeNodes: boolean,
@@ -222,7 +228,7 @@ class ListItem extends PureComponent<any, void> {
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
     const { flamegraphData, scaleX, selectedFiberID, snapshot, width, colorBySelfTime } = itemData;
-    const { lazyIDToDepthMap, lazyIDToXMap, maxDuration } = flamegraphData;
+    const { lazyIDToDepthMap, lazyIDToXMap, maxDuration, maxSelfDuration, selfDurations } = flamegraphData;
     const { committedNodes, nodes } = snapshot;
 
     // List items are absolutely positioned using the CSS "top" attribute.
@@ -264,10 +270,21 @@ class ListItem extends PureComponent<any, void> {
           }
 
           const actualDuration = fiber.get('actualDuration') || 0;
-          const selfBaseDuration = fiber.get('selfBaseDuration') || 0;
+          const selfDuration = selfDurations[id] || 0;
           const name = fiber.get('name') || 'Unknown';
           const didRender = committedNodes.includes(id);
-          const color = didRender ? colorBySelfTime ? getGradientColor(selfBaseDuration / snapshot.maxSelfBaseDuration) : getGradientColor(actualDuration / maxDuration) : didNotRender;
+          
+          let color = didNotRender;
+          let label = name;
+          if (didRender) {
+            if (colorBySelfTime) {
+              color = getGradientColor(selfDuration / maxSelfDuration);
+              label = `${name} (${selfDuration.toFixed(1)}ms / ${actualDuration.toFixed(1)}ms)`;
+            } else {
+              color = getGradientColor(actualDuration / maxDuration);
+              label = `${name} (${actualDuration.toFixed(1)}ms)`;
+            }
+          }
 
           return (
             <ChartNode
@@ -275,7 +292,7 @@ class ListItem extends PureComponent<any, void> {
               height={barHeight}
               isDimmed={index < focusedNodeIndex}
               key={id}
-              label={didRender ? `${name} (${colorBySelfTime ? selfBaseDuration.toFixed(1) : actualDuration.toFixed(1)}ms)` : name}
+              label={label}
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
@@ -295,12 +312,16 @@ const convertSnapshotToChartData = (
   showNativeNodes: boolean,
   snapshot: Snapshot,
 ): FlamegraphData => {
+  const [selfDurations, maxSelfDuration] = computeSelfDurations(snapshot, showNativeNodes);
+
   const flamegraphData: FlamegraphData = {
     flameGraphDepth: calculateFlameGraphDepth(showNativeNodes, snapshot),
     lazyIDToDepthMap: {},
     lazyIDToXMap: {},
     lazyIDsByDepth: [],
     maxDuration: snapshot.duration,
+    maxSelfDuration,
+    selfDurations,
     showNativeNodes,
   };
 

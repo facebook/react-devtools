@@ -55,7 +55,6 @@ export type Snapshot = {|
   memoizedInteractions: Array<Interaction>,
   nodes: Map,
   root: string,
-  maxSelfBaseDuration: number,
 |};
 
 export type StoreSnapshot = {|
@@ -64,5 +63,6 @@ export type StoreSnapshot = {|
   duration: number,
   memoizedInteractions: Array<Interaction>,
   root: string,
-  maxSelfBaseDuration: number,
 |};
+
+export type SelfDurations = {[id: string]: number};
