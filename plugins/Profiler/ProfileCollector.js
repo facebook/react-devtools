@@ -35,6 +35,7 @@ class ProfileCollector {
   _committedNodes: Set<string> = new Set();
   _isRecording: boolean = false;
   _maxActualDuration: number = 0;
+  _maxSelfBaseDuration: number = 0;
   _recordingStartTime: number = 0;
 
   constructor(agent: Agent) {
@@ -65,6 +66,7 @@ class ProfileCollector {
       committedNodes: Array.from(this._committedNodes),
       commitTime: now() - this._recordingStartTime,
       duration: this._maxActualDuration,
+      maxSelfBaseDuration: this._maxSelfBaseDuration,
       root: id,
     };
 
@@ -93,6 +95,7 @@ class ProfileCollector {
 
     this._committedNodes.add(data.id);
     this._maxActualDuration = Math.max(this._maxActualDuration, data.actualDuration);
+    this._maxSelfBaseDuration = Math.max(this._maxSelfBaseDuration, data.selfBaseDuration);
   };
 
   _onRootCommitted = (id: string, data: any) => {
@@ -107,6 +110,7 @@ class ProfileCollector {
     // Then reset data for the next snapshot.
     this._committedNodes = new Set();
     this._maxActualDuration = 0;
+    this._maxSelfBaseDuration = 0;
   }
 
   _onUnmount = (id: string) => {

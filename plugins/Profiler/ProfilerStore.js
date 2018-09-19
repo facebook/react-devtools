@@ -21,6 +21,7 @@ const LRU = require('lru-cache');
 const LOCAL_STORAGE_COMMIT_THRESHOLD = 'profiler:commitThreshold';
 const LOCAL_STORAGE_HIDE_COMMITS_BELOW_THRESHOLD = 'profiler:hideCommitsBelowThreshold';
 const LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY = 'profiler:showNativeNodes';
+const LOCAL_STORAGE_COLOR_BY_SELF_TIME = 'profiler:colorBySelfTime';
 
 class ProfilerStore extends EventEmitter {
   _bridge: Bridge;
@@ -37,6 +38,7 @@ class ProfilerStore extends EventEmitter {
   selectedChartType: ChartType = 'flamegraph';
   selectedRoot: string | null = null;
   showNativeNodes: boolean = ((get(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, false): any): boolean);
+  colorBySelfTime: boolean = ((get(LOCAL_STORAGE_COLOR_BY_SELF_TIME, false): any): boolean);
 
   constructor(bridge: Bridge, mainStore: Object) {
     super();
@@ -123,6 +125,12 @@ class ProfilerStore extends EventEmitter {
     this.showNativeNodes = showNativeNodes;
     this.emit('showNativeNodes', showNativeNodes);
     set(LOCAL_STORAGE_SHOW_NATIVE_NODES_KEY, showNativeNodes);
+  }
+
+  setColorBySelfTime(colorBySelfTime: boolean) {
+    this.colorBySelfTime = colorBySelfTime;
+    this.emit('colorBySelfTime', colorBySelfTime);
+    set(LOCAL_STORAGE_COLOR_BY_SELF_TIME, colorBySelfTime);
   }
 
   storeSnapshot = () => {

@@ -16,6 +16,7 @@ import {sansSerif} from '../../../frontend/Themes/Fonts';
 
 type Props = {|
   commitThreshold: number,
+  colorBySelfTime: boolean,
   isSettingsPanelActive: boolean,
   hideCommitsBelowThreshold: boolean,
   setCommitThrehsold: (value: number) => void,
@@ -23,6 +24,7 @@ type Props = {|
   toggleHideCommitsBelowThreshold: Function,
   toggleIsSettingsPanelActive: Function,
   toggleShowNativeNodes: Function,
+  toggleColorBySelfTime: Function,
 |};
 
 class ProfilerSettings extends PureComponent<Props, void> {
@@ -56,7 +58,9 @@ class ProfilerSettings extends PureComponent<Props, void> {
       toggleHideCommitsBelowThreshold,
       toggleIsSettingsPanelActive,
       toggleShowNativeNodes,
+      toggleColorBySelfTime,
       showNativeNodes,
+      colorBySelfTime,
     } = this.props;
 
     if (!isSettingsPanelActive) {
@@ -133,6 +137,22 @@ class ProfilerSettings extends PureComponent<Props, void> {
               onChange={this.handleCommitThresholdChange}
             /> ms
           </label>
+
+          <label
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              cursor: 'pointer',
+              marginBottom: '0.25rem',
+            }}
+            title="Color by self time"
+          >
+            <input
+              type="checkbox"
+              checked={colorBySelfTime}
+              onChange={toggleColorBySelfTime}
+            /> Color by self time
+          </label>
         </div>
       </div>
     );
@@ -146,6 +166,7 @@ export default decorate({
     'hideCommitsBelowThreshold',
     'isSettingsPanelActive',
     'showNativeNodes',
+    'colorBySelfTime',
   ],
   props(store) {
     return {
@@ -154,9 +175,11 @@ export default decorate({
       isSettingsPanelActive: store.isSettingsPanelActive,
       showNativeNodes: store.showNativeNodes,
       setCommitThrehsold: store.setCommitThrehsold,
+      colorBySelfTime: store.colorBySelfTime,
       toggleHideCommitsBelowThreshold: () => store.setHideCommitsBelowThreshold(!store.hideCommitsBelowThreshold),
       toggleIsSettingsPanelActive: () => store.setIsSettingsPanelActive(!store.isSettingsPanelActive),
       toggleShowNativeNodes: () => store.setShowNativeNodes(!store.showNativeNodes),
+      toggleColorBySelfTime: () => store.setColorBySelfTime(!store.colorBySelfTime),
     };
   },
 }, ProfilerSettings);

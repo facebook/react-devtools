@@ -68,6 +68,7 @@ type ItemData = {|
   snapshot: Snapshot,
   theme: Theme,
   width: number,
+  colorBySelfTime: boolean,
 |};
 
 type Props = {|
@@ -81,6 +82,7 @@ type Props = {|
   snapshot: Snapshot,
   snapshotIndex: number,
   theme: Theme,
+  colorBySelfTime: boolean,
 |};
 
 const SnapshotFlamegraph = ({
@@ -94,6 +96,7 @@ const SnapshotFlamegraph = ({
   snapshot,
   snapshotIndex,
   theme,
+  colorBySelfTime,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const dataKey = showNativeNodes ? 'SnapshotFlamegraphWithNativeNodes' : 'SnapshotFlamegraphWithoutNativeNodes';
@@ -107,6 +110,7 @@ const SnapshotFlamegraph = ({
     <AutoSizer>
       {({ height, width }) => (
         <Flamegraph
+          colorBySelfTime={colorBySelfTime}
           deselectFiber={deselectFiber}
           flamegraphData={((flamegraphData: any): FlamegraphData)}
           height={height}
@@ -134,6 +138,7 @@ type FlamegraphProps = {|
   snapshot: Snapshot,
   theme: Theme,
   width: number,
+  colorBySelfTime: boolean,
 |};
 
 const Flamegraph = ({
@@ -147,6 +152,7 @@ const Flamegraph = ({
   snapshot,
   theme,
   width,
+  colorBySelfTime,
 }: FlamegraphProps) => {
   const { flameGraphDepth, lazyIDToDepthMap, lazyIDsByDepth } = flamegraphData;
 
@@ -170,6 +176,7 @@ const Flamegraph = ({
     snapshot,
     theme,
     width,
+    colorBySelfTime,
   );
 
   // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
@@ -214,7 +221,7 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { flamegraphData, scaleX, selectedFiberID, snapshot, width } = itemData;
+    const { flamegraphData, scaleX, selectedFiberID, snapshot, width, colorBySelfTime } = itemData;
     const { lazyIDToDepthMap, lazyIDToXMap, maxDuration } = flamegraphData;
     const { committedNodes, nodes } = snapshot;
 
@@ -257,16 +264,18 @@ class ListItem extends PureComponent<any, void> {
           }
 
           const actualDuration = fiber.get('actualDuration') || 0;
+          const selfBaseDuration = fiber.get('selfBaseDuration') || 0;
           const name = fiber.get('name') || 'Unknown';
           const didRender = committedNodes.includes(id);
+          const color = didRender ? colorBySelfTime ? getGradientColor(selfBaseDuration / snapshot.maxSelfBaseDuration) : getGradientColor(actualDuration / maxDuration) : didNotRender;
 
           return (
             <ChartNode
-              color={didRender ? getGradientColor(actualDuration / maxDuration) : didNotRender}
+              color={color}
               height={barHeight}
               isDimmed={index < focusedNodeIndex}
               key={id}
-              label={didRender ? `${name} (${actualDuration.toFixed(1)}ms)` : name}
+              label={didRender ? `${name} (${colorBySelfTime ? selfBaseDuration.toFixed(1) : actualDuration.toFixed(1)}ms)` : name}
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
@@ -344,6 +353,7 @@ const getItemData = memoize((
   snapshot: Snapshot,
   theme: Theme,
   width: number,
+  colorBySelfTime: boolean,
 ): ItemData => {
   const maxTreeBaseDuration = getMaxTreeBaseDuration(flamegraphData, selectedFiberID, snapshot);
   return {
@@ -356,6 +366,7 @@ const getItemData = memoize((
     snapshot,
     theme,
     width,
+    colorBySelfTime,
   };
 });
 
@@ -422,7 +433,7 @@ const calculateFibersAtDepthCrawler = (
         // Bailout on Text nodes
         return;
       }
-      
+
       const nodeType = fiber.get('nodeType');
 
       if (nodeType !== 'Composite' && (nodeType !== 'Native' || !showNativeNodes)) {

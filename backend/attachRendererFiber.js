@@ -152,6 +152,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var actualDuration = null;
     var actualStartTime = null;
     var treeBaseDuration = null;
+    var selfBaseDuration = null;
 
     var resolvedType = type;
     if (typeof type === 'object' && type !== null) {
@@ -316,6 +317,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       actualDuration = fiber.actualDuration;
       actualStartTime = fiber.actualStartTime;
       treeBaseDuration = fiber.treeBaseDuration;
+      selfBaseDuration = fiber.selfBaseDuration;
     }
 
     // $FlowFixMe
@@ -338,6 +340,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       actualDuration,
       actualStartTime,
       treeBaseDuration,
+      selfBaseDuration,
     };
   }
 
