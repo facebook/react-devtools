@@ -52,7 +52,6 @@ type Props = {|
   selectedRootID: string | null,
   setSelectedChartType: (chartType: ChartType) => void,
   showNativeNodes: boolean,
-  colorBySelfTime: boolean,
   snapshots: Array<Snapshot>,
   timestampsToInteractions: Map<number, Set<Interaction>>,
   toggleIsRecording: Function,
@@ -64,7 +63,6 @@ type State = {|
   prevIsRecording: boolean,
   prevSelectedChartType: ChartType,
   prevShowNativeNodes: boolean,
-  prevColorBySelfTime: boolean,
   selectedFiberID: string | null,
   selectedFiberName: string | null,
   selectedInteraction: Interaction | null,
@@ -81,7 +79,6 @@ class ProfilerTab extends React.Component<Props, State> {
     prevIsRecording: this.props.isRecording,
     prevSelectedChartType: this.props.selectedChartType,
     prevShowNativeNodes: this.props.showNativeNodes,
-    prevColorBySelfTime: this.props.colorBySelfTime,
     selectedFiberID: null,
     selectedFiberName: null,
     selectedInteraction: null,
@@ -111,14 +108,8 @@ class ProfilerTab extends React.Component<Props, State> {
       return {
         isInspectingSelectedFiber: false,
         prevShowNativeNodes: props.showNativeNodes,
-        prevColorBySelfTime: props.colorBySelfTime,
         selectedFiberID: null,
         selectedFiberName: null,
-      };
-    }
-    if (props.colorBySelfTime !== state.prevColorBySelfTime) {
-      return {
-        prevColorBySelfTime: props.colorBySelfTime,
       };
     }
     return null;
@@ -195,7 +186,6 @@ class ProfilerTab extends React.Component<Props, State> {
       selectedChartType,
       selectedRootID,
       showNativeNodes,
-      colorBySelfTime,
       snapshots,
       timestampsToInteractions,
       toggleIsRecording,
@@ -265,7 +255,6 @@ class ProfilerTab extends React.Component<Props, State> {
 
         content = (
           <ChartComponent
-            colorBySelfTime={colorBySelfTime}
             cacheDataForSnapshot={cacheDataForSnapshot}
             deselectFiber={this.deselectFiber}
             getCachedDataForSnapshot={getCachedDataForSnapshot}
@@ -456,7 +445,6 @@ export default decorate({
     'selectedChartType',
     'selectedRoot',
     'showNativeNodes',
-    'colorBySelfTime',
   ],
   props(store) {
     const profilerData: RootProfilerData | null =
@@ -480,7 +468,6 @@ export default decorate({
       selectedChartType: store.selectedChartType,
       setSelectedChartType: (chartType: ChartType) => store.setSelectedChartType(chartType),
       showNativeNodes: store.showNativeNodes,
-      colorBySelfTime: store.colorBySelfTime,
       snapshots: profilerData !== null
         ? profilerData.snapshots
         : [],

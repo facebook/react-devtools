@@ -43,9 +43,6 @@ type FlamegraphData = {|
   // Lazily constructed array of ids per row within the flamegraph.
   // This enables quick rendering of all fibers in a specific row.
   lazyIDsByDepth: LazyIDsByDepth,
-  // Longest actual duration of all fibers in the current commit.
-  // This determines the color of each node in the flamegram.
-  maxDuration: number,
   // Maximum self duration within the tree for this commit.
   // Nodes are colored relatived to this value.
   maxSelfDuration: number,
@@ -74,7 +71,6 @@ type ItemData = {|
   snapshot: Snapshot,
   theme: Theme,
   width: number,
-  colorBySelfTime: boolean,
 |};
 
 type Props = {|
@@ -88,7 +84,6 @@ type Props = {|
   snapshot: Snapshot,
   snapshotIndex: number,
   theme: Theme,
-  colorBySelfTime: boolean,
 |};
 
 const SnapshotFlamegraph = ({
@@ -102,7 +97,6 @@ const SnapshotFlamegraph = ({
   snapshot,
   snapshotIndex,
   theme,
-  colorBySelfTime,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const dataKey = showNativeNodes ? 'SnapshotFlamegraphWithNativeNodes' : 'SnapshotFlamegraphWithoutNativeNodes';
@@ -116,7 +110,6 @@ const SnapshotFlamegraph = ({
     <AutoSizer>
       {({ height, width }) => (
         <Flamegraph
-          colorBySelfTime={colorBySelfTime}
           deselectFiber={deselectFiber}
           flamegraphData={((flamegraphData: any): FlamegraphData)}
           height={height}
@@ -144,7 +137,6 @@ type FlamegraphProps = {|
   snapshot: Snapshot,
   theme: Theme,
   width: number,
-  colorBySelfTime: boolean,
 |};
 
 const Flamegraph = ({
@@ -158,7 +150,6 @@ const Flamegraph = ({
   snapshot,
   theme,
   width,
-  colorBySelfTime,
 }: FlamegraphProps) => {
   const { flameGraphDepth, lazyIDToDepthMap, lazyIDsByDepth } = flamegraphData;
 
@@ -182,7 +173,6 @@ const Flamegraph = ({
     snapshot,
     theme,
     width,
-    colorBySelfTime,
   );
 
   // If a commit is small and fast enough, it's possible for it to contain no base time values > 0.
@@ -227,8 +217,8 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { flamegraphData, scaleX, selectedFiberID, snapshot, width, colorBySelfTime } = itemData;
-    const { lazyIDToDepthMap, lazyIDToXMap, maxDuration, maxSelfDuration, selfDurations } = flamegraphData;
+    const { flamegraphData, scaleX, selectedFiberID, snapshot, width } = itemData;
+    const { lazyIDToDepthMap, lazyIDToXMap, maxSelfDuration, selfDurations } = flamegraphData;
     const { committedNodes, nodes } = snapshot;
 
     // List items are absolutely positioned using the CSS "top" attribute.
@@ -277,13 +267,8 @@ class ListItem extends PureComponent<any, void> {
           let color = didNotRender;
           let label = name;
           if (didRender) {
-            if (colorBySelfTime) {
-              color = getGradientColor(selfDuration / maxSelfDuration);
-              label = `${name} (${selfDuration.toFixed(1)}ms / ${actualDuration.toFixed(1)}ms)`;
-            } else {
-              color = getGradientColor(actualDuration / maxDuration);
-              label = `${name} (${actualDuration.toFixed(1)}ms)`;
-            }
+            color = getGradientColor(selfDuration / maxSelfDuration);
+            label = `${name} (${selfDuration.toFixed(1)}ms / ${actualDuration.toFixed(1)}ms)`;
           }
 
           return (
@@ -319,7 +304,6 @@ const convertSnapshotToChartData = (
     lazyIDToDepthMap: {},
     lazyIDToXMap: {},
     lazyIDsByDepth: [],
-    maxDuration: snapshot.duration,
     maxSelfDuration,
     selfDurations,
     showNativeNodes,
@@ -374,7 +358,6 @@ const getItemData = memoize((
   snapshot: Snapshot,
   theme: Theme,
   width: number,
-  colorBySelfTime: boolean,
 ): ItemData => {
   const maxTreeBaseDuration = getMaxTreeBaseDuration(flamegraphData, selectedFiberID, snapshot);
   return {
@@ -387,7 +370,6 @@ const getItemData = memoize((
     snapshot,
     theme,
     width,
-    colorBySelfTime,
   };
 });
 

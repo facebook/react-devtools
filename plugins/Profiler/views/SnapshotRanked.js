@@ -55,7 +55,6 @@ type Props = {|
   snapshot: Snapshot,
   snapshotIndex: number,
   theme: Theme,
-  colorBySelfTime: boolean,
 |};
 
 const SnapshotRanked = ({
