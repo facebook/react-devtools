@@ -418,7 +418,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       (
         prevFiber.actualDuration !== nextFiber.actualDuration ||
         prevFiber.actualStartTime !== nextFiber.actualStartTime ||
-        prevFiber.selfBaseDuration !== nextFiber.selfBaseDuration ||
         prevFiber.treeBaseDuration !== nextFiber.treeBaseDuration
       )
     );

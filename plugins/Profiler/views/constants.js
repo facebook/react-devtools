@@ -89,3 +89,23 @@ export const getFilteredSnapshotData = memoize((
     snapshots: filteredSnapshots,
   };
 });
+
+export const calculateSelfDuration = (snapshot: Snapshot, nodeID: string): number => {
+  const {nodes} = snapshot;
+  const node = nodes.get(nodeID);
+  const actualDuration = node.get('actualDuration');
+
+  let selfDuration = actualDuration;
+
+  const children = node.get('children');
+  if (Array.isArray(children)) {
+    children.forEach(childID => {
+      const childActualDuration = nodes.getIn([childID, 'actualDuration']);
+      if (childActualDuration > 0) {
+        selfDuration -= childActualDuration;
+      }
+    });
+  }
+
+  return selfDuration;
+};
