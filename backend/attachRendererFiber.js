@@ -260,18 +260,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             break;
           case CONTEXT_PROVIDER_NUMBER:
           case CONTEXT_PROVIDER_SYMBOL_STRING:
-            nodeType = 'Special';
+            nodeType = 'ContextProvider';
             props = fiber.memoizedProps;
-            name = 'Context.Provider';
+            name = getDisplayName(fiber.type, 'Context.Provider');
             children = [];
             break;
           case CONTEXT_CONSUMER_NUMBER:
           case CONTEXT_CONSUMER_SYMBOL_STRING:
-            nodeType = 'Special';
+            nodeType = 'ContextConsumer';
             props = fiber.memoizedProps;
-            // TODO: TraceUpdatesBackendManager currently depends on this.
-            // If you change .name, figure out a more resilient way to detect it.
-            name = 'Context.Consumer';
+            name = getDisplayName(fiber.type, 'Context.Consumer');
             children = [];
             break;
           case STRICT_MODE_NUMBER:
