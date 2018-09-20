@@ -64,5 +64,3 @@ export type StoreSnapshot = {|
   memoizedInteractions: Array<Interaction>,
   root: string,
 |};
-
-export type SelfDurations = {[id: string]: number};

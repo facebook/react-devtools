@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {CacheDataForSnapshot, GetCachedDataForSnapshot, SelfDurations, Snapshot} from '../ProfilerTypes';
+import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
 import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
@@ -19,7 +19,7 @@ import AutoSizer from 'react-virtualized-auto-sizer';
 import { FixedSizeList as List } from 'react-window';
 import ChartNode from './ChartNode';
 import NoSnapshotDataMessage from './NoSnapshotDataMessage';
-import { barHeight, barWidthThreshold, computeSelfDurations, didNotRender, getGradientColor, scale } from './constants';
+import { barHeight, barWidthThreshold, calculateSelfDuration, didNotRender, getGradientColor, scale } from './constants';
 
 // Mapping of depth (i.e. List row index) to flame graph Nodes.
 // Flamegraphs may contain a lot of data and pre-processing it all would be expensive.
@@ -28,6 +28,7 @@ import { barHeight, barWidthThreshold, computeSelfDurations, didNotRender, getGr
 type LazyIDToDepthMap = {[id: string]: number};
 type LazyIDToXMap = {[id: string]: number};
 type LazyIDsByDepth = Array<Array<string>>;
+type IDToSelfDuration = {[id: string]: number};
 
 type FlamegraphData = {|
   // Number of rows in the flamegraph List.
@@ -48,7 +49,7 @@ type FlamegraphData = {|
   maxSelfDuration: number,
   // Eagerly constructed map of id to actual duration excluding descendants.
   // This value is used to determine the color of each node.
-  selfDurations: SelfDurations,
+  selfDurations: IDToSelfDuration,
   // Native nodes (e.g. div, span) should be included in the flamegraph.
   // If this value is false, these nodes are filtered out of the flamegraph view.
   showNativeNodes: boolean,
@@ -387,6 +388,27 @@ const getMaxTreeBaseDuration = (
   // In that case, we should still fallback to the base node time.
   return snapshot.nodes.getIn([selectedFiberID, 'treeBaseDuration']) || snapshot.nodes.getIn([baseNodeID, 'treeBaseDuration']);
 };
+
+const computeSelfDurations = memoize((snapshot: Snapshot, showNativeNodes: boolean): [IDToSelfDuration, number] => {
+  const { committedNodes, nodes } = snapshot;
+  const selfDurations: IDToSelfDuration = {};
+
+  let maxSelfDuration = 0;
+
+  committedNodes
+    .filter(nodeID => {
+      const nodeType = nodes.getIn([nodeID, 'nodeType']);
+      return (nodeType === 'Composite' || (nodeType === 'Native' && showNativeNodes));
+    })
+    .forEach(nodeID => {
+      const selfDuration = calculateSelfDuration(snapshot, nodeID);
+
+      selfDurations[nodeID] = selfDuration;
+      maxSelfDuration = Math.max(maxSelfDuration, selfDuration);
+    });
+
+  return [selfDurations, maxSelfDuration];
+});
 
 // This method depends on rows being initialized in-order.
 const calculateFibersAtDepth = (flamegraphData: FlamegraphData, depth: number, snapshot: Snapshot): Array<string> => {

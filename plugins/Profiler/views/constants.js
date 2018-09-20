@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {SelfDurations, Snapshot} from '../ProfilerTypes';
+import type {Snapshot} from '../ProfilerTypes';
 
 import memoize from 'memoize-one';
 
@@ -90,36 +90,22 @@ export const getFilteredSnapshotData = memoize((
   };
 });
 
-export const computeSelfDurations = memoize((snapshot: Snapshot, showNativeNodes: boolean): [SelfDurations, number] => {
-  const { committedNodes, nodes } = snapshot;
-  const selfDurations = {};
+export const calculateSelfDuration = (snapshot: Snapshot, nodeID: string): number => {
+  const {nodes} = snapshot;
+  const node = nodes.get(nodeID);
+  const actualDuration = node.get('actualDuration');
 
-  let maxSelfDuration = 0;
+  let selfDuration = actualDuration;
 
-  committedNodes
-    .filter(nodeID => {
-      const nodeType = nodes.getIn([nodeID, 'nodeType']);
-      return (nodeType === 'Composite' || (nodeType === 'Native' && showNativeNodes));
-    })
-    .forEach(nodeID => {
-      const node = nodes.get(nodeID);
-      const actualDuration = node.get('actualDuration');
-
-      let selfDuration = actualDuration;
-
-      const children = node.get('children');
-      if (Array.isArray(children)) {
-        children.forEach(childID => {
-          const childActualDuration = nodes.getIn([childID, 'actualDuration']);
-          if (childActualDuration > 0) {
-            selfDuration -= childActualDuration;
-          }
-        });
+  const children = node.get('children');
+  if (Array.isArray(children)) {
+    children.forEach(childID => {
+      const childActualDuration = nodes.getIn([childID, 'actualDuration']);
+      if (childActualDuration > 0) {
+        selfDuration -= childActualDuration;
       }
-
-      selfDurations[nodeID] = selfDuration;
-      maxSelfDuration = Math.max(maxSelfDuration, selfDuration);
     });
+  }
 
-  return [selfDurations, maxSelfDuration];
-});
+  return selfDuration;
+};
