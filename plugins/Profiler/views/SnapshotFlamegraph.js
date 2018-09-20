@@ -268,7 +268,7 @@ class ListItem extends PureComponent<any, void> {
           let label = name;
           if (didRender) {
             color = getGradientColor(selfDuration / maxSelfDuration);
-            label = `${name} (${selfDuration.toFixed(1)}ms / ${actualDuration.toFixed(1)}ms)`;
+            label = `${name} (${selfDuration.toFixed(1)}ms of ${actualDuration.toFixed(1)}ms)`;
           }
 
           return (
@@ -281,7 +281,7 @@ class ListItem extends PureComponent<any, void> {
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
               theme={itemData.theme}
-              title={didRender ? `${name} (${actualDuration.toFixed(3)}ms)` : name}
+              title={label}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
               y={top}

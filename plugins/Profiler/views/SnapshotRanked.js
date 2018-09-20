@@ -256,9 +256,8 @@ const convertSnapshotToChartData = (snapshot: Snapshot, showNativeNodes: boolean
     .map((nodeID, index) => {
       const node = snapshot.nodes.get(nodeID);
       const name = node.get('name') || 'Unknown';
-      const actualDuration = node.get('actualDuration');
       const selfDuration = selfDurations[nodeID] || 0;
-      const label = `${name} (${selfDuration.toFixed(1)}ms / ${actualDuration.toFixed(1)}ms)`;
+      const label = `${name} (${selfDuration.toFixed(1)}ms)`;
       return {
         id: nodeID,
         label,
