@@ -150,6 +150,7 @@ class PropState extends React.Component<Props> {
             showMenu={this.props.showMenu}
             key={this.props.id + '-props'}
             data={this.props.node.get('props')}
+            propTypes={this.props.node.get('propTypes')}
           />
         </DetailPaneSection>
 

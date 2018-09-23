@@ -94,6 +94,7 @@ class Store extends EventEmitter {
 
   // Public state
   isInspectEnabled: boolean;
+  invalidPropsState: ?ControlState;
   traceupdatesState: ?ControlState;
   colorizerState: ?ControlState;
   contextMenu: ?ContextMenu;
@@ -138,6 +139,7 @@ class Store extends EventEmitter {
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
+    this.invalidPropsState = null;
     this.traceupdatesState = null;
     this.colorizerState = null;
     this.refreshSearch = false;
@@ -580,6 +582,13 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
+  }
+
+  changeInvalidProps(state: ControlState) {
+    this.invalidPropsState = state;
+    this.emit('invalidpropschange');
+    invariant(state.toJS, 'state.toJS should exist');
+    this._bridge.send('invalidpropschange', state.toJS());
   }
 
   setInspectEnabled(isInspectEnabled: boolean) {

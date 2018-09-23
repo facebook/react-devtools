@@ -140,6 +140,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var source = fiber._debugSource;
     var publicInstance = null;
     var props = null;
+    var propTypes = null;
     var state = null;
     var children = null;
     var context = null;
@@ -169,6 +170,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         name = getDisplayName(resolvedType);
         publicInstance = fiber.stateNode;
         props = fiber.memoizedProps;
+        propTypes = resolvedType.propTypes;
         state = fiber.memoizedState;
         if (publicInstance != null) {
           context = publicInstance.context;
@@ -327,6 +329,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       source,
       name,
       props,
+      propTypes,
       state,
       context,
       children,

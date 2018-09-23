@@ -17,6 +17,7 @@ const React = require('react');
 const Simple = require('./Simple');
 const nullthrows = require('nullthrows').default;
 
+const decorate = require('../decorate');
 const consts = require('../../agent/consts');
 const previewComplex = require('./previewComplex');
 
@@ -31,6 +32,8 @@ type DataViewProps = {
   startOpen?: boolean,
   noSort?: boolean,
   readOnly?: boolean,
+  propTypes?: Object,
+  isExtraPropsHighlightEnabled?: boolean,
 };
 
 class DataView extends React.Component<DataViewProps> {
@@ -63,7 +66,10 @@ class DataView extends React.Component<DataViewProps> {
         inspect={this.props.inspect}
         showMenu={this.props.showMenu}
         readOnly={this.props.readOnly}
-        value={data[name]} />
+        value={data[name]}
+        propTypes={this.props.propTypes}
+        isExtraPropsHighlightEnabled={this.props.isExtraPropsHighlightEnabled}
+      />
     );
   }
 
@@ -149,6 +155,8 @@ type Props = {
   readOnly?: boolean,
   name: string,
   value: any,
+  propTypes?: Object,
+  isExtraPropsHighlightEnabled?: boolean,
 };
 
 type State = {
@@ -261,6 +269,8 @@ class DataItem extends React.Component<Props, State> {
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             readOnly={readOnly}
+            propTypes={this.props.propTypes}
+            isExtraPropsHighlightEnabled={this.props.isExtraPropsHighlightEnabled}
           />
         </div>
       );
@@ -271,9 +281,20 @@ class DataItem extends React.Component<Props, State> {
       name = name.slice(0, 50) + '…';
     }
 
+    const style = {...styles.head};
+    let title = null;
+    const isExtraProp = Boolean(this.props.propTypes && !this.props.propTypes[name]);
+    if (this.props.isExtraPropsHighlightEnabled && isExtraProp) {
+      style.backgroundColor = 'yellow';
+      title = 'This prop has no propType defined. If you use tools to ensure there is no missing prop validation, like eslint-plugin-react\'s react/prop-types, this means it\'s is unnecessary and may be removed.';
+    }
+
     return (
       <li>
-        <div style={styles.head}>
+        <div
+          style={style}
+          title={title}
+        >
           {opener}
           <div
             style={nameStyle(complex, theme)}
@@ -395,4 +416,15 @@ var styles = {
   },
 };
 
-module.exports = DataView;
+var Wrapped = decorate({
+  listeners() {
+    return ['invalidpropschange'];
+  },
+  props(store) {
+    return {
+      isExtraPropsHighlightEnabled: store.invalidPropsState && store.invalidPropsState.enabled,
+    };
+  },
+}, DataView);
+
+module.exports = Wrapped;

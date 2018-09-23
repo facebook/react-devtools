@@ -13,6 +13,7 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
+const PropTypes = require('prop-types');
 const ScheduleTracing = require('schedule/tracing');
 const Immutable = require('immutable');
 const assign = require('object-assign');
@@ -479,6 +480,7 @@ class Wrap extends React.Component {
           <PropTester {...complexProps}/>
           <PropTester {...uninspectableProps}/>
           <PropTester massiveMap={massiveMap}/>
+          <PropTesterWithPropTypes validProp="test" invalidProp="test" propWithoutPropTypes="test" />
         </div>
       </ThemeContext.Provider>
     );
@@ -490,6 +492,17 @@ class PropTester extends React.Component {
     return null;
   }
 }
+
+class PropTesterWithPropTypes extends React.Component {
+  render() {
+    return null;
+  }
+}
+
+PropTesterWithPropTypes.propTypes = {
+  validProp: PropTypes.string,
+  invalidProp: PropTypes.number,
+};
 
 class Nested extends React.Component {
   render() {

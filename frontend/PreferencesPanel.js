@@ -22,6 +22,7 @@ const ThemeEditor = require('./Themes/Editor/Editor');
 const Hoverable = require('./Hoverable');
 const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+const InvalidPropTypesFrontendControl = require('../plugins/InvalidPropTypes/InvalidPropTypesFrontendControl');
 
 import type {Theme} from './types';
 
@@ -95,6 +96,9 @@ class PreferencesPanel extends React.Component<Props, State> {
           </div>
           <div style={styles.preference}>
             <ColorizerFrontendControl />
+          </div>
+          <div style={styles.preference}>
+            <InvalidPropTypesFrontendControl />
           </div>
           <h4 style={styles.header}>Theme</h4>
           <div style={styles.selectAndPreviewRow}>
