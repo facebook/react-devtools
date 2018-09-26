@@ -73,6 +73,7 @@ function getInternalReactConstants(version) {
   ReactSymbols = {
     CONCURRENT_MODE_NUMBER: 0xeacf,
     CONCURRENT_MODE_SYMBOL_STRING: 'Symbol(react.concurrent_mode)',
+    DEPRECATED_ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
     CONTEXT_CONSUMER_NUMBER: 0xeace,
     CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
     CONTEXT_PROVIDER_NUMBER: 0xeacd,
@@ -119,6 +120,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   var {
     CONCURRENT_MODE_NUMBER,
     CONCURRENT_MODE_SYMBOL_STRING,
+    DEPRECATED_ASYNC_MODE_SYMBOL_STRING,
     CONTEXT_CONSUMER_NUMBER,
     CONTEXT_CONSUMER_SYMBOL_STRING,
     CONTEXT_PROVIDER_NUMBER,
@@ -254,6 +256,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         switch (switchValue) {
           case CONCURRENT_MODE_NUMBER:
           case CONCURRENT_MODE_SYMBOL_STRING:
+          case DEPRECATED_ASYNC_MODE_SYMBOL_STRING:
             nodeType = 'Special';
             name = 'ConcurrentMode';
             children = [];
