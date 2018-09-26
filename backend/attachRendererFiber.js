@@ -71,8 +71,8 @@ function getInternalReactConstants(version) {
     };
   }
   ReactSymbols = {
-    ASYNC_MODE_NUMBER: 0xeacf,
-    ASYNC_MODE_SYMBOL_STRING: 'Symbol(react.async_mode)',
+    CONCURRENT_MODE_NUMBER: 0xeacf,
+    CONCURRENT_MODE_SYMBOL_STRING: 'Symbol(react.concurrent_mode)',
     CONTEXT_CONSUMER_NUMBER: 0xeace,
     CONTEXT_CONSUMER_SYMBOL_STRING: 'Symbol(react.context)',
     CONTEXT_PROVIDER_NUMBER: 0xeacd,
@@ -117,8 +117,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     ForwardRefLazy,
   } = ReactTypeOfWork;
   var {
-    ASYNC_MODE_NUMBER,
-    ASYNC_MODE_SYMBOL_STRING,
+    CONCURRENT_MODE_NUMBER,
+    CONCURRENT_MODE_SYMBOL_STRING,
     CONTEXT_CONSUMER_NUMBER,
     CONTEXT_CONSUMER_SYMBOL_STRING,
     CONTEXT_PROVIDER_NUMBER,
@@ -252,10 +252,10 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           : symbolOrNumber;
 
         switch (switchValue) {
-          case ASYNC_MODE_NUMBER:
-          case ASYNC_MODE_SYMBOL_STRING:
+          case CONCURRENT_MODE_NUMBER:
+          case CONCURRENT_MODE_SYMBOL_STRING:
             nodeType = 'Special';
-            name = 'AsyncMode';
+            name = 'ConcurrentMode';
             children = [];
             break;
           case CONTEXT_PROVIDER_NUMBER:
