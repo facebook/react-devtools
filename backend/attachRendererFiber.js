@@ -213,7 +213,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
         // TODO (bvaughn) we plan to remove this prefix anyway.
         // We can cut this special case out when it's gone.
-        name = name.replace('topsecret-', '');
+        if (typeof name === 'string') {
+          name = name.replace('topsecret-', ''); 
+        }
 
         publicInstance = fiber.stateNode;
         props = fiber.memoizedProps;
