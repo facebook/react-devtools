@@ -269,7 +269,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           case CONTEXT_PROVIDER_SYMBOL_STRING:
             nodeType = 'Special';
             props = fiber.memoizedProps;
-            name = `${fiber.type._context.displayName || 'Context'}.Provider`;
+            name = `${(fiber.type._context || fiber.type.context).displayName || 'Context'}.Provider`;
             children = [];
             break;
           case CONTEXT_CONSUMER_NUMBER:
