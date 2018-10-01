@@ -82,6 +82,8 @@ function getInternalReactConstants(version) {
     FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
     PROFILER_NUMBER: 0xead2,
     PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
+    PURE_NUMBER: 0xead3,
+    PURE_SYMBOL_STRING: 'Symbol(react.pure)',
     STRICT_MODE_NUMBER: 0xeacc,
     STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
     PLACEHOLDER_NUMBER: 0xead1,
@@ -127,6 +129,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     CONTEXT_PROVIDER_SYMBOL_STRING,
     PROFILER_NUMBER,
     PROFILER_SYMBOL_STRING,
+    PURE_NUMBER,
+    PURE_SYMBOL_STRING,
     STRICT_MODE_NUMBER,
     STRICT_MODE_SYMBOL_STRING,
     PLACEHOLDER_NUMBER,
@@ -258,6 +262,17 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           : symbolOrNumber;
 
         switch (switchValue) {
+          case PURE_NUMBER:
+          case PURE_SYMBOL_STRING:
+            nodeType = 'Special';
+            if (type.displayName) {
+              name = type.displayName;
+            } else {
+              const displayName = type.render.displayName || type.render.name;
+              name = displayName ? `Pure(${displayName})` : 'Pure';
+            }
+            children = [];
+            break;
           case CONCURRENT_MODE_NUMBER:
           case CONCURRENT_MODE_SYMBOL_STRING:
           case DEPRECATED_ASYNC_MODE_SYMBOL_STRING:
