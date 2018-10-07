@@ -48,8 +48,8 @@ class ProfileCollector {
   }
 
   _takeCommitSnapshotForRoot(id: string, data: any) {
-    const interactionsArray = data.stateNode.memoizedInteractions != null
-      ? Array.from(data.stateNode.memoizedInteractions)
+    const interactionsArray = data.memoizedInteractions != null
+      ? Array.from(data.memoizedInteractions)
       : [];
 
     // Map interaction start times to when we started profiling.
@@ -95,7 +95,7 @@ class ProfileCollector {
     this._maxActualDuration = Math.max(this._maxActualDuration, data.actualDuration);
   };
 
-  _onRootCommitted = (id: string, data: any) => {
+  _onRootCommitted = (id: string, internalInstance: any, data: any) => {
     if (!this._isRecording) {
       return;
     }
