@@ -158,6 +158,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var actualDuration = null;
     var actualStartTime = null;
     var treeBaseDuration = null;
+    var memoizedInteractions = null;
 
     var resolvedType = type;
     if (typeof type === 'object' && type !== null) {
@@ -181,6 +182,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           if (context && Object.keys(context).length === 0) {
             context = null;
           }
+          memoizedInteractions = publicInstance.memoizedInteractions;
         }
         const inst = publicInstance;
         if (inst) {
@@ -355,6 +357,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       text,
       updater,
       publicInstance,
+      memoizedInteractions,
 
       // Profiler data
       actualDuration,
@@ -524,6 +527,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function markRootCommitted(fiber) {
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
+      data: getDataFiber(fiber),
       renderer: rid,
       type: 'rootCommitted',
     });
