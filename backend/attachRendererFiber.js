@@ -86,8 +86,9 @@ function getInternalReactConstants(version) {
     PURE_SYMBOL_STRING: 'Symbol(react.pure)',
     STRICT_MODE_NUMBER: 0xeacc,
     STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
-    PLACEHOLDER_NUMBER: 0xead1,
-    PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
+    SUSPENSE_NUMBER: 0xead1,
+    SUSPENSE_SYMBOL_STRING: 'Symbol(react.suspense)',
+    DEPRECATED_PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
   };
   ReactTypeOfSideEffect = {
     PerformedWork: 1,
@@ -133,8 +134,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     PURE_SYMBOL_STRING,
     STRICT_MODE_NUMBER,
     STRICT_MODE_SYMBOL_STRING,
-    PLACEHOLDER_NUMBER,
-    PLACEHOLDER_SYMBOL_STRING,
+    SUSPENSE_NUMBER,
+    SUSPENSE_SYMBOL_STRING,
+    DEPRECATED_PLACEHOLDER_SYMBOL_STRING,
   } = ReactSymbols;
 
   // TODO: we might want to change the data structure
@@ -302,10 +304,11 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             name = 'StrictMode';
             children = [];
             break;
-          case PLACEHOLDER_NUMBER:
-          case PLACEHOLDER_SYMBOL_STRING:
+          case SUSPENSE_NUMBER:
+          case SUSPENSE_SYMBOL_STRING:
+          case DEPRECATED_PLACEHOLDER_SYMBOL_STRING:
             nodeType = 'Special';
-            name = 'Placeholder';
+            name = 'Suspense';
             props = fiber.memoizedProps;
             children = [];
             break;
