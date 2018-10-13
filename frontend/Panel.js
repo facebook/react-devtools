@@ -72,6 +72,7 @@ type State = {
   themeName: ?string,
   showTroubleshooting: boolean,
   hideSymbol: boolean,
+  hideDisplayNamed: boolean,
 };
 
 class Panel extends React.Component<Props, State> {
@@ -101,6 +102,7 @@ class Panel extends React.Component<Props, State> {
       themeKey: 0,
       themeName: props.themeName,
       hideSymbol: true,
+      hideDisplayNamed: true,
     };
     this._unMounted = false;
     window.panel = this;

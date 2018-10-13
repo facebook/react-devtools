@@ -109,6 +109,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   hideSymbol: boolean;
+  hideDisplayNamed: boolean;
   breadcrumbHead: ?ElementID;
   snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
@@ -144,6 +145,7 @@ class Store extends EventEmitter {
     this.refreshSearch = false;
     this.themeStore = themeStore;
     this.hideSymbol = true;
+    this.hideDisplayNamed = true;
 
     // for debugging
     window.store = this;
@@ -385,6 +387,11 @@ class Store extends EventEmitter {
     this.emit('hideSymbol');
   }
 
+  changeHideDisplayNamed(enabled: boolean) {
+    this.hideDisplayNamed = enabled;
+    this.emit('hideDisplayNamed');
+  }
+
   showPreferencesPanel() {
     this.preferencesPanelShown = true;
     this.emit('preferencesPanelShown');
@@ -527,7 +534,11 @@ class Store extends EventEmitter {
       var node = this.get(id);
       var nodeType = node.get('nodeType');
 
-      if (nodeType !== 'Wrapper' && nodeType !== 'Native' && !(nodeType === 'Composite' && this.hideSymbol && node.get('hideSymbol'))) {
+      if (
+          nodeType !== 'Wrapper' && nodeType !== 'Native' &&
+          !(nodeType === 'Composite' && this.hideSymbol && node.get('hideSymbol')) &&
+          !(nodeType === 'Composite' && this.hideDisplayNamed && node.get('hideDisplayNamed'))
+      ) {
         return id;
       }
       if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {

@@ -505,6 +505,7 @@ function wrapWithHoc(Component) {
       return <div><Component /></div>;
     }
   }
+  HigherOrderComponent.displayName = 'HigherOrderComponent(Nested)';
   if (typeof Symbol === 'function') {
     HigherOrderComponent[Symbol.for('react.devtools.hide')] = true;
   }
