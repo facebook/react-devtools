@@ -184,9 +184,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             context = null;
           }
         }
-        if (name === 'HigherOrderComponent') {
-          console.log('fiber backend', fiber);
-        }
         const inst = publicInstance;
         if (inst) {
           updater = {
@@ -360,13 +357,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       text,
       updater,
       publicInstance,
+      hideSymbol,
 
       // Profiler data
       actualDuration,
       actualStartTime,
       treeBaseDuration,
-
-      hideSymbol,
     };
   }
 
