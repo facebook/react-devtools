@@ -536,8 +536,8 @@ class Store extends EventEmitter {
 
       if (
           nodeType !== 'Wrapper' && nodeType !== 'Native' &&
-          !(nodeType === 'Composite' && this.hideSymbol && node.get('hideSymbol')) &&
-          !(nodeType === 'Composite' && this.hideDisplayNamed && node.get('hideDisplayNamed'))
+          !(this.hideSymbol && node.get('hideSymbol')) &&
+          !(this.hideDisplayNamed && node.get('hideDisplayNamed'))
       ) {
         return id;
       }
