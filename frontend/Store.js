@@ -144,8 +144,8 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.refreshSearch = false;
     this.themeStore = themeStore;
-    this.hideSymbol = true;
-    this.hideDisplayNamed = true;
+    this.hideSymbol = false;
+    this.hideDisplayNamed = false;
 
     // for debugging
     window.store = this;
