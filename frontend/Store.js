@@ -20,6 +20,10 @@ var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
+var {get, set} = require('../utils/storage');
+
+const LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL = 'preferences:hideSymbol';
+const LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED = 'preferences:hideDisplayNamed';
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
@@ -144,8 +148,8 @@ class Store extends EventEmitter {
     this.colorizerState = null;
     this.refreshSearch = false;
     this.themeStore = themeStore;
-    this.hideSymbol = false;
-    this.hideDisplayNamed = false;
+    this.hideSymbol = get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false);
+    this.hideDisplayNamed = get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false);
 
     // for debugging
     window.store = this;
@@ -384,11 +388,13 @@ class Store extends EventEmitter {
 
   changeHideSymbol(enabled: boolean) {
     this.hideSymbol = enabled;
+    set(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, enabled);
     this.emit('hideSymbol');
   }
 
   changeHideDisplayNamed(enabled: boolean) {
     this.hideDisplayNamed = enabled;
+    set(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, enabled);
     this.emit('hideDisplayNamed');
   }
 
