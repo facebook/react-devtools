@@ -32,8 +32,7 @@ type PropsType = {
   isBottomTagSelected: boolean,
   searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
-  hideSymbol: boolean,
-  hideDisplayNamed: boolean,
+  isHiddenNode: boolean,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
   onContextMenu: () => void,
@@ -204,11 +203,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     let children = node.get('children');
 
-    if (
-        node.get('nodeType') === 'Wrapper' ||
-        (this.props.hideSymbol && node.get('hideSymbol')) ||
-        (this.props.hideDisplayNamed && node.get('hideDisplayNamed'))
-    ) {
+    if (node.get('nodeType') === 'Wrapper' || this.props.isHiddenNode) {
       return children.map(child =>
         <WrappedNode key={child} id={child} depth={depth}/>
       );
@@ -441,8 +436,7 @@ var WrappedNode = decorate({
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
       searchRegExp: props.searchRegExp,
-      hideSymbol: store.hideSymbol,
-      hideDisplayNamed: store.hideDisplayNamed,
+      isHiddenNode: store.isHiddenNode(node),
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);

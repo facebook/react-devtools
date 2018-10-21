@@ -125,6 +125,7 @@ const fauxStore = {
   setHover: noop,
   selectBottom: noop,
   selectTop: noop,
+  isHiddenNode: noop,
 };
 
 const panelStyle = (theme: Theme) => ({

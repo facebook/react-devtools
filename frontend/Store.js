@@ -540,11 +540,7 @@ class Store extends EventEmitter {
       var node = this.get(id);
       var nodeType = node.get('nodeType');
 
-      if (
-          nodeType !== 'Wrapper' && nodeType !== 'Native' &&
-          !(this.hideSymbol && node.get('hideSymbol')) &&
-          !(this.hideDisplayNamed && node.get('hideDisplayNamed'))
-      ) {
+      if (nodeType !== 'Wrapper' && nodeType !== 'Native' && !this.isHiddenNode(node)) {
         return id;
       }
       if (nodeType === 'Native' && (!up || this.get(this._parents.get(id)).get('nodeType') !== 'NativeWrapper')) {
@@ -567,6 +563,11 @@ class Store extends EventEmitter {
         id = childId;
       }
     }
+  }
+
+  isHiddenNode(node: DataType) {
+    return this.hideSymbol && node.get('hideSymbol') ||
+      this.hideDisplayNamed && node.get('hideDisplayNamed');
   }
 
   off(evt: string, fn: ListenerFunction): void {
