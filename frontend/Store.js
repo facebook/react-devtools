@@ -390,12 +390,23 @@ class Store extends EventEmitter {
     this.hideSymbol = enabled;
     set(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, enabled);
     this.emit('hideSymbol');
+    this._reselect();
   }
 
   changeHideDisplayNamed(enabled: boolean) {
     this.hideDisplayNamed = enabled;
     set(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, enabled);
     this.emit('hideDisplayNamed');
+    this._reselect();
+  }
+
+  _reselect() {
+    var selected = this.selected;
+    if (!selected) {
+      return;
+    }
+    this._revealDeep(selected);
+    this.select(this.skipWrapper(selected));
   }
 
   showPreferencesPanel() {
