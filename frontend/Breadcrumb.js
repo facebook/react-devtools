@@ -72,11 +72,7 @@ class Breadcrumb extends React.Component<Props, State> {
       <ul style={containerStyle(theme)}>
         {path.map(({ id, node }) => {
           const isSelected = id === selected;
-          const style = itemStyle(
-            isSelected,
-            node.get('nodeType'),
-            theme,
-          );
+          const style = itemStyle({isSelected, nodeType: node.get('nodeType')}, theme);
 
           return (
             <li
@@ -127,7 +123,10 @@ const containerStyle = (theme: Theme) => ({
   overflow: 'auto',
 });
 
-const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {
+const itemStyle = (
+  {isSelected, nodeType}: {isSelected: boolean, nodeType: string},
+  theme: Theme
+) => {
   let color;
   if (isSelected) {
     color = theme.state02;

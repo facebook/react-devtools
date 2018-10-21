@@ -298,7 +298,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle(inverted, nodeType, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle({inverted, nodeType}, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -329,7 +329,7 @@ class Node extends React.Component<PropsType, StateType> {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle(inverted && (isBottomTagSelected || collapsed), nodeType, theme);
+    const jsxCloseTagStyle = jsxTagStyle({inverted: inverted && (isBottomTagSelected || collapsed), nodeType}, theme);
     const closeTag = (
       <Fragment>
         &lt;/
@@ -343,7 +343,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     const headInverted = inverted && (!isBottomTagSelected || collapsed);
 
-    const jsxOpenTagStyle = jsxTagStyle(inverted && (!isBottomTagSelected || collapsed), nodeType, theme);
+    const jsxOpenTagStyle = jsxTagStyle({inverted: inverted && (!isBottomTagSelected || collapsed), nodeType}, theme);
     const head = (
       <div style={sharedHeadStyle} {...headEvents}>
         <span
@@ -512,7 +512,10 @@ const headStyle = ({
   };
 };
 
-const jsxTagStyle = (inverted: boolean, nodeType: string, theme: Theme) => {
+const jsxTagStyle = (
+  {inverted, nodeType}: {inverted: boolean, nodeType: string},
+  theme: Theme
+) => {
   let color;
   if (inverted) {
     color = theme.state02;
