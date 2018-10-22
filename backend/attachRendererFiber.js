@@ -208,7 +208,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           if (context && Object.keys(context).length === 0) {
             context = null;
           }
-          memoizedInteractions = publicInstance.memoizedInteractions;
         }
         const inst = publicInstance;
         if (inst) {
@@ -235,6 +234,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case HostRoot:
         nodeType = 'Wrapper';
         children = [];
+        memoizedInteractions = fiber.stateNode.memoizedInteractions;
         break;
       case HostPortal:
         nodeType = 'Portal';
