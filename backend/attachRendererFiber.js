@@ -29,16 +29,13 @@ function getInternalReactConstants(version) {
   if (semver.gte(version, '16.6.0-beta.0')) {
     ReactTypeOfWork = {
       ClassComponent: 1,
-      ClassComponentLazy: -1, // Removed
       ContextConsumer: 9,
       ContextProvider: 10,
       CoroutineComponent: -1, // Removed
       CoroutineHandlerPhase: -1, // Removed
       ForwardRef: 11,
-      ForwardRefLazy: -1, // Removed
       Fragment: 7,
       FunctionalComponent: 0,
-      FunctionalComponentLazy: -1, // Removed
       HostComponent: 5,
       HostPortal: 4,
       HostRoot: 3,
@@ -55,16 +52,13 @@ function getInternalReactConstants(version) {
   } else if (semver.gte(version, '16.4.3-alpha')) {
     ReactTypeOfWork = {
       ClassComponent: 2,
-      ClassComponentLazy: 3,
       ContextConsumer: 11,
       ContextProvider: 12,
       CoroutineComponent: -1, // Removed
       CoroutineHandlerPhase: -1, // Removed
       ForwardRef: 13,
-      ForwardRefLazy: 14,
       Fragment: 9,
       FunctionalComponent: 0,
-      FunctionalComponentLazy: 1,
       HostComponent: 7,
       HostPortal: 6,
       HostRoot: 5,
@@ -81,16 +75,13 @@ function getInternalReactConstants(version) {
   } else {
     ReactTypeOfWork = {
       ClassComponent: 2,
-      ClassComponentLazy: -1, // Doesn't exist yet
       ContextConsumer: 12,
       ContextProvider: 13,
       CoroutineComponent: 7,
       CoroutineHandlerPhase: 8,
       ForwardRef: 14,
-      ForwardRefLazy: -1, // Doesn't exist yet
       Fragment: 10,
       FunctionalComponent: 1,
-      FunctionalComponentLazy: -1, // Doesn't exist yet
       HostComponent: 5,
       HostPortal: 4,
       HostRoot: 3,
@@ -144,9 +135,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   var {PerformedWork} = ReactTypeOfSideEffect;
   var {
     FunctionalComponent,
-    FunctionalComponentLazy,
     ClassComponent,
-    ClassComponentLazy,
     ContextConsumer,
     HostRoot,
     HostPortal,
@@ -154,7 +143,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     HostText,
     Fragment,
     ForwardRef,
-    ForwardRefLazy,
   } = ReactTypeOfWork;
   var {
     CONCURRENT_MODE_NUMBER,
@@ -208,9 +196,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
     switch (fiber.tag) {
       case FunctionalComponent:
-      case FunctionalComponentLazy:
       case ClassComponent:
-      case ClassComponentLazy:
         nodeType = 'Composite';
         name = getDisplayName(resolvedType);
         publicInstance = fiber.stateNode;
@@ -235,7 +221,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         children = [];
         break;
       case ForwardRef:
-      case ForwardRefLazy:
         const functionName = getDisplayName(resolvedType.render, '');
         nodeType = 'Special';
         name = resolvedType.displayName || (
