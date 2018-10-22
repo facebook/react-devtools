@@ -23,51 +23,86 @@ function getInternalReactConstants(version) {
   var ReactTypeOfSideEffect;
 
   // **********************************************************
-  // The section below is copy-pasted from files in React repo.
+  // The section below is copied from files in React repo.
   // Keep it in sync, and add version guards if it changes.
   // **********************************************************
-  if (semver.gte(version, '16.4.3-alpha')) {
+  if (semver.gte(version, '16.6.0-beta.0')) {
     ReactTypeOfWork = {
+      ClassComponent: 1,
+      ClassComponentLazy: -1, // Removed
+      ContextConsumer: 9,
+      ContextProvider: 10,
+      CoroutineComponent: -1, // Removed
+      CoroutineHandlerPhase: -1, // Removed
+      ForwardRef: 11,
+      ForwardRefLazy: -1, // Removed
+      Fragment: 7,
       FunctionalComponent: 0,
-      FunctionalComponentLazy: 1,
+      FunctionalComponentLazy: -1, // Removed
+      HostComponent: 5,
+      HostPortal: 4,
+      HostRoot: 3,
+      HostText: 6,
+      IndeterminateComponent: 2,
+      LazyComponent: 16,
+      MemoComponent: 14,
+      Mode: 8,
+      Profiler: 12,
+      SimpleMemoComponent: 15,
+      SuspenseComponent: 13,
+      YieldComponent: -1, // Removed
+    };
+  } else if (semver.gte(version, '16.4.3-alpha')) {
+    ReactTypeOfWork = {
       ClassComponent: 2,
       ClassComponentLazy: 3,
-      IndeterminateComponent: 4,
-      HostRoot: 5,
-      HostPortal: 6,
-      HostComponent: 7,
-      HostText: 8,
-      Fragment: 9,
-      Mode: 10,
       ContextConsumer: 11,
       ContextProvider: 12,
+      CoroutineComponent: -1, // Removed
+      CoroutineHandlerPhase: -1, // Removed
       ForwardRef: 13,
       ForwardRefLazy: 14,
+      Fragment: 9,
+      FunctionalComponent: 0,
+      FunctionalComponentLazy: 1,
+      HostComponent: 7,
+      HostPortal: 6,
+      HostRoot: 5,
+      HostText: 8,
+      IndeterminateComponent: 4,
+      LazyComponent: -1, // Doesn't exist yet
+      MemoComponent: -1, // Doesn't exist yet
+      Mode: 10,
       Profiler: 15,
-      PlaceholderComponent: 16,
+      SimpleMemoComponent: -1, // Doesn't exist yet
+      SuspenseComponent: 16,
+      YieldComponent: -1, // Removed
     };
   } else {
     ReactTypeOfWork = {
-      IndeterminateComponent: 0,
-      FunctionalComponent: 1,
-      FunctionalComponentLazy: -1, // Doesn't exist yet
       ClassComponent: 2,
       ClassComponentLazy: -1, // Doesn't exist yet
-      HostRoot: 3,
-      HostPortal: 4,
-      HostComponent: 5,
-      HostText: 6,
-      CoroutineComponent: 7,
-      CoroutineHandlerPhase: 8,
-      YieldComponent: 9,
-      Fragment: 10,
-      Mode: 11,
       ContextConsumer: 12,
       ContextProvider: 13,
+      CoroutineComponent: 7,
+      CoroutineHandlerPhase: 8,
       ForwardRef: 14,
       ForwardRefLazy: -1, // Doesn't exist yet
+      Fragment: 10,
+      FunctionalComponent: 1,
+      FunctionalComponentLazy: -1, // Doesn't exist yet
+      HostComponent: 5,
+      HostPortal: 4,
+      HostRoot: 3,
+      HostText: 6,
+      IndeterminateComponent: 0,
+      LazyComponent: -1, // Doesn't exist yet
+      MemoComponent: -1, // Doesn't exist yet
+      Mode: 11,
       Profiler: 15,
-      Placeholder: 16,
+      SimpleMemoComponent: -1, // Doesn't exist yet
+      SuspenseComponent: 16,
+      YieldComponent: 9,
     };
   }
   ReactSymbols = {
@@ -94,8 +129,9 @@ function getInternalReactConstants(version) {
     PerformedWork: 1,
   };
   // **********************************************************
-  // End of copy paste.
+  // End of copied code.
   // **********************************************************
+
   return {
     ReactTypeOfWork,
     ReactSymbols,
@@ -167,6 +203,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         resolvedType = type._reactResult;
       }
     }
+
+    // TODO: Add support for new tags LazyComponent, MemoComponent, and SimpleMemoComponent
 
     switch (fiber.tag) {
       case FunctionalComponent:
