@@ -144,8 +144,8 @@ class Store extends EventEmitter {
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
-    this.traceupdatesState = null;
-    this.colorizerState = null;
+    this.traceupdatesState = {enabled: false};
+    this.colorizerState = {enabled: false};
     this.refreshSearch = false;
     this.themeStore = themeStore;
     this.hideSymbol = get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false);
@@ -225,10 +225,11 @@ class Store extends EventEmitter {
       clearTimeout(this._eventTimer);
       this._eventTimer = null;
     }
-    this._eventQueue.forEach(evt => {
+    var eventQueue = this._eventQueue;
+    this._eventQueue = [];
+    eventQueue.forEach(evt => {
       EventEmitter.prototype.emit.call(this, evt);
     });
-    this._eventQueue = [];
   }
 
   // Public actions
