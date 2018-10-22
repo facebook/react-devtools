@@ -163,7 +163,7 @@ function getBreadcrumbPath(store: Store): BreadcrumbPath {
 }
 
 module.exports = decorate({
-  listeners: () => ['breadcrumbHead', 'selected', 'hideSymbol', 'hideDisplayNamed'],
+  listeners: () => ['breadcrumbHead', 'selected', 'hideSymbolChange', 'hideDisplayNamedChange'],
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),

@@ -22,18 +22,16 @@ const ThemeEditor = require('./Themes/Editor/Editor');
 const Hoverable = require('./Hoverable');
 const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+const HidingSymbolFrontendControl = require('../plugins/HidingComponents/SymbolFrontendControl');
+const HidingDisplayNamedFrontendControl = require('../plugins/HidingComponents/DisplayNamedFrontendControl');
 
 import type {Theme} from './types';
 
 type Props = {
   changeTheme: (themeName: string) => void,
-  changeHideSymbol: (enabled: boolean) => void,
-  changeHideDisplayNamed: (enabled: boolean) => void,
   hasCustomTheme: boolean,
   hide: () => void,
   open: bool,
-  hideSymbol: bool,
-  hideDisplayNamed: bool,
 };
 
 type State = {
@@ -73,7 +71,7 @@ class PreferencesPanel extends React.Component<Props, State> {
 
   render() {
     const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
-    const {hasCustomTheme, hide, open, hideSymbol, hideDisplayNamed} = this.props;
+    const {hasCustomTheme, hide, open} = this.props;
     const {editMode} = this.state;
 
     if (!open) {
@@ -122,25 +120,12 @@ class PreferencesPanel extends React.Component<Props, State> {
               <EditIcon />
             </EditButton>
           </div>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={hideSymbol}
-                onChange={this._changeHideSymbol}
-              />
-              Hide components with truthy <code>Symbol.for('react.devtools.hide')</code> property
-            </label>
+          <h4 style={styles.header}>Hiding components</h4>
+          <div style={styles.preference}>
+            <HidingSymbolFrontendControl />
           </div>
-          <div>
-            <label>
-              <input
-                type="checkbox"
-                checked={hideDisplayNamed}
-                onChange={this._changeHideDisplayNamed}
-              />
-              Hide components with custom <code>displayName</code> property
-            </label>
+          <div style={styles.preference}>
+            <HidingDisplayNamedFrontendControl />
           </div>
           <div style={styles.buttonBar}>
             <button
@@ -166,18 +151,6 @@ class PreferencesPanel extends React.Component<Props, State> {
 
     changeTheme(event.target.value);
   };
-
-  _changeHideSymbol = (event) => {
-    const {changeHideSymbol} = this.props;
-
-    changeHideSymbol(event.target.checked);
-  }
-
-  _changeHideDisplayNamed = (event) => {
-    const {changeHideDisplayNamed} = this.props;
-
-    changeHideDisplayNamed(event.target.checked);
-  }
 
   _hide = () => {
     const {hide} = this.props;
@@ -244,18 +217,14 @@ const blockClick = event => event.stopPropagation();
 
 const WrappedPreferencesPanel = decorate({
   listeners() {
-    return ['preferencesPanelShown', 'hideSymbol', 'hideDisplayNamed'];
+    return ['preferencesPanelShown'];
   },
   props(store, props) {
     return {
       changeTheme: themeName => store.changeTheme(themeName),
-      changeHideSymbol: enabled => store.changeHideSymbol(enabled),
-      changeHideDisplayNamed: enabled => store.changeHideDisplayNamed(enabled),
       hasCustomTheme: !!store.themeStore.customTheme,
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
-      hideSymbol: store.hideSymbol,
-      hideDisplayNamed: store.hideDisplayNamed,
     };
   },
 }, PreferencesPanel);

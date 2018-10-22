@@ -112,8 +112,8 @@ class Store extends EventEmitter {
   selectedTab: string;
   selected: ?ElementID;
   themeStore: ThemeStore;
-  hideSymbol: boolean;
-  hideDisplayNamed: boolean;
+  hideSymbol: ControlState;
+  hideDisplayNamed: ControlState;
   breadcrumbHead: ?ElementID;
   snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
@@ -148,8 +148,8 @@ class Store extends EventEmitter {
     this.colorizerState = {enabled: false};
     this.refreshSearch = false;
     this.themeStore = themeStore;
-    this.hideSymbol = get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false);
-    this.hideDisplayNamed = get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false);
+    this.hideSymbol = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false)};
+    this.hideDisplayNamed = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false)};
 
     // for debugging
     window.store = this;
@@ -387,17 +387,17 @@ class Store extends EventEmitter {
     this.emit('theme');
   }
 
-  changeHideSymbol(enabled: boolean) {
-    this.hideSymbol = enabled;
-    set(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, enabled);
-    this.emit('hideSymbol');
+  changeHideSymbol(state: ControlState) {
+    this.hideSymbol = state;
+    set(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, state.enabled);
+    this.emit('hideSymbolChange');
     this._reselect();
   }
 
-  changeHideDisplayNamed(enabled: boolean) {
-    this.hideDisplayNamed = enabled;
-    set(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, enabled);
-    this.emit('hideDisplayNamed');
+  changeHideDisplayNamed(state: ControlState) {
+    this.hideDisplayNamed = state;
+    set(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, state.enabled);
+    this.emit('hideDisplayNamedChange');
     this._reselect();
   }
 
@@ -578,8 +578,8 @@ class Store extends EventEmitter {
   }
 
   isHiddenNode(node: DataType) {
-    return this.hideSymbol && node.get('hideSymbol') ||
-      this.hideDisplayNamed && node.get('hideDisplayNamed');
+    return this.hideSymbol.enabled && node.get('hideSymbol') ||
+      this.hideDisplayNamed.enabled && node.get('hideDisplayNamed');
   }
 
   off(evt: string, fn: ListenerFunction): void {

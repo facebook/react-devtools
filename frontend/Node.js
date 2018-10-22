@@ -419,7 +419,7 @@ Node.contextTypes = {
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id, 'hideSymbol', 'hideDisplayNamed'];
+    return [props.id, 'hideSymbolChange', 'hideDisplayNamedChange'];
   },
   props(store, props) {
     var node = store.get(props.id);
