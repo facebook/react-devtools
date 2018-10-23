@@ -77,7 +77,11 @@ var config: Props = {
         window.${globalPathToType}.prototype &&
         window.${globalPathToType}.prototype.isReactComponent
       ) {
-        inspect(window.${globalPathToInst}.render);
+        if (window.${globalPathToInst}.REACT_HOT_LOADER_RENDERED_GENERATION) {
+          inspect(Object.getPrototypeOf(window.${globalPathToType}));
+        } else {
+          inspect(window.${globalPathToInst}.render);
+        }
       } else {
         inspect(window.${globalPathToType});
       }
