@@ -179,8 +179,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var nodeType = null;
     var name = null;
     var text = null;
-    var hideSymbol = null;
-    var hideDisplayNamed = null;
+    var needHideBySymbol = null;
+    var needHideByParensInName = null;
 
     // Profiler data
     var actualDuration = null;
@@ -205,8 +205,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         publicInstance = fiber.stateNode;
         props = fiber.memoizedProps;
         state = fiber.memoizedState;
-        hideSymbol = typeof Symbol === 'function' && fiber.type[Symbol.for('react.devtools.hide')];
-        hideDisplayNamed = fiber.type.hasOwnProperty('displayName');
+        needHideBySymbol = typeof Symbol === 'function' && fiber.type[Symbol.for('react.devtools.hide')];
+        needHideByParensInName = /\(.*\)/.test(name);
         if (publicInstance != null) {
           context = publicInstance.context;
           if (context && Object.keys(context).length === 0) {
@@ -388,8 +388,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       updater,
       publicInstance,
       memoizedInteractions,
-      hideSymbol,
-      hideDisplayNamed,
+      needHideBySymbol,
+      needHideByParensInName,
 
       // Profiler data
       actualDuration,

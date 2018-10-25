@@ -35,6 +35,8 @@ export type DataType = {
   text: ?string,
   updater: ?(CompositeUpdater | NativeUpdater),
   publicInstance: ?Object,
+  needHideBySymbol: boolean,
+  needHideByParensInName: boolean
 };
 
 // This type is entirely opaque to the backend.

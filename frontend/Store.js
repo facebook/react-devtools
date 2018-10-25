@@ -23,7 +23,7 @@ var ThemeStore = require('./Themes/Store');
 var {get, set} = require('../utils/storage');
 
 const LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL = 'preferences:hideSymbol';
-const LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED = 'preferences:hideDisplayNamed';
+const LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED = 'preferences:hideByParensInName';
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
@@ -113,7 +113,7 @@ class Store extends EventEmitter {
   selected: ?ElementID;
   themeStore: ThemeStore;
   hideSymbol: ControlState;
-  hideDisplayNamed: ControlState;
+  hideByParensInName: ControlState;
   breadcrumbHead: ?ElementID;
   snapshotQueue: Array<Snapshot> = [];
   // an object describing the capabilities of the inspected runtime.
@@ -149,7 +149,7 @@ class Store extends EventEmitter {
     this.refreshSearch = false;
     this.themeStore = themeStore;
     this.hideSymbol = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false)};
-    this.hideDisplayNamed = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false)};
+    this.hideByParensInName = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false)};
 
     // for debugging
     window.store = this;
@@ -394,10 +394,10 @@ class Store extends EventEmitter {
     this._reselect();
   }
 
-  changeHideDisplayNamed(state: ControlState) {
-    this.hideDisplayNamed = state;
+  changeHideByParensInName(state: ControlState) {
+    this.hideByParensInName = state;
     set(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, state.enabled);
-    this.emit('hideDisplayNamedChange');
+    this.emit('hideByParensInNameChange');
     this._reselect();
   }
 
@@ -578,8 +578,8 @@ class Store extends EventEmitter {
   }
 
   isHiddenNode(node: DataType) {
-    return this.hideSymbol.enabled && node.get('hideSymbol') ||
-      this.hideDisplayNamed.enabled && node.get('hideDisplayNamed');
+    return this.hideSymbol.enabled && node.get('needHideBySymbol') ||
+      this.hideByParensInName.enabled && node.get('needHideByParensInName');
   }
 
   off(evt: string, fn: ListenerFunction): void {

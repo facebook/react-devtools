@@ -16,13 +16,13 @@ var SettingsCheckbox = require('../../frontend/SettingsCheckbox');
 
 var Wrapped = decorate({
   listeners() {
-    return ['hideDisplayNamedChange'];
+    return ['hideByParensInNameChange'];
   },
   props(store) {
     return {
-      state: store.hideDisplayNamed,
-      text: 'Hide components with custom \'displayName\' property',
-      onChange: state => store.changeHideDisplayNamed(state),
+      state: store.hideByParensInName,
+      text: 'Hide HOC\'s with parens in name',
+      onChange: state => store.changeHideByParensInName(state),
     };
   },
 }, SettingsCheckbox);

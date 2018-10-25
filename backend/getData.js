@@ -165,13 +165,13 @@ function getData(internalInstance: Object): DataType {
     };
   }
 
-  const hideSymbol = nodeType === 'Composite' &&
+  const needHideBySymbol = nodeType === 'Composite' &&
     typeof Symbol === 'function' &&
     typeof type === 'function' &&
     type[Symbol.for('react.devtools.hide')];
-  const hideDisplayNamed = nodeType === 'Composite' &&
+  const needHideByParensInName = nodeType === 'Composite' &&
     typeof type === 'function' &&
-    type.hasOwnProperty('displayName');
+    name && /\(.*\)/.test(name);
 
   // $FlowFixMe
   return {
@@ -188,8 +188,8 @@ function getData(internalInstance: Object): DataType {
     text,
     updater,
     publicInstance,
-    hideSymbol,
-    hideDisplayNamed,
+    needHideBySymbol,
+    needHideByParensInName,
   };
 }
 
