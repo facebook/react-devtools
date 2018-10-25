@@ -28,7 +28,7 @@ module.exports = function(hook: Hook, agent: Agent) {
 
     // Required by Profiler plugin
     hook.sub('root', ({renderer, internalInstance}) => agent.addRoot(renderer, internalInstance)),
-    hook.sub('rootCommitted', ({renderer, internalInstance}) => agent.rootCommitted(renderer, internalInstance)),
+    hook.sub('rootCommitted', ({renderer, internalInstance, data}) => agent.rootCommitted(renderer, internalInstance, data)),
     hook.sub('updateProfileTimes', ({renderer, internalInstance, data}) => agent.onUpdatedProfileTimes(internalInstance, data)),
   ];
 
