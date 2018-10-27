@@ -11,6 +11,8 @@
 'use strict';
 
 var {EventEmitter} = require('events');
+// TODO $FlowFixMe - it is not documented API? any alternatives?
+var {flushSync} = require('react-dom');
 var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
 var { copy } = require('clipboard-js');
@@ -215,7 +217,7 @@ class Store extends EventEmitter {
     }
     this._eventQueue.push(event);
     if (!this._eventTimer) {
-      this._eventTimer = setTimeout(() => this.flush(), 50);
+      this._eventTimer = setTimeout(flushSync, 50, () => this.flush());
     }
     return true;
   }
