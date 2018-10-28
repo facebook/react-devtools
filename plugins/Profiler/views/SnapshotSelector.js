@@ -281,11 +281,15 @@ class SnapshotSelector extends PureComponent<SnapshotSelectorProps, SnapshotSele
 
   componentWillUnmount() {
     window.removeEventListener('mouseup', this.handleMouseUp);
+    window.document.removeEventListener('mouseleave', this.handleMouseUp);
   }
 
   handleMouseDown = event => this.setState({ isMouseDown: true }, () => {
     window.addEventListener('mouseup', this.handleMouseUp);
+    // Treat mousing out of the document as a mouse up
+    window.document.addEventListener('mouseleave', this.handleMouseUp);
   });
+
   handleMouseUp = event => this.setState({ isMouseDown: false });
 
   render() {
