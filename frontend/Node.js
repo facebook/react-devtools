@@ -82,6 +82,13 @@ class Node extends React.Component<PropsType, StateType> {
     } else if (!this.props.selected && prevProps.selected) {
       // Losing selection.
       this.unsubscribeFromWindowFocus();
+    } else if (
+      this.props.selected &&
+      this.props.node &&
+      this.props.node.get('collapsed') !== prevProps.node.get('collapsed')
+    ) {
+      // Collapsing/expanding.
+      this.ensureInView();
     }
   }
 
