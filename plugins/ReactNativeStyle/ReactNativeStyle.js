@@ -89,12 +89,14 @@ class NativeStyler extends React.Component<Props, State> {
     this.setState({style, measuredLayout});
   }
 
-  _handleStyleChange(attr: string, val: string | number) {
+  _handleStyleChange(attr: string, val: string | number): Promise<void> {
     if (this.state.style) {
       this.state.style[attr] = val;
     }
     this.props.bridge.send('rn-style:set', {id: this.props.id, attr, val});
-    this.setState({style: this.state.style});
+    return new Promise(resolve => {
+      this.setState({style: this.state.style}, () => resolve());
+    });
   }
 
   _handleStyleRename(oldName: string, newName: string, val: string | number) {

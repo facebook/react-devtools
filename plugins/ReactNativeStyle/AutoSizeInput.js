@@ -24,6 +24,8 @@ type Context = {
 };
 type Props = {
   onChange: (text: string|number) => any,
+  onNavigateNext?: () => any,
+  inputRef?: (input: HTMLInputElement) => any,
   value: string|number,
   type?: string,
   isNew?: boolean,
@@ -96,7 +98,6 @@ class AutoSizeInput extends React.Component<Props, State> {
   onKeyDown(e: KeyboardEvent) {
     if (e.key === 'Enter' || e.key === 'Escape') {
       this.done();
-      return;
     } else if (e.key === 'ArrowUp') {
       if (+this.state.text + '' === this.state.text) {
         this.props.onChange(+this.state.text + 1);
@@ -105,7 +106,21 @@ class AutoSizeInput extends React.Component<Props, State> {
       if (+this.state.text + '' === this.state.text) {
         this.props.onChange(+this.state.text - 1);
       }
+    } else if (e.keyCode === 9 && !e.shiftKey) { // tab pressed without shift
+      this.onTabPressed(e);
     }
+  }
+
+  onTabPressed(e: KeyboardEvent) {
+    if (this.props.onNavigateNext) {
+      e.preventDefault(); 
+    }
+    this.done()
+      .then(() => { // TODO move navigateNext logic into done()
+        if (this.props.onNavigateNext) {
+          this.props.onNavigateNext();
+        }
+      });
   }
 
   onFocus() {
@@ -120,15 +135,16 @@ class AutoSizeInput extends React.Component<Props, State> {
     input.style.padding = '0px 1px';
   }
 
-  done() {
+  done(): Promise<void> {
     const input = this.input;
     input.style.color = this.getColor();
     input.style.boxShadow = 'none';
     input.style.border = 'none';
     input.style.padding = '1px 2px';
     if (this.state.text !== '' + this.props.value || this.props.isNew) {
-      this.props.onChange(this.state.text);
+      return this.props.onChange(this.state.text);
     }
+    return Promise.resolve();
   }
 
   getColor() {
@@ -143,7 +159,12 @@ class AutoSizeInput extends React.Component<Props, State> {
     return (
       <div style={styles.wrapper}>
         <Input
-          innerRef={i => this.input = i}
+          innerRef={i => {
+            this.input = i;
+            if (this.props.inputRef) {
+              this.props.inputRef(i);
+            }
+          }}
           value={this.state.text}
           style={style}
           onChange={e => this.setState({text: e.target.value})}
