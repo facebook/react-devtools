@@ -45,8 +45,8 @@ class SettingsCheckbox extends React.Component<Props, State> {
   }
 
   componentDidMount(): void {
-    if (!this.props.state !== this._defaultState) {
-      this.props.onChange(this._defaultState);
+    if (this.props.state && (this.props.state !== this._defaultState)) {
+      this.props.onChange(this.props.state);
     }
   }
 
