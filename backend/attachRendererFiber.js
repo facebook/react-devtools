@@ -40,6 +40,7 @@ function getInternalReactConstants(version) {
       HostPortal: 4,
       HostRoot: 3,
       HostText: 6,
+      IncompleteClassComponent: 17,
       IndeterminateComponent: 2,
       LazyComponent: 16,
       MemoComponent: 14,
@@ -63,6 +64,7 @@ function getInternalReactConstants(version) {
       HostPortal: 6,
       HostRoot: 5,
       HostText: 8,
+      IncompleteClassComponent: -1, // Doesn't exist yet
       IndeterminateComponent: 4,
       LazyComponent: -1, // Doesn't exist yet
       MemoComponent: -1, // Doesn't exist yet
@@ -86,6 +88,7 @@ function getInternalReactConstants(version) {
       HostPortal: 4,
       HostRoot: 3,
       HostText: 6,
+      IncompleteClassComponent: -1, // Doesn't exist yet
       IndeterminateComponent: 0,
       LazyComponent: -1, // Doesn't exist yet
       MemoComponent: -1, // Doesn't exist yet
@@ -137,12 +140,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     FunctionalComponent,
     ClassComponent,
     ContextConsumer,
+    Fragment,
+    ForwardRef,
     HostRoot,
     HostPortal,
     HostComponent,
     HostText,
-    Fragment,
-    ForwardRef,
+    IncompleteClassComponent,
+    IndeterminateComponent,
     MemoComponent,
     SimpleMemoComponent,
   } = ReactTypeOfWork;
@@ -197,8 +202,10 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     // TODO: Add support for new tags LazyComponent, MemoComponent, and SimpleMemoComponent
 
     switch (fiber.tag) {
-      case FunctionalComponent:
       case ClassComponent:
+      case FunctionalComponent:
+      case IncompleteClassComponent:
+      case IndeterminateComponent:
         nodeType = 'Composite';
         name = getDisplayName(resolvedType);
         publicInstance = fiber.stateNode;
