@@ -199,8 +199,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       }
     }
 
-    // TODO: Add support for new tags LazyComponent, MemoComponent, and SimpleMemoComponent
-
     switch (fiber.tag) {
       case ClassComponent:
       case FunctionalComponent:
