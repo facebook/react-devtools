@@ -419,7 +419,7 @@ class Store extends EventEmitter {
       return;
     }
     this._revealDeep(selected);
-    this.select(this.skipWrapper(selected));
+    this.select(this.skipWrapper(selected), true);
   }
 
   showPreferencesPanel() {
