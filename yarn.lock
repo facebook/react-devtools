@@ -92,7 +92,12 @@ addons-linter@0.22.3:
     yargs "8.0.2"
     yauzl "2.8.0"
 
-adm-zip@^0.4.7, adm-zip@~0.4.x:
+adm-zip@^0.4.7:
+  version "0.4.11"
+  resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.4.11.tgz#2aa54c84c4b01a9d0fb89bb11982a51f13e3d62a"
+  integrity sha512-L8vcjDTCOIJk7wFvmlEUN7AsSb8T+2JrdP7KINBjzr24TJ5Mwj590sLu3BC7zNZowvJWa/JtPmD8eJCzdtDWjA==
+
+adm-zip@~0.4.x:
   version "0.4.7"
   resolved "https://registry.yarnpkg.com/adm-zip/-/adm-zip-0.4.7.tgz#8606c2cbf1c426ce8c8ec00174447fd49b6eafc1"
 
