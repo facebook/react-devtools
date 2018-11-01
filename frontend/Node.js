@@ -33,6 +33,7 @@ type PropsType = {
   searchRegExp: ?RegExp,
   wrappedChildren: ?Array<any>,
   isHiddenNode: boolean,
+  isDimmedNode: boolean,
   onHover: (isHovered: boolean) => void,
   onHoverBottom: (isHovered: boolean) => void,
   onContextMenu: () => void,
@@ -196,6 +197,7 @@ class Node extends React.Component<PropsType, StateType> {
       wrappedChildren,
     } = this.props;
     const {isWindowFocused} = this.state;
+    const isDimmed = this.props.isDimmedNode;
 
     if (!node) {
       return 'Node was deleted';
@@ -298,7 +300,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     // Single-line tag (collapsed / simple content / no content)
     if (!children || typeof children === 'string' || !children.length) {
-      const jsxSingleLineTagStyle = jsxTagStyle({inverted, nodeType}, theme);
+      const jsxSingleLineTagStyle = jsxTagStyle({inverted, nodeType, isDimmed}, theme);
       const content = children;
       const isCollapsed = content === null || content === undefined;
       return (
@@ -329,7 +331,7 @@ class Node extends React.Component<PropsType, StateType> {
       );
     }
 
-    const jsxCloseTagStyle = jsxTagStyle({inverted: inverted && (isBottomTagSelected || collapsed), nodeType}, theme);
+    const jsxCloseTagStyle = jsxTagStyle({inverted: inverted && (isBottomTagSelected || collapsed), nodeType, isDimmed}, theme);
     const closeTag = (
       <Fragment>
         &lt;/
@@ -343,7 +345,7 @@ class Node extends React.Component<PropsType, StateType> {
 
     const headInverted = inverted && (!isBottomTagSelected || collapsed);
 
-    const jsxOpenTagStyle = jsxTagStyle({inverted: inverted && (!isBottomTagSelected || collapsed), nodeType}, theme);
+    const jsxOpenTagStyle = jsxTagStyle({inverted: inverted && (!isBottomTagSelected || collapsed), nodeType, isDimmed}, theme);
     const head = (
       <div style={sharedHeadStyle} {...headEvents}>
         <span
@@ -419,7 +421,7 @@ Node.contextTypes = {
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id, 'hideSymbolChange', 'hideByParensInNameChange'];
+    return [props.id, 'hidingStyleChange', 'hideSymbolChange', 'hideByParensInNameChange'];
   },
   props(store, props) {
     var node = store.get(props.id);
@@ -437,6 +439,7 @@ var WrappedNode = decorate({
       hovered: store.hovered === props.id,
       searchRegExp: props.searchRegExp,
       isHiddenNode: store.isHiddenNode(node),
+      isDimmedNode: store.isDimmedNode(node),
       onToggleCollapse: e => {
         e.preventDefault();
         store.toggleCollapse(props.id);
@@ -513,7 +516,7 @@ const headStyle = ({
 };
 
 const jsxTagStyle = (
-  {inverted, nodeType}: {inverted: boolean, nodeType: string},
+  {inverted, nodeType, isDimmed}: {inverted: boolean, nodeType: string, isDimmed: boolean},
   theme: Theme
 ) => {
   let color;
@@ -529,6 +532,8 @@ const jsxTagStyle = (
 
   return {
     color,
+    opacity: isDimmed ? 0.8 : 1,
+    fontStyle: isDimmed ? 'italic' : undefined,
   };
 };
 

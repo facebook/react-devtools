@@ -76,6 +76,8 @@ export type ControlState = {
   enabled: boolean,
 } & Record;
 
+export type HidingStyle = 'none' | 'hide' | 'dim';
+
 /**
  * A theme is a color template used throughout devtools.
  * All devtools coloring is declared by themes, with one minor exception: status colors.

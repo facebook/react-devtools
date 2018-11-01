@@ -22,6 +22,7 @@ const ThemeEditor = require('./Themes/Editor/Editor');
 const Hoverable = require('./Hoverable');
 const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
+const HidingEffectFrontendControl = require('../plugins/HidingComponents/EffectFrontendControl');
 const HidingSymbolFrontendControl = require('../plugins/HidingComponents/SymbolFrontendControl');
 const HidingDisplayNamedFrontendControl = require('../plugins/HidingComponents/DisplayNamedFrontendControl');
 
@@ -121,6 +122,11 @@ class PreferencesPanel extends React.Component<Props, State> {
             </EditButton>
           </div>
           <h4 style={styles.header}>Hiding components</h4>
+          <div style={styles.preference}>
+            <HidingEffectFrontendControl value="none" text="No hiding" />
+            <HidingEffectFrontendControl value="hide" text="Hiding" />
+            <HidingEffectFrontendControl value="dim" text="Dimming"/>
+          </div>
           <div style={styles.preference}>
             <HidingSymbolFrontendControl />
           </div>

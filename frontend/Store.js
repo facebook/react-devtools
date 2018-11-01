@@ -24,11 +24,12 @@ var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
 var {get, set} = require('../utils/storage');
 
+const LOCAL_STORAGE_PREFERENCES_HIDING_STYLE = 'preferences:hidingStyle';
 const LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL = 'preferences:hideSymbol';
 const LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED = 'preferences:hideByParensInName';
 
 import type Bridge from '../agent/Bridge';
-import type {ControlState, DOMEvent, ElementID, Theme} from './types';
+import type {ControlState, DOMEvent, ElementID, HidingStyle, Theme} from './types';
 import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
@@ -114,6 +115,7 @@ class Store extends EventEmitter {
   selectedTab: string;
   selected: ?ElementID;
   themeStore: ThemeStore;
+  hidingStyle: HidingStyle;
   hideSymbol: ControlState;
   hideByParensInName: ControlState;
   breadcrumbHead: ?ElementID;
@@ -150,6 +152,7 @@ class Store extends EventEmitter {
     this.colorizerState = {enabled: false};
     this.refreshSearch = false;
     this.themeStore = themeStore;
+    this.hidingStyle = get(LOCAL_STORAGE_PREFERENCES_HIDING_STYLE, 'none');
     this.hideSymbol = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, false)};
     this.hideByParensInName = {enabled: get(LOCAL_STORAGE_PREFERENCES_HIDE_DISPLAY_NAMED, false)};
 
@@ -389,6 +392,13 @@ class Store extends EventEmitter {
     this.emit('theme');
   }
 
+  changeHidingStyle(state: HidingStyle) {
+    this.hidingStyle = state;
+    set(LOCAL_STORAGE_PREFERENCES_HIDING_STYLE, state);
+    this.emit('hidingStyleChange');
+    this._reselect();
+  }
+
   changeHideSymbol(state: ControlState) {
     this.hideSymbol = state;
     set(LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL, state.enabled);
@@ -580,8 +590,19 @@ class Store extends EventEmitter {
   }
 
   isHiddenNode(node: DataType) {
-    return this.hideSymbol.enabled && node.get('needHideBySymbol') ||
-      this.hideByParensInName.enabled && node.get('needHideByParensInName');
+    return this.hidingStyle === 'hide' &&
+      (
+        this.hideSymbol.enabled && node.get('needHideBySymbol') ||
+        this.hideByParensInName.enabled && node.get('needHideByParensInName')
+      );
+  }
+
+  isDimmedNode(node: DataType) {
+    return this.hidingStyle === 'dim' &&
+      (
+        this.hideSymbol.enabled && node.get('needHideBySymbol') ||
+        this.hideByParensInName.enabled && node.get('needHideByParensInName')
+      );
   }
 
   off(evt: string, fn: ListenerFunction): void {

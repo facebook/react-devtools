@@ -19,7 +19,7 @@ const PropTypes = require('prop-types');
 const React = require('react');
 const decorate = require('./decorate');
 
-type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
+type BreadcrumbPath = Array<{id: ElementID, node: Object, isDimmedNode: boolean}>;
 
 type Props = {
   hover: (string, boolean) => void;
@@ -70,9 +70,9 @@ class Breadcrumb extends React.Component<Props, State> {
 
     return (
       <ul style={containerStyle(theme)}>
-        {path.map(({ id, node }) => {
+        {path.map(({ id, node, isDimmedNode }) => {
           const isSelected = id === selected;
-          const style = itemStyle({isSelected, nodeType: node.get('nodeType')}, theme);
+          const style = itemStyle({isSelected, nodeType: node.get('nodeType'), isDimmedNode}, theme);
 
           return (
             <li
@@ -124,7 +124,7 @@ const containerStyle = (theme: Theme) => ({
 });
 
 const itemStyle = (
-  {isSelected, nodeType}: {isSelected: boolean, nodeType: string},
+  {isSelected, nodeType, isDimmedNode}: {isSelected: boolean, nodeType: string, isDimmedNode: boolean},
   theme: Theme
 ) => {
   let color;
@@ -145,6 +145,8 @@ const itemStyle = (
     MozUserSelect: 'none',
     userSelect: 'none',
     display: 'inline-block',
+    opacity: isDimmedNode ? 0.8 : 1,
+    fontStyle: isDimmedNode ? 'italic' : undefined,
   };
 };
 
@@ -152,9 +154,11 @@ function getBreadcrumbPath(store: Store): BreadcrumbPath {
   var path = [];
   var current = store.breadcrumbHead;
   while (current) {
+    const node = store.get(current);
     path.unshift({
       id: current,
-      node: store.get(current),
+      node: node,
+      isDimmedNode: store.isDimmedNode(node),
     });
     current = store.skipWrapper(store.getParent(current), true);
   }
@@ -162,7 +166,7 @@ function getBreadcrumbPath(store: Store): BreadcrumbPath {
 }
 
 module.exports = decorate({
-  listeners: () => ['breadcrumbHead', 'selected', 'hideSymbolChange', 'hideByParensInNameChange'],
+  listeners: () => ['breadcrumbHead', 'selected', 'hidingStyleChange', 'hideSymbolChange', 'hideByParensInNameChange'],
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
