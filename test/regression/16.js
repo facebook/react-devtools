@@ -238,4 +238,18 @@ switch (minor) {
     break;
 }
 
-ReactDOM.render(apps, document.getElementById('root'));
+// This component, with the version prop, helps organize DevTools at a glance.
+function TopLevelWrapperForDevTools({ version }) {
+  return (
+    <div>
+      <h1>React {version}</h1>
+      {apps}
+    </div>
+  );
+}
+TopLevelWrapperForDevTools.displayName = 'React';
+
+ReactDOM.render(
+  <TopLevelWrapperForDevTools version={React.version} />,
+  document.getElementById('root')
+);

@@ -3,8 +3,18 @@ body {
   font-size: 12px;
 }
 
+h1 {
+  margin: 0;
+  font-size: 20px;
+}
+
 h2 {
   margin: 1rem 0 0;
+}
+
+iframe {
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
 }
 
 .Feature {
