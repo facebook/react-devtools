@@ -17,6 +17,22 @@ var semver = require('semver');
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
 
+// Taken from ReactElement.
+function resolveDefaultProps(Component: any, baseProps: Object): Object {
+  if (Component && Component.defaultProps) {
+    // Resolve default props. Taken from ReactElement
+    const props = Object.assign({}, baseProps);
+    const defaultProps = Component.defaultProps;
+    for (const propName in defaultProps) {
+      if (props[propName] === undefined) {
+        props[propName] = defaultProps[propName];
+      }
+    }
+    return props;
+  }
+  return baseProps;
+}
+
 function getInternalReactConstants(version) {
   var ReactTypeOfWork;
   var ReactSymbols;
@@ -352,6 +368,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             break;
         }
         break;
+    }
+
+    if (
+      props !== null &&
+      typeof fiber.elementType !== undefined &&
+      fiber.type !== fiber.elementType
+    ) {
+      props = resolveDefaultProps(fiber.type, props);
     }
 
     if (Array.isArray(children)) {
