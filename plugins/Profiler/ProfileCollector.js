@@ -91,7 +91,11 @@ class ProfileCollector {
       return;
     }
 
-    this._committedNodes.add(data.id);
+    // Don't count suspended, hidden components as part of the render.
+    if (!data.isHidden) {
+      this._committedNodes.add(data.id);
+    }
+
     this._maxActualDuration = Math.max(this._maxActualDuration, data.actualDuration);
   };
 
