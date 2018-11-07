@@ -11,7 +11,7 @@
 'use strict';
 
 var {EventEmitter} = require('events');
-var {Map, Set, List} = require('immutable');
+var {Map, Set, List, Record} = require('immutable');
 var assign = require('object-assign');
 var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
@@ -20,6 +20,9 @@ var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
+const {get, set} = require('../utils/storage');
+
+const LOCAL_STORAGE_TRACE_UPDATES_KEY = 'traceUpdates';
 
 import type Bridge from '../agent/Bridge';
 import type {ControlState, DOMEvent, ElementID, Theme} from './types';
@@ -569,6 +572,7 @@ class Store extends EventEmitter {
     this.emit('traceupdatesstatechange');
     invariant(state.toJS, 'state.toJS should exist');
     this._bridge.send('traceupdatesstatechange', state.toJS());
+    set(LOCAL_STORAGE_TRACE_UPDATES_KEY, state.enabled);
   }
 
   changeColorizer(state: ControlState) {
@@ -600,6 +604,13 @@ class Store extends EventEmitter {
       clearInterval(requestInt);
       this.capabilities = assign(this.capabilities, capabilities);
       this.emit('connected');
+
+      const traceUpdates = get(LOCAL_STORAGE_TRACE_UPDATES_KEY);
+
+      if (traceUpdates) {
+        this.changeTraceUpdates(new Record({enabled: true})());
+      }
+
     });
     this._bridge.send('requestCapabilities');
     requestInt = setInterval(() => {
