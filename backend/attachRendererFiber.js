@@ -303,7 +303,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         break;
       case MemoComponent:
       case SimpleMemoComponent:
-        nodeType = 'Special';
+        nodeType = 'Composite';
         if (elementType.displayName) {
           name = elementType.displayName;
         } else {
@@ -476,6 +476,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case ClassComponent:
       case FunctionalComponent:
       case ContextConsumer:
+      case MemoComponent:
+      case SimpleMemoComponent:
         // For types that execute user code, we check PerformedWork effect.
         // We don't reflect bailouts (either referential or sCU) in DevTools.
         // eslint-disable-next-line no-bitwise
