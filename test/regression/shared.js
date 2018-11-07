@@ -103,6 +103,27 @@ switch (major) {
             </React.Suspense>
           </Feature>
         );
+
+        // lazy
+        const LazyWithDefaultProps = React.lazy(() => new Promise(resolve => {
+          function FooWithDefaultProps(props) {
+            return <h1>{props.greeting}, {props.name}</h1>;
+          }
+          FooWithDefaultProps.defaultProps = {
+            name: 'World',
+            greeting: 'Bonjour',
+          };
+          resolve({
+            default: FooWithDefaultProps,
+          });
+        }));
+        apps.push(
+          <Feature key="lazy" label="lazy" version="16.6+">
+            <React.Suspense fallback={<div>loading...</div>}>
+              <LazyWithDefaultProps greeting="Hello" />
+            </React.Suspense>
+          </Feature>
+        );
       case 5:
       case 4:
         // unstable_Profiler
