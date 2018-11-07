@@ -149,7 +149,26 @@ function startServer(port = 8097) {
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
     var backendFile = readFileSync(join(__dirname, 'backend.js'));
-    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
+
+    var headerHostAndPort = (req.headers || {}).host || '';
+    var headerHostAndPortParts = headerHostAndPort.split(':');
+    var headersHost = headerHostAndPortParts[0];
+    var headersPort = headerHostAndPortParts[1];
+
+    var connectOptions = {};
+    if (headersHost) {
+      connectOptions.host = headersHost;
+    }
+    if (headersPort) {
+      connectOptions.port = headersPort;
+    }
+
+    res.end(
+      backendFile + '\n;' +
+      'ReactDevToolsBackend.connectToDevTools(' +
+      JSON.stringify(connectOptions, null, 2) +
+      ');'
+    );
   });
 
   httpServer.on('error', (e) => {
