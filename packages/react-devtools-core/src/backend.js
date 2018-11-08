@@ -16,6 +16,7 @@ type ConnectOptions = {
   resolveRNStyle?: (style: number) => ?Object,
   isAppActive?: () => boolean,
   websocket?: ?WebSocket,
+  websocketProtocol?: string,
 };
 
 var Agent = require('../../../agent/Agent');
@@ -26,8 +27,11 @@ var inject = require('../../../agent/inject');
 var invariant = require('assert');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
 var setupProfiler = require('../../../plugins/Profiler/backend');
+var Replicator = require('replicator');
 
 installGlobalHook(window);
+
+var replicator = new Replicator();
 
 if (window.document) {
   // This shell is universal, and might be used inside a web app.
@@ -44,6 +48,7 @@ function connectToDevTools(options: ?ConnectOptions) {
     websocket,
     resolveRNStyle = null,
     isAppActive = () => true,
+    websocketProtocol = 'ws',
   } = options || {};
 
   function scheduleRetry() {
@@ -60,7 +65,7 @@ function connectToDevTools(options: ?ConnectOptions) {
 
   var messageListeners = [];
   var closeListeners = [];
-  var uri = 'ws://' + host + ':' + port;
+  var uri = websocketProtocol + '://' + host + ':' + port;
   // If existing websocket is passed, use it.
   // This is necessary to support our custom integrations.
   // See D6251744.
@@ -77,7 +82,7 @@ function connectToDevTools(options: ?ConnectOptions) {
         closeListeners.push(fn);
       },
       send(data) {
-        ws.send(JSON.stringify(data));
+        ws.send(replicator.encode(data));
       },
     };
     setupBackend(wall, resolveRNStyle);

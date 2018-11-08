@@ -19,12 +19,14 @@ var Panel = require('../../../frontend/Panel');
 var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var Replicator = require('replicator');
 
 var node = null;
 var onStatusChange = function noop() {};
 var projectRoots = [];
 var wall = null;
 var panel = null;
+var replicator = new Replicator();
 
 var config = {
   reload,
@@ -72,7 +74,7 @@ function onError(e) {
 function initialize(socket) {
   var listeners = [];
   socket.onmessage = (evt) => {
-    var data = JSON.parse(evt.data);
+    var data = replicator.decode(evt.data);
     listeners.forEach((fn) => fn(data));
   };
 
@@ -151,7 +153,16 @@ function startServer(port = 8097) {
     var backendFile = fs.readFileSync(
       path.join(__dirname, '../build/backend.js')
     );
-    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
+    var devToolsConfig = {
+      host: process.env.REACT_DEVTOOLS_HOST,
+      port: process.env.REACT_DEVTOOLS_WS_PORT,
+      websocketProtocol: process.env.REACT_DEVTOOLS_WS_PROTOCOL,
+    };
+    var backendFileWithInit = backendFile +
+      '\n;ReactDevToolsBackend.connectToDevTools(' +
+      JSON.stringify(devToolsConfig) +
+      ');';
+    res.end(backendFileWithInit);
   });
 
   httpServer.on('error', (e) => {

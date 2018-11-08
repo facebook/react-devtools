@@ -78,6 +78,7 @@
         </div>
         <script>
             var port = process.env.PORT || 8097;
+            var localPath = process.env.REACT_DEVTOOLS_HOST || 'http://localhost:' + port;
             var localIp = require('ip').address();
             var $ = document.querySelector.bind(document);
             function selectAll() {
@@ -86,7 +87,7 @@
             }
             var $localhost = $('#localhost');
             var $byIp = $('#byip');
-            $localhost.value = '<' + 'script src="http://localhost:' + port + '"><' + '/script>';
+            $localhost.value = '<' + 'script src="' + localPath + '"><' + '/script>';
             $byIp.value = '<' + 'script src="http://' + localIp + ':' + port + '"><' + '/script>';
             $localhost.onclick = selectAll;
             $byIp.onclick = selectAll;
