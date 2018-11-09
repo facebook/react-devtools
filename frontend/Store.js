@@ -13,7 +13,7 @@
 var {EventEmitter} = require('events');
 // TODO $FlowFixMe - it is not documented API? any alternatives?
 var {flushSync} = require('react-dom');
-var {Map, Set, List} = require('immutable');
+var {Map, Set, List, Record} = require('immutable');
 var assign = require('object-assign');
 var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
@@ -22,7 +22,9 @@ var serializePropsForCopy = require('../utils/serializePropsForCopy');
 var invariant = require('./invariant');
 var SearchUtils = require('./SearchUtils');
 var ThemeStore = require('./Themes/Store');
-var {get, set} = require('../utils/storage');
+const {get, set} = require('../utils/storage');
+
+const LOCAL_STORAGE_TRACE_UPDATES_KEY = 'traceUpdates';
 
 const LOCAL_STORAGE_PREFERENCES_HIDING_STYLE = 'preferences:hidingStyle';
 const LOCAL_STORAGE_PREFERENCES_HIDE_SYMBOL = 'preferences:hideSymbol';
@@ -629,6 +631,7 @@ class Store extends EventEmitter {
     this.emit('traceupdatesstatechange');
     invariant(state.toJS, 'state.toJS should exist');
     this._bridge.send('traceupdatesstatechange', state.toJS());
+    set(LOCAL_STORAGE_TRACE_UPDATES_KEY, state.enabled);
   }
 
   changeColorizer(state: ControlState) {
@@ -660,6 +663,13 @@ class Store extends EventEmitter {
       clearInterval(requestInt);
       this.capabilities = assign(this.capabilities, capabilities);
       this.emit('connected');
+
+      const traceUpdates = get(LOCAL_STORAGE_TRACE_UPDATES_KEY);
+
+      if (traceUpdates) {
+        this.changeTraceUpdates(new Record({enabled: true})());
+      }
+
     });
     this._bridge.send('requestCapabilities');
     requestInt = setInterval(() => {
@@ -707,6 +717,12 @@ class Store extends EventEmitter {
   }
 
   _mountComponent(data: DataType) {
+    if (this._nodes.has(data.id)) {
+      // This node has been re-parented.
+      this._updateComponent(data);
+      return;
+    }
+
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Composite') {
       map = map.set('collapsed', true);
@@ -723,16 +739,18 @@ class Store extends EventEmitter {
   }
 
   _updateComponent(data: DataType) {
-    var node = this.get(data.id);
+    var id = data.id;
+    var node = this.get(id);
     if (!node) {
       return;
     }
     data.renders = node.get('renders') + 1;
-    this._nodes = this._nodes.mergeIn([data.id], Map(data));
+    this._nodes = this._nodes.mergeIn([id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        if (!this._parents.get(cid)) {
-          this._parents = this._parents.set(cid, data.id);
+        var pid = this._parents.get(cid);
+        if (!pid) {
+          this._parents = this._parents.set(cid, id);
           var childNode = this._nodes.get(cid);
           var childID = childNode.get('id');
           if (
@@ -747,6 +765,9 @@ class Store extends EventEmitter {
             this.emit('searchRoots');
             this.highlightSearch();
           }
+        } else if (pid !== id) {
+          // This node has been re-parented.
+          this._parents = this._parents.set(cid, id);
         }
       });
     }

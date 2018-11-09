@@ -17,6 +17,22 @@ var semver = require('semver');
 var copyWithSet = require('./copyWithSet');
 var getDisplayName = require('./getDisplayName');
 
+// Taken from ReactElement.
+function resolveDefaultProps(Component: any, baseProps: Object): Object {
+  if (Component && Component.defaultProps) {
+    // Resolve default props. Taken from ReactElement
+    const props = Object.assign({}, baseProps);
+    const defaultProps = Component.defaultProps;
+    for (const propName in defaultProps) {
+      if (props[propName] === undefined) {
+        props[propName] = defaultProps[propName];
+      }
+    }
+    return props;
+  }
+  return baseProps;
+}
+
 function getInternalReactConstants(version) {
   var ReactTypeOfWork;
   var ReactSymbols;
@@ -40,6 +56,7 @@ function getInternalReactConstants(version) {
       HostPortal: 4,
       HostRoot: 3,
       HostText: 6,
+      IncompleteClassComponent: 17,
       IndeterminateComponent: 2,
       LazyComponent: 16,
       MemoComponent: 14,
@@ -63,6 +80,7 @@ function getInternalReactConstants(version) {
       HostPortal: 6,
       HostRoot: 5,
       HostText: 8,
+      IncompleteClassComponent: -1, // Doesn't exist yet
       IndeterminateComponent: 4,
       LazyComponent: -1, // Doesn't exist yet
       MemoComponent: -1, // Doesn't exist yet
@@ -86,6 +104,7 @@ function getInternalReactConstants(version) {
       HostPortal: 4,
       HostRoot: 3,
       HostText: 6,
+      IncompleteClassComponent: -1, // Doesn't exist yet
       IndeterminateComponent: 0,
       LazyComponent: -1, // Doesn't exist yet
       MemoComponent: -1, // Doesn't exist yet
@@ -106,10 +125,10 @@ function getInternalReactConstants(version) {
     CONTEXT_PROVIDER_SYMBOL_STRING: 'Symbol(react.provider)',
     FORWARD_REF_NUMBER: 0xead0,
     FORWARD_REF_SYMBOL_STRING: 'Symbol(react.forward_ref)',
+    MEMO_NUMBER: 0xead3,
+    MEMO_SYMBOL_STRING: 'Symbol(react.memo)',
     PROFILER_NUMBER: 0xead2,
     PROFILER_SYMBOL_STRING: 'Symbol(react.profiler)',
-    PURE_NUMBER: 0xead3,
-    PURE_SYMBOL_STRING: 'Symbol(react.pure)',
     STRICT_MODE_NUMBER: 0xeacc,
     STRICT_MODE_SYMBOL_STRING: 'Symbol(react.strict_mode)',
     SUSPENSE_NUMBER: 0xead1,
@@ -137,12 +156,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     FunctionalComponent,
     ClassComponent,
     ContextConsumer,
+    Fragment,
+    ForwardRef,
     HostRoot,
     HostPortal,
     HostComponent,
     HostText,
-    Fragment,
-    ForwardRef,
+    IncompleteClassComponent,
+    IndeterminateComponent,
+    MemoComponent,
+    SimpleMemoComponent,
   } = ReactTypeOfWork;
   var {
     CONCURRENT_MODE_NUMBER,
@@ -154,8 +177,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     CONTEXT_PROVIDER_SYMBOL_STRING,
     PROFILER_NUMBER,
     PROFILER_SYMBOL_STRING,
-    PURE_NUMBER,
-    PURE_SYMBOL_STRING,
     STRICT_MODE_NUMBER,
     STRICT_MODE_SYMBOL_STRING,
     SUSPENSE_NUMBER,
@@ -166,6 +187,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   // TODO: we might want to change the data structure
   // once we no longer suppport Stack versions of `getData`.
   function getDataFiber(fiber: Object): DataType {
+    var elementType = fiber.elementType;
     var type = fiber.type;
     var key = fiber.key;
     var ref = fiber.ref;
@@ -195,11 +217,11 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       }
     }
 
-    // TODO: Add support for new tags LazyComponent, MemoComponent, and SimpleMemoComponent
-
     switch (fiber.tag) {
-      case FunctionalComponent:
       case ClassComponent:
+      case FunctionalComponent:
+      case IncompleteClassComponent:
+      case IndeterminateComponent:
         nodeType = 'Composite';
         name = getDisplayName(resolvedType);
         publicInstance = fiber.stateNode;
@@ -283,6 +305,17 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         nodeType = 'Wrapper';
         children = [];
         break;
+      case MemoComponent:
+      case SimpleMemoComponent:
+        nodeType = 'Composite';
+        if (elementType.displayName) {
+          name = elementType.displayName;
+        } else {
+          const displayName = type.displayName || type.name;
+          name = displayName ? `Memo(${displayName})` : 'Memo';
+        }
+        children = [];
+        break;
       default:
         const symbolOrNumber = typeof type === 'object' && type !== null
           ? type.$$typeof
@@ -293,17 +326,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           : symbolOrNumber;
 
         switch (switchValue) {
-          case PURE_NUMBER:
-          case PURE_SYMBOL_STRING:
-            nodeType = 'Special';
-            if (type.displayName) {
-              name = type.displayName;
-            } else {
-              const displayName = type.render.displayName || type.render.name;
-              name = displayName ? `Pure(${displayName})` : 'Pure';
-            }
-            children = [];
-            break;
           case CONCURRENT_MODE_NUMBER:
           case CONCURRENT_MODE_SYMBOL_STRING:
           case DEPRECATED_ASYNC_MODE_SYMBOL_STRING:
@@ -356,6 +378,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             break;
         }
         break;
+    }
+
+    if (
+      props !== null &&
+      typeof fiber.elementType !== undefined &&
+      fiber.type !== fiber.elementType
+    ) {
+      props = resolveDefaultProps(fiber.type, props);
     }
 
     if (Array.isArray(children)) {
@@ -452,6 +482,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       case ClassComponent:
       case FunctionalComponent:
       case ContextConsumer:
+      case MemoComponent:
+      case SimpleMemoComponent:
         // For types that execute user code, we check PerformedWork effect.
         // We don't reflect bailouts (either referential or sCU) in DevTools.
         // eslint-disable-next-line no-bitwise
