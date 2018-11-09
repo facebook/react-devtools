@@ -16,7 +16,6 @@ var invariant = require('assert');
 var nullthrows = require('nullthrows').default;
 
 var installGlobalHook = require('../../backend/installGlobalHook');
-var installRelayHook = require('../../plugins/Relay/installRelayHook');
 
 window.React = React;
 
@@ -30,7 +29,6 @@ var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.j
 
 var win = target.contentWindow;
 installGlobalHook(win);
-installRelayHook(win);
 
 var iframeSrc = document.getElementById('iframe-src');
 if (iframeSrc) {

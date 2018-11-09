@@ -24,7 +24,6 @@ const Bridge = require('../agent/Bridge');
 const {sansSerif} = require('./Themes/Fonts');
 const NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
 const ProfilerPlugin = require('../plugins/Profiler/ProfilerPlugin');
-const RelayPlugin = require('../plugins/Relay/RelayPlugin');
 const Themes = require('./Themes/Themes');
 const ThemeStore = require('./Themes/Store');
 
@@ -243,7 +242,6 @@ class Panel extends React.Component<Props, State> {
 
       var refresh = () => this.forceUpdate();
       this.plugins = [
-        new RelayPlugin(this._store, this._bridge, refresh),
         new ProfilerPlugin(this._store, this._bridge, refresh),
       ];
 
