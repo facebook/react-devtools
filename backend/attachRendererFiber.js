@@ -186,7 +186,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
   // TODO: we might want to change the data structure
   // once we no longer suppport Stack versions of `getData`.
-  function getDataFiber(fiber: Object, isHidden: boolean = false): DataType {
+  function getDataFiber(fiber: Object): DataType {
     var elementType = fiber.elementType;
     var type = fiber.type;
     var key = fiber.key;
@@ -207,6 +207,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var actualStartTime = null;
     var treeBaseDuration = null;
     var memoizedInteractions = null;
+
+    // Suspense data
+    var isTimedOutSuspense;
 
     var resolvedType = type;
     if (typeof type === 'object' && type !== null) {
@@ -358,6 +361,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             name = 'Suspense';
             props = fiber.memoizedProps;
             children = [];
+
+            // Suspense components only have a non-null memoizedState if they're timed-out.
+            isTimedOutSuspense = fiber.memoizedState !== null;
             break;
           case PROFILER_NUMBER:
           case PROFILER_SYMBOL_STRING:
@@ -413,6 +419,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       text,
       updater,
       publicInstance,
+
+      // Tracing
       memoizedInteractions,
 
       // Profiler data
@@ -421,7 +429,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       treeBaseDuration,
 
       // Suspense
-      isHidden,
+      isTimedOutSuspense,
     };
   }
 
@@ -520,10 +528,10 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function enqueueMount(fiber, isHidden) {
+  function enqueueMount(fiber) {
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber, isHidden),
+      data: getDataFiber(fiber),
       renderer: rid,
       type: 'mount',
     });
@@ -538,7 +546,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged, isHidden = false) {
+  function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
     if (
       !hasChildOrderChanged &&
       !hasDataChanged(fiber.alternate, fiber)
@@ -550,7 +558,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       if (haveProfilerTimesChanged(fiber.alternate, fiber)) {
         pendingEvents.push({
           internalInstance: getOpaqueNode(fiber),
-          data: getDataFiber(fiber, isHidden),
+          data: getDataFiber(fiber),
           renderer: rid,
           type: 'updateProfileTimes',
         });
@@ -559,7 +567,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber, isHidden),
+      data: getDataFiber(fiber),
       renderer: rid,
       type: 'update',
     });
@@ -594,7 +602,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     });
   }
 
-  function mountFiber(fiber, isHidden = false) {
+  function mountFiber(fiber) {
     // Depth-first.
     // Logs mounting of children first, parents later.
     let node = fiber;
@@ -604,7 +612,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         node = node.child;
         continue;
       }
-      enqueueMount(node, isHidden);
+      enqueueMount(node);
       if (node == fiber) {
         return;
       }
@@ -615,7 +623,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       }
       while (node.return) {
         node = node.return;
-        enqueueMount(node, isHidden);
+        enqueueMount(node);
         if (node == fiber) {
           return;
         }
@@ -629,32 +637,21 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
   }
 
-  function updateFiber(nextFiber, prevFiber, isHidden) {
-    // Suspense components only have a non-null memoizedState if they're timed-out.
-    const isTimedOutSuspense = (
-      nextFiber.tag === ReactTypeOfWork.SuspenseComponent &&
-      nextFiber.memoizedState !== null
-    );
-
+  function updateFiber(nextFiber, prevFiber) {
     let hasChildOrderChanged = false;
     if (nextFiber.child !== prevFiber.child) {
-      let isFirstChild = true;
       // If the first child is different, we need to traverse them.
       // Each next child will be either a new child (mount) or an alternate (update).
       let nextChild = nextFiber.child;
       let prevChildAtSameIndex = prevFiber.child;
       while (nextChild) {
-        // React hides the first child of a timed-out Suspense component.
-        const isChildHidden = isHidden || isTimedOutSuspense && isFirstChild;
-        isFirstChild = false;
-
         // We already know children will be referentially different because
         // they are either new mounts or alternates of previous children.
         // Schedule updates and mounts depending on whether alternates exist.
         // We don't track deletions here because they are reported separately.
         if (nextChild.alternate) {
           const prevChild = nextChild.alternate;
-          updateFiber(nextChild, prevChild, isChildHidden);
+          updateFiber(nextChild, prevChild);
           // However we also keep track if the order of the children matches
           // the previous order. They are always different referentially, but
           // if the instances line up conceptually we'll want to know that.
@@ -662,7 +659,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             hasChildOrderChanged = true;
           }
         } else {
-          mountFiber(nextChild, isChildHidden);
+          mountFiber(nextChild);
           if (!hasChildOrderChanged) {
             hasChildOrderChanged = true;
           }
@@ -680,7 +677,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         hasChildOrderChanged = true;
       }
     }
-    enqueueUpdateIfNecessary(nextFiber, hasChildOrderChanged, isHidden);
+    enqueueUpdateIfNecessary(nextFiber, hasChildOrderChanged);
   }
 
   function walkTree() {

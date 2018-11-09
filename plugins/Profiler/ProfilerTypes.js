@@ -55,6 +55,7 @@ export type Snapshot = {|
   memoizedInteractions: Array<Interaction>,
   nodes: Map,
   root: string,
+  timedOutSuspenseNodes: Array<string>,
 |};
 
 export type StoreSnapshot = {|
@@ -63,4 +64,5 @@ export type StoreSnapshot = {|
   duration: number,
   memoizedInteractions: Array<Interaction>,
   root: string,
+  timedOutSuspenseNodes: Array<string>,
 |};

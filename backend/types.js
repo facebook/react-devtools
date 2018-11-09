@@ -21,6 +21,11 @@ type NativeUpdater = {
   setNativeProps: ?(nativeProps: {[key: string]: any}) => void,
 };
 
+export type Interaction = {|
+  name: string,
+  timestamp: number,
+|};
+
 export type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Special' | 'Text' | 'Portal' | 'Empty',
   type: ?(string | AnyFn),
@@ -35,6 +40,17 @@ export type DataType = {
   text: ?string,
   updater: ?(CompositeUpdater | NativeUpdater),
   publicInstance: ?Object,
+
+  // Tracing
+  memoizedInteractions: ?Set<Interaction>,
+
+  // Profiler data,
+  actualDuration: ?number,
+  actualStartTime: ?number,
+  treeBaseDuration: ?number,
+
+  // Suspense
+  isTimedOutSuspense: boolean,
 };
 
 // This type is entirely opaque to the backend.
