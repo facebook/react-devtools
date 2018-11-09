@@ -24,6 +24,7 @@
   "author": "Jared Forsyth",
   "license": "BSD-3-Clause",
   "dependencies": {
+    "replicator": "^1.0.2",
     "shell-quote": "^1.6.1",
     "ws": "^3.3.1"
   },
