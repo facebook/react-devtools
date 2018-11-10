@@ -658,12 +658,6 @@ class Store extends EventEmitter {
   }
 
   _mountComponent(data: DataType) {
-    if (this._nodes.has(data.id)) {
-      // This node has been re-parented.
-      this._updateComponent(data);
-      return;
-    }
-
     var map = Map(data).set('renders', 1);
     if (data.nodeType === 'Composite') {
       map = map.set('collapsed', true);
@@ -689,8 +683,7 @@ class Store extends EventEmitter {
     this._nodes = this._nodes.mergeIn([id], Map(data));
     if (data.children && data.children.forEach) {
       data.children.forEach(cid => {
-        var pid = this._parents.get(cid);
-        if (!pid) {
+        if (!this._parents.has(cid)) {
           this._parents = this._parents.set(cid, id);
           var childNode = this._nodes.get(cid);
           var childID = childNode.get('id');
@@ -706,9 +699,6 @@ class Store extends EventEmitter {
             this.emit('searchRoots');
             this.highlightSearch();
           }
-        } else if (pid !== id) {
-          // This node has been re-parented.
-          this._parents = this._parents.set(cid, id);
         }
       });
     }

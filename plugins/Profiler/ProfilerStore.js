@@ -13,7 +13,7 @@
 import type Bridge from '../../agent/Bridge';
 import type {ChartType, Interaction, RootProfilerData, Snapshot} from './ProfilerTypes';
 
-const {List, Map: ImmutableMap} = require('immutable');
+const {List} = require('immutable');
 const {EventEmitter} = require('events');
 const {get, set} = require('../../utils/storage');
 const LRU = require('lru-cache');
@@ -86,22 +86,6 @@ class ProfilerStore extends EventEmitter {
     }
   }
 
-  removeTreeFromCommittedNodes(id: string, committedNodes: Array<string>, nodes: ImmutableMap) {
-    const index = committedNodes.indexOf(id);
-    if (index >= 0) {
-      committedNodes.splice(index, 1);
-    }
-
-    const children = nodes.getIn([id, 'children']);
-    if (Array.isArray(children)) {
-      children.forEach(childID => {
-        this.removeTreeFromCommittedNodes(childID, committedNodes, nodes);
-      });
-    } else if (typeof children === 'string') {
-      this.removeTreeFromCommittedNodes(children, committedNodes, nodes);
-    }
-  }
-
   saveRoots = () => {
     this.roots = this._mainStore.roots;
     this.emit('roots', this._mainStore.roots);
@@ -143,8 +127,7 @@ class ProfilerStore extends EventEmitter {
 
   storeSnapshot = () => {
     this._mainStore.snapshotQueue.forEach((snapshot: Snapshot) => {
-      const {committedNodes, nodes, root, timedOutSuspenseNodes} = snapshot;
-
+      const { root } = snapshot;
       if (!this.rootsToProfilerData.has(root)) {
         this.rootsToProfilerData.set(root, {
           interactionsToSnapshots: new Map(),
@@ -177,20 +160,6 @@ class ProfilerStore extends EventEmitter {
           timestampsToInteractions.set(interaction.timestamp, new Set([interaction]));
         }
       });
-
-      if (timedOutSuspenseNodes.length > 0) {
-        // The behavior of timed-out Suspense trees is unique.
-        // Rather than unmount the timed out content (and possibly lose important state),
-        // React re-parents this content within a hidden Fragment while the fallback is showing.
-        // In this case, the Profiler needs to not color the hidden tree as though it rendered,
-        // so we filter them out of the Set of committed nodes.
-        timedOutSuspenseNodes.forEach(id => {
-          const children = nodes.getIn([id, 'children']);
-          if (children.length === 2) {
-            this.removeTreeFromCommittedNodes(children[0], committedNodes, nodes);
-          }
-        });
-      }
     });
 
     // Clear the queue once we've processed it.

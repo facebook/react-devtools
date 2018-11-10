@@ -44,13 +44,10 @@ export type DataType = {
   // Tracing
   memoizedInteractions: ?Set<Interaction>,
 
-  // Profiler data,
+  // Profiler
   actualDuration: ?number,
   actualStartTime: ?number,
   treeBaseDuration: ?number,
-
-  // Suspense
-  isTimedOutSuspense: boolean,
 };
 
 // This type is entirely opaque to the backend.

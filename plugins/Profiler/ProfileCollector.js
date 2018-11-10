@@ -36,7 +36,6 @@ class ProfileCollector {
   _isRecording: boolean = false;
   _maxActualDuration: number = 0;
   _recordingStartTime: number = 0;
-  _timedOutSuspenseNodes: Set<string> = new Set();
 
   constructor(agent: Agent) {
     this._agent = agent;
@@ -67,7 +66,6 @@ class ProfileCollector {
       commitTime: now() - this._recordingStartTime,
       duration: this._maxActualDuration,
       root: id,
-      timedOutSuspenseNodes: Array.from(this._timedOutSuspenseNodes),
     };
 
     this._agent.emit('storeSnapshot', storeSnapshot);
@@ -77,7 +75,6 @@ class ProfileCollector {
     this._committedNodes = new Set();
     this._isRecording = isRecording;
     this._recordingStartTime = isRecording ? now() : 0;
-    this._timedOutSuspenseNodes = new Set();
 
     if (isRecording) {
       // Maybe in the future, we'll allow collecting multiple profiles and stepping through them.
@@ -95,16 +92,6 @@ class ProfileCollector {
     }
 
     this._committedNodes.add(data.id);
-
-    if (data.isTimedOutSuspense) {
-      // The behavior of timed-out Suspense trees is unique.
-      // Rather than unmount the timed out content (and possibly lose important state),
-      // React re-parents this content within a hidden Fragment while the fallback is showing.
-      // In this case, the Profiler needs to not color the hidden tree as though it rendered.
-      // Store the ids of timed-out Suspense components so we can later identify the hidden tree.
-      this._timedOutSuspenseNodes.add(data.id);
-    }
-
     this._maxActualDuration = Math.max(this._maxActualDuration, data.actualDuration);
   };
 
@@ -120,12 +107,10 @@ class ProfileCollector {
     // Then reset data for the next snapshot.
     this._committedNodes = new Set();
     this._maxActualDuration = 0;
-    this._timedOutSuspenseNodes = new Set();
   }
 
   _onUnmount = (id: string) => {
     this._committedNodes.delete(id);
-    this._timedOutSuspenseNodes.delete(id);
   };
 }
 
