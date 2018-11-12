@@ -40,6 +40,8 @@ if (window.document) {
   });
 }
 
+var CONNECTION_REPLACED = 'CONNECTION_REPLACED';
+
 function connectToDevTools(options: ?ConnectOptions) {
   var {
     host = 'localhost',
@@ -87,10 +89,12 @@ function connectToDevTools(options: ?ConnectOptions) {
   };
 
   var hasClosed = false;
-  function handleClose() {
+  function handleClose(ev) {
     if (!hasClosed) {
       hasClosed = true;
-      scheduleRetry();
+      if (ev.reason !== CONNECTION_REPLACED) {
+        scheduleRetry();
+      }
       closeListeners.forEach(fn => fn());
     }
   }
@@ -159,4 +163,7 @@ function setupBackend(wall, resolveRNStyle) {
   ProfileCollector.init(agent);
 }
 
-module.exports = { connectToDevTools };
+module.exports = {
+  connectToDevTools,
+  CONNECTION_REPLACED,
+};

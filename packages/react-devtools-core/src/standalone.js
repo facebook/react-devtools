@@ -19,6 +19,7 @@ var Panel = require('../../../frontend/Panel');
 var launchEditor = require('./launchEditor');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var { CONNECTION_REPLACED } = require('./backend');
 
 var node = null;
 var onStatusChange = function noop() {};
@@ -114,13 +115,14 @@ function connectToSocket(socket) {
   };
 }
 
+var WS_DEFAULT_CLOSE_CODE = 1000;
 function startServer(port = 8097) {
   var httpServer = require('http').createServer();
   var server = new ws.Server({server: httpServer});
   var connected = false;
   server.on('connection', (socket) => {
     if (connected) {
-      connected.close();
+      connected.close(WS_DEFAULT_CLOSE_CODE, CONNECTION_REPLACED);
       log.warn(
         'Only one connection allowed at a time.',
         'Closing the previous connection'
@@ -132,10 +134,12 @@ function startServer(port = 8097) {
       onDisconnected();
       log.error('Error with websocket connection', err);
     };
-    socket.onclose = () => {
-      connected = false;
-      onDisconnected();
-      log('Connection to RN closed');
+    socket.onclose = (ev) => {
+      if (ev.reason !== CONNECTION_REPLACED) {
+        connected = false;
+        onDisconnected();
+        log('Connection to RN closed');
+      }
     };
     initialize(socket);
   });
