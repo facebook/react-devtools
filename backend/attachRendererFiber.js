@@ -202,11 +202,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var name = null;
     var text = null;
 
-    // Profiler data
+    // Tracing
+    var memoizedInteractions = null;
+
+    // Profiler
     var actualDuration = null;
     var actualStartTime = null;
     var treeBaseDuration = null;
-    var memoizedInteractions = null;
+
+    // Suspense
+    var isTimedOutSuspense = false;
 
     var resolvedType = type;
     if (typeof type === 'object' && type !== null) {
@@ -358,6 +363,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             name = 'Suspense';
             props = fiber.memoizedProps;
             children = [];
+
+            // Suspense components only have a non-null memoizedState if they're timed-out.
+            isTimedOutSuspense = fiber.memoizedState !== null;
             break;
           case PROFILER_NUMBER:
           case PROFILER_SYMBOL_STRING:
@@ -385,10 +393,26 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
 
     if (Array.isArray(children)) {
-      let child = fiber.child;
-      while (child) {
-        children.push(getOpaqueNode(child));
-        child = child.sibling;
+      if (isTimedOutSuspense) {
+        // The behavior of timed-out Suspense trees is unique.
+        // Rather than unmount the timed out content (and possibly lose important state),
+        // React re-parents this content within a hidden Fragment while the fallback is showing.
+        // This behavior doesn't need to be observable in the DevTools though.
+        // It might even result in a bad user experience for e.g. node selection in the Elements panel.
+        // The easiest fix is to strip out the intermediate Fragment fibers,
+        // so the Elements panel and Profiler don't need to special case them.
+        const primaryChildFragment = fiber.child;
+        const primaryChild = primaryChildFragment.child;
+        const fallbackChildFragment = primaryChildFragment.sibling;
+        const fallbackChild = fallbackChildFragment.child;
+        children.push(primaryChild);
+        children.push(fallbackChild);
+      } else {
+        let child = fiber.child;
+        while (child) {
+          children.push(getOpaqueNode(child));
+          child = child.sibling;
+        }
       }
     }
 
@@ -413,6 +437,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       text,
       updater,
       publicInstance,
+
+      // Tracing
       memoizedInteractions,
 
       // Profiler data
@@ -627,46 +653,74 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function updateFiber(nextFiber, prevFiber) {
-    let hasChildOrderChanged = false;
-    if (nextFiber.child !== prevFiber.child) {
-      // If the first child is different, we need to traverse them.
-      // Each next child will be either a new child (mount) or an alternate (update).
-      let nextChild = nextFiber.child;
-      let prevChildAtSameIndex = prevFiber.child;
-      while (nextChild) {
-        // We already know children will be referentially different because
-        // they are either new mounts or alternates of previous children.
-        // Schedule updates and mounts depending on whether alternates exist.
-        // We don't track deletions here because they are reported separately.
-        if (nextChild.alternate) {
-          const prevChild = nextChild.alternate;
-          updateFiber(nextChild, prevChild);
-          // However we also keep track if the order of the children matches
-          // the previous order. They are always different referentially, but
-          // if the instances line up conceptually we'll want to know that.
-          if (!hasChildOrderChanged && prevChild !== prevChildAtSameIndex) {
-            hasChildOrderChanged = true;
+    // Suspense components only have a non-null memoizedState if they're timed-out.
+    const isTimedOutSuspense = (
+      nextFiber.tag === ReactTypeOfWork.SuspenseComponent &&
+      nextFiber.memoizedState !== null
+    );
+
+    if (isTimedOutSuspense) {
+      // The behavior of timed-out Suspense trees is unique.
+      // Rather than unmount the timed out content (and possibly lose important state),
+      // React re-parents this content within a hidden Fragment while the fallback is showing.
+      // This behavior doesn't need to be observable in the DevTools though.
+      // It might even result in a bad user experience for e.g. node selection in the Elements panel.
+      // The easiest fix is to strip out the intermediate Fragment fibers,
+      // so the Elements panel and Profiler don't need to special case them.
+      const primaryChildFragment = nextFiber.child;
+      const fallbackChildFragment = primaryChildFragment.sibling;
+      const fallbackChild = fallbackChildFragment.child;
+      // The primary, hidden child is never actually updated in this case,
+      // so we can skip any updates to its tree.
+      // We only need to track updates to the Fallback UI for now.
+      if (fallbackChild.alternate) {
+        updateFiber(fallbackChild, fallbackChild.alternate);
+      } else {
+        mountFiber(fallbackChild);
+      }
+      enqueueUpdateIfNecessary(nextFiber, false);
+    } else {
+      let hasChildOrderChanged = false;
+      if (nextFiber.child !== prevFiber.child) {
+        // If the first child is different, we need to traverse them.
+        // Each next child will be either a new child (mount) or an alternate (update).
+        let nextChild = nextFiber.child;
+        let prevChildAtSameIndex = prevFiber.child;
+        while (nextChild) {
+          // We already know children will be referentially different because
+          // they are either new mounts or alternates of previous children.
+          // Schedule updates and mounts depending on whether alternates exist.
+          // We don't track deletions here because they are reported separately.
+          if (nextChild.alternate) {
+            const prevChild = nextChild.alternate;
+            updateFiber(nextChild, prevChild);
+            // However we also keep track if the order of the children matches
+            // the previous order. They are always different referentially, but
+            // if the instances line up conceptually we'll want to know that.
+            if (!hasChildOrderChanged && prevChild !== prevChildAtSameIndex) {
+              hasChildOrderChanged = true;
+            }
+          } else {
+            mountFiber(nextChild);
+            if (!hasChildOrderChanged) {
+              hasChildOrderChanged = true;
+            }
           }
-        } else {
-          mountFiber(nextChild);
-          if (!hasChildOrderChanged) {
-            hasChildOrderChanged = true;
+          // Try the next child.
+          nextChild = nextChild.sibling;
+          // Advance the pointer in the previous list so that we can
+          // keep comparing if they line up.
+          if (!hasChildOrderChanged && prevChildAtSameIndex != null) {
+            prevChildAtSameIndex = prevChildAtSameIndex.sibling;
           }
         }
-        // Try the next child.
-        nextChild = nextChild.sibling;
-        // Advance the pointer in the previous list so that we can
-        // keep comparing if they line up.
+        // If we have no more children, but used to, they don't line up.
         if (!hasChildOrderChanged && prevChildAtSameIndex != null) {
-          prevChildAtSameIndex = prevChildAtSameIndex.sibling;
+          hasChildOrderChanged = true;
         }
       }
-      // If we have no more children, but used to, they don't line up.
-      if (!hasChildOrderChanged && prevChildAtSameIndex != null) {
-        hasChildOrderChanged = true;
-      }
+      enqueueUpdateIfNecessary(nextFiber, hasChildOrderChanged);
     }
-    enqueueUpdateIfNecessary(nextFiber, hasChildOrderChanged);
   }
 
   function walkTree() {
