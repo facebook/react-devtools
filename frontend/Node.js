@@ -26,6 +26,7 @@ const {Fragment} = React;
 type PropsType = {
   hovered: boolean,
   selected: boolean,
+  showCopyableInput: boolean,
   node: Map,
   depth: number,
   isBottomTagHovered: boolean,
@@ -38,6 +39,7 @@ type PropsType = {
   onToggleCollapse: () => void,
   onSelectBottom: () => void,
   onSelect: () => void,
+  onShowCopyableInput: () => void,
 };
 
 type StateType = {
@@ -82,6 +84,10 @@ class Node extends React.Component<PropsType, StateType> {
     } else if (!this.props.selected && prevProps.selected) {
       // Losing selection.
       this.unsubscribeFromWindowFocus();
+    }
+
+    if (this.props.showCopyableInput && this._head instanceof HTMLInputElement) {
+      this._head.select();
     }
   }
 
@@ -190,8 +196,10 @@ class Node extends React.Component<PropsType, StateType> {
       onSelect,
       onSelectBottom,
       onToggleCollapse,
+      onShowCopyableInput,
       searchRegExp,
       selected,
+      showCopyableInput,
       wrappedChildren,
     } = this.props;
     const {isWindowFocused} = this.state;
@@ -241,6 +249,13 @@ class Node extends React.Component<PropsType, StateType> {
       onMouseOver: () => onHoverBottom(true),
       onMouseOut: () => onHoverBottom(false),
       onMouseDown: onSelectBottom,
+    };
+
+    const onNameDoubleClick = e => {
+      if (!collapsed) {
+        e.stopPropagation();
+      }
+      onShowCopyableInput();
     };
 
     const nodeType = node.get('nodeType');
@@ -304,7 +319,10 @@ class Node extends React.Component<PropsType, StateType> {
         <div style={headWrapperStyle}>
           <div style={sharedHeadStyle} {...headEvents}>
             &lt;
-            <span ref={this._setHeadRef} style={jsxSingleLineTagStyle}>{name}</span>
+            {showCopyableInput ? 
+              <input ref={this._setHeadRef} defaultValue={name} readOnly="readonly" size={name.length} />
+              : <span ref={this._setHeadRef} style={jsxSingleLineTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
+            }
             {node.get('key') &&
               <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
             }
@@ -356,7 +374,11 @@ class Node extends React.Component<PropsType, StateType> {
           {collapsed ? '▶' : '▼'}
         </span>
         &lt;
-        <span ref={this._setHeadRef} style={jsxOpenTagStyle}>{name}</span>
+        {showCopyableInput ? 
+          <input ref={this._setHeadRef} defaultValue={name} readOnly="readonly" size={name.length} />
+          : <span ref={this._setHeadRef} style={jsxOpenTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
+        }
+
         {node.get('key') &&
           <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
         }
@@ -431,6 +453,7 @@ var WrappedNode = decorate({
       node,
       wrappedChildren,
       selected: store.selected === props.id,
+      showCopyableInput: store.showCopyableInput === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
@@ -449,6 +472,9 @@ var WrappedNode = decorate({
       },
       onContextMenu: e => {
         store.showContextMenu('tree', e, props.id, node);
+      },
+      onShowCopyableInput: () => {
+        store.setShowCopyableInput(props.id);
       },
     };
   },
