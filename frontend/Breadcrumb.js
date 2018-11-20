@@ -13,15 +13,18 @@
 import type Store from './Store';
 import type {ElementID} from './types';
 import type {Theme} from './types';
+import type {HiddenType} from '../backend/types';
 
 const {sansSerif} = require('./Themes/Fonts');
 const PropTypes = require('prop-types');
 const React = require('react');
 const decorate = require('./decorate');
+const memoize = require('memoize-one').default;
 
 type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
 
 type Props = {
+  hiddenTypes: Set<HiddenType>;
   hover: (string, boolean) => void;
   selected: string,
   path: BreadcrumbPath,
@@ -64,13 +67,22 @@ class Breadcrumb extends React.Component<Props, State> {
     this.props.hover(id, false);
   }
 
+  filterPath = memoize((path: BreadcrumbPath) => {
+    const {hiddenTypes} = this.props;
+    return path.filter(
+      ({node}) => !hiddenTypes.has(node.get('hiddenType'))
+    );
+  });
+
   render() {
     const {theme} = this.context;
     const {path, selected} = this.props;
 
+    const filteredPath = this.filterPath(path);
+
     return (
       <ul style={containerStyle(theme)}>
-        {path.map(({ id, node }) => {
+        {filteredPath.map(({ id, node }) => {
           const isSelected = id === selected;
           const style = itemStyle(
             isSelected,
@@ -163,10 +175,11 @@ function getBreadcrumbPath(store: Store): BreadcrumbPath {
 }
 
 module.exports = decorate({
-  listeners: () => ['breadcrumbHead', 'selected'],
+  listeners: () => ['breadcrumbHead', 'hiddenTypes', 'selected'],
   props(store, props) {
     return {
       select: id => store.selectBreadcrumb(id),
+      hiddenTypes: store.hiddenTypes,
       hover: (id, isHovered) => store.setHover(id, isHovered, false),
       selected: store.selected,
       path: getBreadcrumbPath(store),

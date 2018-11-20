@@ -37,6 +37,7 @@ function getData(internalInstance: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
+  var hiddenType = 'Other';
   // If the parent is a native node without rendered children, but with
   // multiple string children, then the `element` that gets passed in here is
   // a plain value -- a string or number.
@@ -111,6 +112,10 @@ function getData(internalInstance: Object): DataType {
     } else if (typeof type === 'function') {
       nodeType = 'Composite';
       name = getDisplayName(type);
+      if (name.indexOf('(') >= 0) {
+        // HACK heuristic for a HOC is a name with ()s (e.g. "connect(MyComponent)")
+        hiddenType = 'HOC';
+      }
       // 0.14 top-level wrapper
       // TODO(jared): The backend should just act as if these don't exist.
       if (internalInstance._renderedComponent && (
@@ -165,6 +170,10 @@ function getData(internalInstance: Object): DataType {
     };
   }
 
+  if (nodeType === 'Native') {
+    hiddenType = 'Native';
+  }
+
   // $FlowFixMe
   return {
     nodeType,
@@ -180,6 +189,7 @@ function getData(internalInstance: Object): DataType {
     text,
     updater,
     publicInstance,
+    hiddenType,
   };
 }
 

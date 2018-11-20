@@ -40,7 +40,6 @@ class SettingsCheckbox extends React.Component<Props, State> {
 
   constructor(props: Props) {
     super(props);
-    this._toggle = this._toggle.bind(this);
     this._defaultState = new StateRecord();
   }
 
@@ -53,40 +52,37 @@ class SettingsCheckbox extends React.Component<Props, State> {
   render() {
     var state = this.props.state || this._defaultState;
     return (
-      <div style={styles.container} onClick={this._toggle} tabIndex={0}>
+      <label style={styles.container}>
         <input
-          style={styles.checkbox}
           type="checkbox"
           checked={state.enabled}
-          readOnly={true}
+          onChange={this._toggle}
+          style={styles.checkbox}
         />
-        <span>{this.props.text}</span>
-      </div>
+        {this.props.text}
+      </label>
     );
   }
 
-  _toggle() {
+  _toggle = () => {
     var state = this.props.state || this._defaultState;
     var nextState = state.merge({
       enabled: !state.enabled,
     });
 
     this.props.onChange(nextState);
-  }
+  };
 }
 
 var styles = {
   checkbox: {
-    pointerEvents: 'none',
     marginRight: '5px',
   },
   container: {
     WebkitUserSelect: 'none',
     cursor: 'default',
     display: 'inline-block',
-    outline: 'none',
     fontFamily: sansSerif.family,
-    userSelect: 'none',
     marginRight: '10px',
   },
 };

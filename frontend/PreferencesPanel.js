@@ -24,12 +24,15 @@ const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdate
 const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 
 import type {Theme} from './types';
+import type {HiddenType} from '../backend/types';
 
 type Props = {
   changeTheme: (themeName: string) => void,
   hasCustomTheme: boolean,
+  hiddenTypes: Set<HiddenType>,
   hide: () => void,
   open: bool,
+  toggleHiddenType: (hiddenType: HiddenType) => void,
 };
 
 type State = {
@@ -69,7 +72,7 @@ class PreferencesPanel extends React.Component<Props, State> {
 
   render() {
     const {browserName, showHiddenThemes, theme, themeName, themes} = this.context;
-    const {hasCustomTheme, hide, open} = this.props;
+    const {hasCustomTheme, hide, hiddenTypes, open} = this.props;
     const {editMode} = this.state;
 
     if (!open) {
@@ -90,14 +93,47 @@ class PreferencesPanel extends React.Component<Props, State> {
       content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
           <h4 style={styles.header}>Preferences</h4>
-          <div style={styles.preference}>
+          <div style={styles.preferencesSection}>
             <TraceUpdatesFrontendControl />
-          </div>
-          <div style={styles.preference}>
             <ColorizerFrontendControl />
           </div>
+          <h4 style={styles.header}>Hide types</h4>
+          <div style={styles.preferencesSection}>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('ContextConsumer')} onChange={() => this._toggleHiddenType('ContextConsumer')} />
+              Context consumers
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('ContextProvider')} onChange={() => this._toggleHiddenType('ContextProvider')} />
+              Context providers
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('ForwardRef')} onChange={() => this._toggleHiddenType('ForwardRef')} />
+              ForwardRefs
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('Fragment')} onChange={() => this._toggleHiddenType('Fragment')} />
+              Fragments
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('HOC')} onChange={() => this._toggleHiddenType('HOC')} />
+              HOCs
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('Mode')} onChange={() => this._toggleHiddenType('Mode')} />
+              Modes
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('Native')} onChange={() => this._toggleHiddenType('Native')} />
+              Native elements
+            </label>
+            <label>
+              <input type="checkbox" checked={hiddenTypes.has('Profiler')} onChange={() => this._toggleHiddenType('Profiler')} />
+              Profiler
+            </label>
+          </div>
           <h4 style={styles.header}>Theme</h4>
-          <div style={styles.selectAndPreviewRow}>
+          <div style={styles.preferencesSection}>
             <select
               onChange={this._changeTheme}
               onKeyUp={this._onKeyUp}
@@ -136,6 +172,12 @@ class PreferencesPanel extends React.Component<Props, State> {
       </div>
     );
   }
+
+  _toggleHiddenType = (hiddenType: HiddenType) => {
+    const {toggleHiddenType} = this.props;
+
+    toggleHiddenType(hiddenType);
+  };
 
   _changeTheme = (event) => {
     const {changeTheme} = this.props;
@@ -208,14 +250,16 @@ const blockClick = event => event.stopPropagation();
 
 const WrappedPreferencesPanel = decorate({
   listeners() {
-    return ['preferencesPanelShown'];
+    return ['hiddenTypes', 'preferencesPanelShown'];
   },
   props(store, props) {
     return {
       changeTheme: themeName => store.changeTheme(themeName),
+      hiddenTypes: store.hiddenTypes,
       hasCustomTheme: !!store.themeStore.customTheme,
       hide: () => store.hidePreferencesPanel(),
       open: store.preferencesPanelShown,
+      toggleHiddenType: hiddenType => store.toggleHiddenType(hiddenType),
     };
   },
 }, PreferencesPanel);
@@ -230,6 +274,7 @@ const panelStyle = (theme: Theme) => ({
   alignItems: 'flex-start',
   zIndex: 1,
   fontFamily: sansSerif.family,
+  fontSize: sansSerif.sizes.normal,
   backgroundColor: theme.base01,
   border: `1px solid ${theme.base03}`,
   color: theme.base05,
@@ -259,23 +304,20 @@ const styles = {
   },
   header: {
     margin: '0 0 0.5rem',
+    fontSize: sansSerif.sizes.large,
   },
   buttonBar: {
     flexDirection: 'row',
   },
   button: {
-    marginTop: '0.5rem',
-    marginRight: '0.25rem',
     padding: '0.25rem',
   },
-  preference: {
+  preferencesSection: {
+    display: 'grid',
+    gridTemplateColumns: 'auto auto auto',
+    gridColumnGap: '5px',
+    gridRowGap: '5px',
     margin: '0 0 0.5rem',
-    fontSize: sansSerif.sizes.normal,
-  },
-  selectAndPreviewRow: {
-    display: 'flex',
-    direction: 'row',
-    alignItems: 'center',
   },
 };
 

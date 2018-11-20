@@ -31,6 +31,7 @@ function getData012(internalInstance: Object): DataType {
   var text = null;
   var publicInstance = null;
   var nodeType = 'Native';
+  var hiddenType = 'Other';
   if (internalInstance._renderedComponent) {
     nodeType = 'Wrapper';
     children = [internalInstance._renderedComponent];
@@ -45,6 +46,7 @@ function getData012(internalInstance: Object): DataType {
     name = internalInstance.constructor.displayName;
     children = props.children;
     nodeType = 'Native';
+    hiddenType = 'Native';
   }
 
   if (!props && internalInstance._currentElement && internalInstance._currentElement.props) {
@@ -65,11 +67,19 @@ function getData012(internalInstance: Object): DataType {
       if (!name) {
         name = 'No display name';
       }
+      if (name.indexOf('(') >= 0) {
+        // HACK heuristic for a HOC is a name with ()s (e.g. "connect(MyComponent)")
+        hiddenType = 'HOC';
+      }
     }
   }
 
   if (!name) {
     name = internalInstance.constructor.displayName || 'No display name';
+    if (name.indexOf('(') >= 0) {
+      // HACK heuristic for a HOC is a name with ()s (e.g. "connect(MyComponent)")
+      hiddenType = 'HOC';
+    }
     nodeType = 'Composite';
   }
 
@@ -106,6 +116,7 @@ function getData012(internalInstance: Object): DataType {
     text,
     updater,
     publicInstance,
+    hiddenType,
   };
 }
 

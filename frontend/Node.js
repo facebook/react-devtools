@@ -20,11 +20,13 @@ const {monospace} = require('./Themes/Fonts');
 const {getInvertedWeak, hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
+import type {HiddenType} from '../backend/types';
 import type {Theme} from './types';
 
 const {Fragment} = React;
 
 type PropsType = {
+  hiddenTypes: Set<HiddenType>,
   hovered: boolean,
   selected: boolean,
   showCopyableInput: boolean,
@@ -187,6 +189,7 @@ class Node extends React.Component<PropsType, StateType> {
     const {theme} = this.context;
     const {
       depth,
+      hiddenTypes,
       hovered,
       isBottomTagHovered,
       isBottomTagSelected,
@@ -211,10 +214,20 @@ class Node extends React.Component<PropsType, StateType> {
 
     let children = node.get('children');
 
-    if (node.get('nodeType') === 'Wrapper') {
-      return children.map(child =>
-        <WrappedNode key={child} id={child} depth={depth}/>
-      );
+    if (
+      node.get('nodeType') === 'Wrapper' ||
+      hiddenTypes.has(node.get('hiddenType'))
+    ) {
+      if (Array.isArray(children)) {
+        return children.map(child =>
+          <WrappedNode key={child} id={child} depth={depth}/>
+        );
+      } else if (typeof children === 'string') {
+        // Special case to avoid showing "Node was deleted" when Native compoents are hidden.
+        return null;
+      } else {
+        return <WrappedNode key={children} id={children} depth={depth}/>;
+      }
     }
 
     if (node.get('nodeType') === 'NativeWrapper') {
@@ -443,7 +456,7 @@ Node.contextTypes = {
 
 var WrappedNode = decorate({
   listeners(props) {
-    return [props.id];
+    return [props.id, 'hiddenTypes'];
   },
   props(store, props) {
     var node = store.get(props.id);
@@ -459,6 +472,7 @@ var WrappedNode = decorate({
       showCopyableInput: store.showCopyableInput === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
+      hiddenTypes: store.hiddenTypes,
       hovered: store.hovered === props.id,
       searchRegExp: props.searchRegExp,
       onToggleCollapse: e => {

@@ -26,6 +26,8 @@ export type Interaction = {|
   timestamp: number,
 |};
 
+export type HiddenType = 'ContextConsumer' | 'ContextProvider' | 'ForwardRef' | 'Fragment' | 'HOC' | 'Mode' | 'Native' | 'Other' | 'Profiler';
+
 export type DataType = {
   nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Special' | 'Text' | 'Portal' | 'Empty',
   type: ?(string | AnyFn),
@@ -48,6 +50,9 @@ export type DataType = {
   actualDuration: ?number,
   actualStartTime: ?number,
   treeBaseDuration: ?number,
+
+  // Filtering
+  hiddenType: HiddenType,
 };
 
 // This type is entirely opaque to the backend.
