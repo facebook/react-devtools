@@ -42,6 +42,22 @@ module.exports = {
         loader: 'babel-loader',
         options: JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
       },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              modules: true,
+              localIdentName: '[local]___[hash:base64:5]',
+            },
+          },
+        ],
+      },
     ],
   },
 };

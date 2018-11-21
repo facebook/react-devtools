@@ -9,19 +9,19 @@
  */
 'use strict';
 
-const PropTypes = require('prop-types');
-const React = require('react');
-const ReactDOM = require('react-dom');
-const {sansSerif} = require('./Themes/Fonts');
-const SearchUtils = require('./SearchUtils');
-const SvgIcon = require('./SvgIcon');
-const Icons = require('./Icons');
-const Input = require('./Input');
-const Hoverable = require('./Hoverable');
-
-const decorate = require('./decorate');
-
 import type {Theme} from './types';
+
+import PropTypes from 'prop-types';
+import React, {Component} from 'react';
+import {findDOMNode} from 'react-dom';
+import {sansSerif} from './Themes/Fonts';
+import SearchUtils from './SearchUtils';
+import SvgIcon from './SvgIcon';
+import Icons from './Icons';
+import Input from './Input';
+import Hoverable from './Hoverable';
+import decorate from './decorate';
+import css from './SettingsPane.css';
 
 type EventLike = {
   keyCode: number,
@@ -30,7 +30,7 @@ type EventLike = {
   stopPropagation: () => void,
 };
 
-class SettingsPane extends React.Component {
+class SettingsPane extends Component {
   context: {
     theme: Theme,
   };
@@ -44,13 +44,13 @@ class SettingsPane extends React.Component {
 
   componentDidMount() {
     this._key = this.onDocumentKeyDown.bind(this);
-    const doc = ReactDOM.findDOMNode(this).ownerDocument;
+    const doc = findDOMNode(this).ownerDocument;
     // capture=true is needed to prevent chrome devtools console popping up
     doc.addEventListener('keydown', this._key, true);
   }
 
   componentWillUnmount() {
-    const doc = ReactDOM.findDOMNode(this).ownerDocument;
+    const doc = findDOMNode(this).ownerDocument;
     doc.removeEventListener('keydown', this._key, true);
   }
 
@@ -116,7 +116,7 @@ class SettingsPane extends React.Component {
           />
         )}
 
-        <div style={styles.searchInputWrapper}>
+        <div className={css.searchInputWrapper}>
           <Input
             style={inputStyle}
             innerRef={i => this.input = i}
@@ -160,7 +160,7 @@ SettingsPane.propTypes = {
   toggleInspectEnabled: PropTypes.func,
 };
 
-var Wrapped = decorate({
+const Wrapped = decorate({
   listeners(props) {
     return ['isInspectEnabled', 'isRecording', 'searchText'];
   },
@@ -314,17 +314,4 @@ const errorInputStyle = (theme: Theme) => ({
   ...baseInputStyle(theme),
 });
 
-var styles = {
-  growToFill: {
-    flexGrow: 1,
-  },
-  searchInputWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    flexGrow: 1,
-    flexShrink: 0,
-    position: 'relative',
-  },
-};
-
-module.exports = Wrapped;
+export default Wrapped;
