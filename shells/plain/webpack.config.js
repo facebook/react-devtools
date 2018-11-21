@@ -9,8 +9,12 @@
  */
 'use strict';
 
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
+
 module.exports = {
-  devtool: false, //'cheap-module-eval-source-map',
+  mode: 'development',
+  devtool: false,
   entry: {
     backend: './backend.js',
     container: './container.js',
@@ -19,12 +23,15 @@ module.exports = {
     path: __dirname + '/build',
     filename: '[name].js',
   },
-
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader:  'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: {
+          ...JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+        },
+      },
+    ],
   },
 };

@@ -9,12 +9,14 @@
  */
 'use strict';
 
-var webpack = require('webpack');
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
 
-var __DEV__ = process.env.NODE_ENV !== 'production';
+const __DEV__ = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-  devtool: __DEV__ ? '#cheap-module-eval-source-map' : false,
+  mode: __DEV__ ? 'development' : 'production',
+  devtool: __DEV__ ? 'cheap-module-eval-source-map' : false,
   entry: {
     backend: './src/backend.js',
   },
@@ -22,19 +24,15 @@ module.exports = {
     path: __dirname + '/build',
     filename: '[name].js',
   },
-
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader:  'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: {
+          ...JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+        },
+      },
+    ],
   },
-
-  plugins: [new webpack.ProvidePlugin({
-    'Object.create': __dirname + '/helpers/object-create.js',
-    Map: __dirname + '/helpers/map.js',
-    WeakMap: __dirname + '/helpers/weak-map.js',
-    Set: __dirname + '/helpers/set.js',
-  })],
 };

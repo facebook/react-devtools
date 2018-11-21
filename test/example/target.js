@@ -78,7 +78,7 @@ class Todos extends React.Component {
     todos.some(item => {
       if (item.id === id) {
         item.completed = completed;
-        text = item.text;
+        text = item.title;
         return true;
       }
       return false;

@@ -9,38 +9,37 @@
  */
 'use strict';
 
-var webpack = require('webpack');
-var __DEV__ = process.env.NODE_ENV !== 'production';
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
+const webpack = require('webpack');
+
+const __DEV__ = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-  debug: true,
-  devtool: 'source-map',
+  mode: __DEV__ ? 'development' : 'production',
+  devtool: __DEV__ ? 'source-map' : false,
   entry: {
     backend: './src/backend.js',
   },
   output: {
-    path: __dirname + '/build', // eslint-disable-line no-path-concat
+    path: __dirname + '/build',
     filename: '[name].js',
-    library: 'ReactDevToolsBackend',
-    libraryTarget: 'umd',
   },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     }),
-    // Remove dead code but keep it readable:
-    new webpack.optimize.UglifyJsPlugin({
-      mangle: false,
-      beautify: true,
-    }),
   ],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader: 'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: {
+          ...JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+        },
+      },
+    ],
   },
 };
-
