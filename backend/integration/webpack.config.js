@@ -11,6 +11,9 @@
  */
 'use strict';
 
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
+
 module.exports = {
   devtool: 'cheap-module-eval-source-map',
   entry: {
@@ -29,25 +32,14 @@ module.exports = {
   },
 
   module: {
-
-    // require
-    unknownContextRegExp: /$^/,
-    unknownContextCritical: false,
-
-    // require(expr)
-    exprContextRegExp: /$^/,
-    exprContextCritical: false,
-
-    // require("prefix" + expr + "surfix")
-    wrappedContextRegExp: /$^/,
-    wrappedContextCritical: false,
-
-    loaders: [{
-      test: /\.js$/,
-      loader:  'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: {
+          ...JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+        },
+      },
+    ],
   },
 };
-
-// TODO
