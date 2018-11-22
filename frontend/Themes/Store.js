@@ -14,6 +14,7 @@ const {deserialize, serialize} = require('./Serializer');
 const Themes = require('./Themes');
 const {CUSTOM_THEME_NAME} = require('./constants');
 const {get, set} = require('../../utils/storage');
+const Fonts = require('./Fonts');
 
 const LOCAL_STORAGE_CUSTOM_THEME_KEY = 'customTheme';
 const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
@@ -38,6 +39,8 @@ class Store {
     }
 
     this.setDefaultTheme(defaultThemeName);
+
+    updateFontVariables(Fonts);
   }
 
   setDefaultTheme(defaultThemeName: ?string) {
@@ -55,6 +58,8 @@ class Store {
     // Or one of the built-in sets (based on the default).
     this.theme = themeName === CUSTOM_THEME_NAME ? this.customTheme : Themes[themeName];
     this.themeName = themeName;
+
+    updateCSSVariables(this.theme);
   }
 
   update(themeName: ?string) {
@@ -71,6 +76,8 @@ class Store {
 
     // But allow users to restore "default" mode by selecting an empty theme.
     set(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+
+    updateCSSVariables(this.theme);
   }
 
   saveCustomTheme(theme: Theme) {
@@ -78,7 +85,28 @@ class Store {
     this.theme = theme;
 
     set(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
+
+    updateCSSVariables(theme);
   }
+}
+
+function updateCSSVariables(theme: Theme): void {
+  for (const key in theme) {
+    // $FlowFixMe
+    document.body.style.setProperty(`--${key}`, theme[key]);
+  }
+}
+
+function updateFontVariables({ monospace, sansSerif }) {
+  // $FlowFixMe
+  const {style} = document.body;
+  style.setProperty('--font-family-mono', monospace.family);
+  style.setProperty('--font-size-mono-normal', monospace.sizes.normal + 'px');
+  style.setProperty('--font-size-mono-large', monospace.sizes.large + 'px');
+  style.setProperty('--font-family-sans', sansSerif.family);
+  style.setProperty('--font-size-sans-small', sansSerif.sizes.small + 'px');
+  style.setProperty('--font-size-sans-normal', sansSerif.sizes.normal + 'px');
+  style.setProperty('--font-size-sans-large', sansSerif.sizes.large + 'px');
 }
 
 function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {

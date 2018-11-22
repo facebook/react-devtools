@@ -13,13 +13,18 @@
 const React = require('react');
 
 type Props = {
+  className?: string,
   path: string,
   style?: Object,
 };
 
-const SvgIcon = ({ path, style }: Props) => (
+// TODO Remove DEFAULT_STYLE in favor of className once all styles have been migrated.
+// For now, suppress inline styles when a className is provided–
+// since these would always override className values.
+const SvgIcon = ({ className, path, style }: Props) => (
   <svg
-    style={{
+    className={className}
+    style={className ? null : {
       ...DEFAULT_STYLE,
       ...style,
     }}
