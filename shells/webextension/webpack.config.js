@@ -9,16 +9,20 @@
  */
 'use strict';
 
-var webpack = require('webpack');
-var __DEV__ = process.env.NODE_ENV !== 'production';
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
+const webpack = require('webpack');
+
+const __DEV__ = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-  devtool: __DEV__ ? '#cheap-module-eval-source-map' : false,
+  mode: __DEV__ ? 'development' : 'production',
+  devtool: __DEV__ ? 'cheap-module-eval-source-map' : false,
   entry: {
-    main: './src/main.js',
     background: './src/background.js',
-    inject: './src/GlobalHook.js',
     contentScript: './src/contentScript.js',
+    inject: './src/GlobalHook.js',
+    main: './src/main.js',
     panel: './src/panel.js',
   },
   output: {
@@ -30,17 +34,14 @@ module.exports = {
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     }),
-    // Remove dead code but keep it readable:
-    new webpack.optimize.UglifyJsPlugin({
-      mangle: false,
-      beautify: true,
-    }),
   ],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader:  'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+      },
+    ],
   },
 };
