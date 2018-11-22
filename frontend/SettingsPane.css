@@ -4,8 +4,8 @@
   flex-shrink: 0;
   align-items: center;
   position: relative;
-  background-color: var(--base01);
-  border-bottom: 1px solid var(--base03);
+  background-color: var(--theme-base01);
+  border-bottom: 1px solid var(--theme-base03);
 }
 
 .SettingsMenuButton {
@@ -17,7 +17,7 @@
   color: inherit;
 }
 .SettingsMenuButton:hover {
-  color: var(--state06);
+  color: var(--theme-state06);
 }
 
 .SearchInputWrapper {
@@ -35,10 +35,10 @@
   cursor: default;
   right: 0;
   line-height: 28px;
-  color: var(--base02);
+  color: var(--theme-base02);
 }
 .ClearSearchButton:hover {
-  color: var(--base04);
+  color: var(--theme-base04);
 }
 
 .ActiveInspectMenuButton,
@@ -51,10 +51,10 @@
   color: inherit;
 }
 .InspectMenuButton:hover {
-  color: var(--state06);
+  color: var(--theme-state06);
 }
 .ActiveInspectMenuButton {
-  color: var(--state00);
+  color: var(--theme-state00);
 }
 
 .SearchIcon {
@@ -66,8 +66,8 @@
   width: 1em;
   height: 100%;
   stroke-width: 0;
-  stroke: var(--base03);
-  fill: var(--base03);
+  stroke: var(--theme-base03);
+  fill: var(--theme-base03);
   line-height: 28px;
   font-size: var(--font-size-sans-normal);
 }
@@ -83,5 +83,5 @@
   width: 100%;
 }
 .Input:focus {
-  background-color: var(--base00);
+  background-color: var(--theme-base00);
 }

@@ -93,7 +93,7 @@ class Store {
 function updateCSSVariables(theme: Theme): void {
   for (const key in theme) {
     // $FlowFixMe
-    document.body.style.setProperty(`--${key}`, theme[key]);
+    document.body.style.setProperty(`--theme-${key}`, theme[key]);
   }
 }
 
