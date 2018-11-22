@@ -11,7 +11,6 @@
 'use strict';
 
 import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
-import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
 import React, { PureComponent } from 'react';
@@ -40,7 +39,6 @@ type ItemData = {|
   scaleX: (value: number, fallbackValue: number) => number,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 |};
 
@@ -54,7 +52,6 @@ type Props = {|
   showNativeNodes: boolean,
   snapshot: Snapshot,
   snapshotIndex: number,
-  theme: Theme,
 |};
 
 const SnapshotRanked = ({
@@ -67,7 +64,6 @@ const SnapshotRanked = ({
   showNativeNodes,
   snapshot,
   snapshotIndex,
-  theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const dataKey = showNativeNodes ? 'SnapshotRankedDataWithNativeNodes' : 'SnapshotRankedDataWithoutNativeNodes';
@@ -88,7 +84,6 @@ const SnapshotRanked = ({
           selectedFiberID={selectedFiberID}
           selectFiber={selectFiber}
           snapshot={snapshot}
-          theme={theme}
           width={width}
         />
       )}
@@ -109,7 +104,6 @@ type SnapshotRankedInnerProps = {|
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 |};
 
@@ -121,7 +115,6 @@ const SnapshotRankedInner = ({
   selectedFiberID,
   selectFiber,
   snapshot,
-  theme,
   width,
 }: SnapshotRankedInnerProps) => {
   // If a commit contains no fibers with an actualDuration > 0,
@@ -140,7 +133,6 @@ const SnapshotRankedInner = ({
     rankedData,
     selectFiber,
     snapshot,
-    theme,
     width,
   );
 
@@ -200,7 +192,6 @@ class ListItem extends PureComponent<any, void> {
         label={node.label}
         onClick={this.handleClick}
         onDoubleClick={this.handleDoubleClick}
-        theme={data.theme}
         title={node.title}
         width={Math.max(minBarWidth, scaleX(node.value, width))}
         x={0}
@@ -216,7 +207,6 @@ const getItemData = memoize((
   rankedData: RankedData,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 ): ItemData => ({
   focusedNode: rankedData.nodes[focusedNodeIndex],
@@ -227,7 +217,6 @@ const getItemData = memoize((
   scaleX: scale(0, rankedData.nodes[focusedNodeIndex].value, 0, width),
   selectFiber,
   snapshot,
-  theme,
   width,
 }));
 

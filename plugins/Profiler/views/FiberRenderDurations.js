@@ -11,7 +11,6 @@
 'use strict';
 
 import type {Snapshot} from '../ProfilerTypes';
-import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
 import React, { PureComponent } from 'react';
@@ -40,7 +39,6 @@ type ItemData = {|
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   stopInspecting: Function,
-  theme: Theme,
 |};
 
 type SelectSnapshot = (snapshot: Snapshot) => void;
@@ -54,7 +52,6 @@ type Props = {|
   snapshotIndex: number,
   snapshots: Array<Snapshot>,
   stopInspecting: Function,
-  theme: Theme,
 |};
 
 export default ({
@@ -66,7 +63,6 @@ export default ({
   snapshotIndex,
   snapshots,
   stopInspecting,
-  theme,
 }: Props) => {
   const filteredData = getFilteredSnapshotData(
     commitThreshold,
@@ -90,7 +86,6 @@ export default ({
           selectSnapshot={selectSnapshot}
           snapshots={filteredData.snapshots}
           stopInspecting={stopInspecting}
-          theme={theme}
           width={width}
         />
       )}
@@ -107,7 +102,6 @@ type RenderDurationsProps = {|
   selectSnapshot: SelectSnapshot,
   snapshots: Array<Snapshot>,
   stopInspecting: Function,
-  theme: Theme,
   width: number,
 |};
 
@@ -120,7 +114,6 @@ const RenderDurations = ({
   selectSnapshot,
   snapshots,
   stopInspecting,
-  theme,
   width,
 }: RenderDurationsProps) => {
   // getChartData() is memoized so it's okay to call them on every render.
@@ -153,7 +146,6 @@ const RenderDurations = ({
     selectedSnapshot,
     selectSnapshot,
     stopInspecting,
-    theme,
   );
 
   return (
@@ -176,7 +168,7 @@ class ListItem extends PureComponent<any, void> {
     const { index, style } = this.props;
     const itemData: ItemData = ((this.props.data: any): ItemData);
 
-    const { height, nodes, scaleY, selectedSnapshot, selectSnapshot, stopInspecting, theme } = itemData;
+    const { height, nodes, scaleY, selectedSnapshot, selectSnapshot, stopInspecting } = itemData;
 
     const node = nodes[index];
     const safeHeight = Math.max(minBarHeight, scaleY(node.value, minBarHeight));
@@ -196,7 +188,6 @@ class ListItem extends PureComponent<any, void> {
         label={`${node.value.toFixed(1)}ms`}
         onClick={() => selectSnapshot(node.parentSnapshot)}
         onDoubleClick={stopInspecting}
-        theme={theme}
         title={`${node.value.toFixed(3)}ms`}
         width={width}
         x={left}
@@ -244,7 +235,6 @@ const getItemData = memoize((
   selectedSnapshot: Snapshot,
   selectSnapshot: SelectSnapshot,
   stopInspecting: Function,
-  theme: Theme,
 ): ItemData => ({
   height,
   nodes,
@@ -252,5 +242,4 @@ const getItemData = memoize((
   selectedSnapshot,
   selectSnapshot,
   stopInspecting,
-  theme,
 }));
