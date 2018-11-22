@@ -28,9 +28,7 @@ module.exports = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        options: {
-          ...JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
-        },
+        options: JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
       },
     ],
   },
