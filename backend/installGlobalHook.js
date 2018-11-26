@@ -28,6 +28,17 @@ function installGlobalHook(window: Object) {
     return false;
   }
 
+  function getCommitSha(renderer) {
+    var version = renderer.version;
+    if (typeof version === 'string') {
+      const index = renderer.version.indexOf('-canary-');
+      if (index > 0) {
+        return version.substr(index + 8);
+      }
+    }
+    return null;
+  }
+
   function detectReactBuildType(renderer) {
     try {
       if (typeof renderer.version === 'string') {
@@ -167,7 +178,8 @@ function installGlobalHook(window: Object) {
         'deadcode' :
         detectReactBuildType(renderer);
       var isCanaryVersion = detectCanaryVersion(renderer);
-      hook.emit('renderer', {id, isCanaryVersion, renderer, reactBuildType});
+      var commitSha = getCommitSha(renderer);
+      hook.emit('renderer', {id, isCanaryVersion, commitSha, renderer, reactBuildType});
       return id;
     },
     _listeners: {},

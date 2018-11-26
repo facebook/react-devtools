@@ -30,6 +30,7 @@ window.addEventListener('message', function(evt) {
   if (evt.source === window && evt.data && evt.data.source === 'react-devtools-detector') {
     lastDetectionResult = {
       hasDetectedReact: true,
+      commitSha: evt.data.commitSha,
       isCanaryVersion: evt.data.isCanaryVersion,
       reactBuildType: evt.data.reactBuildType,
     };
@@ -52,6 +53,7 @@ var detectReact = `
 window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('renderer', function(evt) {
   window.postMessage({
     source: 'react-devtools-detector',
+    commitSha: evt.commitSha,
     isCanaryVersion: evt.isCanaryVersion,
     reactBuildType: evt.reactBuildType,
   }, '*');

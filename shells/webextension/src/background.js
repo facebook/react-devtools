@@ -70,7 +70,7 @@ function doublePipe(one, two) {
   two.onDisconnect.addListener(shutdown);
 }
 
-function setIconAndPopup(reactBuildType, isCanaryVersion, tabId) {
+function setIconAndPopup(reactBuildType, isCanaryVersion, commitSha, tabId) {
   var iconType = reactBuildType === 'production' && isCanaryVersion
     ? 'canary'
     : reactBuildType;
@@ -83,9 +83,15 @@ function setIconAndPopup(reactBuildType, isCanaryVersion, tabId) {
       '128': 'icons/128-' + iconType + '.png',
     },
   });
+
+  var urlParams = '';
+  if (commitSha) {
+    urlParams = '?commitSha=' + commitSha;
+  }
+
   chrome.browserAction.setPopup({
     tabId: tabId,
-    popup: 'popups/' + reactBuildType + '.html',
+    popup: 'popups/' + reactBuildType + '.html' + urlParams,
   });
 }
 
@@ -96,7 +102,7 @@ function setIconAndPopup(reactBuildType, isCanaryVersion, tabId) {
 if (IS_FIREFOX) {
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (tab.active && changeInfo.status === 'loading') {
-      setIconAndPopup('disabled', 'disabled', tabId);
+      setIconAndPopup('disabled', false, null, tabId);
     }
   });
 }
@@ -118,7 +124,6 @@ chrome.runtime.onMessage.addListener((req, sender) => {
       // version of React in React docs, but not in any other case.
       reactBuildType = 'production';
     }
-    var isCanaryVersion = req.isCanaryVersion;
-    setIconAndPopup(reactBuildType, isCanaryVersion, sender.tab.id);
+    setIconAndPopup(reactBuildType, req.isCanaryVersion, req.commitSha, sender.tab.id);
   }
 });
