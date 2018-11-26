@@ -30,6 +30,7 @@ window.addEventListener('message', function(evt) {
   if (evt.source === window && evt.data && evt.data.source === 'react-devtools-detector') {
     lastDetectionResult = {
       hasDetectedReact: true,
+      isCanaryVersion: evt.data.isCanaryVersion,
       reactBuildType: evt.data.reactBuildType,
     };
     chrome.runtime.sendMessage(lastDetectionResult);
@@ -51,6 +52,7 @@ var detectReact = `
 window.__REACT_DEVTOOLS_GLOBAL_HOOK__.on('renderer', function(evt) {
   window.postMessage({
     source: 'react-devtools-detector',
+    isCanaryVersion: evt.isCanaryVersion,
     reactBuildType: evt.reactBuildType,
   }, '*');
 });

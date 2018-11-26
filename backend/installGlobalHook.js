@@ -20,6 +20,14 @@ function installGlobalHook(window: Object) {
   if (window.__REACT_DEVTOOLS_GLOBAL_HOOK__) {
     return;
   }
+
+  function detectCanaryVersion(renderer) {
+    if (typeof renderer.version === 'string') {
+      return renderer.version.indexOf('-canary-') > 0;
+    }
+    return false;
+  }
+
   function detectReactBuildType(renderer) {
     try {
       if (typeof renderer.version === 'string') {
@@ -158,7 +166,8 @@ function installGlobalHook(window: Object) {
       var reactBuildType = hasDetectedBadDCE ?
         'deadcode' :
         detectReactBuildType(renderer);
-      hook.emit('renderer', {id, renderer, reactBuildType});
+      var isCanaryVersion = detectCanaryVersion(renderer);
+      hook.emit('renderer', {id, isCanaryVersion, renderer, reactBuildType});
       return id;
     },
     _listeners: {},

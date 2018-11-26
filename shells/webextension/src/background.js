@@ -70,14 +70,17 @@ function doublePipe(one, two) {
   two.onDisconnect.addListener(shutdown);
 }
 
-function setIconAndPopup(reactBuildType, tabId) {
+function setIconAndPopup(reactBuildType, isCanaryVersion, tabId) {
+  var iconType = reactBuildType === 'production' && isCanaryVersion
+    ? 'canary'
+    : reactBuildType;
   chrome.browserAction.setIcon({
     tabId: tabId,
     path: {
-      '16': 'icons/16-' + reactBuildType + '.png',
-      '32': 'icons/32-' + reactBuildType + '.png',
-      '48': 'icons/48-' + reactBuildType + '.png',
-      '128': 'icons/128-' + reactBuildType + '.png',
+      '16': 'icons/16-' + iconType + '.png',
+      '32': 'icons/32-' + iconType + '.png',
+      '48': 'icons/48-' + iconType + '.png',
+      '128': 'icons/128-' + iconType + '.png',
     },
   });
   chrome.browserAction.setPopup({
@@ -93,7 +96,7 @@ function setIconAndPopup(reactBuildType, tabId) {
 if (IS_FIREFOX) {
   chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
     if (tab.active && changeInfo.status === 'loading') {
-      setIconAndPopup('disabled', tabId);
+      setIconAndPopup('disabled', 'disabled', tabId);
     }
   });
 }
@@ -115,7 +118,7 @@ chrome.runtime.onMessage.addListener((req, sender) => {
       // version of React in React docs, but not in any other case.
       reactBuildType = 'production';
     }
-
-    setIconAndPopup(reactBuildType, sender.tab.id);
+    var isCanaryVersion = req.isCanaryVersion;
+    setIconAndPopup(reactBuildType, isCanaryVersion, sender.tab.id);
   }
 });
