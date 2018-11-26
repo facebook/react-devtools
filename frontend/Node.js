@@ -16,6 +16,7 @@ const nullthrows = require('nullthrows').default;
 
 const decorate = require('./decorate');
 const Props = require('./Props');
+const {monospace} = require('./Themes/Fonts');
 const {getInvertedWeak, hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
@@ -286,6 +287,8 @@ class Node extends React.Component<PropsType, StateType> {
 
     let name = node.get('name') + '';
 
+    const nameString = name;
+
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
     if (searchRegExp) {
@@ -320,7 +323,7 @@ class Node extends React.Component<PropsType, StateType> {
           <div style={sharedHeadStyle} {...headEvents}>
             &lt;
             {showCopyableInput ? 
-              <input ref={this._setHeadRef} defaultValue={name} readOnly="readonly" size={name.length} />
+              <input ref={this._setHeadRef} defaultValue={nameString} readOnly="readonly" size={nameString.length} style={copyableElementName} />
               : <span ref={this._setHeadRef} style={jsxSingleLineTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
             }
             {node.get('key') &&
@@ -375,7 +378,7 @@ class Node extends React.Component<PropsType, StateType> {
         </span>
         &lt;
         {showCopyableInput ? 
-          <input ref={this._setHeadRef} defaultValue={name} readOnly="readonly" size={name.length} />
+          <input ref={this._setHeadRef} defaultValue={nameString} readOnly="readonly" size={nameString.length} style={copyableElementName} />
           : <span ref={this._setHeadRef} style={jsxOpenTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
         }
 
@@ -523,7 +526,6 @@ const headStyle = ({
 
   return {
     cursor: 'default',
-    borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
     flexShrink: 0,
@@ -534,6 +536,12 @@ const headStyle = ({
     backgroundColor,
     color,
   };
+};
+
+const copyableElementName = {
+  border: 'none',
+  boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.25)',
+  fontFamily: monospace.family,
 };
 
 const jsxTagStyle = (inverted: boolean, nodeType: string, theme: Theme) => {
@@ -600,7 +608,6 @@ const tailStyle = ({
   const color = isInverted ? theme.state02 : theme.base04;
 
   return {
-    borderTop: '1px solid transparent',
     cursor: 'default',
     paddingLeft: '1rem',
     paddingRight,
