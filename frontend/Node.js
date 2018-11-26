@@ -16,6 +16,7 @@ const nullthrows = require('nullthrows').default;
 
 const decorate = require('./decorate');
 const Props = require('./Props');
+const {monospace} = require('./Themes/Fonts');
 const {getInvertedWeak, hexToRgba} = require('./Themes/utils');
 
 import type {Map} from 'immutable';
@@ -26,6 +27,7 @@ const {Fragment} = React;
 type PropsType = {
   hovered: boolean,
   selected: boolean,
+  showCopyableInput: boolean,
   node: Map,
   depth: number,
   isBottomTagHovered: boolean,
@@ -38,6 +40,7 @@ type PropsType = {
   onToggleCollapse: () => void,
   onSelectBottom: () => void,
   onSelect: () => void,
+  onShowCopyableInput: () => void,
 };
 
 type StateType = {
@@ -82,6 +85,10 @@ class Node extends React.Component<PropsType, StateType> {
     } else if (!this.props.selected && prevProps.selected) {
       // Losing selection.
       this.unsubscribeFromWindowFocus();
+    }
+
+    if (this.props.showCopyableInput && this._head instanceof HTMLInputElement) {
+      this._head.select();
     }
   }
 
@@ -190,8 +197,10 @@ class Node extends React.Component<PropsType, StateType> {
       onSelect,
       onSelectBottom,
       onToggleCollapse,
+      onShowCopyableInput,
       searchRegExp,
       selected,
+      showCopyableInput,
       wrappedChildren,
     } = this.props;
     const {isWindowFocused} = this.state;
@@ -243,6 +252,13 @@ class Node extends React.Component<PropsType, StateType> {
       onMouseDown: onSelectBottom,
     };
 
+    const onNameDoubleClick = e => {
+      if (!collapsed) {
+        e.stopPropagation();
+      }
+      onShowCopyableInput();
+    };
+
     const nodeType = node.get('nodeType');
     if (nodeType === 'Text' || nodeType === 'Empty') {
       let tag;
@@ -270,6 +286,8 @@ class Node extends React.Component<PropsType, StateType> {
     }
 
     let name = node.get('name') + '';
+
+    const nameString = name;
 
     // If the user's filtering then highlight search terms in the tag name.
     // This will serve as a visual reminder that the visible tree is filtered.
@@ -304,7 +322,10 @@ class Node extends React.Component<PropsType, StateType> {
         <div style={headWrapperStyle}>
           <div style={sharedHeadStyle} {...headEvents}>
             &lt;
-            <span ref={this._setHeadRef} style={jsxSingleLineTagStyle}>{name}</span>
+            {showCopyableInput ? 
+              <input ref={this._setHeadRef} defaultValue={nameString} readOnly="readonly" size={nameString.length} style={copyableElementName} />
+              : <span ref={this._setHeadRef} style={jsxSingleLineTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
+            }
             {node.get('key') &&
               <Props key="key" props={{'key': node.get('key')}} inverted={inverted}/>
             }
@@ -356,7 +377,11 @@ class Node extends React.Component<PropsType, StateType> {
           {collapsed ? '▶' : '▼'}
         </span>
         &lt;
-        <span ref={this._setHeadRef} style={jsxOpenTagStyle}>{name}</span>
+        {showCopyableInput ? 
+          <input ref={this._setHeadRef} defaultValue={nameString} readOnly="readonly" size={nameString.length} style={copyableElementName} />
+          : <span ref={this._setHeadRef} style={jsxOpenTagStyle} onDoubleClick={onNameDoubleClick}>{name}</span>
+        }
+
         {node.get('key') &&
           <Props key="key" props={{'key': node.get('key')}} inverted={headInverted}/>
         }
@@ -431,6 +456,7 @@ var WrappedNode = decorate({
       node,
       wrappedChildren,
       selected: store.selected === props.id,
+      showCopyableInput: store.showCopyableInput === props.id,
       isBottomTagSelected: store.isBottomTagSelected,
       isBottomTagHovered: store.isBottomTagHovered,
       hovered: store.hovered === props.id,
@@ -449,6 +475,9 @@ var WrappedNode = decorate({
       },
       onContextMenu: e => {
         store.showContextMenu('tree', e, props.id, node);
+      },
+      onShowCopyableInput: () => {
+        store.setShowCopyableInput(props.id);
       },
     };
   },
@@ -497,7 +526,6 @@ const headStyle = ({
 
   return {
     cursor: 'default',
-    borderTop: '1px solid transparent',
     position: 'relative',
     display: 'flex',
     flexShrink: 0,
@@ -508,6 +536,12 @@ const headStyle = ({
     backgroundColor,
     color,
   };
+};
+
+const copyableElementName = {
+  border: 'none',
+  boxShadow: '2px 2px 4px rgba(0, 0, 0, 0.25)',
+  fontFamily: monospace.family,
 };
 
 const jsxTagStyle = (inverted: boolean, nodeType: string, theme: Theme) => {
@@ -574,7 +608,6 @@ const tailStyle = ({
   const color = isInverted ? theme.state02 : theme.base04;
 
   return {
-    borderTop: '1px solid transparent',
     cursor: 'default',
     paddingLeft: '1rem',
     paddingRight,

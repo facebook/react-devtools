@@ -110,6 +110,7 @@ class Store extends EventEmitter {
   searchText: string;
   selectedTab: string;
   selected: ?ElementID;
+  showCopyableInput: ?ElementID;
   themeStore: ThemeStore;
   breadcrumbHead: ?ElementID;
   snapshotQueue: Array<Snapshot> = [];
@@ -136,6 +137,7 @@ class Store extends EventEmitter {
     this.hovered = null;
     this.selected = null;
     this.selectedTab = 'Elements';
+    this.showCopyableInput = null;
     this.breadcrumbHead = null;
     this.isBottomTagHovered = false;
     this.isBottomTagSelected = false;
@@ -422,6 +424,11 @@ class Store extends EventEmitter {
     this._toggleDeepChildren(id, value);
   }
 
+  setShowCopyableInput(id: ElementID) {
+    this.showCopyableInput = id;
+    this.emit(id);
+  }
+
   setProps(id: ElementID, path: Array<string>, value: any) {
     this._bridge.send('setProps', {id, path, value});
   }
@@ -488,6 +495,7 @@ class Store extends EventEmitter {
 
   select(id: ?ElementID, noHighlight?: boolean, keepBreadcrumb?: boolean) {
     var oldSel = this.selected;
+    this.showCopyableInput = null;
     this.selected = id;
     if (oldSel) {
       this.emit(oldSel);
