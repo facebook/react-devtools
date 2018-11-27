@@ -11,7 +11,6 @@
 'use strict';
 
 import type {CacheDataForSnapshot, GetCachedDataForSnapshot, Snapshot} from '../ProfilerTypes';
-import type {Theme} from '../../../frontend/types';
 
 import memoize from 'memoize-one';
 import React, { Fragment, PureComponent } from 'react';
@@ -70,7 +69,6 @@ type ItemData = {|
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 |};
 
@@ -84,7 +82,6 @@ type Props = {|
   showNativeNodes: boolean,
   snapshot: Snapshot,
   snapshotIndex: number,
-  theme: Theme,
 |};
 
 const SnapshotFlamegraph = ({
@@ -97,7 +94,6 @@ const SnapshotFlamegraph = ({
   showNativeNodes,
   snapshot,
   snapshotIndex,
-  theme,
 }: Props) => {
   // Cache data in ProfilerStore so we only have to compute it the first time a Snapshot is shown.
   const dataKey = showNativeNodes ? 'SnapshotFlamegraphWithNativeNodes' : 'SnapshotFlamegraphWithoutNativeNodes';
@@ -119,7 +115,6 @@ const SnapshotFlamegraph = ({
           selectFiber={selectFiber}
           showNativeNodes={showNativeNodes}
           snapshot={snapshot}
-          theme={theme}
           width={width}
         />
       )}
@@ -136,7 +131,6 @@ type FlamegraphProps = {|
   selectFiber: SelectOrInspectFiber,
   showNativeNodes: boolean,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 |};
 
@@ -149,7 +143,6 @@ const Flamegraph = ({
   selectFiber,
   showNativeNodes,
   snapshot,
-  theme,
   width,
 }: FlamegraphProps) => {
   const { flameGraphDepth, lazyIDToDepthMap, lazyIDsByDepth } = flamegraphData;
@@ -172,7 +165,6 @@ const Flamegraph = ({
     selectedFiberID,
     selectFiber,
     snapshot,
-    theme,
     width,
   );
 
@@ -281,7 +273,6 @@ class ListItem extends PureComponent<any, void> {
               label={label}
               onClick={this.handleClick.bind(this, id, name)}
               onDoubleClick={this.handleDoubleClick.bind(this, id, name)}
-              theme={itemData.theme}
               title={label}
               width={nodeWidth}
               x={nodeX - focusedNodeX}
@@ -357,7 +348,6 @@ const getItemData = memoize((
   selectedFiberID: string | null,
   selectFiber: SelectOrInspectFiber,
   snapshot: Snapshot,
-  theme: Theme,
   width: number,
 ): ItemData => {
   const maxTreeBaseDuration = getMaxTreeBaseDuration(flamegraphData, selectedFiberID, snapshot);
@@ -369,7 +359,6 @@ const getItemData = memoize((
     selectedFiberID,
     selectFiber,
     snapshot,
-    theme,
     width,
   };
 });

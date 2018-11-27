@@ -230,7 +230,6 @@ class ProfilerTab extends React.Component<Props, State> {
             snapshotIndex={snapshotIndex}
             snapshots={snapshots}
             stopInspecting={this.stopInspecting}
-            theme={theme}
           />
         );
       } else if (selectedChartType === 'interactions') {
@@ -264,7 +263,6 @@ class ProfilerTab extends React.Component<Props, State> {
             showNativeNodes={showNativeNodes}
             snapshot={snapshot}
             snapshotIndex={snapshotIndex}
-            theme={theme}
           />
         );
       }
