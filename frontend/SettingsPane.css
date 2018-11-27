@@ -85,3 +85,18 @@
 .Input:focus {
   background-color: var(--theme-base00);
 }
+
+.HiddenTypesWrapper {
+  display: flex;
+  align-items: center;
+  font-family: var(--font-family-sans);
+  font-size: var(--font-size-sans-small);
+  color: var(--theme-special03);
+}
+
+.HiddenTypesIcon {
+  height: 0.75rem;
+  width: 0.75rem;
+  fill: currentColor;
+  margin-right: 0.125rem;
+}

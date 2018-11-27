@@ -112,6 +112,12 @@ class SettingsPane extends Component {
           )}
         </div>
 
+        {this.props.hiddenTypes.size > 0 && (
+          <span className={styles.HiddenTypesWrapper}>
+            <SvgIcon path={Icons.HIDDEN} className={styles.HiddenTypesIcon} /> <span>{this.props.hiddenTypes.size}</span>
+          </span>
+        )}
+
         <button
           className={styles.SettingsMenuButton}
           onClick={this.props.showPreferencesPanel}
@@ -139,10 +145,11 @@ SettingsPane.propTypes = {
 
 const Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'isRecording', 'searchText'];
+    return ['hiddenTypes', 'isInspectEnabled', 'isRecording', 'searchText'];
   },
   props(store) {
     return {
+      hiddenTypes: store.hiddenTypes,
       isInspectEnabled: store.isInspectEnabled,
       isRecording: store.isRecording,
       onChangeSearch: text => store.changeSearch(text),
