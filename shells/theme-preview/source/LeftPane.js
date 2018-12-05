@@ -39,9 +39,9 @@ const LeftPane = (_: any, {theme}: Context) => (
           theme={theme}
         />
         <SettingsCheckbox
+          isChecked={false}
+          label="Example checkbox"
           onChange={noop}
-          state=""
-          text="Example checkbox"
         />
       </div>
       <Input

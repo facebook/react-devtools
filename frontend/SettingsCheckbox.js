@@ -12,67 +12,27 @@
 'use strict';
 
 const React = require('react');
-const immutable = require('immutable');
 
 const {sansSerif} = require('./Themes/Fonts');
 
-import type {ControlState} from './types.js';
-
 type Props = {
-  state: any,
-  text: string,
-  onChange: (v: ControlState) => void,
+  isChecked: boolean,
+  label: string,
+  onChange: (isChecked: boolean) => void,
 };
 
-type State = StateRecord;
-
-type DefaultProps = {};
-
-const StateRecord = immutable.Record({
-  enabled: false,
-});
-
-class SettingsCheckbox extends React.Component<Props, State> {
-  defaultProps: DefaultProps;
-
-  _defaultState: ControlState;
-  _toggle: (b: boolean) => void;
-
-  constructor(props: Props) {
-    super(props);
-    this._toggle = this._toggle.bind(this);
-    this._defaultState = new StateRecord();
-  }
-
-  componentDidMount(): void {
-    if (!this.props.state !== this._defaultState) {
-      this.props.onChange(this._defaultState);
-    }
-  }
-
-  render() {
-    var state = this.props.state || this._defaultState;
-    return (
-      <div style={styles.container} onClick={this._toggle} tabIndex={0}>
-        <input
-          style={styles.checkbox}
-          type="checkbox"
-          checked={state.enabled}
-          readOnly={true}
-        />
-        <span>{this.props.text}</span>
-      </div>
-    );
-  }
-
-  _toggle() {
-    var state = this.props.state || this._defaultState;
-    var nextState = state.merge({
-      enabled: !state.enabled,
-    });
-
-    this.props.onChange(nextState);
-  }
+function SettingsCheckbox({ isChecked, label, onChange }: Props) {
+  return (
+    <label style={styles.container}>
+      <input
+        type="checkbox"
+        style={styles.checkbox}
+        checked={isChecked}
+        onChange={() => onChange(!isChecked)}
+      />
+      {label}
+    </label>
+  );
 }
 
 var styles = {
