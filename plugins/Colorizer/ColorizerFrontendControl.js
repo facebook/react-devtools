@@ -20,9 +20,9 @@ var Wrapped = decorate({
   },
   props(store) {
     return {
-      state: store.colorizerState,
-      text: 'Highlight Search',
-      onChange: state => store.changeColorizer(state),
+      label: 'Highlight Search',
+      isChecked: store.colorizer,
+      onChange: enabled => store.changeColorizer(enabled),
     };
   },
 }, SettingsCheckbox);

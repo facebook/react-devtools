@@ -23,8 +23,6 @@ import type {
   Presenter,
 } from './TraceUpdatesTypes';
 
-import type {ControlState} from '../../frontend/types.js';
-
 const NODE_TYPE_COMPOSITE = 'Composite';
 const NODE_TYPE_SPECIAL = 'Special';
 
@@ -83,9 +81,9 @@ class TraceUpdatesBackendManager {
     this._presenter.present(measurement);
   }
 
-  _onTraceUpdatesStateChange(state: ControlState): void {
-    this._isActive = state.enabled;
-    this._presenter.setEnabled(state.enabled);
+  _onTraceUpdatesStateChange(enabled: boolean): void {
+    this._isActive = enabled;
+    this._presenter.setEnabled(enabled);
   }
 
   _shutdown(): void {

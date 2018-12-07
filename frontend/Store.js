@@ -11,7 +11,7 @@
 'use strict';
 
 var {EventEmitter} = require('events');
-var {Map, Set, List, Record} = require('immutable');
+var {Map, Set, List} = require('immutable');
 var assign = require('object-assign');
 var { copy } = require('clipboard-js');
 var nodeMatchesText = require('./nodeMatchesText');
@@ -25,7 +25,7 @@ const {get, set} = require('../utils/storage');
 const LOCAL_STORAGE_TRACE_UPDATES_KEY = 'traceUpdates';
 
 import type Bridge from '../agent/Bridge';
-import type {ControlState, DOMEvent, ElementID, Theme} from './types';
+import type {DOMEvent, ElementID, Theme} from './types';
 import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
 type ListenerFunction = () => void;
@@ -97,8 +97,8 @@ class Store extends EventEmitter {
 
   // Public state
   isInspectEnabled: boolean;
-  traceupdatesState: ?ControlState;
-  colorizerState: ?ControlState;
+  traceUpdates: boolean = false;
+  colorizer: boolean = false;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
@@ -143,8 +143,6 @@ class Store extends EventEmitter {
     this.isBottomTagSelected = false;
     this.searchText = '';
     this.capabilities = {};
-    this.traceupdatesState = null;
-    this.colorizerState = null;
     this.refreshSearch = false;
     this.themeStore = themeStore;
 
@@ -317,7 +315,7 @@ class Store extends EventEmitter {
 
   highlight(id: string): void {
     // Individual highlighting is disabled while colorizer is active
-    if (!this.colorizerState || !this.colorizerState.enabled) {
+    if (!this.colorizer) {
       this._bridge.send('highlight', id);
     }
   }
@@ -327,7 +325,7 @@ class Store extends EventEmitter {
   }
 
   highlightSearch(): void {
-    if (this.colorizerState && this.colorizerState.enabled) {
+    if (this.colorizer) {
       this._bridge.send('hideHighlight');
       if (this.searchRoots) {
         this.highlightMany(this.searchRoots.toArray());
@@ -463,7 +461,7 @@ class Store extends EventEmitter {
   }
 
   hideHighlight() {
-    if (this.colorizerState && this.colorizerState.enabled) {
+    if (this.colorizer) {
       return;
     }
     this._bridge.send('hideHighlight');
@@ -575,19 +573,18 @@ class Store extends EventEmitter {
     });
   }
 
-  changeTraceUpdates(state: ControlState) {
-    this.traceupdatesState = state;
+  changeTraceUpdates(enabled: boolean) {
+    this.traceUpdates = enabled;
     this.emit('traceupdatesstatechange');
-    invariant(state.toJS, 'state.toJS should exist');
-    this._bridge.send('traceupdatesstatechange', state.toJS());
-    set(LOCAL_STORAGE_TRACE_UPDATES_KEY, state.enabled);
+    this._bridge.send('traceupdatesstatechange', enabled);
+    set(LOCAL_STORAGE_TRACE_UPDATES_KEY, enabled);
   }
 
-  changeColorizer(state: ControlState) {
-    this.colorizerState = state;
+  changeColorizer(enabled: boolean) {
+    this.colorizer = enabled;
     this.emit('colorizerchange');
-    this._bridge.send('colorizerchange', state.toJS());
-    if (this.colorizerState && this.colorizerState.enabled) {
+    this._bridge.send('colorizerchange', enabled);
+    if (enabled) {
       this.highlightSearch();
     } else {
       this.hideHighlight();
@@ -612,13 +609,7 @@ class Store extends EventEmitter {
       clearInterval(requestInt);
       this.capabilities = assign(this.capabilities, capabilities);
       this.emit('connected');
-
-      const traceUpdates = get(LOCAL_STORAGE_TRACE_UPDATES_KEY);
-
-      if (traceUpdates) {
-        this.changeTraceUpdates(new Record({enabled: true})());
-      }
-
+      this.changeTraceUpdates(get(LOCAL_STORAGE_TRACE_UPDATES_KEY, false));
     });
     this._bridge.send('requestCapabilities');
     requestInt = setInterval(() => {
