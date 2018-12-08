@@ -316,6 +316,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           const displayName = type.displayName || type.name;
           name = displayName ? `Memo(${displayName})` : 'Memo';
         }
+        props = fiber.memoizedProps;
         children = [];
         break;
       default:
