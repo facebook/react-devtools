@@ -256,6 +256,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             ? `ForwardRef(${functionName})`
             : 'ForwardRef'
         );
+        props = fiber.memoizedProps;
         children = [];
         break;
       case HostRoot:
