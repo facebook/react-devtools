@@ -13,12 +13,16 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
-const ScheduleTracing = require('schedule/tracing');
+const ScheduleTracing = require('scheduler/tracing');
 const Immutable = require('immutable');
 const assign = require('object-assign');
 const guid = require('../../utils/guid');
 
 const { unstable_trace: trace } = ScheduleTracing;
+
+const Greeting = ({ forwardedRef, name }) => <div ref={forwardedRef}>Hello, {name}</div>
+const ForwardedGreeting = React.forwardRef((props, ref) => <Greeting {...props} forwardedRef={ref} />);
+const MemoizedGreeting = React.memo(Greeting);
 
 const themes = {
   blue: {
@@ -34,6 +38,8 @@ const ThemeContext = React.createContext();
 ThemeContext.displayName = 'ThemeContext';
 
 class Todos extends React.Component {
+  ref = React.createRef();
+
   constructor(props) {
     super(props);
     this._nextid = 50;
@@ -109,6 +115,8 @@ class Todos extends React.Component {
   render() {
     return (
       <div style={styles.container}>
+        <ForwardedGreeting ref={this.ref} name="Brian" />
+        <MemoizedGreeting name="Memoized" />
         <ThemeContext.Consumer>
           {theme => (
             <h1 style={{
