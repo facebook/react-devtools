@@ -138,8 +138,8 @@ function getData(internalInstance: Object): DataType {
       inst.updater.enqueueForceUpdate(this, cb, 'forceUpdate');
     });
     updater = {
+      canUpdate: true,
       setState: inst.setState && inst.setState.bind(inst),
-      forceUpdate: forceUpdate && forceUpdate.bind(inst),
       setInProps: forceUpdate && setInProps.bind(null, internalInstance, forceUpdate),
       setInState: inst.forceUpdate && setInState.bind(null, inst),
       setInContext: forceUpdate && setInContext.bind(null, inst, forceUpdate),

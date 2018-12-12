@@ -395,7 +395,7 @@ class Agent extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
-    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    send.canUpdate = send.updater && send.updater.canUpdate;
     delete send.type;
     delete send.updater;
     this.emit('mount', send);
@@ -410,7 +410,7 @@ class Agent extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
-    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    send.canUpdate = send.updater && send.updater.canUpdate;
     delete send.type;
     delete send.updater;
     this.emit('update', send);
@@ -425,7 +425,7 @@ class Agent extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
-    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    send.canUpdate = send.updater && send.updater.canUpdate;
     delete send.type;
     delete send.updater;
     this.emit('updateProfileTimes', send);

@@ -150,6 +150,7 @@ function getInternalReactConstants(version) {
 }
 
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
+  var {overrideProps} = renderer;
   var {ReactTypeOfWork, ReactSymbols, ReactTypeOfSideEffect} = getInternalReactConstants(renderer.version);
   var {PerformedWork} = ReactTypeOfSideEffect;
   var {
@@ -220,6 +221,16 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       }
     }
 
+    if (typeof overrideProps === 'function') {
+      updater = {
+        canUpdate: true,
+        setState: null,
+        setInProps: overrideProps.bind(null, fiber),
+        setInState: null,
+        setInContext: null,
+      };
+    }
+
     switch (fiber.tag) {
       case ClassComponent:
       case FunctionalComponent:
@@ -239,8 +250,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         const inst = publicInstance;
         if (inst) {
           updater = {
+            canUpdate: true,
             setState: inst.setState && inst.setState.bind(inst),
-            forceUpdate: inst.forceUpdate && inst.forceUpdate.bind(inst),
             setInProps: inst.forceUpdate && setInProps.bind(null, fiber),
             setInState: inst.forceUpdate && setInState.bind(null, inst),
             setInContext: inst.forceUpdate && setInContext.bind(null, inst),
