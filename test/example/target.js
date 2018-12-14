@@ -20,7 +20,7 @@ const guid = require('../../utils/guid');
 
 const { unstable_trace: trace } = ScheduleTracing;
 
-const Greeting = ({ forwardedRef, name }) => <div ref={forwardedRef}>Hello, {name}</div>
+const Greeting = ({ forwardedRef, name }) => <div ref={forwardedRef}>Hello, {name}</div>;
 const ForwardedGreeting = React.forwardRef((props, ref) => <Greeting {...props} forwardedRef={ref} />);
 const MemoizedGreeting = React.memo(Greeting);
 
