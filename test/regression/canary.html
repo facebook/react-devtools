@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <title>React 16.0</title>
+    <title>React canary</title>
     <link rel="stylesheet" href="styles.css" />
 
     <script type="text/javascript">
@@ -11,8 +11,11 @@
       __REACT_DEVTOOLS_GLOBAL_HOOK__ = parent.__REACT_DEVTOOLS_GLOBAL_HOOK__;
     </script>
 
-    <script src="https://unpkg.com/react@16.0/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@16.0/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/scheduler@canary/umd/scheduler.development.js"></script>
+    <script src="https://unpkg.com/scheduler@canary/umd/scheduler-tracing.development.js"></script>
+    <script src="https://unpkg.com/react@canary/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@canary/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/react-cache@next/umd/react-cache.development.js"></script>
     
     <!-- Don't use this in production: -->
     <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
@@ -25,7 +28,7 @@
       <br/><br/>
       <code>npm install -g pushstate-server</code><br/>
       <code>pushstate-server .</code><br/>
-      <code>open <a href="http://localhost:9000/test/regression/16.0.html">http://localhost:9000/test/regression/16.0.html</a></code>
+      <code>open <a href="http://localhost:9000/test/regression/canary.html">http://localhost:9000/test/regression/canary.html</a></code>
     </div>
 
     <script src="shared.js" type="text/babel"></script>
