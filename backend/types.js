@@ -11,10 +11,10 @@
 'use strict';
 
 type CompositeUpdater = {
+  canUpdate: boolean,
   setInProps: ?(path: Array<string>, value: any) => void,
   setInState: ?(path: Array<string>, value: any) => void,
   setInContext: ?(path: Array<string>, value: any) => void,
-  forceUpdate: ?() => void,
 };
 
 type NativeUpdater = {
@@ -73,6 +73,7 @@ export type ReactRenderer = {
   findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
   version: string,
   bundleType: BundleType,
+  overrideProps?: ?(fiber: Object, path: Array<string | number>, value: any) => void,
 
   // Stack
   Reconciler: {
