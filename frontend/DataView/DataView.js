@@ -24,7 +24,7 @@ type Inspect = (path: Array<string>, cb: () => void) => void;
 type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
 type DataViewProps = {
-  data: ?Object,
+  data: ?any,
   path: Array<string>,
   inspect: Inspect,
   showMenu: ShowMenu,
@@ -74,9 +74,20 @@ class DataView extends React.Component<DataViewProps> {
       return <div style={missingStyle(theme)}>null</div>;
     }
 
+    const dataType = typeof data;
+    var isPrimitive = dataType === 'number' || dataType === 'string' || dataType === 'boolean';
     var isArray = Array.isArray(data);
     var elements = [];
-    if (isArray) {
+    if (isPrimitive) {
+      elements.push(<DataItem
+          name={''}
+          hideName={true}
+          path={this.props.path}
+          inspect={this.props.inspect}
+          showMenu={this.props.showMenu}
+          readOnly={this.props.readOnly}
+          value={data} />);
+    } else if (isArray) {
       // Iterate over array, filling holes with special items
       var lastIndex = -1;
       data.forEach((item, i) => {
@@ -148,6 +159,7 @@ type Props = {
   noSort?: boolean,
   readOnly?: boolean,
   name: string,
+  hideName?: boolean,
   value: any,
 };
 
@@ -275,12 +287,15 @@ class DataItem extends React.Component<Props, State> {
       <li>
         <div style={styles.head}>
           {opener}
-          <div
-            style={nameStyle(complex, theme)}
-            onClick={inspectable && this.toggleOpen.bind(this)}
-          >
-            {name}:
-          </div>
+          {
+            !this.props.hideName &&
+            <div
+                style={nameStyle(complex, theme)}
+                onClick={inspectable && this.toggleOpen.bind(this)}
+            >
+              {name}:
+            </div>
+          }
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
