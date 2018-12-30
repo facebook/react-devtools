@@ -75,10 +75,10 @@ class DataView extends React.Component<DataViewProps> {
     }
 
     const dataType = typeof data;
-    var isPrimitive = dataType === 'number' || dataType === 'string' || dataType === 'boolean';
+    var isSingleValue = dataType === 'number' || dataType === 'string' || dataType === 'boolean';
     var isArray = Array.isArray(data);
     var elements = [];
-    if (isPrimitive) {
+    if (isSingleValue) {
       elements.push(<DataItem
           name={''}
           hideName={true}
