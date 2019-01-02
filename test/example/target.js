@@ -13,6 +13,7 @@
 
 const React = require('react');
 const ReactDOM = require('react-dom');
+const PropTypes = require('prop-types');
 const ScheduleTracing = require('scheduler/tracing');
 const Immutable = require('immutable');
 const assign = require('object-assign');
@@ -37,6 +38,8 @@ const themes = {
 const ThemeContext = React.createContext();
 ThemeContext.displayName = 'ThemeContext';
 
+const LocaleContext = React.createContext('en-US');
+
 class Todos extends React.Component {
   ref = React.createRef();
 
@@ -48,17 +51,6 @@ class Todos extends React.Component {
         {title: 'Inspect all the things', completed: true, id: 10},
         {title: 'Profit!!', completed: false, id: 11},
         {title: 'Profit!!', completed: false, id: 12},
-        /*
-        {title: 'Profit!!', completed: false, id: 13},
-        {title: 'Profit!!', completed: false, id: 14},
-        {title: 'Profit!!', completed: false, id: 15},
-        {title: 'Profit!!', completed: false, id: 16},
-        {title: 'Profit!!', completed: false, id: 17},
-        {title: 'Profit!!', completed: false, id: 18},
-        {title: 'Profit!!', completed: false, id: 19},
-        {title: 'Profit!!', completed: false, id: 21},
-        {title: 'Profit!!', completed: false, id: 41},
-        */
       ],
       filter: 'All',
     };
@@ -480,6 +472,12 @@ class Wrap extends React.Component {
           <span val={null}/>
           <span val={undefined}/>
           <div>&lt;</div>*/}
+          <div style={styles.container}>
+            Context tests
+            <SimpleContextType />
+            <ObjectContextType />
+            <LegacyContextTypes />
+          </div>
           <DeeplyNested />
           <PropTester awesome={2}/>
           <PropTester {...emptyProps}/>
@@ -551,6 +549,62 @@ function long(children) { // eslint-disable-line no-unused-vars
       {children}
     </div>
   );
+}
+
+class SimpleContextType extends React.Component {
+  static contextType = LocaleContext;
+
+  render() {
+    return (
+      <div>
+        Simple: {this.context}
+      </div>
+    );
+  }
+}
+
+class ObjectContextType extends React.Component {
+  static contextType = ThemeContext;
+
+  render() {
+    return (
+      <div>
+        Object: {this.context.primary}, {this.context.contrast}
+      </div>
+    );
+  }
+}
+
+class LegacyContextTypes extends React.Component {
+  static childContextTypes = {
+    locale: PropTypes.string,
+    theme: PropTypes.object,
+  };
+
+  getChildContext() {
+    return {
+      locale: 'en-US',
+      theme: themes.blue,
+    };
+  }
+
+  render() {
+    return <LegacyContextTypesConsumer />;
+  }
+}
+class LegacyContextTypesConsumer extends React.Component {
+  static contextTypes = {
+    locale: PropTypes.string,
+    theme: PropTypes.object,
+  };
+
+  render() {
+    return (
+      <div>
+        Legacy: {this.context.locale}, {this.context.theme.primary}, {this.context.theme.contrast}
+      </div>
+    );
+  }
 }
 
 class Target extends React.Component {
