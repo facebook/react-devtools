@@ -15,6 +15,7 @@
 // unless the frontend explicitly requests it (e.g. a user clicks to expand a props object).
 // This value was originally set to 2, but we reduced it to improve performance:
 // see https://github.com/facebook/react-devtools/issues/1200
+// Note this value also indirectly determines how far props can be drilled into within the Profiler.
 const LEVEL_THRESHOLD = 1;
 
 /**
