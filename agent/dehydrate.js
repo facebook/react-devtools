@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const LEVEL_THRESHOLD = 1;
+
 /**
  * Get a enhanced/artificial type string based on the object instance
  */
@@ -69,7 +71,7 @@ function createDehydrated(type: string, data: Object, cleaned: Array<Array<strin
 }
 
 /**
- * Strip out complex data (instances, functions, and data nested > 2 levels
+ * Strip out complex data (instances, functions, and data nested > LEVEL_THRESHOLD levels
  * deep). The paths of the stripped out objects are appended to the `cleaned`
  * list. On the other side of the barrier, the cleaned list is used to
  * "re-hydrate" the cleaned representation into an object with symbols as
@@ -131,7 +133,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       };
 
     case 'array':
-      if (level > 2) {
+      if (level > LEVEL_THRESHOLD) {
         return createDehydrated(type, data, cleaned, path);
       }
       return data.map((item, i) => dehydrate(item, cleaned, path.concat([i]), level + 1));
@@ -149,7 +151,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
         },
       };
     case 'object':
-      if (level > 2 || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
+      if (level > LEVEL_THRESHOLD || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
         return createDehydrated(type, data, cleaned, path);
       } else {
 
