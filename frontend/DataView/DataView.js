@@ -245,7 +245,7 @@ class DataItem extends React.Component<Props, State> {
     }
 
     var inspectable = typeof this.props.inspect === 'function' && (!data || !data[consts.meta] || !data[consts.meta].uninspectable);
-    var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
+    var open = this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
 
     if (complex && inspectable) {
