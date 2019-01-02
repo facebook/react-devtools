@@ -10,6 +10,11 @@
  */
 'use strict';
 
+// This threshold determines the depth at which the bridge "dehydrates" nested data.
+// Dehydration means that we don't serialize the data for e.g. postMessage or stringify,
+// unless the frontend explicitly requests it (e.g. a user clicks to expand a props object).
+// This value was originally set to 2, but we reduced it to improve performance:
+// see https://github.com/facebook/react-devtools/issues/1200
 const LEVEL_THRESHOLD = 1;
 
 /**
