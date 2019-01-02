@@ -195,14 +195,15 @@ class DataItem extends React.Component<Props, State> {
   }
 
   inspect() {
-    if (this.props.inspect === null) {
+    const inspect = this.props.inspect;
+    if (inspect === null) {
       // The Profiler displays props/state for oudated Fibers.
       // These Fibers have already been mutated so they can't be inspected.
       return;
     }
 
     this.setState({loading: true, open: true});
-    this.props.inspect(this.props.path, () => {
+    inspect(this.props.path, () => {
       this.setState({loading: false});
     });
   }
