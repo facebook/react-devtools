@@ -114,7 +114,7 @@ const ProfilerFiberDetailPane = ({
             <DataView
               path={['props']}
               readOnly={true}
-              inspect={emptyFunction}
+              inspect={null}
               showMenu={emptyFunction}
               data={snapshotFiber.get('props')}
             />
@@ -124,7 +124,7 @@ const ProfilerFiberDetailPane = ({
               <DataView
                 path={['state']}
                 readOnly={true}
-                inspect={emptyFunction}
+                inspect={null}
                 showMenu={emptyFunction}
                 data={snapshotFiber.get('state')}
               />

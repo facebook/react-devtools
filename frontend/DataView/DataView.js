@@ -26,7 +26,7 @@ type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: str
 type DataViewProps = {
   data: ?any,
   path: Array<string>,
-  inspect: Inspect,
+  inspect: Inspect | null,
   showMenu: ShowMenu,
   startOpen?: boolean,
   noSort?: boolean,
@@ -155,7 +155,7 @@ DataView.contextTypes = {
 
 type Props = {
   path: Array<string>,
-  inspect: Inspect,
+  inspect: Inspect | null,
   showMenu: ShowMenu,
   startOpen?: boolean,
   noSort?: boolean,
@@ -195,17 +195,23 @@ class DataItem extends React.Component<Props, State> {
   }
 
   inspect() {
+    if (this.props.inspect === null) {
+      return;
+    }
+
     this.setState({loading: true, open: true});
     this.props.inspect(this.props.path, () => {
       this.setState({loading: false});
     });
   }
 
-  toggleOpen() {
+  toggleOpen = () => {
     if (this.state.loading) {
       return;
     }
-    if (this.props.value && this.props.value[consts.inspected] === false) {
+
+    const { value } = this.props;
+    if (value && value[consts.inspected] === false) {
       this.inspect();
       return;
     }
@@ -213,7 +219,7 @@ class DataItem extends React.Component<Props, State> {
     this.setState({
       open: !this.state.open,
     });
-  }
+  };
 
   toggleBooleanValue(e) {
     this.context.onChange(this.props.path, e.target.checked);
@@ -238,14 +244,14 @@ class DataItem extends React.Component<Props, State> {
       preview = previewComplex(data, theme);
     }
 
-    var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
+    var inspectable = typeof this.props.inspect === 'function' && (!data || !data[consts.meta] || !data[consts.meta].uninspectable);
     var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
 
     if (complex && inspectable) {
       opener = (
         <div
-          onClick={this.toggleOpen.bind(this)}
+          onClick={this.toggleOpen}
           style={styles.opener}>
           {open ?
             <span style={expandedArrowStyle(theme)} /> :
@@ -292,8 +298,8 @@ class DataItem extends React.Component<Props, State> {
           {
             !this.props.hideName &&
             <div
-                style={nameStyle(complex, theme)}
-                onClick={inspectable && this.toggleOpen.bind(this)}
+                style={nameStyle(complex, inspectable, theme)}
+                onClick={inspectable ? this.toggleOpen : undefined}
             >
               {name}:
             </div>
@@ -330,8 +336,8 @@ function alphanumericSort(a: string, b: string): number {
   return (a < b) ? -1 : 1;
 }
 
-const nameStyle = (isComplex: boolean, theme: Theme) => ({
-  cursor: isComplex ? 'pointer' : 'default',
+const nameStyle = (isComplex: boolean, isInspectable: boolean, theme: Theme) => ({
+  cursor: isComplex && isInspectable ? 'pointer' : 'default',
   color: theme.special03,
   margin: '0 0.25rem',
 });
