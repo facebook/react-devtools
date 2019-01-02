@@ -286,6 +286,9 @@ var styles = {
     fontSize: 25,
     marginBottom: 10,
   },
+  content: {
+    fontSize: 16,
+  },
   newInput: {
     padding: '5px 10px',
     fontSize: 16,
@@ -473,10 +476,12 @@ class Wrap extends React.Component {
           <span val={undefined}/>
           <div>&lt;</div>*/}
           <div style={styles.container}>
-            Context tests
-            <SimpleContextType />
-            <ObjectContextType />
-            <LegacyContextTypes />
+            <div style={styles.title}>Context tests</div>
+            <div style={styles.content}>
+              <SimpleContextType />
+              <ObjectContextType />
+              <LegacyContextTypes />
+            </div>
           </div>
           <DeeplyNested />
           <PropTester awesome={2}/>
@@ -567,9 +572,10 @@ class ObjectContextType extends React.Component {
   static contextType = ThemeContext;
 
   render() {
+    const theme = this.context;
     return (
       <div>
-        Object: {this.context.primary}, {this.context.contrast}
+        Object: <span style={{color: theme.contrast, backgroundColor: theme.primary}}>theme</span>
       </div>
     );
   }
@@ -599,9 +605,10 @@ class LegacyContextTypesConsumer extends React.Component {
   };
 
   render() {
+    const { locale, theme } = this.context;
     return (
       <div>
-        Legacy: {this.context.locale}, {this.context.theme.primary}, {this.context.theme.contrast}
+        Legacy: {locale}, <span style={{color: theme.contrast, backgroundColor: theme.primary}}>theme</span>
       </div>
     );
   }
