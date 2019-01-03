@@ -33,31 +33,31 @@ describe('dehydrate', () => {
     var object = {a: {b: {c: {d: 4}}}};
     var cleaned = [];
     var result = dehydrate(object, cleaned);
-    expect(cleaned).toEqual([['a', 'b']]);
-    expect(result.a.b).toEqual({type: 'object', name: '', meta: {}});
-    expect(result.a.b.c).toBeUndefined(); // Dehydrated
+    expect(cleaned).toEqual([['a', 'b', 'c']]);
+    expect(result.a.b.c).toEqual({type: 'object', name: '', meta: {}});
+    expect(result.a.b.c.d).toBeUndefined(); // Dehydrated
 
     // Re-hydrate
-    result.a.b = dehydrate(object.a.b, [], ['a', 'b']);
+    result.a.b.c = dehydrate(object.a.b.c, [], ['a', 'b', 'c']);
     expect(result).toEqual(object);
   });
 
   it('cleans a deeply nested array', () => {
-    var object = {a: {b: [1, 3]}};
+    var object = {a: {b: {c: [1, 3]}}};
     var cleaned = [];
     var result = dehydrate(object, cleaned);
-    expect(cleaned).toEqual([['a', 'b']]);
-    expect(result.a.b).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
+    expect(cleaned).toEqual([['a', 'b', 'c']]);
+    expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
   });
 
   it('cleans multiple things', () => {
     var Something = function() {};
-    var object = {a: {b: [1, 3], c: new Something()}};
+    var object = {a: {b: {c: [1, 3], d: new Something()}}};
     var cleaned = [];
     var result = dehydrate(object, cleaned);
-    expect(cleaned).toEqual([['a', 'b'], ['a', 'c']]);
-    expect(result.a.b).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
-    expect(result.a.c).toEqual({type: 'object', name: 'Something', meta: {}});
+    expect(cleaned).toEqual([['a', 'b', 'c'], ['a', 'b', 'd']]);
+    expect(result.a.b.c).toEqual({type: 'array', name: 'Array', meta: {length: 2}});
+    expect(result.a.b.d).toEqual({type: 'object', name: 'Something', meta: {}});
   });
 
   it('returns readable name for dates', () => {

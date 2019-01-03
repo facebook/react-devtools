@@ -13,10 +13,14 @@
 // This threshold determines the depth at which the bridge "dehydrates" nested data.
 // Dehydration means that we don't serialize the data for e.g. postMessage or stringify,
 // unless the frontend explicitly requests it (e.g. a user clicks to expand a props object).
-// This value was originally set to 2, but we reduced it to improve performance:
-// see https://github.com/facebook/react-devtools/issues/1200
-// Note this value also indirectly determines how far props can be drilled into within the Profiler.
-const LEVEL_THRESHOLD = 1;
+// We tried reducing this value from 2 to 1 to improve performance:
+// https://github.com/facebook/react-devtools/issues/1200
+// But this caused problems with the Profiler's interaction tracing output.
+// Because React mutates Fibers, profiling data that is dehydrated for old commits–
+// will not be available later from within the Profiler.
+// This impacts props/state as well as Interactions.
+// https://github.com/facebook/react-devtools/issues/1262
+const LEVEL_THRESHOLD = 2;
 
 /**
  * Get a enhanced/artificial type string based on the object instance
