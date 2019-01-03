@@ -202,6 +202,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var nodeType = null;
     var name = null;
     var text = null;
+    var resolvedContext = null;
 
     // Tracing
     var memoizedInteractions = null;
@@ -351,7 +352,12 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           case CONTEXT_PROVIDER_SYMBOL_STRING:
             nodeType = 'Special';
             props = fiber.memoizedProps;
-            name = `${fiber.type._context.displayName || 'Context'}.Provider`;
+
+            // 16.3.0 exposed the context object as "context"
+            // PR #12501 changed it to "_context" for 16.3.1+
+            resolvedContext = fiber.type._context || fiber.type.context;
+
+            name = `${resolvedContext.displayName || 'Context'}.Provider`;
             children = [];
             break;
           case CONTEXT_CONSUMER_NUMBER:
@@ -361,7 +367,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
 
             // 16.3-16.5 read from "type" because the Consumer is the actual context object.
             // 16.6+ should read from "type._context" because Consumer can be different (in DEV).
-            const resolvedContext = fiber.type._context || fiber.type;
+            resolvedContext = fiber.type._context || fiber.type;
 
             // NOTE: TraceUpdatesBackendManager depends on the name ending in '.Consumer'
             // If you change the name, figure out a more resilient way to detect it.
