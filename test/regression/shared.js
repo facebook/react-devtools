@@ -35,24 +35,26 @@ switch (major) {
   case 16:
     switch (minor) {
       case 7:
-        // Hooks
-        function Hooks() {
-          const [count, setCount] = React.useState(0);
-          const incrementCount = React.useCallback(
-            () => setCount(count + 1),
-            [count]
-          );
-          return (
-            <div>
-              count: {count} <button onClick={incrementCount}>increment</button>
-            </div>
+        if (typeof React.useState === 'function') {
+          // Hooks
+          function Hooks() {
+            const [count, setCount] = React.useState(0);
+            const incrementCount = React.useCallback(
+              () => setCount(count + 1),
+              [count]
+            );
+            return (
+              <div>
+                count: {count} <button onClick={incrementCount}>increment</button>
+              </div>
+            );
+          }
+          apps.push(
+            <Feature key="Hooks" label="Hooks" version="16.7+">
+              <Hooks />
+            </Feature>
           );
         }
-        apps.push(
-          <Feature key="Hooks" label="Hooks" version="16.7+">
-            <Hooks />
-          </Feature>
-        );
       case 6:
         // memo
         function LabelComponent({label}) {
@@ -277,6 +279,12 @@ function TopLevelWrapperForDevTools({ version }) {
     header = (
       <h1>
         React canary <a href={`https://github.com/facebook/react/commit/${commitSha}`}>{commitSha}</a>
+      </h1>
+    );
+  } else if (version.includes('alpha')) {
+    header = (
+      <h1>
+        React next
       </h1>
     );
   }
