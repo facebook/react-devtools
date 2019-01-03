@@ -359,8 +359,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             nodeType = 'Special';
             props = fiber.memoizedProps;
 
-            // v16.3-16.5 read from fiber.type (because the Consumer is the full context object)
-            // v16.6+ should read from fiber.type._context (because Consumer is a separate object)
+            // 16.3-16.5 read from "type" because the Consumer is the actual context object.
+            // 16.6+ should read from "type._context" because Consumer can be different (in DEV).
             const resolvedContext = fiber.type._context || fiber.type;
 
             // NOTE: TraceUpdatesBackendManager depends on the name ending in '.Consumer'
