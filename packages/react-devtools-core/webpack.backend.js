@@ -24,6 +24,8 @@ module.exports = {
   output: {
     path: __dirname + '/build',
     filename: '[name].js',
+    library: '[name]',
+    libraryTarget: 'umd',
   },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
