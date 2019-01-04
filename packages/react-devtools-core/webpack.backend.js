@@ -24,6 +24,7 @@ module.exports = {
   output: {
     path: __dirname + '/build',
     filename: '[name].js',
+    libraryTarget: 'commonjs2',
   },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
