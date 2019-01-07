@@ -29,6 +29,12 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'commonjs2',
   },
+  node: {
+    // Don't replace __dirname!
+    // This would break the standalone DevTools ability to load the backend.
+    // see https://github.com/facebook/react-devtools/issues/1269
+    __dirname: false,
+  },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
     new webpack.DefinePlugin({

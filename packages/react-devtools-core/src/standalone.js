@@ -10,7 +10,8 @@
 'use strict';
 
 var ws = require('ws');
-var fs = require('fs');
+var {readFileSync} = require('fs');
+var {join} = require('path');
 
 var installGlobalHook = require('../../../backend/installGlobalHook');
 installGlobalHook(window);
@@ -146,14 +147,8 @@ function startServer(port = 8097) {
   });
 
   httpServer.on('request', (req, res) => {
-    // NPM installs should read from node_modules,
-    // But local dev mode needs to use a relative path.
-    const basePath = fs.existsSync('./node_modules/react-devtools-core')
-      ? 'node_modules/react-devtools-core'
-      : '../react-devtools-core';
-
     // Serve a file that immediately sets up the connection.
-    var backendFile = fs.readFileSync(`${basePath}/build/backend.js`);
+    var backendFile = readFileSync(join(__dirname, 'backend.js'));
     res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
   });
 
