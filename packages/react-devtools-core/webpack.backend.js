@@ -24,7 +24,9 @@ module.exports = {
   output: {
     path: __dirname + '/build',
     filename: '[name].js',
-    library: '[name]',
+
+    // This name is important; standalone references it in order to connect.
+    library: 'ReactDevToolsBackend',
     libraryTarget: 'umd',
   },
   plugins: __DEV__ ? [] : [
