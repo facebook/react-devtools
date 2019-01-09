@@ -114,39 +114,15 @@ class Agent extends EventEmitter {
     this.on('selected', id => {
       var data = this.elementData.get(id);
       var inspectedHooks = null;
-
       if (data) {
         if (data.publicInstance && this.global.$r === lastSelected) {
           this.global.$r = data.publicInstance;
           lastSelected = data.publicInstance;
         }
-
         if (data.containsHooks) {
-          var internalInstance = this.internalInstancesById.get(id);
-          if (internalInstance) {
-            var rendererID = this.rendererIdsByInternalInstance.get(internalInstance);
-            if (rendererID) {
-              var internals = this.reactInternals[rendererID].renderer;
-              if (internals && internals.currentDispatcherRef) {
-                var hooksTree = inspectHooksOfFiber(internals.currentDispatcherRef, internalInstance);
-
-                // It's also important to store the element ID,
-                // so the frontend can avoid potentially showing the wrong hooks data for an element,
-                // (since hooks inspection is done as part of a separate Bridge message).
-                // But we can't store it as "id"– because the Bridge stores a map of "inspectable" data keyed by this field.
-                // Use an id that won't conflict with the element itself (because we don't want to override data).
-                // This is important if components have both inspectable props and inspectable hooks.
-                inspectedHooks = {
-                  elementID: id,
-                  id: 'hooksTree',
-                  hooksTree,
-                };
-              }
-            }
-          }
+          inspectedHooks = this.updateHooksTree(id);
         }
       }
-
       if (this._prevInspectedHooks !== inspectedHooks) {
         this._prevInspectedHooks = inspectedHooks;
         this.emit('inspectedHooks', inspectedHooks);
@@ -477,6 +453,47 @@ class Agent extends EventEmitter {
     delete send.type;
     delete send.updater;
     this.emit('updateProfileTimes', send);
+  }
+
+  onUpdateHooksTree(component: OpaqueNodeHandle, data: DataType) {
+    const id = this.getId(component);
+    const inspectedHooks = this.updateHooksTree(id);
+
+    if (this._prevInspectedHooks !== inspectedHooks) {
+      this._prevInspectedHooks = inspectedHooks;
+      this.emit('inspectedHooks', inspectedHooks);
+    }
+  }
+
+  updateHooksTree(id: ElementID) {
+    const data = this.elementData.get(id);
+    const internalInstance = this.internalInstancesById.get(id);
+    if (internalInstance) {
+      const rendererID = this.rendererIdsByInternalInstance.get(internalInstance);
+      if (rendererID) {
+        const internals = this.reactInternals[rendererID].renderer;
+        if (internals && internals.currentDispatcherRef) {
+          // HACK: This leaks Fiber-specific logic into the Agent which is not ideal.
+          // $FlowFixMe
+          const currentFiber = data.state === internalInstance.memoizedState ? internalInstance : internalInstance.alternate;
+
+          const hooksTree = inspectHooksOfFiber(internals.currentDispatcherRef, currentFiber);
+
+          // It's also important to store the element ID,
+          // so the frontend can avoid potentially showing the wrong hooks data for an element,
+          // (since hooks inspection is done as part of a separate Bridge message).
+          // But we can't store it as "id"– because the Bridge stores a map of "inspectable" data keyed by this field.
+          // Use an id that won't conflict with the element itself (because we don't want to override data).
+          // This is important if components have both inspectable props and inspectable hooks.
+          return {
+            elementID: id,
+            id: 'hooksTree',
+            hooksTree,
+          };
+        }
+      }
+    }
+    return null;
   }
 
   onUnmounted(component: OpaqueNodeHandle) {

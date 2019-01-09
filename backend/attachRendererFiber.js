@@ -277,6 +277,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             : 'ForwardRef'
         );
         props = fiber.memoizedProps;
+        state = fiber.memoizedState;
         children = [];
         break;
       case HostRoot:
@@ -337,6 +338,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           name = displayName ? `Memo(${displayName})` : 'Memo';
         }
         props = fiber.memoizedProps;
+        state = fiber.memoizedState;
         children = [];
         break;
       default:
@@ -597,6 +599,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
+    const data = getDataFiber(fiber);
+
     if (
       !hasChildOrderChanged &&
       !hasDataChanged(fiber.alternate, fiber)
@@ -608,7 +612,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       if (haveProfilerTimesChanged(fiber.alternate, fiber)) {
         pendingEvents.push({
           internalInstance: getOpaqueNode(fiber),
-          data: getDataFiber(fiber),
+          data,
           renderer: rid,
           type: 'updateProfileTimes',
         });
@@ -617,10 +621,19 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber),
+      data,
       renderer: rid,
       type: 'update',
     });
+
+    if (data.containsHooks) {
+      pendingEvents.push({
+        internalInstance: getOpaqueNode(fiber),
+        data,
+        renderer: rid,
+        type: 'updateHooksTree',
+      });
+    }
   }
 
   function enqueueUnmount(fiber) {

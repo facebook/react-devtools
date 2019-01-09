@@ -76,7 +76,7 @@ const hooksTestProps = {
   nestedArray: ['a', 'b', 'c'],
 };
 
-function HooksTest(props) {
+function FunctionWithHooks(props, ref) {
   const [count, updateCount] = useState(0);
   const onClick = useCallback(() => updateCount(count + 1), [count]);
 
@@ -95,6 +95,8 @@ function HooksTest(props) {
     </button>
   );
 }
+const MemoWithHooks = React.memo(FunctionWithHooks);
+const ForwardRefWithHooks = React.forwardRef(FunctionWithHooks);
 
 class Todos extends React.Component {
   ref = React.createRef();
@@ -525,7 +527,11 @@ class Wrap extends React.Component {
           <center>
             <button onClick={this.toggleTheme.bind(this)}>Toggle color</button>
           </center>
-          <center><HooksTest props={hooksTestProps}/></center>
+          <center>
+            <FunctionWithHooks props={hooksTestProps} />
+            <MemoWithHooks props={hooksTestProps} />
+            <ForwardRefWithHooks props={hooksTestProps} />
+          </center>
           {/*<span thing={someVal}/>
           <Target count={1}/>
           <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
