@@ -16,6 +16,7 @@ var assign = require('object-assign');
 var nullthrows = require('nullthrows').default;
 var guid = require('../utils/guid');
 var getIn = require('./getIn');
+var {inspectHooksOfFiber} = require('../backend/ReactDebugHooks');
 
 import type {RendererID, DataType, OpaqueNodeHandle, NativeType, Helpers} from '../backend/types';
 
@@ -87,6 +88,7 @@ class Agent extends EventEmitter {
   global: Object;
   internalInstancesById: Map<ElementID, OpaqueNodeHandle>;
   idsByInternalInstances: WeakMap<OpaqueNodeHandle, ElementID>;
+  rendererIdsByInternalInstance: WeakMap<OpaqueNodeHandle, RendererID>;
   renderers: Map<ElementID, RendererID>;
   elementData: Map<ElementID, DataType>;
   roots: Set<ElementID>;
@@ -96,12 +98,14 @@ class Agent extends EventEmitter {
   capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
   _inspectEnabled: boolean;
+  _prevInspectedHooks: any = null;
 
   constructor(global: Object, capabilities?: Object) {
     super();
     this.global = global;
     this.internalInstancesById = new Map();
     this.idsByInternalInstances = new WeakMap();
+    this.rendererIdsByInternalInstance = new WeakMap();
     this.renderers = new Map();
     this.elementData = new Map();
     this.roots = new Set();
@@ -109,9 +113,43 @@ class Agent extends EventEmitter {
     var lastSelected;
     this.on('selected', id => {
       var data = this.elementData.get(id);
-      if (data && data.publicInstance && this.global.$r === lastSelected) {
-        this.global.$r = data.publicInstance;
-        lastSelected = data.publicInstance;
+      var inspectedHooks = null;
+
+      if (data) {
+        if (data.publicInstance && this.global.$r === lastSelected) {
+          this.global.$r = data.publicInstance;
+          lastSelected = data.publicInstance;
+        }
+
+        if (data.containsHooks) {
+          var internalInstance = this.internalInstancesById.get(id);
+          if (internalInstance) {
+            var rendererID = this.rendererIdsByInternalInstance.get(internalInstance);
+            if (rendererID) {
+              var internals = this.reactInternals[rendererID].renderer;
+              if (internals && internals.currentDispatcherRef) {
+                var hooksTree = inspectHooksOfFiber(internals.currentDispatcherRef, internalInstance);
+
+                // It's also important to store the element ID,
+                // so the frontend can avoid potentially showing the wrong hooks data for an element,
+                // (since hooks inspection is done as part of a separate Bridge message).
+                // But we can't store it as "id"– because the Bridge stores a map of "inspectable" data keyed by this field.
+                // Use an id that won't conflict with the element itself (because we don't want to override data).
+                // This is important if components have both inspectable props and inspectable hooks.
+                inspectedHooks = {
+                  elementID: id,
+                  id: 'hooksTree',
+                  hooksTree,
+                };
+              }
+            }
+          }
+        }
+      }
+
+      if (this._prevInspectedHooks !== inspectedHooks) {
+        this._prevInspectedHooks = inspectedHooks;
+        this.emit('inspectedHooks', inspectedHooks);
       }
     });
     this._prevSelected = null;
@@ -223,6 +261,7 @@ class Agent extends EventEmitter {
     this.on('isRecording', isRecording => bridge.send('isRecording', isRecording));
     this.on('storeSnapshot', (data) => bridge.send('storeSnapshot', data));
     this.on('clearSnapshots', () => bridge.send('clearSnapshots'));
+    this.on('inspectedHooks', data => bridge.send('inspectedHooks', data));
   }
 
   scrollToNode(id: ElementID): void {
@@ -389,6 +428,15 @@ class Agent extends EventEmitter {
     var id = this.getId(component);
     this.renderers.set(id, renderer);
     this.elementData.set(id, data);
+
+    // We need to map Fiber instance IDs to their renderers to support Hooks inspection.
+    // This is because the Store does not know how to connect the two,
+    // but the Agent needs to use the parent renderer's injected internals to get the current dispatcher.
+    // We only need to store this for components that use hooks (to reduce memory impact).
+    // We can only store on-mount (to reduce write operations) since hooks cannot be conditional.
+    if (data.containsHooks) {
+      this.rendererIdsByInternalInstance.set(component, renderer);
+    }
 
     var send = assign({}, data);
     if (send.children && send.children.map) {

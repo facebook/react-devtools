@@ -25,6 +25,7 @@ const {get, set} = require('../utils/storage');
 const LOCAL_STORAGE_TRACE_UPDATES_KEY = 'traceUpdates';
 
 import type Bridge from '../agent/Bridge';
+import type {InspectedHooks} from '../backend/types';
 import type {DOMEvent, ElementID, Theme} from './types';
 import type {Snapshot} from '../plugins/Profiler/ProfilerTypes';
 
@@ -99,6 +100,7 @@ class Store extends EventEmitter {
   isInspectEnabled: boolean;
   traceUpdates: boolean = false;
   colorizer: boolean = false;
+  inspectedHooks: InspectedHooks | null = null;
   contextMenu: ?ContextMenu;
   hovered: ?ElementID;
   isBottomTagHovered: boolean;
@@ -169,6 +171,7 @@ class Store extends EventEmitter {
     this._bridge.on('updateProfileTimes', (data) => this._updateComponentProfileTimes(data));
     this._bridge.on('unmount', id => this._unmountComponent(id));
     this._bridge.on('setInspectEnabled', (data) => this.setInspectEnabled(data));
+    this._bridge.on('inspectedHooks', data => this.setInspectedHooks(data));
     this._bridge.on('select', ({id, quiet, offsetFromLeaf = 0}) => {
       // Backtrack if we want to skip leaf nodes
       while (offsetFromLeaf > 0) {
@@ -559,18 +562,32 @@ class Store extends EventEmitter {
   }
 
   inspect(id: ElementID, path: Array<string>, cb: () => void) {
-    invariant(path[0] === 'props' || path[0] === 'state' || path[0] === 'context',
+    var basePath = path[0];
+    invariant(basePath === 'props' || basePath === 'state' || basePath === 'context' || basePath === 'hooksTree',
               'Inspected path must be one of props, state, or context');
-    this._bridge.inspect(id, path, value => {
-      var base = this.get(id).get(path[0]);
-      // $FlowFixMe
-      var inspected: ?{[string]: boolean} = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
-      if (inspected) {
-        assign(inspected, value);
-        inspected[consts.inspected] = true;
-      }
-      cb();
-    });
+    if (basePath === 'hooksTree') {
+      this._bridge.inspect('hooksTree', path, value => {
+        var base = this.inspectedHooks;
+        // $FlowFixMe
+        var inspected: ?{[string]: boolean} = path.reduce((obj, attr) => obj ? obj[attr] : null, base);
+        if (inspected) {
+          assign(inspected, value);
+          inspected[consts.inspected] = true;
+        }
+        cb();
+      });
+    } else {
+      this._bridge.inspect(id, path, value => {
+        var base = this.get(id).get(basePath);
+        // $FlowFixMe
+        var inspected: ?{[string]: boolean} = path.slice(1).reduce((obj, attr) => obj ? obj[attr] : null, base);
+        if (inspected) {
+          assign(inspected, value);
+          inspected[consts.inspected] = true;
+        }
+        cb();
+      });
+    }
   }
 
   changeTraceUpdates(enabled: boolean) {
@@ -589,6 +606,11 @@ class Store extends EventEmitter {
     } else {
       this.hideHighlight();
     }
+  }
+
+  setInspectedHooks(inspectedHooks: InspectedHooks | null) {
+    this.emit('inspectedHooks');
+    this.inspectedHooks = inspectedHooks;
   }
 
   setInspectEnabled(isInspectEnabled: boolean) {

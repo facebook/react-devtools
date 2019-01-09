@@ -10,6 +10,7 @@ plugins:
 globals:
   chrome: false
   React$Element: false
+  React$Node: false
 
 rules:
   brace-style: [2, 1tbs]

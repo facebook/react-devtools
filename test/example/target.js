@@ -40,6 +40,62 @@ ThemeContext.displayName = 'ThemeContext';
 
 const LocaleContext = React.createContext('en-US');
 
+const {useCallback, useEffect, useState} = React;
+
+// Below copied from https://usehooks.com/
+function useTheme(theme) {
+  useEffect(
+    () => {
+      for (var key in theme) {
+        document.documentElement.style.setProperty(`--${key}`, theme[key]);
+      }
+    },
+    [theme]
+  );
+}
+// Above copied from https://usehooks.com/
+
+function useNestedInnerHook() {
+  return useState(123);
+}
+function useNestedOuterHook() {
+  return useNestedInnerHook();
+}
+
+const cssVars = {
+  'background-color': 'green',
+  color: 'white',
+};
+
+const hooksTestProps = {
+  string: 'abc',
+  number: 123,
+  nestedObject:  {
+    boolean: true,
+  },
+  nestedArray: ['a', 'b', 'c'],
+};
+
+function HooksTest(props) {
+  const [count, updateCount] = useState(0);
+  const onClick = useCallback(() => updateCount(count + 1), [count]);
+
+  useNestedOuterHook();
+
+  useTheme(cssVars);
+
+  const style = {
+    backgroundColor: 'var(--background-color)',
+    color: 'var(--color)',
+  };
+
+  return (
+    <button style={style} onClick={onClick}>
+      Count: {count}
+    </button>
+  );
+}
+
 class Todos extends React.Component {
   ref = React.createRef();
 
@@ -469,6 +525,7 @@ class Wrap extends React.Component {
           <center>
             <button onClick={this.toggleTheme.bind(this)}>Toggle color</button>
           </center>
+          <center><HooksTest props={hooksTestProps}/></center>
           {/*<span thing={someVal}/>
           <Target count={1}/>
           <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
