@@ -40,7 +40,7 @@ ThemeContext.displayName = 'ThemeContext';
 
 const LocaleContext = React.createContext('en-US');
 
-const {useCallback, useDebugValueLabel, useEffect, useState} = React;
+const {useCallback, useDebugValue, useEffect, useState} = React;
 
 // Below copied from https://usehooks.com/
 function useDebounce(value, delay) {
@@ -48,7 +48,7 @@ function useDebounce(value, delay) {
   const [debouncedValue, setDebouncedValue] = useState(value);
 
   // Show the value in DevTools
-  useDebugValueLabel(debouncedValue);
+  useDebugValue(debouncedValue);
 
   useEffect(
     () => {

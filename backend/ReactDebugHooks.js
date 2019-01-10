@@ -61,7 +61,7 @@ function getPrimitiveStackCache(): Map<string, Array<any>> {
       Dispatcher.useImperativeHandle(undefined, () => null);
       Dispatcher.useCallback(() => {});
       Dispatcher.useMemo(() => null);
-      Dispatcher.useDebugValueLabel(null);
+      Dispatcher.useDebugValue(null);
     } finally {
       readHookLog = hookLog;
       hookLog = [];
@@ -195,9 +195,9 @@ function useCallback<T>(callback: T, inputs: Array<mixed> | void | null): T {
   return callback;
 }
 
-function useDebugValueLabel(valueLabel: any) {
+function useDebugValue(valueLabel: any) {
   hookLog.push({
-    primitive: 'DebugValueLabel',
+    primitive: 'DebugValue',
     stackError: new Error(),
     value: valueLabel,
   });
@@ -219,7 +219,7 @@ const Dispatcher = {
   useContext,
   useEffect,
   useImperativeHandle,
-  useDebugValueLabel,
+  useDebugValue,
   useLayoutEffect,
   useMemo,
   useReducer,
@@ -422,19 +422,19 @@ function buildTree(rootStack, readHookLog): HooksTree {
   }
 
   // Associate custom hook values (useInpect() hook entries) with the correct hooks
-  rootChildren.forEach(hooksNode => rollupDebugValueLabels(hooksNode));
+  rootChildren.forEach(hooksNode => rollupDebugValues(hooksNode));
 
   return rootChildren;
 }
 
-function rollupDebugValueLabels(hooksNode: HooksNode): void {
+function rollupDebugValues(hooksNode: HooksNode): void {
   const useInpectHooksNodes: Array<HooksNode> = [];
   hooksNode.subHooks = hooksNode.subHooks.filter(subHooksNode => {
-    if (subHooksNode.name === 'DebugValueLabel') {
+    if (subHooksNode.name === 'DebugValue') {
       useInpectHooksNodes.push(subHooksNode);
       return false;
     } else {
-      rollupDebugValueLabels(subHooksNode);
+      rollupDebugValues(subHooksNode);
       return true;
     }
   });
