@@ -110,7 +110,7 @@ function HooksNodeView({ hooksNode, index, inspect, path, theme }: HooksNodeView
 
         <div className={isCustomHook ? styles.nameCustom : styles.name}>
           {name}:
-        </div> {!isCustomHook && <div className={styles.value}>{preview}</div>}
+        </div> {<div className={styles.value}>{preview}</div>}
       </div>
 
       {hasBeenHydrated && isOpen &&

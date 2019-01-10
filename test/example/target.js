@@ -40,18 +40,34 @@ ThemeContext.displayName = 'ThemeContext';
 
 const LocaleContext = React.createContext('en-US');
 
-const {useCallback, useEffect, useState} = React;
+const {useCallback, useDebugValueLabel, useEffect, useState} = React;
 
 // Below copied from https://usehooks.com/
-function useTheme(theme) {
+function useDebounce(value, delay) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  // Show the value in DevTools
+  useDebugValueLabel(debouncedValue);
+
   useEffect(
     () => {
-      for (var key in theme) {
-        document.documentElement.style.setProperty(`--${key}`, theme[key]);
-      }
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
     },
-    [theme]
+    [value, delay] // Only re-call effect if value or delay changes
   );
+
+  return debouncedValue;
 }
 // Above copied from https://usehooks.com/
 
@@ -61,11 +77,6 @@ function useNestedInnerHook() {
 function useNestedOuterHook() {
   return useNestedInnerHook();
 }
-
-const cssVars = {
-  'background-color': 'green',
-  color: 'white',
-};
 
 const hooksTestProps = {
   string: 'abc',
@@ -78,20 +89,18 @@ const hooksTestProps = {
 
 function FunctionWithHooks(props, ref) {
   const [count, updateCount] = useState(0);
+
+  // Custom hook with a custom debug label
+  const debouncedCount = useDebounce(count, 1000);
+
   const onClick = useCallback(() => updateCount(count + 1), [count]);
 
+  // Tests nested custom hooks
   useNestedOuterHook();
 
-  useTheme(cssVars);
-
-  const style = {
-    backgroundColor: 'var(--background-color)',
-    color: 'var(--color)',
-  };
-
   return (
-    <button style={style} onClick={onClick}>
-      Count: {count}
+    <button onClick={onClick}>
+      Count: {debouncedCount}
     </button>
   );
 }
