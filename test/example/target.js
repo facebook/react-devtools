@@ -93,7 +93,9 @@ function FunctionWithHooks(props, ref) {
   // Custom hook with a custom debug label
   const debouncedCount = useDebounce(count, 1000);
 
-  const onClick = useCallback(() => updateCount(count + 1), [count]);
+  const onClick = useCallback(function onClick() {
+    updateCount(count + 1);
+  }, [count]);
 
   // Tests nested custom hooks
   useNestedOuterHook();

@@ -195,11 +195,14 @@ function useCallback<T>(callback: T, inputs: Array<mixed> | void | null): T {
   return callback;
 }
 
-function useDebugValue(valueLabel: any) {
+function useDebugValue(
+  value: any,
+  formatterFn: ?(value: any) => any,
+) {
   hookLog.push({
     primitive: 'DebugValue',
     stackError: new Error(),
-    value: valueLabel,
+    value: typeof formatterFn === 'function' ? formatterFn(value) : value,
   });
 }
 
@@ -421,34 +424,49 @@ function buildTree(rootStack, readHookLog): HooksTree {
     });
   }
 
-  // Associate custom hook values (useInpect() hook entries) with the correct hooks
-  rootChildren.forEach(hooksNode => rollupDebugValues(hooksNode));
+  // Associate custom hook values (useDebugValue() hook entries) with the correct hooks.
+  rollupDebugValues(rootChildren, null);
 
   return rootChildren;
 }
 
-function rollupDebugValues(hooksNode: HooksNode): void {
-  const useInpectHooksNodes: Array<HooksNode> = [];
-  hooksNode.subHooks = hooksNode.subHooks.filter(subHooksNode => {
-    if (subHooksNode.name === 'DebugValue') {
-      useInpectHooksNodes.push(subHooksNode);
-      return false;
+// Custom hooks support user-configurable labels (via the useDebugValue() hook).
+// That hook adds the user-provided values to the hooks tree.
+// This method removes those values (so they don't appear in DevTools),
+// and bubbles them up to the "value" attribute of their parent custom hook.
+function rollupDebugValues(
+  hooksTree: HooksTree,
+  parentHooksNode: HooksNode | null,
+): void {
+  const debugValueHooksNodes: Array<HooksNode> = [];
+
+  for (let i = 0; i < hooksTree.length; i++) {
+    const hooksNode = hooksTree[i];
+    if (hooksNode.name === 'DebugValue' && hooksNode.subHooks.length === 0) {
+      hooksTree.splice(i, 1);
+      i--;
+      debugValueHooksNodes.push(hooksNode);
     } else {
-      rollupDebugValues(subHooksNode);
-      return true;
+      rollupDebugValues(hooksNode.subHooks, hooksNode);
     }
-  });
-  if (useInpectHooksNodes.length === 1) {
-    hooksNode.value = useInpectHooksNodes[0].value;
-  } else if (useInpectHooksNodes.length > 1) {
-    hooksNode.value = useInpectHooksNodes.map(({value}) => value);
+  }
+
+  // Bubble debug value labels to their parent custom hook.
+  // If there is no parent hook, just ignore them.
+  // (We may warn about this in the future.)
+  if (parentHooksNode !== null) {
+    if (debugValueHooksNodes.length === 1) {
+      parentHooksNode.value = debugValueHooksNodes[0].value;
+    } else if (debugValueHooksNodes.length > 1) {
+      parentHooksNode.value = debugValueHooksNodes.map(({value}) => value);
+    }
   }
 }
 
 export function inspectHooks<Props>(
-  currentDispatcher: ReactCurrentDispatcher,
   renderFunction: Props => React$Node,
   props: Props,
+  currentDispatcher: ReactCurrentDispatcher,
 ): HooksTree {
   const previousDispatcher = currentDispatcher.current;
   let readHookLog;
@@ -488,10 +506,10 @@ function restoreContexts(contextMap: Map<any, any>) {
 }
 
 function inspectHooksOfForwardRef<Props, Ref>(
-  currentDispatcher: ReactCurrentDispatcher,
   renderFunction: (Props, Ref) => React$Node,
   props: Props,
   ref: Ref,
+  currentDispatcher: ReactCurrentDispatcher,
 ): HooksTree {
   const previousDispatcher = currentDispatcher.current;
   let readHookLog;
@@ -524,7 +542,10 @@ function resolveDefaultProps(Component, baseProps) {
   return baseProps;
 }
 
-export function inspectHooksOfFiber(currentDispatcher: ReactCurrentDispatcher, fiber: Fiber) {
+export function inspectHooksOfFiber(
+  fiber: Fiber,
+  currentDispatcher: ReactCurrentDispatcher,
+) {
   if (
     fiber.tag !== FunctionComponent &&
     fiber.tag !== SimpleMemoComponent &&
@@ -548,9 +569,9 @@ export function inspectHooksOfFiber(currentDispatcher: ReactCurrentDispatcher, f
   try {
     setupContexts(contextMap, fiber);
     if (fiber.tag === ForwardRef) {
-      return inspectHooksOfForwardRef(currentDispatcher, type.render, props, fiber.ref);
+      return inspectHooksOfForwardRef(type.render, props, fiber.ref, currentDispatcher);
     }
-    return inspectHooks(currentDispatcher, type, props);
+    return inspectHooks(type, props, currentDispatcher);
   } finally {
     currentHook = null;
     restoreContexts(contextMap);

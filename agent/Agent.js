@@ -477,7 +477,7 @@ class Agent extends EventEmitter {
           // $FlowFixMe
           const currentFiber = data.state === internalInstance.memoizedState ? internalInstance : internalInstance.alternate;
 
-          const hooksTree = inspectHooksOfFiber(internals.currentDispatcherRef, currentFiber);
+          const hooksTree = inspectHooksOfFiber(currentFiber, internals.currentDispatcherRef);
 
           // It's also important to store the element ID,
           // so the frontend can avoid potentially showing the wrong hooks data for an element,
