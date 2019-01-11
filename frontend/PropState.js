@@ -188,7 +188,7 @@ class PropState extends React.Component<Props> {
                 inspect={inspect}
                 theme={theme}
               />}
-            {!showHooksTree && 'Loading...'}
+            {!showHooksTree && <div style={hooksTreeLoadingStyle}>Loading...</div>}
           </DetailPaneSection>}
 
         {extraPanes &&
@@ -269,5 +269,10 @@ const noPropsStateStyle = (theme: Theme) => ({
   fontStyle: 'italic',
   padding: '0.5rem',
 });
+
+const hooksTreeLoadingStyle = {
+  lineHeight: '1.25rem',
+  marginLeft: '1rem',
+};
 
 module.exports = WrappedPropState;

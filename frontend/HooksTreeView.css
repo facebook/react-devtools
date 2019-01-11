@@ -34,6 +34,7 @@
 
 .arrowContainer {
   cursor: pointer;
+  width: 1rem;
   margin-left: -10px;
   position: absolute;
 }

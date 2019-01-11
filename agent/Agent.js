@@ -438,6 +438,18 @@ class Agent extends EventEmitter {
     delete send.type;
     delete send.updater;
     this.emit('update', send);
+
+    // If the element that was just updated is also being inspected, update the hooks values.
+    if (
+      this._prevInspectedHooks !== null &&
+      this._prevInspectedHooks.elementID === id
+    ) {
+      const inspectedHooks = this.updateHooksTree(id);
+      if (this._prevInspectedHooks !== inspectedHooks) {
+        this._prevInspectedHooks = inspectedHooks;
+        this.emit('inspectedHooks', inspectedHooks);
+      }
+    }
   }
 
   onUpdatedProfileTimes(component: OpaqueNodeHandle, data: DataType) {
@@ -453,16 +465,6 @@ class Agent extends EventEmitter {
     delete send.type;
     delete send.updater;
     this.emit('updateProfileTimes', send);
-  }
-
-  onUpdateHooksTree(component: OpaqueNodeHandle, data: DataType) {
-    const id = this.getId(component);
-    const inspectedHooks = this.updateHooksTree(id);
-
-    if (this._prevInspectedHooks !== inspectedHooks) {
-      this._prevInspectedHooks = inspectedHooks;
-      this.emit('inspectedHooks', inspectedHooks);
-    }
   }
 
   updateHooksTree(id: ElementID) {

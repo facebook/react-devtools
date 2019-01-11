@@ -625,15 +625,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       renderer: rid,
       type: 'update',
     });
-
-    if (data.containsHooks) {
-      pendingEvents.push({
-        internalInstance: getOpaqueNode(fiber),
-        data,
-        renderer: rid,
-        type: 'updateHooksTree',
-      });
-    }
   }
 
   function enqueueUnmount(fiber) {

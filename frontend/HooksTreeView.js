@@ -65,32 +65,43 @@ function HooksNodeView({ hooksNode, index, inspect, path, theme }: HooksNodeView
   const isCustomHook = subHooks.length > 0 || subHooks[consts.meta] && (subHooks: any)[consts.meta].length > 0;
   const hasBeenHydrated = subHooks.length > 0 || subHooks[consts.inspected];
 
+  const [isOpen, setIsOpen] = useState(hasBeenHydrated);
   const [isLoading, setIsLoading] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+
+  // Reset open and loading states when a new hooks tree is passed in.
+  // (This could be because a new element was selected, or because the previous element re-rendered.)
+  const [prevHooksNode, setPrevHooksNode] = useState(hooksNode);
+  if (hooksNode !== prevHooksNode) {
+    setPrevHooksNode(hooksNode);
+    setIsOpen(hasBeenHydrated);
+    setIsLoading(false);
+  }
+
   const toggleOpen = useCallback(() => {
     if (!isCustomHook || isLoading) {
       return;
     }
 
-    if (subHooks && subHooks[consts.inspected] === false) {
-      if (inspect === null) {
-        // The Profiler displays props/state for oudated Fibers.
-        // These Fibers have already been mutated so they can't be inspected.
-        return;
-      }
-
-      setIsLoading(true);
+    if (isOpen) {
+      setIsOpen(false);
+    } else {
       setIsOpen(true);
 
-      inspect(path, data => {
-        setIsLoading(false);
-      });
-      return;
+      if (subHooks && subHooks[consts.inspected] === false) {
+        if (inspect === null) {
+          // The Profiler displays props/state for oudated Fibers.
+          // These Fibers have already been mutated so they can't be inspected.
+          return;
+        }
+
+        setIsLoading(true);
+        inspect(path, data => setIsLoading(false));
+        return;
+      }
     }
+  }, [inspect, isCustomHook, isLoading, isOpen, subHooks]);
 
-    setIsOpen(!isOpen);
-  }, [isLoading, isOpen]);
-
+  // Format data for display to mimic the DataView UI.
   const type = typeof value;
   let preview;
   if (type === 'number' || type === 'string' || value == null /* null or undefined */ || type === 'boolean') {
@@ -113,7 +124,7 @@ function HooksNodeView({ hooksNode, index, inspect, path, theme }: HooksNodeView
         </div> {<div className={styles.value}>{preview}</div>}
       </div>
 
-      {hasBeenHydrated && isOpen &&
+      {isOpen && hasBeenHydrated &&
         <HooksTreeView
           hooksTree={subHooks}
           inspect={inspect}
