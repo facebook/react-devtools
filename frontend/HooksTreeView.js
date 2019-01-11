@@ -104,7 +104,9 @@ function HooksNodeView({ hooksNode, index, inspect, path, theme }: HooksNodeView
   // Format data for display to mimic the DataView UI.
   const type = typeof value;
   let preview;
-  if (type === 'number' || type === 'string' || value == null /* null or undefined */ || type === 'boolean') {
+  if (isCustomHook && value === undefined) {
+    preview = null;
+  } else if (type === 'number' || type === 'string' || value == null /* null or undefined */ || type === 'boolean') {
     preview = <Simple readOnly={true} path={[]} data={value} />;
   } else {
     preview = previewComplex((value: any), theme);
