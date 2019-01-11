@@ -220,7 +220,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var containsHooks =
       (tag === FunctionComponent ||
         tag === SimpleMemoComponent ||
-        tag == ForwardRef) &&
+        tag === ForwardRef) &&
       !!fiber.memoizedState;
 
     var resolvedType = type;
