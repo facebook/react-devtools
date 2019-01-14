@@ -15,6 +15,7 @@ var ProfileCollector = require('../../plugins/Profiler/ProfileCollector');
 var TraceUpdatesBackendManager = require('../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var Bridge = require('../../agent/Bridge');
 var setupHighlighter = require('../../frontend/Highlighter/setup');
+var setupHooksInspector = require('../../plugins/HooksInspector/backend').default;
 var setupProfiler = require('../../plugins/Profiler/backend');
 var inject = require('../../agent/inject');
 
@@ -39,6 +40,7 @@ inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
 
 setupHighlighter(agent);
 setupProfiler(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
+setupHooksInspector(bridge, agent);
 
 ProfileCollector.init(agent);
 TraceUpdatesBackendManager.init(agent);

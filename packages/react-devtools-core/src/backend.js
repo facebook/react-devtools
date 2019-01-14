@@ -25,6 +25,7 @@ var installGlobalHook = require('../../../backend/installGlobalHook');
 var inject = require('../../../agent/inject');
 var invariant = require('assert');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+var setupHooksInspector = require('../../../plugins/HooksInspector/backend').default;
 var setupProfiler = require('../../../plugins/Profiler/backend');
 
 installGlobalHook(window);
@@ -139,6 +140,7 @@ function setupBackend(wall, resolveRNStyle) {
   }
 
   setupProfiler(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  setupHooksInspector(bridge, agent);
 
   var _connectTimeout = setTimeout(() => {
     console.warn('react-devtools agent got no connection');
