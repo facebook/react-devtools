@@ -88,12 +88,6 @@ function HooksNodeView({ hooksNode, index, inspect, path, theme }: HooksNodeView
       setIsOpen(true);
 
       if (subHooks && subHooks[consts.inspected] === false) {
-        if (inspect === null) {
-          // The Profiler displays props/state for oudated Fibers.
-          // These Fibers have already been mutated so they can't be inspected.
-          return;
-        }
-
         setIsLoading(true);
         inspect(path, data => setIsLoading(false));
         return;

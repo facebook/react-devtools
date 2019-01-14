@@ -29,7 +29,7 @@ import type {InspectedHooks} from '../backend/types';
 type Props = {
   id: string,
   extraPanes: Array<any>,
-  inspectedHooks: InspectedHooks,
+  inspectedHooks: ?InspectedHooks,
   inspect: Function,
   showMenu: Function,
   node: Map<string, any>,
@@ -184,7 +184,7 @@ class PropState extends React.Component<Props> {
           <DetailPaneSection title="Hooks">
             {showHooksTree &&
               <HooksTreeView
-                hooksTree={inspectedHooks.hooksTree}
+                hooksTree={((inspectedHooks: any): InspectedHooks).hooksTree}
                 inspect={inspect}
                 theme={theme}
               />}
