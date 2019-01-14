@@ -164,6 +164,8 @@ function attachRenderer(hook: Hook, rid: string, renderer: ReactRenderer): Helpe
     oldRenderComponent = null;
   };
 
+  extras.renderer = null;
+
   return extras;
 }
 

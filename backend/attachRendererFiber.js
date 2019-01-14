@@ -51,7 +51,7 @@ function getInternalReactConstants(version) {
       CoroutineHandlerPhase: -1, // Removed
       ForwardRef: 11,
       Fragment: 7,
-      FunctionalComponent: 0,
+      FunctionComponent: 0,
       HostComponent: 5,
       HostPortal: 4,
       HostRoot: 3,
@@ -75,7 +75,7 @@ function getInternalReactConstants(version) {
       CoroutineHandlerPhase: -1, // Removed
       ForwardRef: 13,
       Fragment: 9,
-      FunctionalComponent: 0,
+      FunctionComponent: 0,
       HostComponent: 7,
       HostPortal: 6,
       HostRoot: 5,
@@ -99,7 +99,7 @@ function getInternalReactConstants(version) {
       CoroutineHandlerPhase: 8,
       ForwardRef: 14,
       Fragment: 10,
-      FunctionalComponent: 1,
+      FunctionComponent: 1,
       HostComponent: 5,
       HostPortal: 4,
       HostRoot: 3,
@@ -154,7 +154,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   var {ReactTypeOfWork, ReactSymbols, ReactTypeOfSideEffect} = getInternalReactConstants(renderer.version);
   var {PerformedWork} = ReactTypeOfSideEffect;
   var {
-    FunctionalComponent,
+    FunctionComponent,
     ClassComponent,
     ContextConsumer,
     Fragment,
@@ -192,6 +192,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     var type = fiber.type;
     var key = fiber.key;
     var ref = fiber.ref;
+    var tag = fiber.tag;
     var source = fiber._debugSource;
     var publicInstance = null;
     var props = null;
@@ -215,6 +216,13 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     // Suspense
     var isTimedOutSuspense = false;
 
+    // Hooks inspection
+    var containsHooks =
+      (tag === FunctionComponent ||
+        tag === SimpleMemoComponent ||
+        tag === ForwardRef) &&
+      !!fiber.memoizedState;
+
     var resolvedType = type;
     if (typeof type === 'object' && type !== null) {
       if (typeof type.then === 'function') {
@@ -232,9 +240,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       };
     }
 
-    switch (fiber.tag) {
+    switch (tag) {
       case ClassComponent:
-      case FunctionalComponent:
+      case FunctionComponent:
       case IncompleteClassComponent:
       case IndeterminateComponent:
         nodeType = 'Composite';
@@ -269,6 +277,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
             : 'ForwardRef'
         );
         props = fiber.memoizedProps;
+        state = fiber.memoizedState;
         children = [];
         break;
       case HostRoot:
@@ -329,6 +338,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           name = displayName ? `Memo(${displayName})` : 'Memo';
         }
         props = fiber.memoizedProps;
+        state = fiber.memoizedState;
         children = [];
         break;
       default:
@@ -469,6 +479,9 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       actualDuration,
       actualStartTime,
       treeBaseDuration,
+
+      // Hooks inspection
+      containsHooks,
     };
   }
 
@@ -524,7 +537,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   function hasDataChanged(prevFiber, nextFiber) {
     switch (nextFiber.tag) {
       case ClassComponent:
-      case FunctionalComponent:
+      case FunctionComponent:
       case ContextConsumer:
       case MemoComponent:
       case SimpleMemoComponent:
@@ -586,6 +599,8 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   }
 
   function enqueueUpdateIfNecessary(fiber, hasChildOrderChanged) {
+    const data = getDataFiber(fiber);
+
     if (
       !hasChildOrderChanged &&
       !hasDataChanged(fiber.alternate, fiber)
@@ -597,7 +612,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       if (haveProfilerTimesChanged(fiber.alternate, fiber)) {
         pendingEvents.push({
           internalInstance: getOpaqueNode(fiber),
-          data: getDataFiber(fiber),
+          data,
           renderer: rid,
           type: 'updateProfileTimes',
         });
@@ -606,7 +621,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     pendingEvents.push({
       internalInstance: getOpaqueNode(fiber),
-      data: getDataFiber(fiber),
+      data,
       renderer: rid,
       type: 'update',
     });
@@ -764,7 +779,6 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     // This is not recursive.
     // We can't traverse fibers after unmounting so instead
     // we rely on React telling us about each unmount.
-    // It will be flushed after the root is committed.
     enqueueUnmount(fiber);
   }
 
@@ -816,6 +830,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     return null;
   }
+
   return {
     getNativeFromReactElement,
     getReactElementFromNative,
@@ -823,6 +838,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     handleCommitFiberUnmount,
     cleanup,
     walkTree,
+    renderer,
   };
 }
 

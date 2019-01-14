@@ -40,6 +40,75 @@ ThemeContext.displayName = 'ThemeContext';
 
 const LocaleContext = React.createContext('en-US');
 
+const {useCallback, useDebugValue, useEffect, useState} = React;
+
+// Below copied from https://usehooks.com/
+function useDebounce(value, delay) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  // Show the value in DevTools
+  useDebugValue(debouncedValue);
+
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  );
+
+  return debouncedValue;
+}
+// Above copied from https://usehooks.com/
+
+function useNestedInnerHook() {
+  return useState(123);
+}
+function useNestedOuterHook() {
+  return useNestedInnerHook();
+}
+
+const hooksTestProps = {
+  string: 'abc',
+  number: 123,
+  nestedObject:  {
+    boolean: true,
+  },
+  nestedArray: ['a', 'b', 'c'],
+};
+
+function FunctionWithHooks(props, ref) {
+  const [count, updateCount] = useState(0);
+
+  // Custom hook with a custom debug label
+  const debouncedCount = useDebounce(count, 1000);
+
+  const onClick = useCallback(function onClick() {
+    updateCount(count + 1);
+  }, [count]);
+
+  // Tests nested custom hooks
+  useNestedOuterHook();
+
+  return (
+    <button onClick={onClick}>
+      Count: {debouncedCount}
+    </button>
+  );
+}
+const MemoWithHooks = React.memo(FunctionWithHooks);
+const ForwardRefWithHooks = React.forwardRef(FunctionWithHooks);
+
 class Todos extends React.Component {
   ref = React.createRef();
 
@@ -468,6 +537,11 @@ class Wrap extends React.Component {
           <Todos/>
           <center>
             <button onClick={this.toggleTheme.bind(this)}>Toggle color</button>
+          </center>
+          <center>
+            <FunctionWithHooks props={hooksTestProps} />
+            <MemoWithHooks props={hooksTestProps} />
+            <ForwardRefWithHooks props={hooksTestProps} />
           </center>
           {/*<span thing={someVal}/>
           <Target count={1}/>

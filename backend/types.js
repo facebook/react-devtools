@@ -102,6 +102,9 @@ export type ReactRenderer = {
     getNodeFromInstance: (component: OpaqueNodeHandle) => ?NativeType,
     getClosestInstanceFromNode: (component: NativeType) => ?OpaqueNodeHandle,
   },
+  currentDispatcherRef?: {
+    current: null | Object,
+  },
 };
 
 export type Helpers = {
@@ -109,6 +112,7 @@ export type Helpers = {
   getReactElementFromNative?: ?(component: NativeType) => ?OpaqueNodeHandle,
   walkTree: (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) => void,
   cleanup: () => void,
+  renderer: ReactRenderer | null,
 };
 
 export type Handler = (data: any) => void;
@@ -125,3 +129,16 @@ export type Hook = {
   reactDevtoolsAgent?: ?Object,
   getFiberRoots: (rendererID : string) => Set<Object>,
 };
+
+export type HooksNode = {
+  name: string,
+  value: mixed,
+  subHooks: Array<HooksNode>,
+};
+export type HooksTree = Array<HooksNode>;
+
+export type InspectedHooks = {|
+  elementID: string,
+  id: string,
+  hooksTree: HooksTree,
+|};
