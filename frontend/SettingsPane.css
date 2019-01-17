@@ -78,6 +78,7 @@
   margin: 0.25rem;
   margin-left: 1.75rem;
   background-color: transparent;
+  color: var(--theme-base05);
   border: none;
   outline: none;
   width: 100%;
