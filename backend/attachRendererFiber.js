@@ -322,6 +322,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
         break;
       case HostText:
         nodeType = 'Text';
+        publicInstance = fiber.stateNode;
         text = fiber.memoizedProps;
         break;
       case Fragment:
@@ -454,6 +455,14 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
       actualDuration = fiber.actualDuration;
       actualStartTime = fiber.actualStartTime;
       treeBaseDuration = fiber.treeBaseDuration;
+    }
+
+    if (publicInstance === null) {
+      // publicInstance is used for $r.
+      // If we have nothing useful to expose, at least give props and state.
+      // This is an escape hatch to avoid a situation where there is useful
+      // data in the tree but DevTools don't offer any way to get it through console.
+      publicInstance = { props, state, type };
     }
 
     // $FlowFixMe
