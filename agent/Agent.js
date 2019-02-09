@@ -96,6 +96,7 @@ class Agent extends EventEmitter {
   capabilities: {[key: string]: boolean};
   _updateScroll: () => void;
   _inspectEnabled: boolean;
+  _isRecordingProfile: boolean
 
   constructor(global: Object, capabilities?: Object) {
     super();
@@ -163,7 +164,10 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
-    bridge.on('isRecording', isRecording => this.emit('isRecording', isRecording));
+    bridge.on('isRecording', isRecording => {
+      this._isRecordingProfile = isRecording;
+      this.emit('isRecording', isRecording);
+    });
     bridge.on('setInspectEnabled', enabled => {
       this._inspectEnabled = enabled;
       this.emit('stopInspecting');
@@ -419,6 +423,9 @@ class Agent extends EventEmitter {
   }
 
   onUpdatedProfileTimes(component: OpaqueNodeHandle, data: DataType) {
+    if (!this._isRecordingProfile) {
+      return;
+    }
     var id = this.getId(component);
     this.elementData.set(id, data);
 
