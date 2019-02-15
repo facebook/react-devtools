@@ -186,7 +186,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
   } = ReactSymbols;
 
   // TODO: we might want to change the data structure
-  // once we no longer suppport Stack versions of `getData`.
+  // once we no longer support Stack versions of `getData`.
   function getDataFiber(fiber: Object): DataType {
     var elementType = fiber.elementType;
     var type = fiber.type;
