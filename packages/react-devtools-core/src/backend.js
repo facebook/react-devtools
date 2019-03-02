@@ -67,7 +67,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   // See D6251744.
   var ws = websocket ? websocket : new window.WebSocket(uri);
   ws.onclose = handleClose;
-  ws.onerror = handleClose;
+  ws.onerror = handleFailed;
   ws.onmessage = handleMessage;
   ws.onopen = function() {
     var wall = {
@@ -89,6 +89,12 @@ function connectToDevTools(options: ?ConnectOptions) {
     if (!hasClosed) {
       hasClosed = true;
       scheduleRetry();
+      closeListeners.forEach(fn => fn());
+    }
+  }
+  function handleFailed() {
+    if (!hasClosed) {
+      hasClosed = true;
       closeListeners.forEach(fn => fn());
     }
   }
