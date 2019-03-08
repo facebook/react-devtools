@@ -1,0 +1,72 @@
+/* Theme colors taken from https://github.com/reactjs/reactjs.org/blob/b50fe64c1e88489022eddf2cfff0995778827f84/src/theme.js */
+
+body {
+  background: #fff;
+  color: #000;
+  font-family: -apple-system, BlinkMacSystemFont,
+    "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell",
+    "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: normal;
+  line-height: 1.5;
+  margin: 8px;
+  text-align: left;
+  width: 460px;
+
+  /* Re-enable text selection on Firefox */
+  cursor: auto;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  user-select: text;
+}
+
+p {
+  margin: 0 0 1rem;
+}
+
+p:last-child {
+  margin-bottom: 0;
+}
+
+a {
+  background-color: rgba(187, 239, 253, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+  color: #1a1a1a;
+  text-decoration: none;
+}
+
+a:hover {
+  background-color: #bbeffd;
+  border-bottom-color: #1a1a1a;
+}
+
+hr {
+  width: 100%;
+  height: 1px;
+  margin: 0 0 1rem;
+  border: none;
+  border-bottom: 1px solid #ececec;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background: rgb(49, 54, 56);
+    color: #fff;
+  }
+
+  a {
+    border-bottom-color: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+  
+  a:hover {
+    background-color: rgba(97, 218, 251, 0.3);
+    border-bottom-color: #fff;
+  }
+
+  hr {
+    border-bottom-color: #444;
+  }
+}
