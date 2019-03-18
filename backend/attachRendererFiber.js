@@ -406,7 +406,7 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
           case PROFILER_SYMBOL_STRING:
             nodeType = 'Special';
             props = fiber.memoizedProps;
-            name = `Profiler(${fiber.memoizedProps.id})`;
+            name = 'Profiler';
             children = [];
             break;
           default:
