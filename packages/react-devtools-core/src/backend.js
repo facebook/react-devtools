@@ -21,6 +21,7 @@ type ConnectOptions = {
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
 var ProfileCollector = require('../../../plugins/Profiler/ProfileCollector');
+var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
 var installGlobalHook = require('../../../backend/installGlobalHook');
 var inject = require('../../../agent/inject');
 var invariant = require('assert');
@@ -161,6 +162,7 @@ function setupBackend(wall, resolveRNStyle) {
   });
 
   ProfileCollector.init(agent);
+  TraceUpdatesBackendManager.init(agent);
 }
 
 module.exports = { connectToDevTools };
