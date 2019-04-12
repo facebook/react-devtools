@@ -436,8 +436,9 @@ class Bridge {
         if (isFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
           return;
         }
+        var desc = Object.getOwnPropertyDescriptor(val, name);
         // $FlowIgnore This is intentional
-        result[name] = dehydrate(val[name], cleaned, [name]);
+        result[name] = dehydrate(desc.value, cleaned, [name]);
       });
 
       /* eslint-disable no-proto */
@@ -448,7 +449,8 @@ class Bridge {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
-          newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
+          var desc = Object.getOwnPropertyDescriptor(val.__proto__, name);
+          newProto[name] = dehydrate(desc.value, protoclean, [name]);
         });
         proto = newProto;
       }
