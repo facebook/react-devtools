@@ -14,14 +14,10 @@ import type {Theme} from '../../../frontend/types';
 import type {Snapshot} from '../ProfilerTypes';
 
 import React, {Fragment} from 'react';
-import {monospace, sansSerif} from '../../../frontend/Themes/Fonts';
-import DataView from '../../../frontend/DataView/DataView';
-import DetailPane from '../../../frontend/detail_pane/DetailPane';
-import DetailPaneSection from '../../../frontend/detail_pane/DetailPaneSection';
+import {monospace} from '../../../frontend/Themes/Fonts';
 import Icons from '../../../frontend/Icons';
 import IconButton from './IconButton';
-
-const emptyFunction = () => {};
+import ProfilerSnapshotDetailPaneFiber from './ProfilerSnapshotDetailPaneFiber';
 
 type Props = {|
   deselectFiber: Function,
@@ -42,11 +38,6 @@ const ProfilerFiberDetailPane = ({
   theme,
   toggleInspectingSelectedFiber,
 }: Props) => {
-  const containsHooks = snapshotFiber.get('containsHooks');
-  const props = snapshotFiber.get('props');
-  const renders = snapshotFiber.get('renders');
-  const state = snapshotFiber.get('state');
-
   return (
     <Fragment>
       <div style={{
@@ -104,56 +95,7 @@ const ProfilerFiberDetailPane = ({
         </div>
       </div>
       {snapshotFiber !== null && (
-        <div style={{
-          flex: 1,
-          overflow: 'auto',
-        }}>
-          <div style={{
-            padding: '0.25rem',
-            fontSize: monospace.sizes.normal,
-            fontFamily: monospace.family,
-          }}>
-            <strong>Total renders</strong>: {renders}
-          </div>
-          <DetailPane theme={theme}>
-            <DetailPaneSection title="Props">
-              <DataView
-                path={['props']}
-                readOnly={true}
-                inspect={null}
-                showMenu={emptyFunction}
-                startOpen={true}
-                data={props}
-              />
-            </DetailPaneSection>
-
-            {state && containsHooks && (
-              <DetailPaneSection title="Hooks">
-                <div style={{
-                  lineHeight: '1.25rem',
-                  marginLeft: '1rem',
-                  fontFamily: sansSerif.family,
-                  fontSize: sansSerif.sizes.normal,
-                }}>
-                  Not available in profiling mode.
-                </div>
-              </DetailPaneSection>
-            )}
-
-            {state && !containsHooks && (
-              <DetailPaneSection title="State">
-                <DataView
-                  path={['state']}
-                  readOnly={true}
-                  inspect={null}
-                  showMenu={emptyFunction}
-                  startOpen={true}
-                  data={state}
-                />
-              </DetailPaneSection>
-            )}
-          </DetailPane>
-        </div>
+        <ProfilerSnapshotDetailPaneFiber snapshotFiber={snapshotFiber} theme={theme} />
       )}
     </Fragment>
   );
