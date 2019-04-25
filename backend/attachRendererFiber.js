@@ -10,7 +10,7 @@
  */
 'use strict';
 
-import type {Hook, ReactRenderer, DataType, Helpers} from './types';
+import type {Hook, ReactRenderer, DataType, Helpers, Fiber} from './types';
 
 var semver = require('semver');
 
@@ -136,7 +136,9 @@ function getInternalReactConstants(version) {
     DEPRECATED_PLACEHOLDER_SYMBOL_STRING: 'Symbol(react.placeholder)',
   };
   ReactTypeOfSideEffect = {
-    PerformedWork: 1,
+    NoEffect: 0b00,
+    PerformedWork: 0b01,
+    Placement: 0b10,
   };
   // **********************************************************
   // End of copied code.
@@ -152,7 +154,7 @@ function getInternalReactConstants(version) {
 function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): Helpers {
   var {overrideProps} = renderer;
   var {ReactTypeOfWork, ReactSymbols, ReactTypeOfSideEffect} = getInternalReactConstants(renderer.version);
-  var {PerformedWork} = ReactTypeOfSideEffect;
+  var {NoEffect, PerformedWork, Placement} = ReactTypeOfSideEffect;
   var {
     FunctionComponent,
     ClassComponent,
@@ -818,18 +820,55 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     flushPendingEvents();
   }
 
+  function findAllCurrentHostFibers(parent: Fiber): Array<Fiber> {
+    const fibers = [];
+    const currentParent = findCurrentFiberUsingSlowPath(parent);
+    if (!currentParent) {
+      return fibers;
+    }
+
+    // Next we'll drill down this component to find all HostComponent/Text.
+    let node: Fiber = currentParent;
+    while (true) {
+      if (node.tag === HostComponent || node.tag === HostText) {
+        fibers.push(node);
+      } else if (node.child) {
+        node.child.return = node;
+        node = node.child;
+        continue;
+      }
+      if (node === currentParent) {
+        return fibers;
+      }
+      while (!node.sibling) {
+        if (!node.return || node.return === currentParent) {
+          return fibers;
+        }
+        node = node.return;
+      }
+      node.sibling.return = node.return;
+      node = node.sibling;
+    }
+    // Flow needs the return here, but ESLint complains about it.
+    // eslint-disable-next-line no-unreachable
+    return fibers;
+  }
+
   // The naming is confusing.
   // They deal with opaque nodes (fibers), not elements.
-  function getNativeFromReactElement(fiber) {
+  function getNativeFromReactElement(fiber: Fiber): Fiber | null {
     try {
-      const opaqueNode = fiber;
-      const hostInstance = renderer.findHostInstanceByFiber(opaqueNode);
-      return hostInstance;
+      const hostFibers = findAllCurrentHostFibers(fiber);
+      const hostInstances = hostFibers.map(hostFiber => hostFiber.stateNode).filter(Boolean);
+      // For now, keep the API unchanged and return just the first host instance.
+      // TODO: Return all host instances and show multiple overlays. See https://github.com/bvaughn/react-devtools-experimental/pull/207
+      return hostInstances[0] || null;
     } catch (err) {
       // The fiber might have unmounted by now.
       return null;
     }
   }
+
   function getReactElementFromNative(hostInstance) {
     const fiber = renderer.findFiberByHostInstance(hostInstance);
     if (fiber != null) {
@@ -839,6 +878,189 @@ function attachRendererFiber(hook: Hook, rid: string, renderer: ReactRenderer): 
     }
     return null;
   }
+
+  const MOUNTING = 1;
+  const MOUNTED = 2;
+  const UNMOUNTED = 3;
+
+  // This function is copied from React and should be kept in sync:
+  // https://github.com/facebook/react/blob/master/packages/react-reconciler/src/ReactFiberTreeReflection.js
+  function isFiberMountedImpl(fiber: Fiber): number {
+    let node = fiber;
+    if (!fiber.alternate) {
+      // If there is no alternate, this might be a new tree that isn't inserted
+      // yet. If it is, then it will have a pending insertion effect on it.
+      if ((node.effectTag & Placement) !== NoEffect) {
+        return MOUNTING;
+      }
+      while (node.return) {
+        node = node.return;
+        if ((node.effectTag & Placement) !== NoEffect) {
+          return MOUNTING;
+        }
+      }
+    } else {
+      while (node.return) {
+        node = node.return;
+      }
+    }
+    if (node.tag === HostRoot) {
+      // TODO: Check if this was a nested HostRoot when used with
+      // renderContainerIntoSubtree.
+      return MOUNTED;
+    }
+    // If we didn't hit the root, that means that we're in an disconnected tree
+    // that has been unmounted.
+    return UNMOUNTED;
+  }
+
+  // This function is copied from React and should be kept in sync:
+  // https://github.com/facebook/react/blob/master/packages/react-reconciler/src/ReactFiberTreeReflection.js
+  // It would be nice if we updated React to inject this function directly (vs just indirectly via findDOMNode).
+  // BEGIN copied code
+  function findCurrentFiberUsingSlowPath(fiber: Fiber): ?Fiber {
+    let alternate = fiber.alternate;
+    if (!alternate) {
+      // If there is no alternate, then we only need to check if it is mounted.
+      const state = isFiberMountedImpl(fiber);
+      if (state === UNMOUNTED) {
+        throw Error("Unable to find node on an unmounted component.");
+      }
+      if (state === MOUNTING) {
+        return null;
+      }
+      return fiber;
+    }
+    // If we have two possible branches, we'll walk backwards up to the root
+    // to see what path the root points to. On the way we may hit one of the
+    // special cases and we'll deal with them.
+    let a: Fiber = fiber;
+    let b: Fiber = alternate;
+    while (true) {
+      let parentA = a.return;
+      if (parentA === null) {
+        // We're at the root.
+        break;
+      }
+      let parentB = parentA.alternate;
+      if (parentB === null) {
+        // There is no alternate. This is an unusual case. Currently, it only
+        // happens when a Suspense component is hidden. An extra fragment fiber
+        // is inserted in between the Suspense fiber and its children. Skip
+        // over this extra fragment fiber and proceed to the next parent.
+        const nextParent = parentA.return;
+        if (nextParent !== null) {
+          a = b = nextParent;
+          continue;
+        }
+        // If there's no parent, we're at the root.
+        break;
+      }
+
+      // If both copies of the parent fiber point to the same child, we can
+      // assume that the child is current. This happens when we bailout on low
+      // priority: the bailed out fiber's child reuses the current child.
+      if (parentA.child === parentB.child) {
+        let child = parentA.child;
+        while (child) {
+          if (child === a) {
+            // We've determined that A is the current branch.
+            if (isFiberMountedImpl(parentA) !== MOUNTED) {
+              throw Error("Unable to find node on an unmounted component.");
+            }
+            return fiber;
+          }
+          if (child === b) {
+            // We've determined that B is the current branch.
+            if (isFiberMountedImpl(parentA) !== MOUNTED) {
+              throw Error("Unable to find node on an unmounted component.");
+            }
+            return alternate;
+          }
+          child = child.sibling;
+        }
+        // We should never have an alternate for any mounting node. So the only
+        // way this could possibly happen is if this was unmounted, if at all.
+        throw Error("Unable to find node on an unmounted component.");
+      }
+
+      if (a.return !== b.return) {
+        // The return pointer of A and the return pointer of B point to different
+        // fibers. We assume that return pointers never criss-cross, so A must
+        // belong to the child set of A.return, and B must belong to the child
+        // set of B.return.
+        a = parentA;
+        b = parentB;
+      } else {
+        // The return pointers point to the same fiber. We'll have to use the
+        // default, slow path: scan the child sets of each parent alternate to see
+        // which child belongs to which set.
+        //
+        // Search parent A's child set
+        let didFindChild = false;
+        let child = parentA.child;
+        while (child) {
+          if (child === a) {
+            didFindChild = true;
+            a = parentA;
+            b = parentB;
+            break;
+          }
+          if (child === b) {
+            didFindChild = true;
+            b = parentA;
+            a = parentB;
+            break;
+          }
+          child = child.sibling;
+        }
+        if (!didFindChild) {
+          // Search parent B's child set
+          child = parentB.child;
+          while (child) {
+            if (child === a) {
+              didFindChild = true;
+              a = parentB;
+              b = parentA;
+              break;
+            }
+            if (child === b) {
+              didFindChild = true;
+              b = parentB;
+              a = parentA;
+              break;
+            }
+            child = child.sibling;
+          }
+          if (!didFindChild) {
+            throw Error(
+              "Child was not found in either parent set. This indicates a bug " +
+                "in React related to the return pointer. Please file an issue."
+            );
+          }
+        }
+      }
+
+      if (a.alternate !== b) {
+        throw Error(
+          "Return fibers should always be each others' alternates. " +
+            "This error is likely caused by a bug in React. Please file an issue."
+        );
+      }
+    }
+    // If the root is not a host container, we're in a disconnected tree. I.e.
+    // unmounted.
+    if (a.tag !== HostRoot) {
+      throw Error("Unable to find node on an unmounted component.");
+    }
+    if (a.stateNode.current === a) {
+      // We've determined that A is the current branch.
+      return fiber;
+    }
+    // Otherwise B has to be current branch.
+    return alternate;
+  }
+  // END copied code
 
   return {
     getNativeFromReactElement,

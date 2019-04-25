@@ -67,10 +67,12 @@ type BundleType =
   // DEV
   | 1;
 
+// TODO: Better type for Fiber
+export type Fiber = Object;
+
 export type ReactRenderer = {
   // Fiber
-  findHostInstanceByFiber: (fiber: Object) => ?NativeType,
-  findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
+  findFiberByHostInstance: (hostInstance: NativeType) => ?Fiber,
   version: string,
   bundleType: BundleType,
   overrideProps?: ?(fiber: Object, path: Array<string | number>, value: any) => void,
