@@ -326,32 +326,28 @@ class Panel extends React.Component<Props, State> {
           <h2>Connecting to React…</h2>
           <br />
           {this.state.showTroubleshooting && (
-            <a style={{
-              color: 'gray',
-              textDecoration: 'underline',
-              cursor: 'pointer',
-            }} onClick={() => {
-              chrome.tabs.create({
-                active: true,
-                url: 'https://github.com/facebook/react-devtools/blob/master/' +
-                  'README.md#the-react-tab-doesnt-show-up',
-              });
-            }}>
-              Click here for troubleshooting instructions
-            </a>
-          )}
-        </div>
-      );
-    }
-    if (!this.state.isReact) {
-      return (
-        <div style={loadingStyle(theme)}>
-            <h2>React was not detected on this page.</h2>
-            {showFileUrlWarningMessage &&
             <div>
-                If this seems wrong, follow the <a href="https://github.com/facebook/react-devtools/blob/master/README.md#the-react-tab-doesnt-show-up" target="_blank">troubleshooting instructions</a>.
+              {showFileUrlWarningMessage && (
+                <div>
+                  Please enable "Allow access to file URLs" permission
+                </div>
+              )}
+              <br />
+              <a style={{
+                color: 'gray',
+                textDecoration: 'underline',
+                cursor: 'pointer',
+              }} onClick={() => {
+                chrome.tabs.create({
+                  active: true,
+                  url: 'https://github.com/facebook/react-devtools/blob/master/' +
+                    'README.md#the-react-tab-doesnt-show-up',
+                });
+              }}>
+                Click here for troubleshooting instructions
+              </a>
             </div>
-            }
+          )}
         </div>
       );
     }
