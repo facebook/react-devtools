@@ -76,7 +76,8 @@ There is a [standalone version](https://github.com/facebook/react-devtools/blob/
 
 **If you are running your app from a local `file://` URL**, don't forget to check "Allow access to file URLs" on the Chrome Extensions settings page. You can find it by opening Settings > Extensions:
 
-![Allow access to file URLs](http://i.imgur.com/Yt1rmUp.png)
+![Allow access to file URLs step 1](https://imgur.com/ZRmjrPg.jpg)
+![Allow access to file URLs step 2](https://imgur.com/WgbzYkJ.jpg)
 
 Or you could develop with a local HTTP server [like `serve`](https://www.npmjs.com/package/serve).
 
