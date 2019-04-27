@@ -351,6 +351,13 @@ class Panel extends React.Component<Props, State> {
         </div>
       );
     }
+    if (!this.state.isReact) {
+      return (
+        <div style={loadingStyle(theme)}>
+          <h2>Looking for React…</h2>
+        </div>
+      );
+    }
     var extraTabs = assign.apply(null, [{}].concat(this.plugins.map(p => p.tabs())));
     var extraPanes = [].concat(...this.plugins.map(p => p.panes()));
     if (this._store.capabilities.rnStyle) {
