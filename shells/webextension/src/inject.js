@@ -18,6 +18,7 @@ module.exports = function(scriptName: string, done: () => void) {
   (function () {
     var script = document.constructor.prototype.createElement.call(document, 'script');
     script.src = "${scriptName}";
+    script.charset = "utf-8";
     document.documentElement.appendChild(script);
     script.parentNode.removeChild(script);
   })()

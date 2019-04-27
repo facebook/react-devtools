@@ -10,6 +10,7 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
 const React = require('react');
 
 const decorate = require('./decorate');
@@ -19,10 +20,23 @@ const Icons = require('./Icons');
 const SvgIcon = require('./SvgIcon');
 const ThemeEditor = require('./Themes/Editor/Editor');
 const Hoverable = require('./Hoverable');
+const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
+const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
 
 import type {Theme} from './types';
 
-class PreferencesPanel extends React.Component {
+type Props = {
+  changeTheme: (themeName: string) => void,
+  hasCustomTheme: boolean,
+  hide: () => void,
+  open: bool,
+};
+
+type State = {
+  editMode: bool,
+};
+
+class PreferencesPanel extends React.Component<Props, State> {
   _selectRef: any;
 
   context: {
@@ -31,15 +45,6 @@ class PreferencesPanel extends React.Component {
     theme: Theme,
     themeName: string,
     themes: { [key: string]: Theme },
-  };
-  props: {
-    changeTheme: (themeName: string) => void,
-    hasCustomTheme: boolean,
-    hide: () => void,
-    open: bool,
-  };
-  state: {
-    editMode: bool,
   };
 
   constructor(props, context) {
@@ -84,6 +89,13 @@ class PreferencesPanel extends React.Component {
 
       content = (
         <div style={panelStyle(theme)} onClick={blockClick}>
+          <h4 style={styles.header}>Preferences</h4>
+          <div style={styles.preference}>
+            <TraceUpdatesFrontendControl />
+          </div>
+          <div style={styles.preference}>
+            <ColorizerFrontendControl />
+          </div>
           <h4 style={styles.header}>Theme</h4>
           <div style={styles.selectAndPreviewRow}>
             <select
@@ -162,16 +174,16 @@ class PreferencesPanel extends React.Component {
 }
 
 PreferencesPanel.contextTypes = {
-  browserName: React.PropTypes.string.isRequired,
-  showHiddenThemes: React.PropTypes.bool.isRequired,
-  theme: React.PropTypes.object.isRequired,
-  themeName: React.PropTypes.string.isRequired,
-  themes: React.PropTypes.object.isRequired,
+  browserName: PropTypes.string.isRequired,
+  showHiddenThemes: PropTypes.bool.isRequired,
+  theme: PropTypes.object.isRequired,
+  themeName: PropTypes.string.isRequired,
+  themes: PropTypes.object.isRequired,
 };
 PreferencesPanel.propTypes = {
-  changeTheme: React.PropTypes.func,
-  hide: React.PropTypes.func,
-  open: React.PropTypes.bool,
+  changeTheme: PropTypes.func,
+  hide: PropTypes.func,
+  open: PropTypes.bool,
 };
 
 
@@ -246,7 +258,7 @@ const styles = {
     backgroundColor: 'rgba(0,0,0,0)',
   },
   header: {
-    margin: '0 0 0.25rem',
+    margin: '0 0 0.5rem',
   },
   buttonBar: {
     flexDirection: 'row',
@@ -255,6 +267,10 @@ const styles = {
     marginTop: '0.5rem',
     marginRight: '0.25rem',
     padding: '0.25rem',
+  },
+  preference: {
+    margin: '0 0 0.5rem',
+    fontSize: sansSerif.sizes.normal,
   },
   selectAndPreviewRow: {
     display: 'flex',

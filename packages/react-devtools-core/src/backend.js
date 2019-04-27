@@ -15,18 +15,20 @@ type ConnectOptions = {
   port?: number,
   resolveRNStyle?: (style: number) => ?Object,
   isAppActive?: () => boolean,
+  websocket?: ?WebSocket,
 };
 
 var Agent = require('../../../agent/Agent');
 var Bridge = require('../../../agent/Bridge');
+var ProfileCollector = require('../../../plugins/Profiler/ProfileCollector');
 var installGlobalHook = require('../../../backend/installGlobalHook');
-var installRelayHook = require('../../../plugins/Relay/installRelayHook');
 var inject = require('../../../agent/inject');
+var invariant = require('assert');
 var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
-var setupRelay = require('../../../plugins/Relay/backend');
+var setupHooksInspector = require('../../../plugins/HooksInspector/backend').default;
+var setupProfiler = require('../../../plugins/Profiler/backend');
 
 installGlobalHook(window);
-installRelayHook(window);
 
 if (window.document) {
   // This shell is universal, and might be used inside a web app.
@@ -40,6 +42,7 @@ function connectToDevTools(options: ?ConnectOptions) {
   var {
     host = 'localhost',
     port = 8097,
+    websocket,
     resolveRNStyle = null,
     isAppActive = () => true,
   } = options || {};
@@ -59,9 +62,12 @@ function connectToDevTools(options: ?ConnectOptions) {
   var messageListeners = [];
   var closeListeners = [];
   var uri = 'ws://' + host + ':' + port;
-  var ws = new window.WebSocket(uri);
+  // If existing websocket is passed, use it.
+  // This is necessary to support our custom integrations.
+  // See D6251744.
+  var ws = websocket ? websocket : new window.WebSocket(uri);
   ws.onclose = handleClose;
-  ws.onerror = handleClose;
+  ws.onerror = handleFailed;
   ws.onmessage = handleMessage;
   ws.onopen = function() {
     var wall = {
@@ -86,21 +92,20 @@ function connectToDevTools(options: ?ConnectOptions) {
       closeListeners.forEach(fn => fn());
     }
   }
+  function handleFailed() {
+    if (!hasClosed) {
+      hasClosed = true;
+      closeListeners.forEach(fn => fn());
+    }
+  }
 
   function handleMessage(evt) {
     var data;
-    // <hack>
-    // This branch can be dropped when we don't care about supporting
-    // Nuclide Inspector versions before https://github.com/facebook/nuclide/pull/1021.
-    // Inspector used to send this message but it is unnecessary now.
-    if (evt.data.indexOf('eval:') === 0) {
-      return;
-    }
-    // </hack>
     try {
+      invariant(typeof evt.data === 'string');
       data = JSON.parse(evt.data);
     } catch (e) {
-      console.error('failed to parse json: ' + evt.data);
+      console.error('failed to parse json: ' + String(evt.data));
       return;
     }
     messageListeners.forEach(fn => {
@@ -122,7 +127,7 @@ function setupBackend(wall, resolveRNStyle) {
     if (agent) {
       agent.emit('shutdown');
     }
-    // This appears necessary for plugin (e.g. Relay) cleanup.
+    // This appears necessary for plugin cleanup.
     window.__REACT_DEVTOOLS_GLOBAL_HOOK__.emit('shutdown');
     bridge = null;
     agent = null;
@@ -140,7 +145,8 @@ function setupBackend(wall, resolveRNStyle) {
     setupRNStyle(bridge, agent, resolveRNStyle);
   }
 
-  setupRelay(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  setupProfiler(bridge, agent, window.__REACT_DEVTOOLS_GLOBAL_HOOK__);
+  setupHooksInspector(bridge, agent);
 
   var _connectTimeout = setTimeout(() => {
     console.warn('react-devtools agent got no connection');
@@ -153,6 +159,8 @@ function setupBackend(wall, resolveRNStyle) {
     inject(window.__REACT_DEVTOOLS_GLOBAL_HOOK__, agent);
     clearTimeout(_connectTimeout);
   });
+
+  ProfileCollector.init(agent);
 }
 
 module.exports = { connectToDevTools };

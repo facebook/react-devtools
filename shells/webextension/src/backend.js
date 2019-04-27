@@ -10,13 +10,9 @@
  */
 'use strict';
 
-var Agent = require('../../../agent/Agent');
-var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
-var Bridge = require('../../../agent/Bridge');
-var inject = require('../../../agent/inject');
-var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
-var setupHighlighter = require('../../../frontend/Highlighter/setup');
-var setupRelay = require('../../../plugins/Relay/backend');
+// Do not add requires here!
+// Running module factories is intentionally delayed until we know the hook exists.
+// This is to avoid issues like: https://github.com/facebook/react-devtools/issues/1039
 
 window.addEventListener('message', welcome);
 function welcome(evt) {
@@ -29,6 +25,16 @@ function welcome(evt) {
 }
 
 function setup(hook) {
+  var Agent = require('../../../agent/Agent');
+  var ProfileCollector = require('../../../plugins/Profiler/ProfileCollector');
+  var TraceUpdatesBackendManager = require('../../../plugins/TraceUpdates/TraceUpdatesBackendManager');
+  var Bridge = require('../../../agent/Bridge');
+  var inject = require('../../../agent/inject');
+  var setupRNStyle = require('../../../plugins/ReactNativeStyle/setupBackend');
+  var setupHighlighter = require('../../../frontend/Highlighter/setup');
+  var setupProfiler = require('../../../plugins/Profiler/backend');
+  var setupHooksInspector = require('../../../plugins/HooksInspector/backend').default;
+
   var listeners = [];
 
   var wall = {
@@ -68,7 +74,8 @@ function setup(hook) {
     setupRNStyle(bridge, agent, hook.resolveRNStyle);
   }
 
-  setupRelay(bridge, agent, hook);
+  setupProfiler(bridge, agent, hook);
+  setupHooksInspector(bridge, agent);
 
   agent.on('shutdown', () => {
     hook.emit('shutdown');
@@ -79,5 +86,6 @@ function setup(hook) {
   });
 
   setupHighlighter(agent);
+  ProfileCollector.init(agent);
   TraceUpdatesBackendManager.init(agent);
 }

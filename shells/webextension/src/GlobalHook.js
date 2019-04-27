@@ -16,7 +16,7 @@
 // devtools are installed (and skip its suggestion to install the devtools).
 
 var installGlobalHook = require('../../../backend/installGlobalHook.js');
-var installRelayHook = require('../../../plugins/Relay/installRelayHook.js');
+var nullthrows = require('nullthrows').default;
 
 var lastDetectionResult;
 
@@ -64,7 +64,6 @@ window.__REACT_DEVTOOLS_GLOBAL_HOOK__.nativeSet = Set;
 
 var js = (
   ';(' + installGlobalHook.toString() + '(window))' +
-  ';(' + installRelayHook.toString() + '(window))' +
   saveNativeValues +
   detectReact
 );
@@ -73,5 +72,5 @@ var js = (
 // to <html> instead.
 var script = document.createElement('script');
 script.textContent = js;
-document.documentElement.appendChild(script);
-script.parentNode.removeChild(script);
+nullthrows(document.documentElement).appendChild(script);
+nullthrows(script.parentNode).removeChild(script);

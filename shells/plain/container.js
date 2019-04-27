@@ -12,22 +12,23 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var invariant = require('assert');
+var nullthrows = require('nullthrows').default;
 
 var installGlobalHook = require('../../backend/installGlobalHook');
-var installRelayHook = require('../../plugins/Relay/installRelayHook');
 
 window.React = React;
 
 var Panel = require('../../frontend/Panel');
 
-var target: Object = document.getElementById('target');
+var target = document.getElementById('target');
+invariant(target instanceof HTMLIFrameElement);
 
 var appSrc = target.getAttribute('data-app-src') || '../../test/example/build/target.js';
 var devtoolsSrc = target.getAttribute('data-devtools-src') || './build/backend.js';
 
 var win = target.contentWindow;
 installGlobalHook(win);
-installRelayHook(win);
 
 var iframeSrc = document.getElementById('iframe-src');
 if (iframeSrc) {
@@ -35,11 +36,12 @@ if (iframeSrc) {
 }
 
 window.addEventListener('keydown', function(e) {
+  const body = nullthrows(document.body);
   if (e.altKey && e.keyCode === 68) { // Alt + D
-    if (document.body.className === 'devtools-bottom') {
-      document.body.className = 'devtools-right';
+    if (body.className === 'devtools-bottom') {
+      body.className = 'devtools-right';
     } else {
-      document.body.className = 'devtools-bottom';
+      body.className = 'devtools-bottom';
     }
   }
 });
@@ -71,10 +73,11 @@ function inject(src, done) {
     done();
     return;
   }
+  invariant(target instanceof HTMLIFrameElement);
   var script = target.contentDocument.createElement('script');
   script.src = src;
   script.onload = done;
-  target.contentDocument.body.appendChild(script);
+  nullthrows(target.contentDocument.body).appendChild(script);
 }
 
 function injectMany(sources, done) {
@@ -88,7 +91,7 @@ function injectMany(sources, done) {
 var sources = appSrc.split('|');
 
 injectMany(sources, () => {
-  var node = document.getElementById('container');
+  var node = nullthrows(document.getElementById('container'));
 
   ReactDOM.render(<Panel {...config} />, node);
 });

@@ -23,9 +23,8 @@ import type {
   Presenter,
 } from './TraceUpdatesTypes';
 
-import type {ControlState} from '../../frontend/types.js';
-
 const NODE_TYPE_COMPOSITE = 'Composite';
+const NODE_TYPE_SPECIAL = 'Special';
 
 class TraceUpdatesBackendManager {
   _onMeasureNode: () => void;
@@ -53,12 +52,20 @@ class TraceUpdatesBackendManager {
   }
 
   _onUpdate(agent: Agent, obj: any) {
-    if (
-      !this._isActive ||
-      !obj.publicInstance ||
-      !obj.id ||
-      obj.nodeType !== NODE_TYPE_COMPOSITE
-    ) {
+    if (!this._isActive || !obj.id) {
+      return;
+    }
+
+    // Highlighting every host node would be too noisy.
+    // We highlight user components and context consumers
+    // (without consumers, a context update that renders
+    // only host nodes directly wouldn't highlight at all).
+    const shouldHighlight = obj.nodeType === NODE_TYPE_COMPOSITE || (
+      obj.nodeType === NODE_TYPE_SPECIAL &&
+      obj.name.endsWith('.Consumer')
+    );
+
+    if (!shouldHighlight) {
       return;
     }
 
@@ -74,9 +81,9 @@ class TraceUpdatesBackendManager {
     this._presenter.present(measurement);
   }
 
-  _onTraceUpdatesStateChange(state: ControlState): void {
-    this._isActive = state.enabled;
-    this._presenter.setEnabled(state.enabled);
+  _onTraceUpdatesStateChange(enabled: boolean): void {
+    this._isActive = enabled;
+    this._presenter.setEnabled(enabled);
   }
 
   _shutdown(): void {

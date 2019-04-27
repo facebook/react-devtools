@@ -10,14 +10,15 @@
  */
 'use strict';
 
+var PropTypes = require('prop-types');
 var React = require('react');
 
+type Props = {
+  children: () => React.Node,
+  store: Object,
+};
 module.exports = function(name: string): Object {
-  class Wrapper extends React.Component {
-    props: {
-      children: () => React$Element,
-      store: Object,
-    };
+  class Wrapper extends React.Component<Props> {
     getChildContext() {
       return {[name]: this.props.store};
     }
@@ -26,7 +27,7 @@ module.exports = function(name: string): Object {
     }
   }
   Wrapper.childContextTypes = {
-    [name]: React.PropTypes.object,
+    [name]: PropTypes.object,
   };
   Wrapper.displayName = 'StoreProvider(' + name + ')';
   return Wrapper;

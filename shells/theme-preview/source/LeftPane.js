@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 const React = require('react');
 
 const ExampleIconButton = require('./ExampleIconButton');
@@ -37,9 +39,9 @@ const LeftPane = (_: any, {theme}: Context) => (
           theme={theme}
         />
         <SettingsCheckbox
+          isChecked={false}
+          label="Example checkbox"
           onChange={noop}
-          state=""
-          text="Example checkbox"
         />
       </div>
       <Input
@@ -58,7 +60,7 @@ const LeftPane = (_: any, {theme}: Context) => (
 );
 
 LeftPane.contextTypes = {
-  theme: React.PropTypes.object,
+  theme: PropTypes.object,
 };
 
 const noop = () => {};

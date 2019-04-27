@@ -13,6 +13,8 @@
 const {deserialize, serialize} = require('./Serializer');
 const Themes = require('./Themes');
 const {CUSTOM_THEME_NAME} = require('./constants');
+const {get, set} = require('../../utils/storage');
+const Fonts = require('./Fonts');
 
 const LOCAL_STORAGE_CUSTOM_THEME_KEY = 'customTheme';
 const LOCAL_STORAGE_THEME_NAME_KEY = 'themeName';
@@ -31,12 +33,14 @@ class Store {
 
     // Load previous custom theme from localStorage.
     // If there isn't one in local storage, start by cloning the default theme.
-    const customTheme = getFromLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY);
+    const customTheme = get(LOCAL_STORAGE_CUSTOM_THEME_KEY);
     if (customTheme) {
       this.customTheme = deserialize(customTheme);
     }
 
     this.setDefaultTheme(defaultThemeName);
+
+    updateFontVariables(Fonts);
   }
 
   setDefaultTheme(defaultThemeName: ?string) {
@@ -46,7 +50,7 @@ class Store {
     // Don't restore an invalid themeName.
     // This guards against themes being removed or renamed.
     const themeName = getSafeThemeName(
-      getFromLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY),
+      get(LOCAL_STORAGE_THEME_NAME_KEY),
       this.defaultThemeName,
     );
 
@@ -54,6 +58,8 @@ class Store {
     // Or one of the built-in sets (based on the default).
     this.theme = themeName === CUSTOM_THEME_NAME ? this.customTheme : Themes[themeName];
     this.themeName = themeName;
+
+    updateCSSVariables(this.theme);
   }
 
   update(themeName: ?string) {
@@ -69,25 +75,38 @@ class Store {
     }
 
     // But allow users to restore "default" mode by selecting an empty theme.
-    setInLocalStorage(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+    set(LOCAL_STORAGE_THEME_NAME_KEY, themeName || null);
+
+    updateCSSVariables(this.theme);
   }
 
   saveCustomTheme(theme: Theme) {
     this.customTheme = theme;
     this.theme = theme;
 
-    setInLocalStorage(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
+    set(LOCAL_STORAGE_CUSTOM_THEME_KEY, serialize(theme));
+
+    updateCSSVariables(theme);
   }
 }
 
-function getFromLocalStorage(key: string): any {
-  let value;
-  try {
-    value = localStorage.getItem(key);
-  } catch (error) {
-    console.error('Could not read from localStorage.', error);
+function updateCSSVariables(theme: Theme): void {
+  for (const key in theme) {
+    // $FlowFixMe
+    document.body.style.setProperty(`--theme-${key}`, theme[key]);
   }
-  return value || null;
+}
+
+function updateFontVariables({ monospace, sansSerif }) {
+  // $FlowFixMe
+  const {style} = document.body;
+  style.setProperty('--font-family-mono', monospace.family);
+  style.setProperty('--font-size-mono-normal', monospace.sizes.normal + 'px');
+  style.setProperty('--font-size-mono-large', monospace.sizes.large + 'px');
+  style.setProperty('--font-family-sans', sansSerif.family);
+  style.setProperty('--font-size-sans-small', sansSerif.sizes.small + 'px');
+  style.setProperty('--font-size-sans-normal', sansSerif.sizes.normal + 'px');
+  style.setProperty('--font-size-sans-large', sansSerif.sizes.large + 'px');
 }
 
 function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): string {
@@ -106,16 +125,6 @@ function getSafeThemeName(themeName: ?string, fallbackThemeName: ?string): strin
   } else {
     return 'ChromeDefault';
   }
-}
-
-function setInLocalStorage(key: string, value: any): boolean {
-  try {
-    localStorage.setItem(key, value);
-    return true;
-  } catch (error) {
-    console.error('Could not write to localStorage.', error);
-  }
-  return false;
 }
 
 module.exports = Store;

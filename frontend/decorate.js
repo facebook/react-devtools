@@ -10,6 +10,7 @@
  */
 'use strict';
 
+var PropTypes = require('prop-types');
 var React = require('react');
 
 type Options = {
@@ -54,7 +55,7 @@ type State = {};
  */
 module.exports = function(options: Options, Component: any): any {
   var storeKey = options.store || 'store';
-  class Wrapper extends React.Component {
+  class Wrapper extends React.Component<*, State> {
     _listeners: Array<string>;
     _update: () => void;
     state: State;
@@ -126,7 +127,8 @@ module.exports = function(options: Options, Component: any): any {
   }
 
   Wrapper.contextTypes = {
-    [storeKey]: React.PropTypes.object,
+    // $FlowFixMe
+    [storeKey]: PropTypes.object,
   };
 
   Wrapper.displayName = 'Wrapper(' + Component.name + ')';

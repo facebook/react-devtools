@@ -11,13 +11,107 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Immutable = require('immutable');
-var assign = require('object-assign');
-var guid = require('../../utils/guid');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const PropTypes = require('prop-types');
+const ScheduleTracing = require('scheduler/tracing');
+const Immutable = require('immutable');
+const assign = require('object-assign');
+const guid = require('../../utils/guid');
+
+const { unstable_trace: trace } = ScheduleTracing;
+
+const Greeting = ({ forwardedRef, name }) => <div ref={forwardedRef}>Hello, {name}</div>;
+const ForwardedGreeting = React.forwardRef((props, ref) => <Greeting {...props} forwardedRef={ref} />);
+const MemoizedGreeting = React.memo(Greeting);
+
+const themes = {
+  blue: {
+    primary: '#2962ff',
+    contrast: '#fff',
+  },
+  red: {
+    primary: '#d50000',
+    contrast: '#fff',
+  },
+};
+const ThemeContext = React.createContext();
+ThemeContext.displayName = 'ThemeContext';
+
+const LocaleContext = React.createContext('en-US');
+
+const {useCallback, useDebugValue, useEffect, useState} = React;
+
+// Below copied from https://usehooks.com/
+function useDebounce(value, delay) {
+  // State and setters for debounced value
+  const [debouncedValue, setDebouncedValue] = useState(value);
+
+  // Show the value in DevTools
+  useDebugValue(debouncedValue);
+
+  useEffect(
+    () => {
+      // Update debounced value after delay
+      const handler = setTimeout(() => {
+        setDebouncedValue(value);
+      }, delay);
+
+      // Cancel the timeout if value changes (also on delay change or unmount)
+      // This is how we prevent debounced value from updating if value is changed ...
+      // .. within the delay period. Timeout gets cleared and restarted.
+      return () => {
+        clearTimeout(handler);
+      };
+    },
+    [value, delay] // Only re-call effect if value or delay changes
+  );
+
+  return debouncedValue;
+}
+// Above copied from https://usehooks.com/
+
+function useNestedInnerHook() {
+  return useState(123);
+}
+function useNestedOuterHook() {
+  return useNestedInnerHook();
+}
+
+const hooksTestProps = {
+  string: 'abc',
+  number: 123,
+  nestedObject:  {
+    boolean: true,
+  },
+  nestedArray: ['a', 'b', 'c'],
+};
+
+function FunctionWithHooks(props, ref) {
+  const [count, updateCount] = useState(0);
+
+  // Custom hook with a custom debug label
+  const debouncedCount = useDebounce(count, 1000);
+
+  const onClick = useCallback(function onClick() {
+    updateCount(count + 1);
+  }, [count]);
+
+  // Tests nested custom hooks
+  useNestedOuterHook();
+
+  return (
+    <button onClick={onClick}>
+      Count: {debouncedCount}
+    </button>
+  );
+}
+const MemoWithHooks = React.memo(FunctionWithHooks);
+const ForwardRefWithHooks = React.forwardRef(FunctionWithHooks);
 
 class Todos extends React.Component {
+  ref = React.createRef();
+
   constructor(props) {
     super(props);
     this._nextid = 50;
@@ -26,17 +120,6 @@ class Todos extends React.Component {
         {title: 'Inspect all the things', completed: true, id: 10},
         {title: 'Profit!!', completed: false, id: 11},
         {title: 'Profit!!', completed: false, id: 12},
-        /*
-        {title: 'Profit!!', completed: false, id: 13},
-        {title: 'Profit!!', completed: false, id: 14},
-        {title: 'Profit!!', completed: false, id: 15},
-        {title: 'Profit!!', completed: false, id: 16},
-        {title: 'Profit!!', completed: false, id: 17},
-        {title: 'Profit!!', completed: false, id: 18},
-        {title: 'Profit!!', completed: false, id: 19},
-        {title: 'Profit!!', completed: false, id: 21},
-        {title: 'Profit!!', completed: false, id: 41},
-        */
       ],
       filter: 'All',
     };
@@ -46,25 +129,29 @@ class Todos extends React.Component {
     if (!text.trim().length) {
       return;
     }
-    this.setState({
-      todos: this.state.todos.concat([{
-        title: text,
-        completed: false,
-        id: this._nextid++,
-      }]),
-    });
+    trace(`Add "${text}"`, performance.now(), () =>
+      this.setState({
+        todos: this.state.todos.concat([{
+          title: text,
+          completed: false,
+          id: this._nextid++,
+        }]),
+      }));
   }
 
   toggleComplete(id, completed) {
     var todos = this.state.todos.slice();
+    let text;
     todos.some(item => {
       if (item.id === id) {
         item.completed = completed;
+        text = item.title;
         return true;
       }
       return false;
     });
-    this.setState({todos});
+    trace(`Toggle "${text}" ${completed ? 'complete' : 'incomplete'}`, performance.now(), () =>
+      this.setState({todos}));
   }
 
   sort() {
@@ -75,19 +162,30 @@ class Todos extends React.Component {
       }
       return a.title > b.title ? 1 : -1;
     });
-    this.setState({todos});
+    trace('Sorting items', performance.now(), () =>
+      this.setState({todos}));
   }
 
   changeFilter(val) {
-    this.setState({
-      filter: val,
-    });
+    trace(`Filter by "${val}"`, performance.now(), () =>
+      this.setState({
+        filter: val,
+      }));
   }
 
   render() {
     return (
       <div style={styles.container}>
-        <h1 style={styles.title}>Things to do</h1>
+        <ForwardedGreeting ref={this.ref} name="Brian" />
+        <MemoizedGreeting name="Memoized" />
+        <ThemeContext.Consumer>
+          {theme => (
+            <h1 style={{
+              ...styles.title,
+              color: theme.primary,
+            }}>Things to do</h1>
+          )}
+        </ThemeContext.Consumer>
         <NewTodo onAdd={this.onAdd.bind(this)} />
         <TodoItems
           todos={this.state.todos}
@@ -131,9 +229,19 @@ class NewTodo extends React.Component {
           onKeyDown={e => this.checkEnter(e)}
           onChange={e => this.setState({text: e.target.value})}
         />
-        <button onClick={this.submit.bind(this)} style={styles.addButton}>
-          +
-        </button>
+        <ThemeContext.Consumer>
+          {theme => (
+            <button
+              onClick={this.submit.bind(this)}
+              style={{
+                ...styles.addButton,
+                color: theme.primary,
+              }}
+            >
+              +
+            </button>
+          )}
+        </ThemeContext.Consumer>
       </div>
     );
   }
@@ -198,22 +306,28 @@ class HoverHighlight extends React.Component {
   }
 }
 
-class Filter extends React.Component {
-  render() {
-    var options = ['All', 'Completed', 'Remaining'];
-    return (
-      <div style={styles.filter}>
-        {options.map(text => (
-          <button
-            key={text}
-            style={assign({}, styles.filterButton, text === this.props.filter && styles.filterButtonActive)}
-            onClick={this.props.onFilter.bind(null, text)}
-          >{text}</button>
-        ))}
-        {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
-      </div>
-    );
-  }
+function Filter(props) {
+  var options = ['All', 'Completed', 'Remaining'];
+  return (
+    <ThemeContext.Consumer>
+      {theme => (
+        <div style={styles.filter}>
+          {options.map(text => (
+            <button
+              key={text}
+              style={{
+                ...styles.filterButton,
+                backgroundColor: text === props.filter ? theme.primary : undefined,
+                color: text === props.filter ? theme.contrast : undefined,
+              }}
+              onClick={props.onFilter.bind(null, text)}
+            >{text}</button>
+          ))}
+          {/*<button onClick={this.props.onSort} style={styles.filterButton}>Sort</button>*/}
+        </div>
+      )}
+    </ThemeContext.Consumer>
+  );
 }
 
 var styles = {
@@ -224,7 +338,7 @@ var styles = {
     boxShadow: '0 2px 5px #ccc',
     width: 300,
     textAlign: 'center',
-    margin: '50px auto',
+    margin: '20px auto',
   },
 
   filterButton: {
@@ -236,14 +350,13 @@ var styles = {
     backgroundColor: 'transparent',
   },
 
-  filterButtonActive: {
-    backgroundColor: '#eef',
-  },
-
   title: {
     margin: 0,
     fontSize: 25,
     marginBottom: 10,
+  },
+  content: {
+    fontSize: 16,
   },
   newInput: {
     padding: '5px 10px',
@@ -399,38 +512,69 @@ for (var mCount = 200; mCount--;) {
 
 
 class Wrap extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      theme: themes.blue,
+    };
+  }
+
+  toggleTheme() {
+    this.setState(({ theme }) => ({
+      theme: theme === themes.blue ? themes.red : themes.blue,
+    }));
+  }
+
   render() {
     return (
-      <div>
-        <div style={styles.iframeWatermark}>
-          this is an iframe
+      <ThemeContext.Provider value={this.state.theme}>
+        <div>
+          <div style={styles.iframeWatermark}>
+            this is an iframe
+          </div>
+          {/* for testing highlighing in the presence of multiple scrolls
+          {long(long(long()))} {/* */}
+          <Todos/>
+          <center>
+            <button onClick={this.toggleTheme.bind(this)}>Toggle color</button>
+          </center>
+          <center>
+            <FunctionWithHooks props={hooksTestProps} />
+            <MemoWithHooks props={hooksTestProps} />
+            <ForwardRefWithHooks props={hooksTestProps} />
+          </center>
+          {/*<span thing={someVal}/>
+          <Target count={1}/>
+          <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
+          <span val={null}/>
+          <span val={undefined}/>
+          <div>&lt;</div>*/}
+          <div style={styles.container}>
+            <div style={styles.title}>Context tests</div>
+            <div style={styles.content}>
+              <SimpleContextType />
+              <ObjectContextType />
+              <LegacyContextTypes />
+            </div>
+          </div>
+          <DeeplyNested />
+          <PropTester awesome={2}/>
+          <PropTester {...emptyProps}/>
+          <PropTester {...primitiveProps}/>
+          <PropTester {...complexProps}/>
+          <PropTester {...uninspectableProps}/>
+          <PropTester massiveMap={massiveMap}/>
         </div>
-        {/* for testing highlighing in the presence of multiple scrolls
-        {long(long(long()))} {/* */}
-        <Todos/>
-        {/*<span thing={someVal}/>
-        <Target count={1}/>
-        <span awesome={2} thing={[1,2,3]} more={{2:3}}/>
-        <span val={null}/>
-        <span val={undefined}/>
-        <div>&lt;</div>*/}
-        <DeeplyNested />
-        <PropTester awesome={2}/>
-        <PropTester {...emptyProps}/>
-        <PropTester {...primitiveProps}/>
-        <PropTester {...complexProps}/>
-        <PropTester {...uninspectableProps}/>
-        <PropTester massiveMap={massiveMap}/>
-      </div>
+      </ThemeContext.Provider>
     );
   }
 }
 
-var PropTester = React.createClass({
+class PropTester extends React.Component {
   render() {
     return null;
-  },
-});
+  }
+}
 
 class Nested extends React.Component {
   render() {
@@ -486,6 +630,64 @@ function long(children) { // eslint-disable-line no-unused-vars
   );
 }
 
+class SimpleContextType extends React.Component {
+  static contextType = LocaleContext;
+
+  render() {
+    return (
+      <div>
+        Simple: {this.context}
+      </div>
+    );
+  }
+}
+
+class ObjectContextType extends React.Component {
+  static contextType = ThemeContext;
+
+  render() {
+    const theme = this.context;
+    return (
+      <div>
+        Object: <span style={{color: theme.contrast, backgroundColor: theme.primary}}>theme</span>
+      </div>
+    );
+  }
+}
+
+class LegacyContextTypes extends React.Component {
+  static childContextTypes = {
+    locale: PropTypes.string,
+    theme: PropTypes.object,
+  };
+
+  getChildContext() {
+    return {
+      locale: 'en-US',
+      theme: themes.blue,
+    };
+  }
+
+  render() {
+    return <LegacyContextTypesConsumer />;
+  }
+}
+class LegacyContextTypesConsumer extends React.Component {
+  static contextTypes = {
+    locale: PropTypes.string,
+    theme: PropTypes.object,
+  };
+
+  render() {
+    const { locale, theme } = this.context;
+    return (
+      <div>
+        Legacy: {locale}, <span style={{color: theme.contrast, backgroundColor: theme.primary}}>theme</span>
+      </div>
+    );
+  }
+}
+
 class Target extends React.Component {
   constructor(props) {
     super(props);
@@ -521,6 +723,8 @@ class Target extends React.Component {
   }
 }
 
-var node = document.createElement('div');
-document.body.appendChild(node);
-ReactDOM.render(<Wrap />, node);
+trace('initial render', performance.now(), () => {
+  var node = document.createElement('div');
+  document.body.appendChild(node);
+  ReactDOM.render(<Wrap />, node);
+});

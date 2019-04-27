@@ -19,7 +19,7 @@ function createPanelIfReactLoaded() {
     return;
   }
   chrome.devtools.inspectedWindow.eval(`!!(
-    Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length || window.React
+    (window.__REACT_DEVTOOLS_GLOBAL_HOOK__ && Object.keys(window.__REACT_DEVTOOLS_GLOBAL_HOOK__._renderers).length) || window.React
   )`, function(pageHasReact, err) {
 
     clearInterval(loadCheckInterval);

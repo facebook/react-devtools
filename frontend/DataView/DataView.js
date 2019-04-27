@@ -12,31 +12,31 @@
 
 import type {Theme, DOMEvent} from '../types';
 
-var {sansSerif} = require('../Themes/Fonts');
-var React = require('react');
-var Simple = require('./Simple');
+const PropTypes = require('prop-types');
+const React = require('react');
+const Simple = require('./Simple');
+const nullthrows = require('nullthrows').default;
 
-var consts = require('../../agent/consts');
-var previewComplex = require('./previewComplex');
+const consts = require('../../agent/consts');
+const previewComplex = require('./previewComplex');
 
 type Inspect = (path: Array<string>, cb: () => void) => void;
 type ShowMenu = boolean | (e: DOMEvent, val: any, path: Array<string>, name: string) => void;
 
 type DataViewProps = {
-  data: Object,
+  data: ?any,
   path: Array<string>,
-  inspect: Inspect,
+  inspect: Inspect | null,
   showMenu: ShowMenu,
   startOpen?: boolean,
   noSort?: boolean,
   readOnly?: boolean,
 };
 
-class DataView extends React.Component {
+class DataView extends React.Component<DataViewProps> {
   context: {
     theme: Theme,
   };
-  props: DataViewProps;
 
   renderSparseArrayHole(count: number, key: string) {
     const {theme} = this.context;
@@ -53,6 +53,7 @@ class DataView extends React.Component {
   }
 
   renderItem(name: string, key: string) {
+    const data = nullthrows(this.props.data);
     return (
       <DataItem
         key={key}
@@ -62,26 +63,39 @@ class DataView extends React.Component {
         inspect={this.props.inspect}
         showMenu={this.props.showMenu}
         readOnly={this.props.readOnly}
-        value={this.props.data[name]} />
+        value={data[name]} />
     );
   }
 
   render() {
     const {theme} = this.context;
-    var data = this.props.data;
+    const data = this.props.data;
     if (!data) {
       return <div style={missingStyle(theme)}>null</div>;
     }
 
-    var isArray = Array.isArray(data);
-    var elements = [];
-    if (isArray) {
+    const dataType = typeof data;
+    const dataIsSimpleType = dataType === 'number' || dataType === 'string' || dataType === 'boolean';
+    const dataIsArray = Array.isArray(data);
+    const elements = [];
+    if (dataIsSimpleType) {
+      elements.push(<DataItem
+        key="simple"
+        name={''}
+        hideName={true}
+        path={this.props.path}
+        inspect={this.props.inspect}
+        showMenu={this.props.showMenu}
+        readOnly={true}
+        value={data} />
+      );
+    } else if (dataIsArray) {
       // Iterate over array, filling holes with special items
-      var lastIndex = -1;
+      let lastIndex = -1;
       data.forEach((item, i) => {
         if (lastIndex < i - 1) {
           // Have we skipped over a hole?
-          var holeCount = (i - 1) - lastIndex;
+          const holeCount = (i - 1) - lastIndex;
           elements.push(
             this.renderSparseArrayHole(holeCount, i + '-hole')
           );
@@ -91,14 +105,14 @@ class DataView extends React.Component {
       });
       if (lastIndex < data.length - 1) {
         // Is there a hole at the end?
-        var holeCount = (data.length - 1) - lastIndex;
+        const holeCount = (data.length - 1) - lastIndex;
         elements.push(
           this.renderSparseArrayHole(holeCount, lastIndex + '-hole')
         );
       }
     } else {
       // Iterate over a regular object
-      var names = Object.keys(data);
+      const names = Object.keys(data);
       if (!this.props.noSort) {
         names.sort(alphanumericSort);
       }
@@ -110,7 +124,7 @@ class DataView extends React.Component {
     if (!elements.length) {
       return (
         <div style={emptyStyle(theme)}>
-          {isArray ? 'Empty array' : 'Empty object'}
+          {dataIsArray ? 'Empty array' : 'Empty object'}
         </div>
       );
     }
@@ -126,7 +140,7 @@ class DataView extends React.Component {
             inspect={this.props.inspect}
             showMenu={this.props.showMenu}
             readOnly={this.props.readOnly}
-            value={this.props.data[consts.proto]}
+            value={data[consts.proto]}
           />}
 
         {elements}
@@ -136,26 +150,32 @@ class DataView extends React.Component {
 }
 
 DataView.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
-class DataItem extends React.Component {
+type Props = {
+  path: Array<string>,
+  inspect: Inspect | null,
+  showMenu: ShowMenu,
+  startOpen?: boolean,
+  noSort?: boolean,
+  readOnly?: boolean,
+  name: string,
+  hideName?: boolean,
+  value: any,
+};
+
+type State = {
+  open: boolean,
+  loading: boolean,
+}
+
+class DataItem extends React.Component<Props, State> {
   context: {
     onChange: (path: Array<string>, checked: boolean) => void,
     theme: Theme,
   };
-  props: {
-    path: Array<string>,
-    inspect: Inspect,
-    showMenu: ShowMenu,
-    startOpen?: boolean,
-    noSort?: boolean,
-    readOnly?: boolean,
-    name: string,
-    value: any,
-  };
   defaultProps: {};
-  state: {open: boolean, loading: boolean};
 
   constructor(props) {
     super(props);
@@ -175,17 +195,26 @@ class DataItem extends React.Component {
   }
 
   inspect() {
+    const inspect = this.props.inspect;
+    if (inspect === null) {
+      // The Profiler displays props/state for oudated Fibers.
+      // These Fibers have already been mutated so they can't be inspected.
+      return;
+    }
+
     this.setState({loading: true, open: true});
-    this.props.inspect(this.props.path, () => {
+    inspect(this.props.path, () => {
       this.setState({loading: false});
     });
   }
 
-  toggleOpen() {
+  toggleOpen = () => {
     if (this.state.loading) {
       return;
     }
-    if (this.props.value && this.props.value[consts.inspected] === false) {
+
+    const { value } = this.props;
+    if (value && value[consts.inspected] === false) {
       this.inspect();
       return;
     }
@@ -193,7 +222,7 @@ class DataItem extends React.Component {
     this.setState({
       open: !this.state.open,
     });
-  }
+  };
 
   toggleBooleanValue(e) {
     this.context.onChange(this.props.path, e.target.checked);
@@ -218,14 +247,14 @@ class DataItem extends React.Component {
       preview = previewComplex(data, theme);
     }
 
-    var inspectable = !data || !data[consts.meta] || !data[consts.meta].uninspectable;
-    var open = inspectable && this.state.open && (!data || data[consts.inspected] !== false);
+    var inspectable = typeof this.props.inspect === 'function' && (!data || !data[consts.meta] || !data[consts.meta].uninspectable);
+    var open = this.state.open && (!data || data[consts.inspected] !== false);
     var opener = null;
 
     if (complex && inspectable) {
       opener = (
         <div
-          onClick={this.toggleOpen.bind(this)}
+          onClick={this.toggleOpen}
           style={styles.opener}>
           {open ?
             <span style={expandedArrowStyle(theme)} /> :
@@ -269,12 +298,15 @@ class DataItem extends React.Component {
       <li>
         <div style={styles.head}>
           {opener}
-          <div
-            style={nameStyle(complex, theme)}
-            onClick={inspectable && this.toggleOpen.bind(this)}
-          >
-            {name}:
-          </div>
+          {
+            !this.props.hideName &&
+            <div
+                style={nameStyle(complex, inspectable, theme)}
+                onClick={inspectable ? this.toggleOpen : undefined}
+            >
+              {name}:
+            </div>
+          }
           <div
             onContextMenu={e => {
               if (typeof this.props.showMenu === 'function') {
@@ -293,8 +325,8 @@ class DataItem extends React.Component {
 }
 
 DataItem.contextTypes = {
-  onChange: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 function alphanumericSort(a: string, b: string): number {
@@ -307,15 +339,14 @@ function alphanumericSort(a: string, b: string): number {
   return (a < b) ? -1 : 1;
 }
 
-const nameStyle = (isComplex: boolean, theme: Theme) => ({
-  cursor: isComplex ? 'pointer' : 'default',
+const nameStyle = (isComplex: boolean, isInspectable: boolean, theme: Theme) => ({
+  cursor: isComplex && isInspectable ? 'pointer' : 'default',
   color: theme.special03,
-  margin: '2px 3px',
+  margin: '0 0.25rem',
 });
 
 const previewStyle = (theme: Theme) => ({
   display: 'flex',
-  margin: '2px 3px',
   whiteSpace: 'pre',
   wordBreak: 'break-word',
   flex: 1,
@@ -323,38 +354,32 @@ const previewStyle = (theme: Theme) => ({
 });
 
 const emptyStyle = (theme: Theme) => ({
-  marginLeft: '0.75rem',
-  padding: '0 5px',
+  lineHeight: '1.25rem',
   color: theme.base04,
-  fontFamily: sansSerif.family,
-  fontSize: sansSerif.sizes.normal,
-  fontStyle: 'italic',
+  paddingLeft: '1rem',
 });
 
 const missingStyle = (theme: Theme) => ({
-  fontSize: sansSerif.sizes.normal,
   fontWeight: 'bold',
-  marginLeft: '0.75rem',
-  padding: '2px 5px',
+  lineHeight: '1.25rem',
   color: theme.base03,
+  paddingLeft: '1rem',
 });
 
 const collapsedArrowStyle = (theme: Theme) => ({
   borderColor: `transparent transparent transparent ${theme.base03}`,
   borderStyle: 'solid',
-  borderWidth: '4px 0 4px 7px',
+  borderWidth: '4px 0 4px 6px',
   display: 'inline-block',
-  marginLeft: 1,
-  verticalAlign: 'top',
+  verticalAlign: 'middle',
 });
 
 const expandedArrowStyle = (theme: Theme) => ({
   borderColor: `${theme.base03} transparent transparent transparent`,
   borderStyle: 'solid',
-  borderWidth: '7px 4px 0 4px',
+  borderWidth: '6px 4px 0 4px',
   display: 'inline-block',
-  marginTop: 1,
-  verticalAlign: 'top',
+  verticalAlign: 'middle',
 });
 
 const sparseArrayHoleStyle = (theme: Theme) => ({
@@ -377,9 +402,7 @@ var styles = {
   opener: {
     cursor: 'pointer',
     marginLeft: -10,
-    paddingRight: 3,
     position: 'absolute',
-    top: 4,
   },
 
   toggler: {
@@ -391,6 +414,7 @@ var styles = {
   head: {
     display: 'flex',
     position: 'relative',
+    lineHeight: '1.25rem',
   },
 
   value: {

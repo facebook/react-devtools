@@ -10,11 +10,13 @@
  */
 'use strict';
 
-var React = require('react');
-var {sansSerif} = require('./Themes/Fonts');
-var HighlightHover = require('./HighlightHover');
+const PropTypes = require('prop-types');
+const React = require('react');
+const nullthrows = require('nullthrows').default;
+const {sansSerif} = require('./Themes/Fonts');
+const HighlightHover = require('./HighlightHover');
 
-var decorate = require('./decorate');
+const decorate = require('./decorate');
 
 import type {Theme} from './types';
 
@@ -24,21 +26,26 @@ export type MenuItem = {
   action: () => void
 };
 
-class ContextMenu extends React.Component {
+type Props = {
+  open: boolean,
+  hideContextMenu: () => void,
+  items: Array<MenuItem>,
+  pos: {
+    x: number,
+    y: number,
+  },
+};
+
+type State = {
+  elementHeight: number,
+  windowHeight: number,
+};
+
+class ContextMenu extends React.Component<Props, State> {
   _clickout: (evt: Object) => void;
 
   context: {
     theme: Theme,
-  };
-
-  props: {
-    open: boolean,
-    hideContextMenu: () => void,
-    items: Array<MenuItem>,
-    pos: {
-      x: number,
-      y: number,
-    },
   };
 
   state = {
@@ -68,7 +75,7 @@ class ContextMenu extends React.Component {
       return;
     }
 
-    const elementHeight = element.querySelector('ul').clientHeight;
+    const elementHeight = nullthrows(element.querySelector('ul')).clientHeight;
     const windowHeight = window.innerHeight;
 
     if (this.state.elementHeight === elementHeight && this.state.windowHeight === windowHeight) {
@@ -114,7 +121,7 @@ class ContextMenu extends React.Component {
 }
 
 ContextMenu.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 var Wrapped = decorate({

@@ -10,26 +10,32 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-
-var Input = require('../Input');
-var flash = require('../flash');
-var {monospace} = require('../Themes/Fonts');
-
 import type {Theme, DOMEvent, DOMNode} from '../types';
+
+const PropTypes = require('prop-types');
+const React = require('react');
+const ReactDOM = require('react-dom');
+
+const Input = require('../Input');
+const flash = require('../flash');
+const {monospace} = require('../Themes/Fonts');
+
+type Props = {
+  data: any,
+  path: Array<string>,
+  readOnly: ?boolean,
+}
 
 type State = {
   editing: boolean,
   text: string,
 };
 
-class Simple extends React.Component {
+class Simple extends React.Component<Props, State> {
   context: {
     onChange: (path: Array<any>, value: any) => void,
     theme: Theme,
   };
-  state: State;
   input: DOMNode;
 
   constructor(props: Object) {
@@ -102,6 +108,7 @@ class Simple extends React.Component {
       this.selectAll();
     }
     if (!this.state.editing && this.props.data !== prevProps.data) {
+      // $FlowFixMe replace with root ref
       flash(ReactDOM.findDOMNode(this), this.context.theme.state04, 'transparent', 1);
     }
   }
@@ -142,14 +149,14 @@ class Simple extends React.Component {
 }
 
 Simple.propTypes = {
-  data: React.PropTypes.any,
-  path: React.PropTypes.array,
-  readOnly: React.PropTypes.bool,
+  data: PropTypes.any,
+  path: PropTypes.array,
+  readOnly: PropTypes.bool,
 };
 
 Simple.contextTypes = {
-  onChange: React.PropTypes.func,
-  theme: React.PropTypes.object.isRequired,
+  onChange: PropTypes.func,
+  theme: PropTypes.object.isRequired,
 };
 
 const inputStyle = (theme: Theme) => ({
@@ -164,7 +171,7 @@ const inputStyle = (theme: Theme) => ({
   fontSize: 'inherit',
 });
 
-const simpleStyle = (readOnly: boolean, theme: Theme) => ({
+const simpleStyle = (readOnly: ?boolean, theme: Theme) => ({
   display: 'flex',
   flex: 1,
   whiteSpace: 'pre-wrap',

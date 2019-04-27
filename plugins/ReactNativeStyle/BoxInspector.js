@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var {sansSerif} = require('../../frontend/Themes/Fonts');
 
@@ -24,7 +26,7 @@ type BoxMeasurements = {
 
 type BoxProps = BoxMeasurements & {
   title: string,
-  children: React$Element,
+  children: React.Node,
   theme: Theme,
 };
 
@@ -44,17 +46,18 @@ var Box = (props: BoxProps) => {
   );
 };
 
-class BoxInspector extends React.Component {
+type BoxInspectorProps = {
+  left: number,
+  top: number,
+  width: number,
+  height: number,
+  margin: BoxMeasurements,
+  padding: BoxMeasurements,
+}
+
+class BoxInspector extends React.Component<BoxInspectorProps> {
   context: {
     theme: Theme,
-  };
-  props: {
-    left: number,
-    top: number,
-    width: number,
-    height: number,
-    margin: BoxMeasurements,
-    padding: BoxMeasurements,
   };
 
   render() {
@@ -78,7 +81,7 @@ class BoxInspector extends React.Component {
 }
 
 BoxInspector.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const labelStyle = (theme: Theme) => ({

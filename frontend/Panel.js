@@ -10,21 +10,24 @@
  */
 'use strict';
 
-var React = require('react');
-var Container = require('./Container');
-var Store = require('./Store');
-var keyboardNav = require('./keyboardNav');
-var invariant = require('./invariant');
-var assign = require('object-assign');
+/* globals chrome */
 
-var Bridge = require('../agent/Bridge');
-var {sansSerif} = require('./Themes/Fonts');
-var NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
-var RelayPlugin = require('../plugins/Relay/RelayPlugin');
-var Themes = require('./Themes/Themes');
-var ThemeStore = require('./Themes/Store');
+const PropTypes = require('prop-types');
+const React = require('react');
+const Container = require('./Container');
+const Store = require('./Store');
+const keyboardNav = require('./keyboardNav');
+const invariant = require('./invariant');
+const assign = require('object-assign');
 
-var consts = require('../agent/consts');
+const Bridge = require('../agent/Bridge');
+const {sansSerif} = require('./Themes/Fonts');
+const NativeStyler = require('../plugins/ReactNativeStyle/ReactNativeStyle.js');
+const ProfilerPlugin = require('../plugins/Profiler/ProfilerPlugin');
+const Themes = require('./Themes/Themes');
+const ThemeStore = require('./Themes/Store');
+
+const consts = require('../agent/consts');
 
 import type {Theme} from './types';
 import type {DOMEvent} from './types';
@@ -66,12 +69,16 @@ type State = {
   preferencesPanelShown: boolean,
   themeKey: number,
   themeName: ?string,
+  showTroubleshooting: boolean,
 };
 
-class Panel extends React.Component {
+class Panel extends React.Component<Props, State> {
   _teardownWall: ?() => void;
   _keyListener: ?(e: DOMEvent) => void;
-  _checkTimeout: ?number;
+  // eslint shouldn't error on type positions. TODO: update eslint
+  // eslint-disable-next-line no-undef
+  _checkTimeout: ?TimeoutID;
+  _troubleshootingTimeout: ?TimeoutID; // eslint-disable-line no-undef
   _unMounted: boolean;
   _bridge: Bridge;
   _store: Store;
@@ -80,14 +87,13 @@ class Panel extends React.Component {
   // TODO: typecheck plugin interface
   plugins: Array<any>;
 
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
     this.state = {
       loading: true,
+      showTroubleshooting: false,
       preferencesPanelShown: false,
       isReact: props.alreadyFoundReact,
       themeKey: 0,
@@ -121,6 +127,13 @@ class Panel extends React.Component {
     if (this.props.reloadSubscribe) {
       this._unsub = this.props.reloadSubscribe(() => this.reload());
     }
+
+    if (this.state.loading) {
+      this._troubleshootingTimeout = setTimeout(
+        () => this.setState({showTroubleshooting: true}),
+        3000
+      );
+    }
   }
 
   componentWillUnmount() {
@@ -129,6 +142,10 @@ class Panel extends React.Component {
       this._unsub();
     }
     this.teardown();
+
+    if (this._troubleshootingTimeout !== null) {
+      clearTimeout(this._troubleshootingTimeout);
+    }
   }
 
   pauseTransfer() {
@@ -225,8 +242,9 @@ class Panel extends React.Component {
 
       var refresh = () => this.forceUpdate();
       this.plugins = [
-        new RelayPlugin(this._store, this._bridge, refresh),
+        new ProfilerPlugin(this._store, this._bridge, refresh),
       ];
+
       this._keyListener = keyboardNav(this._store, window);
 
       window.addEventListener('keydown', this._keyListener);
@@ -254,14 +272,25 @@ class Panel extends React.Component {
     });
   }
 
-  componentDidUpdate() {
-    if (!this.state.isReact && this.state.loading) {
+  componentDidUpdate(prevProps: Props, prevState: State) {
+    if (!this.state.isReact) {
       if (!this._checkTimeout) {
         this._checkTimeout = setTimeout(() => {
           this._checkTimeout = null;
           this.lookForReact();
         }, 200);
       }
+    }
+
+    if (prevState.loading && !this.state.loading) {
+      if (this._troubleshootingTimeout !== null) {
+        clearTimeout(this._troubleshootingTimeout);
+      }
+    } else if (!prevState.loading && this.state.loading) {
+      this._troubleshootingTimeout = setTimeout(
+        () => this.setState({showTroubleshooting: true}),
+        3000
+      );
     }
   }
 
@@ -295,6 +324,22 @@ class Panel extends React.Component {
       return (
         <div style={loadingStyle(theme)}>
           <h2>Connecting to React…</h2>
+          <br />
+          {this.state.showTroubleshooting && (
+            <a style={{
+              color: 'gray',
+              textDecoration: 'underline',
+              cursor: 'pointer',
+            }} onClick={() => {
+              chrome.tabs.create({
+                active: true,
+                url: 'https://github.com/facebook/react-devtools/blob/master/' +
+                  'README.md#the-react-tab-doesnt-show-up',
+              });
+            }}>
+              Click here for troubleshooting instructions
+            </a>
+          )}
         </div>
       );
     }
@@ -365,14 +410,14 @@ class Panel extends React.Component {
 }
 
 Panel.childContextTypes = {
-  browserName: React.PropTypes.string.isRequired,
-  defaultThemeName: React.PropTypes.string.isRequired,
-  showHiddenThemes: React.PropTypes.bool.isRequired,
-  showInspectButton: React.PropTypes.bool.isRequired,
-  store: React.PropTypes.object,
-  theme: React.PropTypes.object.isRequired,
-  themeName: React.PropTypes.string.isRequired,
-  themes: React.PropTypes.object.isRequired,
+  browserName: PropTypes.string.isRequired,
+  defaultThemeName: PropTypes.string.isRequired,
+  showHiddenThemes: PropTypes.bool.isRequired,
+  showInspectButton: PropTypes.bool.isRequired,
+  store: PropTypes.object,
+  theme: PropTypes.object.isRequired,
+  themeName: PropTypes.string.isRequired,
+  themes: PropTypes.object.isRequired,
 };
 
 var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {

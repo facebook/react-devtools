@@ -10,8 +10,9 @@
  */
 'use strict';
 
-var React = require('react');
-var assign = require('object-assign');
+const PropTypes = require('prop-types');
+const React = require('react');
+const assign = require('object-assign');
 
 import type {Theme} from './types';
 
@@ -28,7 +29,7 @@ type State = {
   hover: boolean,
 };
 
-class HighlightHover extends React.Component {
+class HighlightHover extends React.Component<Props, State> {
   context: Context;
   props: Props;
   defaultProps: {};
@@ -56,7 +57,7 @@ class HighlightHover extends React.Component {
 }
 
 HighlightHover.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 module.exports = HighlightHover;

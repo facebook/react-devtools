@@ -13,26 +13,32 @@
 const React = require('react');
 
 type Props = {
+  className?: string,
   path: string,
   style?: Object,
 };
 
-const SvgIcon = ({ path, style = styles.svgIcon }: Props) => (
+// TODO Remove DEFAULT_STYLE in favor of className once all styles have been migrated.
+// For now, suppress inline styles when a className is provided–
+// since these would always override className values.
+const SvgIcon = ({ className, path, style }: Props) => (
   <svg
-    style={style}
+    className={className}
+    style={className ? null : {
+      ...DEFAULT_STYLE,
+      ...style,
+    }}
     viewBox="0 0 24 24"
   >
     <path d={path}></path>
   </svg>
 );
 
-const styles = {
-  svgIcon: {
-    flex: '0 0 1rem',
-    width: '1rem',
-    height: '1rem',
-    fill: 'currentColor',
-  },
+const DEFAULT_STYLE = {
+  flex: '0 0 1rem',
+  width: '1rem',
+  height: '1rem',
+  fill: 'currentColor',
 };
 
 module.exports = SvgIcon;

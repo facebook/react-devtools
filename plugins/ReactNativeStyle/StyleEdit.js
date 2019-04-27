@@ -10,6 +10,8 @@
  */
 'use strict';
 
+const PropTypes = require('prop-types');
+
 var React = require('react');
 var AutoSizeInput = require('./AutoSizeInput');
 
@@ -33,11 +35,9 @@ type State = {
   newValue: string|number,
 };
 
-class StyleEdit extends React.Component {
+class StyleEdit extends React.Component<Props, State> {
   context: Context;
-  props: Props;
   defaultProps: DefaultProps;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -46,7 +46,7 @@ class StyleEdit extends React.Component {
 
   onChange(name: string, val: string | number) {
     var num = Number(val);
-    this.props.onChange(name, num == val ? num : val);
+    this.props.onChange(name, num === Number(val) ? num : val);
   }
 
   onNewSubmit(val: string | number) {
@@ -114,7 +114,7 @@ class StyleEdit extends React.Component {
 }
 
 StyleEdit.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const blockClick = event => event.stopPropagation();

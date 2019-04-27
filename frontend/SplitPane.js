@@ -10,9 +10,11 @@
  */
 'use strict';
 
-var React = require('react');
-var ReactDOM = require('react-dom');
-var Draggable = require('./Draggable');
+const PropTypes = require('prop-types');
+const React = require('react');
+const ReactDOM = require('react-dom');
+const Draggable = require('./Draggable');
+const nullthrows = require('nullthrows').default;
 
 import type {Theme} from './types';
 
@@ -22,8 +24,8 @@ type Context = {
 
 type Props = {
   style?: {[key: string]: any},
-  left: () => React$Element,
-  right: () => React$Element,
+  left: () => React.Node,
+  right: () => React.Node,
   initialWidth: number,
   initialHeight: number,
   isVertical: bool,
@@ -35,10 +37,8 @@ type State = {
   height: number,
 };
 
-class SplitPane extends React.Component {
+class SplitPane extends React.Component<Props, State> {
   context: Context;
-  props: Props;
-  state: State;
 
   constructor(props: Props) {
     super(props);
@@ -50,7 +50,8 @@ class SplitPane extends React.Component {
   }
 
   componentDidMount() {
-    var node = ReactDOM.findDOMNode(this);
+    // $FlowFixMe use a ref on the root
+    var node: HTMLDivElement = nullthrows(ReactDOM.findDOMNode(this));
 
     const width = Math.floor(node.offsetWidth * (this.props.isVertical ? 0.6 : 0.3));
 
@@ -61,6 +62,7 @@ class SplitPane extends React.Component {
   }
 
   onMove(x: number, y: number) {
+    // $FlowFixMe use a ref on the root
     var rect = ReactDOM.findDOMNode(this).getBoundingClientRect();
 
     this.setState(prevState => ({
@@ -101,7 +103,7 @@ class SplitPane extends React.Component {
 }
 
 SplitPane.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const containerStyle = (isVertical: boolean) => ({
@@ -109,6 +111,7 @@ const containerStyle = (isVertical: boolean) => ({
   minWidth: 0,
   flex: 1,
   flexDirection: isVertical ? 'column' : 'row',
+  maxWidth: '100vw',
 });
 
 const draggerInnerStyle = (isVertical: boolean, theme: Theme) => ({
@@ -138,6 +141,7 @@ const styles = {
   rightPane: {
     display: 'flex',
     width: '100%',
+    overflow: 'auto',
   },
   leftPane: {
     display: 'flex',

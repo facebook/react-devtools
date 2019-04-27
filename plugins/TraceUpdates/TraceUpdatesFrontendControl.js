@@ -20,9 +20,9 @@ var Wrapped = decorate({
   },
   props(store) {
     return {
-      state: store.traceupdatesState,
-      text: 'Highlight Updates',
-      onChange: state => store.changeTraceUpdates(state),
+      label: 'Highlight Updates',
+      isChecked: store.traceUpdates,
+      onChange: enabled => store.changeTraceUpdates(enabled),
     };
   },
 }, SettingsCheckbox);

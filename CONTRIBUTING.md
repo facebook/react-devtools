@@ -1,5 +1,10 @@
 # Contributing to React Devtools
 
+## Code of Conduct
+Facebook has adopted a Code of Conduct that we expect project
+participants to adhere to. Please [read the full text](https://code.facebook.com/codeofconduct)
+so that you can understand what actions will and will not be tolerated.
+
 ### Pull Requests
 
 The core team will be monitoring for pull requests.
@@ -7,11 +12,12 @@ The core team will be monitoring for pull requests.
 *Before* submitting a pull request, please make sure the following is done…
 
 1. Fork the repo and create your branch from `master`.
-2. If you've added code that should be tested, add tests!
-3. If you've changed APIs, update the documentation.
-4. Make sure your code lints (`npm run lint`) - we've done our best to make sure these rules match our internal linting guidelines.
-5. Also make sure your code passes flow check(`flow check`).
-6. If you haven't already, complete the CLA.
+2. Within the repo, run `yarn install`
+3. If you've added code that should be tested, add tests!
+4. If you've changed APIs, update the documentation.
+5. Make sure your code lints (`yarn run lint`) - we've done our best to make sure these rules match our internal linting guidelines.
+6. Also make sure your code passes flow check(`yarn run typecheck`).
+7. If you haven't already, complete the CLA.
 
 ### Contributor License Agreement ("CLA")
 
@@ -48,7 +54,7 @@ Facebook has a [bounty program](https://www.facebook.com/whitehat/) for the safe
 * 80 character line length
 * "Attractive"
 
-Please `npm run lint`.
+Please `yarn run lint`.
 
 ## License
 

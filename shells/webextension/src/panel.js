@@ -136,8 +136,9 @@ var config: Props = {
 var Panel = require('../../../frontend/Panel');
 var React = require('react');
 var ReactDOM = require('react-dom');
+var nullthrows = require('nullthrows').default;
 
-var node = document.getElementById('container');
+var node = nullthrows(document.getElementById('container'));
 
 function reload() {
   setTimeout(() => {

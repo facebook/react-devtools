@@ -12,16 +12,20 @@
  */
 'use strict';
 
+var PropTypes = require('prop-types');
 var React = require('react');
-var SettingsPane = require('./SettingsPane');
+var SettingsPane = require('./SettingsPane').default;
 var TreeView = require('./TreeView');
-var {PropTypes} = React;
+
+type Props = {
+  reload?: () => void,
+}
 
 type State = {
   focused: boolean,
 };
 
-class LeftPane extends React.Component {
+class LeftPane extends React.Component<Props, State> {
   input: ?HTMLElement;
   state: State;
 

@@ -9,22 +9,13 @@
  */
 'use strict';
 
-const TraceUpdatesFrontendControl = require('../plugins/TraceUpdates/TraceUpdatesFrontendControl');
-const ColorizerFrontendControl = require('../plugins/Colorizer/ColorizerFrontendControl');
-const React = require('react');
-const ReactDOM = require('react-dom');
-const {sansSerif} = require('./Themes/Fonts');
-const SearchUtils = require('./SearchUtils');
-const SvgIcon = require('./SvgIcon');
-const {PropTypes} = React;
-const Icons = require('./Icons');
-const Input = require('./Input');
-const Hoverable = require('./Hoverable');
-
-const decorate = require('./decorate');
-const {hexToRgba} = require('./Themes/utils');
-
-import type {Theme} from './types';
+import PropTypes from 'prop-types';
+import React, {Component, createRef} from 'react';
+import {findDOMNode} from 'react-dom';
+import SvgIcon from './SvgIcon';
+import Icons from './Icons';
+import decorate from './decorate';
+import styles from './SettingsPane.css';
 
 type EventLike = {
   keyCode: number,
@@ -33,107 +24,75 @@ type EventLike = {
   stopPropagation: () => void,
 };
 
-class SettingsPane extends React.Component {
-  context: {
-    theme: Theme,
-  };
-
-  _key: (evt: EventLike) => void;
-
-  constructor(props) {
-    super(props);
-    this.state = {focused: false};
-  }
+class SettingsPane extends Component {
+  input = createRef();
+  state = {focused: false};
 
   componentDidMount() {
-    this._key = this.onDocumentKeyDown.bind(this);
-    const doc = ReactDOM.findDOMNode(this).ownerDocument;
+    const doc = findDOMNode(this).ownerDocument;
     // capture=true is needed to prevent chrome devtools console popping up
-    doc.addEventListener('keydown', this._key, true);
+    doc.addEventListener('keydown', this.onDocumentKeyDown, true);
   }
 
   componentWillUnmount() {
-    const doc = ReactDOM.findDOMNode(this).ownerDocument;
-    doc.removeEventListener('keydown', this._key, true);
+    const doc = findDOMNode(this).ownerDocument;
+    doc.removeEventListener('keydown', this.onDocumentKeyDown, true);
   }
 
-  onDocumentKeyDown(e) {
+  onDocumentKeyDown = (event: EventLike) => {
     if (
-      e.keyCode === 191 && // forward slash
-      e.target.nodeName !== 'INPUT' &&
-      !e.target.isContentEditable &&
-      this.input
+      event.keyCode === 191 && // forward slash
+      event.target.nodeName !== 'INPUT' &&
+      !event.target.isContentEditable &&
+      this.input.current
     ) {
-      this.input.focus();
-      e.preventDefault();
+      this.input.current.focus();
+      event.preventDefault();
     }
-    if (e.keyCode === 27) { // escape
+    if (event.keyCode === 27) { // escape
       if (!this.props.searchText && !this.state.focused) {
         return;
       }
-      e.stopPropagation();
-      e.preventDefault();
+      event.stopPropagation();
+      event.preventDefault();
       this.cancel();
     }
-  }
+  };
 
   cancel() {
     this.props.onChangeSearch('');
-    if (this.input) {
-      this.input.blur();
+    if (this.input.current) {
+      this.input.current.blur();
     }
   }
 
   onKeyDown(key) {
-    if (key === 'Enter' && this.input) {
+    if (key === 'Enter' && this.input.current) {
       // switch focus to tree view
-      this.input.blur();
+      this.input.current.blur();
       this.props.selectFirstSearchResult();
     }
   }
 
   render() {
-    var theme = this.context.theme;
-    var searchText = this.props.searchText;
-
-    var inputStyle;
-    if (
-      searchText &&
-      SearchUtils.shouldSearchUseRegex(searchText) &&
-      !SearchUtils.isValidRegex(searchText)
-    ) {
-      inputStyle = errorInputStyle(theme);
-    } else if (searchText || this.state.focused) {
-      inputStyle = highlightedInputStyle(theme);
-    } else {
-      inputStyle = baseInputStyle(theme);
-    }
+    const searchText = this.props.searchText;
 
     return (
-      <div style={settingsPaneStyle(theme)}>
+      <div className={styles.SettingsPane}>
         {this.context.showInspectButton && (
-          <InspectMenuButton
-            isInspectEnabled={this.props.isInspectEnabled}
+          <button
+            className={this.props.isInspectEnabled ? styles.ActiveInspectMenuButton : styles.InspectMenuButton}
             onClick={this.props.toggleInspectEnabled}
-            theme={theme}
-          />
+            title="Select a React element in the page to inspect it"
+          >
+            <SvgIcon path={Icons.INSPECT} />
+          </button>
         )}
 
-        <SettingsMenuButton
-          onClick={this.props.showPreferencesPanel}
-          theme={theme}
-        />
-
-        <TraceUpdatesFrontendControl {...this.props} />
-
-        <div style={styles.growToFill}>
-          <ColorizerFrontendControl {...this.props} />
-        </div>
-
-        <div style={styles.searchInputWrapper}>
-          <Input
-            style={inputStyle}
-            innerRef={i => this.input = i}
+        <div className={styles.SearchInputWrapper}>
+          <input
+            ref={this.input}
+            className={styles.Input}
             value={searchText}
             onFocus={() => this.setState({focused: true})}
             onBlur={() => this.setState({focused: false})}
@@ -142,36 +101,50 @@ class SettingsPane extends React.Component {
             onChange={e => this.props.onChangeSearch(e.target.value)}
             title="Search by React component name or text"
           />
-          <SearchIcon theme={theme} />
+          <SvgIcon className={styles.SearchIcon} path={Icons.SEARCH} />
           {!!searchText && (
-            <ClearSearchButton
+            <div
+              className={styles.ClearSearchButton}
               onClick={this.cancel.bind(this)}
-              theme={theme}
-            />
+            >
+              &times;
+            </div>
           )}
         </div>
+
+        <button
+          className={styles.SettingsMenuButton}
+          onClick={this.props.showPreferencesPanel}
+          title="Customize React DevTools"
+        >
+          <SvgIcon path={Icons.SETTINGS} />
+        </button>
       </div>
     );
   }
 }
 
 SettingsPane.contextTypes = {
-  showInspectButton: React.PropTypes.bool.isRequired,
-  theme: React.PropTypes.object.isRequired,
+  showInspectButton: PropTypes.bool.isRequired,
 };
 SettingsPane.propTypes = {
+  isInspectEnabled: PropTypes.bool,
+  isRecording: PropTypes.bool,
   searchText: PropTypes.string,
   selectFirstSearchResult: PropTypes.func,
+  toggleRecord: PropTypes.func,
   onChangeSearch: PropTypes.func,
+  toggleInspectEnabled: PropTypes.func,
 };
 
-var Wrapped = decorate({
+const Wrapped = decorate({
   listeners(props) {
-    return ['isInspectEnabled', 'searchText'];
+    return ['isInspectEnabled', 'isRecording', 'searchText'];
   },
   props(store) {
     return {
       isInspectEnabled: store.isInspectEnabled,
+      isRecording: store.isRecording,
       onChangeSearch: text => store.changeSearch(text),
       searchText: store.searchText,
       selectFirstSearchResult: store.selectFirstSearchResult.bind(store),
@@ -179,154 +152,9 @@ var Wrapped = decorate({
         store.showPreferencesPanel();
       },
       toggleInspectEnabled: () => store.setInspectEnabled(!store.isInspectEnabled),
+      toggleRecord: () => store.setIsRecording(!store.isRecording),
     };
   },
 }, SettingsPane);
 
-const ClearSearchButton = Hoverable(
-  ({ isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <div
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={clearSearchButtonStyle(isHovered, theme)}
-    >
-      &times;
-    </div>
-  )
-);
-
-const InspectMenuButton = Hoverable(
-  ({ isHovered, isInspectEnabled, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={inspectMenuButtonStyle(isInspectEnabled, isHovered, theme)}
-      title="Select a React element in the page to inspect it"
-    >
-      <SvgIcon path={Icons.INSPECT} />
-    </button>
-  )
-);
-
-const SettingsMenuButton = Hoverable(
-  ({ isHovered, onClick, onMouseEnter, onMouseLeave, theme }) => (
-    <button
-      onClick={onClick}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      style={settingsMenuButtonStyle(isHovered, theme)}
-      title="Customize React DevTools"
-    >
-      <SvgIcon path={Icons.SETTINGS} />
-    </button>
-  )
-);
-
-function SearchIcon({ theme }) {
-  return (
-    <SvgIcon
-      style={searchIconStyle(theme)}
-      path={Icons.SEARCH}
-    />
-  );
-}
-
-const settingsPaneStyle = (theme: Theme) => ({
-  padding: '0.25rem',
-  display: 'flex',
-  flexWrap: 'wrap',
-  flexShrink: 0,
-  alignItems: 'center',
-  position: 'relative',
-  backgroundColor: theme.base01,
-  borderBottom: `1px solid ${theme.base03}`,
-});
-
-const clearSearchButtonStyle = (isHovered: boolean, theme: Theme) => ({
-  fontSize: sansSerif.sizes.large,
-  padding: '0 0.5rem',
-  position: 'absolute',
-  cursor: 'default',
-  right: 0,
-  lineHeight: '28px',
-  color: isHovered ? theme.base04 : theme.base02,
-});
-
-const inspectMenuButtonStyle = (isInspectEnabled: boolean, isHovered: boolean, theme: Theme) => {
-  let color;
-  if (isInspectEnabled) {
-    color = theme.state00;
-  } else if (isHovered) {
-    color = theme.state06;
-  } else {
-    color = 'inherit';
-  }
-
-  return {
-    display: 'flex',
-    background: 'none',
-    border: 'none',
-    outline: 'none', // Use custom active highlight instead
-    color,
-  };
-};
-
-const searchIconStyle = (theme: Theme) => ({
-  position: 'absolute',
-  display: 'inline-block',
-  pointerEvents: 'none',
-  left: '0.25rem',
-  top: 0,
-  width: '1em',
-  height: '100%',
-  strokeWidth: 0,
-  stroke: theme.base02,
-  fill: theme.base02,
-  lineHeight: '28px',
-  fontSize: sansSerif.sizes.normal,
-});
-
-const settingsMenuButtonStyle = (isHovered: boolean, theme: Theme) => ({
-  display: 'flex',
-  background: 'none',
-  border: 'none',
-  marginRight: '0.5rem',
-  color: isHovered ? theme.state06 : 'inherit',
-});
-
-const baseInputStyle = (theme: Theme) => ({
-  fontSize: sansSerif.sizes.normal,
-  padding: '0.25rem',
-  border: `1px solid ${theme.base02}`,
-  outline: 'none',
-  borderRadius: '0.25rem',
-  paddingLeft: '1.25rem',
-  width: '150px',
-});
-
-const highlightedInputStyle = (theme: Theme) => ({
-  ...baseInputStyle(theme),
-  border: `1px solid ${hexToRgba(theme.state00, 0.75)}`,
-});
-
-const errorInputStyle = (theme: Theme) => ({
-  ...baseInputStyle(theme),
-  backgroundColor: hexToRgba(theme.special03, 0.1),
-  border: `1px solid ${theme.special03}`,
-});
-
-var styles = {
-  growToFill: {
-    flexGrow: 1,
-  },
-  searchInputWrapper: {
-    display: 'flex',
-    alignItems: 'center',
-    flexShrink: 0,
-    position: 'relative',
-  },
-};
-
-module.exports = Wrapped;
+export default Wrapped;

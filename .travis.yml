@@ -1,13 +1,15 @@
 sudo: false
 install:
-  - npm install
+  - yarn
 language: node_js
 node_js:
-  - '4'
+  - '8'
 script:
-  - npm run lint
-  - flow check
-  - npm test
+  - yarn run lint
+  - yarn run typecheck
+  - yarn run test
+cache:
+  yarn: true
 env:
   - CXX=g++-4.8
 addons:
@@ -16,4 +18,3 @@ addons:
       - ubuntu-toolchain-r-test
     packages:
       - g++-4.8
-

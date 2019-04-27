@@ -10,6 +10,18 @@
  */
 'use strict';
 
+// This threshold determines the depth at which the bridge "dehydrates" nested data.
+// Dehydration means that we don't serialize the data for e.g. postMessage or stringify,
+// unless the frontend explicitly requests it (e.g. a user clicks to expand a props object).
+// We tried reducing this value from 2 to 1 to improve performance:
+// https://github.com/facebook/react-devtools/issues/1200
+// But this caused problems with the Profiler's interaction tracing output.
+// Because React mutates Fibers, profiling data that is dehydrated for old commits–
+// will not be available later from within the Profiler.
+// This impacts props/state as well as Interactions.
+// https://github.com/facebook/react-devtools/issues/1262
+const LEVEL_THRESHOLD = 2;
+
 /**
  * Get a enhanced/artificial type string based on the object instance
  */
@@ -69,7 +81,7 @@ function createDehydrated(type: string, data: Object, cleaned: Array<Array<strin
 }
 
 /**
- * Strip out complex data (instances, functions, and data nested > 2 levels
+ * Strip out complex data (instances, functions, and data nested > LEVEL_THRESHOLD levels
  * deep). The paths of the stripped out objects are appended to the `cleaned`
  * list. On the other side of the barrier, the cleaned list is used to
  * "re-hydrate" the cleaned representation into an object with symbols as
@@ -131,7 +143,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
       };
 
     case 'array':
-      if (level > 2) {
+      if (level > LEVEL_THRESHOLD) {
         return createDehydrated(type, data, cleaned, path);
       }
       return data.map((item, i) => dehydrate(item, cleaned, path.concat([i]), level + 1));
@@ -149,7 +161,7 @@ function dehydrate(data: Object, cleaned: Array<Array<string>>, path?: Array<str
         },
       };
     case 'object':
-      if (level > 2 || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
+      if (level > LEVEL_THRESHOLD || (data.constructor && typeof data.constructor === 'function' && data.constructor.name !== 'Object')) {
         return createDehydrated(type, data, cleaned, path);
       } else {
 

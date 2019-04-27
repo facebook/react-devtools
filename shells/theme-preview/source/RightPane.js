@@ -11,11 +11,14 @@
 'use strict';
 
 const Immutable = require('immutable');
+const PropTypes = require('prop-types');
 const React = require('react');
 
 const PropState = require('../../../frontend/PropState');
 
-class RightPane extends React.Component {
+type Props = {};
+
+class RightPane extends React.Component<Props> {
   getChildContext() {
     return {
       onChange: noop,
@@ -34,7 +37,7 @@ class RightPane extends React.Component {
 }
 
 RightPane.childContextTypes = {
-  onChange: React.PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 const fauxNode = Immutable.Map({

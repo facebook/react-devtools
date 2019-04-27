@@ -12,22 +12,23 @@
 
 var React = require('react');
 var ReactDOM = require('react-dom');
+var PropTypes = require('prop-types');
 
 var consts = require('../agent/consts');
-var createFragment = require('react-addons-create-fragment');
 var {getInvertedWeak} = require('./Themes/utils');
 var flash = require('./flash');
 
 import type {Theme} from './types';
 
-class PropVal extends React.Component {
+type Props = {
+  val: any,
+  nested?: boolean,
+  inverted?: boolean,
+};
+
+class PropVal extends React.Component<Props> {
   context: {
     theme: Theme,
-  };
-  props: {
-    val: any,
-    nested?: boolean,
-    inverted?: boolean,
   };
   componentDidUpdate(prevProps: Object) {
     if (this.props.val === prevProps.val) {
@@ -37,6 +38,7 @@ class PropVal extends React.Component {
       return;
     }
     var node = ReactDOM.findDOMNode(this);
+    // $FlowFixMe
     flash(node, this.context.theme.state04, 'transparent', 1);
   }
 
@@ -46,7 +48,7 @@ class PropVal extends React.Component {
 }
 
 PropVal.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme) {
@@ -122,14 +124,14 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
       return <span style={style}>{`${val[consts.name]}[${val[consts.meta].length}]`}</span>;
     }
     case 'iterator': {
-      style = {    
-        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+      style = {
+        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
       };
       return <span style={style}>{val[consts.name] + '(…)'}</span>;
     }
     case 'symbol': {
-      style = {    
-        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+      style = {
+        color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
       };
       // the name is "Symbol(something)"
       return <span style={style}>{val[consts.name]}</span>;
@@ -137,8 +139,8 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
   }
 
   if (nested) {
-    style = {    
-      color: inverted ? getInvertedWeak(theme.state02) : theme.base05,    
+    style = {
+      color: inverted ? getInvertedWeak(theme.state02) : theme.base05,
     };
     return <span style={style}>{'{…}'}</span>;
   }
@@ -147,49 +149,47 @@ function previewProp(val: any, nested: boolean, inverted: boolean, theme: Theme)
 }
 
 function previewArray(val, inverted, theme) {
-  var items = {};
+  var items = [];
   val.slice(0, 3).forEach((item, i) => {
-    items['n' + i] = <PropVal val={item} nested={true} inverted={inverted} theme={theme} />;
-    items['c' + i] = ', ';
+    if (i > 0) {
+      items.push(', ');
+    }
+    items.push(
+      <PropVal key={i} val={item} nested={true} inverted={inverted} theme={theme} />
+    );
   });
-  if (val.length > 3) {
-    items.last = '…';
-  } else {
-    delete items['c' + (val.length - 1)];
-  }
   var style = {
     color: inverted ? theme.base03 : theme.special01,
   };
   return (
     <span style={style}>
-      [{createFragment(items)}]
+      {'['}{items}{val.length > 3 ? ', …' : ''}{']'}
     </span>
   );
 }
 
 function previewObject(val, inverted, theme) {
   var names = Object.keys(val);
-  var items = {};
+  var items = [];
   var attrStyle = {
     color: inverted ? getInvertedWeak(theme.state02) : theme.special06,
   };
   names.slice(0, 3).forEach((name, i) => {
-    items['k' + i] = <span style={attrStyle}>{name}</span>;
-    items['c' + i] = ': ';
-    items['v' + i] = <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />;
-    items['m' + i] = ', ';
+    items.push( // Fragment
+      <span key={i}>
+        {i > 0 ? ', ' : ''}
+        <span style={attrStyle}>{name}</span>
+        {': '}
+        <PropVal val={val[name]} nested={true} inverted={inverted} theme={theme} />
+      </span>
+    );
   });
-  if (names.length > 3) {
-    items.rest = '…';
-  } else {
-    delete items['m' + (names.length - 1)];
-  }
   var style = {
     color: inverted ? getInvertedWeak(theme.state02) : theme.special01,
   };
   return (
     <span style={style}>
-      {'{'}{createFragment(items)}{'}'}
+      {'{'}{items}{names.length > 3 ? ', …' : ''}{'}'}
     </span>
   );
 }

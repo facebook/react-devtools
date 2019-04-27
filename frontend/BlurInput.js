@@ -16,8 +16,8 @@ var Input = require('./Input');
 import type {DOMEvent, DOMNode} from './types';
 
 type Props = {
-  value?: string,
-  onChange: (text: string) => any,
+  value: ?string,
+  onChange: (text: string) => mixed,
 };
 
 type DefaultProps = {};
@@ -26,10 +26,8 @@ type State = {
 };
 
 
-class BlurInput extends React.Component {
-  props: Props;
+class BlurInput extends React.Component<Props, State> {
   defaultProps: DefaultProps;
-  state: State;
   node: ?DOMNode;
 
   constructor(props: Object) {

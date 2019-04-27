@@ -11,18 +11,23 @@
 'use strict';
 
 type CompositeUpdater = {
+  canUpdate: boolean,
   setInProps: ?(path: Array<string>, value: any) => void,
   setInState: ?(path: Array<string>, value: any) => void,
   setInContext: ?(path: Array<string>, value: any) => void,
-  forceUpdate: ?() => void,
 };
 
 type NativeUpdater = {
   setNativeProps: ?(nativeProps: {[key: string]: any}) => void,
 };
 
+export type Interaction = {|
+  name: string,
+  timestamp: number,
+|};
+
 export type DataType = {
-  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Text' | 'Portal' | 'Empty',
+  nodeType: 'Native' | 'Wrapper' | 'NativeWrapper' | 'Composite' | 'Special' | 'Text' | 'Portal' | 'Empty',
   type: ?(string | AnyFn),
   key: ?string,
   ref: ?(string | AnyFn),
@@ -35,6 +40,14 @@ export type DataType = {
   text: ?string,
   updater: ?(CompositeUpdater | NativeUpdater),
   publicInstance: ?Object,
+
+  // Tracing
+  memoizedInteractions: ?Set<Interaction>,
+
+  // Profiler
+  actualDuration: ?number,
+  actualStartTime: ?number,
+  treeBaseDuration: ?number,
 };
 
 // This type is entirely opaque to the backend.
@@ -60,6 +73,7 @@ export type ReactRenderer = {
   findFiberByHostInstance: (hostInstance: NativeType) => ?OpaqueNodeHandle,
   version: string,
   bundleType: BundleType,
+  overrideProps?: ?(fiber: Object, path: Array<string | number>, value: any) => void,
 
   // Stack
   Reconciler: {
@@ -88,6 +102,9 @@ export type ReactRenderer = {
     getNodeFromInstance: (component: OpaqueNodeHandle) => ?NativeType,
     getClosestInstanceFromNode: (component: NativeType) => ?OpaqueNodeHandle,
   },
+  currentDispatcherRef?: {
+    current: null | Object,
+  },
 };
 
 export type Helpers = {
@@ -95,6 +112,7 @@ export type Helpers = {
   getReactElementFromNative?: ?(component: NativeType) => ?OpaqueNodeHandle,
   walkTree: (visit: (component: OpaqueNodeHandle, data: DataType) => void, visitRoot: (element: OpaqueNodeHandle) => void) => void,
   cleanup: () => void,
+  renderer: ReactRenderer | null,
 };
 
 export type Handler = (data: any) => void;
@@ -111,3 +129,16 @@ export type Hook = {
   reactDevtoolsAgent?: ?Object,
   getFiberRoots: (rendererID : string) => Set<Object>,
 };
+
+export type HooksNode = {
+  name: string,
+  value: mixed,
+  subHooks: Array<HooksNode>,
+};
+export type HooksTree = Array<HooksNode>;
+
+export type InspectedHooks = {|
+  elementID: string,
+  id: string,
+  hooksTree: HooksTree,
+|};

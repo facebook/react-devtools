@@ -13,6 +13,7 @@
 var {EventEmitter} = require('events');
 
 var assign = require('object-assign');
+var nullthrows = require('nullthrows').default;
 var guid = require('../utils/guid');
 var getIn = require('./getIn');
 
@@ -108,9 +109,11 @@ class Agent extends EventEmitter {
     var lastSelected;
     this.on('selected', id => {
       var data = this.elementData.get(id);
-      if (data && data.publicInstance && this.global.$r === lastSelected) {
-        this.global.$r = data.publicInstance;
-        lastSelected = data.publicInstance;
+      if (data) {
+        if (data.publicInstance && this.global.$r === lastSelected) {
+          this.global.$r = data.publicInstance;
+          lastSelected = data.publicInstance;
+        }
       }
     });
     this._prevSelected = null;
@@ -160,6 +163,7 @@ class Agent extends EventEmitter {
     bridge.on('startInspecting', () => this.emit('startInspecting'));
     bridge.on('stopInspecting', () => this.emit('stopInspecting'));
     bridge.on('selected', id => this.emit('selected', id));
+    bridge.on('isRecording', isRecording => this.emit('isRecording', isRecording));
     bridge.on('setInspectEnabled', enabled => {
       this._inspectEnabled = enabled;
       this.emit('stopInspecting');
@@ -209,6 +213,7 @@ class Agent extends EventEmitter {
     this.on('root', id => bridge.send('root', id));
     this.on('mount', data => bridge.send('mount', data));
     this.on('update', data => bridge.send('update', data));
+    this.on('updateProfileTimes', data => bridge.send('updateProfileTimes', data));
     this.on('unmount', id => {
       bridge.send('unmount', id);
       // once an element has been unmounted, the bridge doesn't need to be
@@ -217,6 +222,9 @@ class Agent extends EventEmitter {
     });
     this.on('setSelection', data => bridge.send('select', data));
     this.on('setInspectEnabled', data => bridge.send('setInspectEnabled', data));
+    this.on('isRecording', isRecording => bridge.send('isRecording', isRecording));
+    this.on('storeSnapshot', (data) => bridge.send('storeSnapshot', data));
+    this.on('clearSnapshots', () => bridge.send('clearSnapshots'));
   }
 
   scrollToNode(id: ElementID): void {
@@ -313,7 +321,7 @@ class Agent extends EventEmitter {
 
   _setProps({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInProps) {
+    if (data && data.updater && typeof data.updater.setInProps === 'function') {
       data.updater.setInProps(path, value);
     } else {
       console.warn("trying to set props on a component that doesn't support it");
@@ -322,7 +330,7 @@ class Agent extends EventEmitter {
 
   _setState({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInState) {
+    if (data && data.updater && typeof data.updater.setInState === 'function') {
       data.updater.setInState(path, value);
     } else {
       console.warn("trying to set state on a component that doesn't support it");
@@ -331,7 +339,8 @@ class Agent extends EventEmitter {
 
   _setContext({id, path, value}: {id: ElementID, path: Array<string>, value: any}) {
     var data = this.elementData.get(id);
-    if (data && data.updater && data.updater.setInContext) {
+    if (data && data.updater && typeof data.updater.setInContext === 'function') {
+      // $FlowFixMe
       data.updater.setInContext(path, value);
     } else {
       console.warn("trying to set context on a component that doesn't support it");
@@ -360,17 +369,22 @@ class Agent extends EventEmitter {
     if (!this.idsByInternalInstances.has(internalInstance)) {
       this.idsByInternalInstances.set(internalInstance, guid());
       this.internalInstancesById.set(
-        this.idsByInternalInstances.get(internalInstance),
+        nullthrows(this.idsByInternalInstances.get(internalInstance)),
         internalInstance
       );
     }
-    return this.idsByInternalInstances.get(internalInstance);
+    return nullthrows(this.idsByInternalInstances.get(internalInstance));
   }
 
   addRoot(renderer: RendererID, internalInstance: OpaqueNodeHandle) {
     var id = this.getId(internalInstance);
     this.roots.add(id);
     this.emit('root', id);
+  }
+
+  rootCommitted(renderer: RendererID, internalInstance: OpaqueNodeHandle, data: DataType) {
+    var id = this.getId(internalInstance);
+    this.emit('rootCommitted', id, internalInstance, data);
   }
 
   onMounted(renderer: RendererID, component: OpaqueNodeHandle, data: DataType) {
@@ -383,7 +397,7 @@ class Agent extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
-    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    send.canUpdate = send.updater && send.updater.canUpdate;
     delete send.type;
     delete send.updater;
     this.emit('mount', send);
@@ -398,16 +412,34 @@ class Agent extends EventEmitter {
       send.children = send.children.map(c => this.getId(c));
     }
     send.id = id;
-    send.canUpdate = send.updater && !!send.updater.forceUpdate;
+    send.canUpdate = send.updater && send.updater.canUpdate;
     delete send.type;
     delete send.updater;
     this.emit('update', send);
   }
 
+  onUpdatedProfileTimes(component: OpaqueNodeHandle, data: DataType) {
+    var id = this.getId(component);
+    this.elementData.set(id, data);
+
+    var send = assign({}, data);
+    if (send.children && send.children.map) {
+      send.children = send.children.map(c => this.getId(c));
+    }
+    send.id = id;
+    send.canUpdate = send.updater && send.updater.canUpdate;
+    delete send.type;
+    delete send.updater;
+    this.emit('updateProfileTimes', send);
+  }
+
   onUnmounted(component: OpaqueNodeHandle) {
     var id = this.getId(component);
     this.elementData.delete(id);
-    this.roots.delete(id);
+    if (this.roots.has(id)) {
+      this.roots.delete(id);
+      this.emit('rootUnmounted', id);
+    }
     this.renderers.delete(id);
     this.emit('unmount', id);
     this.idsByInternalInstances.delete(component);
@@ -449,7 +481,7 @@ class Agent extends EventEmitter {
       if (!id) {
         return;
       }
-      
+
       this.highlight(id);
     }
   }

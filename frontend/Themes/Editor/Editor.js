@@ -12,6 +12,7 @@
 
 const {copy} = require('clipboard-js');
 const decorate = require('../../decorate');
+const PropTypes = require('prop-types');
 const React = require('react');
 const ColorInput = require('./ColorInput');
 const ColorGroups = require('./ColorGroups');
@@ -42,24 +43,24 @@ const colors = Object.assign({},
   ColorGroups.Syntax
 );
 
-class Editor extends React.Component {
+type Props = {
+  changeTheme: (themeName: string) => void,
+  defaultThemeName: string,
+  hide: () => {},
+  saveTheme: (theme: Theme) => {},
+  setTimeout: SetTimeout,
+  theme: Theme,
+}
+
+type State = {
+  isResetEnabled: boolean,
+  showCopyConfirmation: boolean,
+  updateCounter: number,
+}
+
+class Editor extends React.Component<Props, State> {
   _customTheme: Theme;
   _serializedPropsTheme: string;
-
-  props: {
-    changeTheme: (themeName: string) => void,
-    defaultThemeName: string,
-    hide: () => {},
-    saveTheme: (theme: Theme) => {},
-    setTimeout: SetTimeout,
-    theme: Theme,
-  };
-
-  state: {
-    isResetEnabled: boolean,
-    showCopyConfirmation: boolean,
-    updateCounter: number,
-  };
 
   constructor(props, context) {
     super(props, context);
@@ -199,7 +200,7 @@ class Editor extends React.Component {
 }
 
 Editor.childContextTypes = {
-  theme: React.PropTypes.object,
+  theme: PropTypes.object,
 };
 
 const WrappedEditor = decorate({

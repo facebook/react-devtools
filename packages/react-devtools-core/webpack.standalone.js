@@ -9,20 +9,19 @@
  */
 'use strict';
 
-var webpack = require('webpack');
-var __DEV__ = process.env.NODE_ENV !== 'production';
+const {readFileSync} = require('fs');
+const {resolve} = require('path');
+const webpack = require('webpack');
+
+const __DEV__ = process.env.NODE_ENV !== 'production';
 
 module.exports = {
-  debug: true,
-  devtool: 'source-map',
+  mode: __DEV__ ? 'development' : 'production',
+  devtool: __DEV__ ? 'source-map' : false,
+  target: 'electron-main',
+  externals: ['ws'],
   entry: {
     standalone: './src/standalone.js',
-  },
-  // this lets us `require('fs')` etc
-  target: 'electron',
-  node: {
-    // don't replace __dirname, electron will handle it
-    __dirname: false,
   },
   output: {
     path: __dirname + '/build', // eslint-disable-line no-path-concat
@@ -30,23 +29,41 @@ module.exports = {
     library: '[name]',
     libraryTarget: 'commonjs2',
   },
+  node: {
+    // Don't replace __dirname!
+    // This would break the standalone DevTools ability to load the backend.
+    // see https://github.com/facebook/react-devtools/issues/1269
+    __dirname: false,
+  },
   plugins: __DEV__ ? [] : [
     // Ensure we get production React
     new webpack.DefinePlugin({
       'process.env.NODE_ENV': '"production"',
     }),
-    // Remove dead code but keep it readable:
-    new webpack.optimize.UglifyJsPlugin({
-      mangle: false,
-      beautify: true,
-    }),
   ],
-  externals: ['ws'],
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader:  'babel',
-      exclude: /node_modules/,
-    }],
+    rules: [
+      {
+        test: /\.js$/,
+        loader: 'babel-loader',
+        options: JSON.parse(readFileSync(resolve(__dirname, '../../.babelrc'))),
+      },
+      {
+        test: /\.css$/,
+        use: [
+          {
+            loader: 'style-loader',
+          },
+          {
+            loader: 'css-loader',
+            options: {
+              sourceMap: true,
+              modules: true,
+              localIdentName: '[local]___[hash:base64:5]',
+            },
+          },
+        ],
+      },
+    ],
   },
 };

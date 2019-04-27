@@ -10,8 +10,6 @@
  */
 'use strict';
 
-var {Record} = require('immutable');
-
 export type Dir = 'up' | 'down' | 'left' | 'right';
 export type Dest = 'firstChild' | 'lastChild' | 'prevSibling' | 'nextSibling' | 'collapse' | 'uncollapse' | 'parent' | 'parentBottom' | 'selectTop';
 
@@ -71,10 +69,6 @@ export type DOMRect = {
   bottom: number,
   right: number,
 };
-
-export type ControlState = {
-  enabled: boolean,
-} & Record;
 
 /**
  * A theme is a color template used throughout devtools.

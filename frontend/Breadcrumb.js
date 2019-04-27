@@ -14,17 +14,44 @@ import type Store from './Store';
 import type {ElementID} from './types';
 import type {Theme} from './types';
 
-var {sansSerif} = require('./Themes/Fonts');
-var React = require('react');
-var decorate = require('./decorate');
+const {sansSerif} = require('./Themes/Fonts');
+const PropTypes = require('prop-types');
+const React = require('react');
+const decorate = require('./decorate');
 
-class Breadcrumb extends React.Component {
+type BreadcrumbPath = Array<{id: ElementID, node: Object}>;
+
+type Props = {
+  hover: (string, boolean) => void;
+  selected: string,
+  path: BreadcrumbPath,
+  select: string => ElementID,
+}
+
+type State ={
+  hovered: ?string
+}
+
+class Breadcrumb extends React.Component<Props, State> {
   context: {theme: Theme};
-  state: {hovered: ?string};
+  // $FlowFixMe createRef()
+  selectedListItem = React.createRef();
 
   constructor(props) {
     super(props);
     this.state = { hovered: null };
+  }
+
+  componentDidMount() {
+    if (this.props.selected) {
+      this.ensureInView();
+    }
+  }
+
+  componentDidUpdate(prevProps, prevState) {
+    if (this.props.selected !== prevProps.selected) {
+      this.ensureInView();
+    }
   }
 
   handleCrumbMouseOver(id) {
@@ -38,14 +65,16 @@ class Breadcrumb extends React.Component {
   }
 
   render() {
-    var theme = this.context.theme;
+    const {theme} = this.context;
+    const {path, selected} = this.props;
+
     return (
       <ul style={containerStyle(theme)}>
-        {this.props.path.map(({ id, node }) => {
-          const isSelected = id === this.props.selected;
+        {path.map(({ id, node }) => {
+          const isSelected = id === selected;
           const style = itemStyle(
             isSelected,
-            node.get('nodeType') === 'Composite',
+            node.get('nodeType'),
             theme,
           );
 
@@ -56,6 +85,7 @@ class Breadcrumb extends React.Component {
               onMouseOver={() => this.handleCrumbMouseOver(id)}
               onMouseOut={() => this.handleCrumbMouseOut(id)}
               onClick={isSelected ? null : () => this.props.select(id)}
+              ref={isSelected ? this.selectedListItem : undefined}
             >
               {node.get('name') || '"' + node.get('text') + '"'}
             </li>
@@ -64,29 +94,46 @@ class Breadcrumb extends React.Component {
       </ul>
     );
   }
+
+  ensureInView() {
+    const selectedListItem = this.selectedListItem.current;
+    if (selectedListItem != null) {
+      if (typeof selectedListItem.scrollIntoViewIfNeeded === 'function') {
+        selectedListItem.scrollIntoViewIfNeeded({
+          inline: 'nearest',
+        });
+      } else if (typeof selectedListItem.scrollIntoView === 'function') {
+        selectedListItem.scrollIntoView({
+          inline: 'nearest',
+        });
+      }
+    }
+  }
 }
 
 Breadcrumb.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 const containerStyle = (theme: Theme) => ({
   fontFamily: sansSerif.family,
   listStyle: 'none',
-  padding: 0,
+  padding: '0 0.5rem',
   margin: 0,
   maxHeight: '80px',
-  overflow: 'auto',
-  marginTop: '2px',
   backgroundColor: theme.base01,
   borderTop: `1px solid ${theme.base03}`,
+  whiteSpace: 'nowrap',
+  overflow: 'auto',
 });
 
-const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
+const itemStyle = (isSelected: boolean, nodeType: string, theme: Theme) => {
   let color;
   if (isSelected) {
     color = theme.state02;
-  } else if (isComposite) {
+  } else if (nodeType === 'Special') {
+    color = theme.special01;
+  } else if (nodeType === 'Composite') {
     color = theme.special05;
   }
 
@@ -99,11 +146,10 @@ const itemStyle = (isSelected: boolean, isComposite: boolean, theme: Theme) => {
     MozUserSelect: 'none',
     userSelect: 'none',
     display: 'inline-block',
-    marginRight: '2px',
   };
 };
 
-function getBreadcrumbPath(store: Store): Array<{id: ElementID, node: Object}> {
+function getBreadcrumbPath(store: Store): BreadcrumbPath {
   var path = [];
   var current = store.breadcrumbHead;
   while (current) {

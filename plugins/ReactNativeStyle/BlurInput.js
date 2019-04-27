@@ -24,18 +24,16 @@ type State = {
   text: string;
 };
 
-class BlurInput extends React.Component {
-  props: Props;
+class BlurInput extends React.Component<Props, State> {
   defaultProps: DefaultProps;
-  state: State;
   node: ?DOMNode;
 
-  constructor(props: Object) {
+  constructor(props: Props) {
     super(props);
     this.state = {text: '' + this.props.value};
   }
 
-  componentWillReceiveProps(nextProps: Object) {
+  componentWillReceiveProps(nextProps: Props) {
     this.setState({text: '' + nextProps.value});
   }
 

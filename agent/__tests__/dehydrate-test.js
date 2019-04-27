@@ -9,7 +9,6 @@
  */
 'use strict';
 
-jest.dontMock('../dehydrate');
 var dehydrate = require('../dehydrate');
 
 describe('dehydrate', () => {
@@ -36,6 +35,11 @@ describe('dehydrate', () => {
     var result = dehydrate(object, cleaned);
     expect(cleaned).toEqual([['a', 'b', 'c']]);
     expect(result.a.b.c).toEqual({type: 'object', name: '', meta: {}});
+    expect(result.a.b.c.d).toBeUndefined(); // Dehydrated
+
+    // Re-hydrate
+    result.a.b.c = dehydrate(object.a.b.c, [], ['a', 'b', 'c']);
+    expect(result).toEqual(object);
   });
 
   it('cleans a deeply nested array', () => {

@@ -10,6 +10,11 @@
  */
 'use strict';
 
+// ----------------------------------------------------
+// This is Stack-only version.
+// The Fiber version is inlined in attachRendererFiber.
+// ----------------------------------------------------
+
 import type {DataType} from './types';
 var copyWithSet = require('./copyWithSet');
 
@@ -77,8 +82,8 @@ function getData012(internalInstance: Object): DataType {
 
   if (internalInstance.forceUpdate) {
     updater = {
+      canUpdate: true,
       setState: internalInstance.setState.bind(internalInstance),
-      forceUpdate: internalInstance.forceUpdate.bind(internalInstance),
       setInProps: internalInstance.forceUpdate && setInProps.bind(null, internalInstance),
       setInState: internalInstance.forceUpdate && setInState.bind(null, internalInstance),
       setInContext: internalInstance.forceUpdate && setInContext.bind(null, internalInstance),
@@ -86,6 +91,7 @@ function getData012(internalInstance: Object): DataType {
     publicInstance = internalInstance;
   }
 
+  // $FlowFixMe
   return {
     nodeType,
     type,

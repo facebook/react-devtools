@@ -10,20 +10,35 @@
  */
 'use strict';
 
-var BlurInput = require('./BlurInput');
-var DataView = require('./DataView/DataView');
-var DetailPane = require('./detail_pane/DetailPane');
-var DetailPaneSection = require('./detail_pane/DetailPaneSection');
-var {sansSerif} = require('./Themes/Fonts');
-var PropVal = require('./PropVal');
-var React = require('react');
+const BlurInput = require('./BlurInput');
+const DataView = require('./DataView/DataView');
+const DetailPane = require('./detail_pane/DetailPane');
+const DetailPaneSection = require('./detail_pane/DetailPaneSection');
+const {sansSerif} = require('./Themes/Fonts');
+const PropVal = require('./PropVal');
+const HooksTreeView = require('./HooksTreeView').default;
+const PropTypes = require('prop-types');
+const React = require('react');
 
-var decorate = require('./decorate');
-var invariant = require('./invariant');
+const decorate = require('./decorate');
+const invariant = require('./invariant');
 
 import type {Theme} from './types';
+import type {InspectedHooks} from '../backend/types';
 
-class PropState extends React.Component {
+type Props = {
+  id: string,
+  extraPanes: Array<any>,
+  inspectedHooks: ?InspectedHooks,
+  inspect: Function,
+  showMenu: Function,
+  node: Map<string, any>,
+  onChange: (path: Array<string>, val: any) => mixed,
+  onChangeText: (string) => mixed,
+  onViewElementSource?: (id: string, node: ?Object) => mixed,
+};
+
+class PropState extends React.Component<Props> {
   context: {
     onChange: () => void,
     theme: Theme,
@@ -37,7 +52,7 @@ class PropState extends React.Component {
     };
   }
 
-  renderSource(): ?React.Element {
+  renderSource(): React.Node {
     const {theme} = this.context;
     const {id, node, onViewElementSource} = this.props;
     const source = node.get('source');
@@ -63,21 +78,22 @@ class PropState extends React.Component {
     );
   }
 
-  render(): React.Element {
+  render() {
+    var {extraPanes, id, inspect, inspectedHooks, node, showMenu} = this.props;
     var theme = this.context.theme;
 
-    if (!this.props.node) {
+    if (!node) {
       return <span style={emptyStyle(theme)}>No selection</span>;
     }
 
-    var nodeType = this.props.node.get('nodeType');
+    var nodeType = node.get('nodeType');
 
     if (nodeType === 'Text') {
       if (this.props.canEditTextContent) {
         return (
           <DetailPane>
             <BlurInput
-              value={this.props.node.get('text')}
+              value={node.get('text')}
               onChange={this.props.onChangeText}
             />
           </DetailPane>
@@ -90,21 +106,23 @@ class PropState extends React.Component {
 
     var editTextContent = null;
     if (this.props.canEditTextContent) {
-      if (typeof this.props.node.get('children') === 'string') {
+      if (typeof node.get('children') === 'string') {
         editTextContent = (
           <BlurInput
-            value={this.props.node.get('children')}
+            value={node.get('children')}
             onChange={this.props.onChangeText}
           />
         );
       }
     }
 
-    var key = this.props.node.get('key');
-    var ref = this.props.node.get('ref');
-    var state = this.props.node.get('state');
-    var context = this.props.node.get('context');
-    var propsReadOnly = !this.props.node.get('canUpdate');
+    var key = node.get('key');
+    var ref = node.get('ref');
+    var state = node.get('state');
+    var context = node.get('context');
+    var propsReadOnly = !node.get('canUpdate');
+    var containsHooks = node.get('containsHooks');
+    var showHooksTree = inspectedHooks != null && inspectedHooks.elementID === id;
 
     return (
       <DetailPane
@@ -112,7 +130,7 @@ class PropState extends React.Component {
         {key &&
           <DetailPaneSection
             title="Key"
-            key={this.props.id + '-key'}>
+            key={id + '-key'}>
             <PropVal
               val={key}
             />
@@ -121,7 +139,7 @@ class PropState extends React.Component {
         {ref &&
           <DetailPaneSection
             title="Ref"
-            key={this.props.id + '-ref'}>
+            key={id + '-ref'}>
             <PropVal
               val={ref}
             />
@@ -134,21 +152,21 @@ class PropState extends React.Component {
           <DataView
             path={['props']}
             readOnly={propsReadOnly}
-            inspect={this.props.inspect}
-            showMenu={this.props.showMenu}
-            key={this.props.id + '-props'}
-            data={this.props.node.get('props')}
+            inspect={inspect}
+            showMenu={showMenu}
+            key={id + '-props'}
+            data={node.get('props')}
           />
         </DetailPaneSection>
 
-        {state &&
+        {!containsHooks && state &&
           <DetailPaneSection title="State">
             <DataView
               data={state}
               path={['state']}
-              inspect={this.props.inspect}
-              showMenu={this.props.showMenu}
-              key={this.props.id + '-state'}
+              inspect={inspect}
+              showMenu={showMenu}
+              key={id + '-state'}
             />
           </DetailPaneSection>}
         {context &&
@@ -156,13 +174,25 @@ class PropState extends React.Component {
             <DataView
               data={context}
               path={['context']}
-              inspect={this.props.inspect}
-              showMenu={this.props.showMenu}
-              key={this.props.id + '-context'}
+              inspect={inspect}
+              showMenu={showMenu}
+              key={id + '-context'}
             />
           </DetailPaneSection>}
-        {this.props.extraPanes &&
-          this.props.extraPanes.map(fn => fn && fn(this.props.node, this.props.id))}
+
+        {containsHooks &&
+          <DetailPaneSection title="Hooks">
+            {showHooksTree &&
+              <HooksTreeView
+                hooksTree={((inspectedHooks: any): InspectedHooks).hooksTree}
+                inspect={inspect}
+                theme={theme}
+              />}
+            {!showHooksTree && <div style={hooksTreeLoadingStyle}>Loading...</div>}
+          </DetailPaneSection>}
+
+        {extraPanes &&
+          extraPanes.map(fn => fn && fn(node, id))}
         <div style={{flex: 1}} />
         {this.renderSource()}
       </DetailPane>
@@ -171,22 +201,23 @@ class PropState extends React.Component {
 }
 
 PropState.contextTypes = {
-  theme: React.PropTypes.object.isRequired,
+  theme: PropTypes.object.isRequired,
 };
 
 PropState.childContextTypes = {
-  onChange: React.PropTypes.func,
+  onChange: PropTypes.func,
 };
 
 var WrappedPropState = decorate({
   listeners(props, store) {
-    return ['selected', store.selected];
+    return ['selected', store.selected, 'inspectedHooks'];
   },
 
   props(store) {
     var node = store.selected ? store.get(store.selected) : null;
     return {
       id: store.selected,
+      inspectedHooks: store.inspectedHooks,
       node,
       canEditTextContent: store.capabilities.editTextContent,
       onChangeText(text) {
@@ -238,5 +269,10 @@ const noPropsStateStyle = (theme: Theme) => ({
   fontStyle: 'italic',
   padding: '0.5rem',
 });
+
+const hooksTreeLoadingStyle = {
+  lineHeight: '1.25rem',
+  marginLeft: '1rem',
+};
 
 module.exports = WrappedPropState;
