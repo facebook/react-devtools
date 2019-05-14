@@ -149,7 +149,8 @@ function startServer(port = 8097) {
   httpServer.on('request', (req, res) => {
     // Serve a file that immediately sets up the connection.
     var backendFile = readFileSync(join(__dirname, 'backend.js'));
-    res.end(backendFile + '\n;ReactDevToolsBackend.connectToDevTools();');
+    var hostname = req.headers.host.split(':')[0];
+    res.end(backendFile + `\n;ReactDevToolsBackend.connectToDevTools({host: '${hostname}'});`);
   });
 
   httpServer.on('error', (e) => {
