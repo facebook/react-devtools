@@ -1,6 +1,6 @@
 {
   "name": "react-devtools",
-  "version": "3.6.0",
+  "version": "3.6.1",
   "description": "Use react-devtools outside of the browser",
   "repository": {
     "url": "https://github.com/facebook/react-devtools.git",
