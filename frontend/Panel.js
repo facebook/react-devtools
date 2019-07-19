@@ -67,6 +67,7 @@ type State = {
   loading: boolean,
   isReact: boolean,
   preferencesPanelShown: boolean,
+  showUpgradeMessage: boolean,
   themeKey: number,
   themeName: ?string,
   showTroubleshooting: boolean,
@@ -96,6 +97,7 @@ class Panel extends React.Component<Props, State> {
       showTroubleshooting: false,
       preferencesPanelShown: false,
       isReact: props.alreadyFoundReact,
+      showUpgradeMessage: false,
       themeKey: 0,
       themeName: props.themeName,
     };
@@ -122,6 +124,37 @@ class Panel extends React.Component<Props, State> {
       this.inject();
     } else {
       this.lookForReact();
+    }
+
+    if (this.props.showUpgradeMessageIfModernBackendDetected) {
+      let removeListener = this._bridge.wall.listen(message => {
+        switch ((message: any).event) {
+          case 'isBackendStorageAPISupported':
+          case 'isNativeStyleEditorSupported':
+          case 'operations':
+          case 'overrideComponentFilters':
+            // Any of these is sufficient to indicate a newer backend version.
+            if (typeof removeListener === 'function') {
+              removeListener();
+              removeListener = null;
+            }
+            this.setState({ showUpgradeMessage: true });
+            break;
+        }
+
+        // If we've detected an old backend though, it's safe to unsubscribe.
+        switch (message.type) {
+          case 'call':
+          case 'event':
+          case 'many-events':
+            // Any of these types indicate the v3 backend.
+            if (typeof removeListener === 'function') {
+              removeListener();
+              removeListener = null;
+            }
+            break;
+        }
+      });
     }
 
     if (this.props.reloadSubscribe) {
@@ -311,7 +344,16 @@ class Panel extends React.Component<Props, State> {
 
   render() {
     var theme = this._store ? this._themeStore.theme : Themes.ChromeDefault;
-    if (this.state.loading) {
+    if (this.state.showUpgradeMessage) {
+      return (
+        <div style={loadingStyle(theme)}>
+          <h2>DevTools v3 is incompatible with this version of React</h2>
+          <br />
+          <p>Upgrade to the latest React DevTools:</p>
+          <code style={codeStyle(theme)}>npm install -d react-devtools</code>
+        </div>
+      );
+    } else if (this.state.loading) {
       // TODO: This currently shows in the Firefox shell when navigating from a
       // React page to a non-React page. We should show a better message but
       // properly doing so probably requires refactoring how we load the panel
@@ -426,6 +468,13 @@ var panelRNStyle = (bridge, supportsMeasure, theme) => (node, id) => {
     </div>
   );
 };
+
+const codeStyle = (theme: Theme) => ({
+  backgroundColor: theme.base01,
+  color: theme.base05,
+  borderRadius: '0.125rem',
+  padding: '0.25rem 0.5rem',
+});
 
 const containerStyle = (theme: Theme) => ({
   borderTop: `1px solid ${theme.base01}`,

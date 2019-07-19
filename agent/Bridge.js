@@ -194,6 +194,12 @@ class Bridge {
     });
   }
 
+  // Listening directly to the wall isn't advised.
+  // It can be used to listen/detect v4 messages (since they use a different format).
+  get wall(): Wall {
+    return this._wall;
+  }
+
   call(name: string, args: Array<any>, cb: (val: any) => any) {
     var _cid = this._cid++;
     this._cbs.set(_cid, cb);
