@@ -31,6 +31,7 @@ var config = {
   alreadyFoundReact: true,
   showInspectButton: false,
   showHiddenThemes: true,
+  showUpgradeMessageIfModernBackendDetected: true,
   inject(done) {
     done(wall);
   },
@@ -79,6 +80,12 @@ function initialize(socket) {
   wall = {
     listen(fn) {
       listeners.push(fn);
+      return () => {
+        const index = listeners.indexOf(fn);
+        if (index >= 0) {
+          listeners.splice(index, 1);
+        }
+      };
     },
     send(data) {
       if (socket.readyState === socket.OPEN) {
