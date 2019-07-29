@@ -454,7 +454,8 @@ class Bridge {
           if (pIsFn && (name === 'arguments' || name === 'callee' || name === 'caller')) {
             return;
           }
-          newProto[name] = dehydrate(val.__proto__[name], protoclean, [name]);
+          var desc = Object.getOwnPropertyDescriptor(val.__proto__, name);
+          newProto[name] = dehydrate(desc && desc.get ? desc.get.call(val) : val.__proto__[name], protoclean, [name]);
         });
         proto = newProto;
       }
