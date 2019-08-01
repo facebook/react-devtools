@@ -120,7 +120,7 @@ class Overlay {
         width: box.width + dims.marginLeft + dims.marginRight,
       }, this.win);
 
-    } else if (node.nodeType === Node.TEXT_NODE && node.data.trim()) {
+    } else if (node.nodeType === Node.TEXT_NODE) {
       // Get the bounding rect for a text node using range
       box = getTextRect(node);
 
