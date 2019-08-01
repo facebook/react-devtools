@@ -93,37 +93,62 @@ class Overlay {
   }
 
   inspect(node: DOMNode, name?: ?string) {
-    // We can't get the size of text nodes or comment nodes. React as of v15
-    // heavily uses comment nodes to delimit text.
-    if (node.nodeType !== Node.ELEMENT_NODE) {
+    var box, tipPos, dims;
+
+    if (node.nodeType === Node.ELEMENT_NODE) {
+      box = getNestedBoundingClientRect(node, this.win);
+      dims = getElementDimensions(node);
+
+      boxWrap(dims, 'margin', this.node);
+      boxWrap(dims, 'border', this.border);
+      boxWrap(dims, 'padding', this.padding);
+
+      assign(this.content.style, {
+        height: box.height - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
+        width: box.width - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
+      });
+
+      assign(this.node.style, {
+        top: box.top - dims.marginTop + 'px',
+        left: box.left - dims.marginLeft + 'px',
+      });
+
+      tipPos = findTipPos({
+        top: box.top - dims.marginTop,
+        left: box.left - dims.marginLeft,
+        height: box.height + dims.marginTop + dims.marginBottom,
+        width: box.width + dims.marginLeft + dims.marginRight,
+      }, this.win);
+
+    } else if (node.nodeType === Node.TEXT_NODE && node.data.trim()) {
+      // Get the bounding rect for a text node using range
+      box = getTextRect(node);
+
+      assign(this.content.style, {
+        height: box.height + 'px',
+        width: box.width + 'px',
+      });
+  
+      assign(this.node.style, {
+        top: box.top + 'px',
+        left: box.left + 'px',
+      });
+  
+      tipPos = findTipPos({
+        top: box.top,
+        left: box.left,
+        height: box.height,
+        width: box.width,
+      }, this.win);
+
+    } else {
+      // Ignore if it is a comment node
       return;
     }
-    var box = getNestedBoundingClientRect(node, this.win);
-    var dims = getElementDimensions(node);
-
-    boxWrap(dims, 'margin', this.node);
-    boxWrap(dims, 'border', this.border);
-    boxWrap(dims, 'padding', this.padding);
-
-    assign(this.content.style, {
-      height: box.height - dims.borderTop - dims.borderBottom - dims.paddingTop - dims.paddingBottom + 'px',
-      width: box.width - dims.borderLeft - dims.borderRight - dims.paddingLeft - dims.paddingRight + 'px',
-    });
-
-    assign(this.node.style, {
-      top: box.top - dims.marginTop + 'px',
-      left: box.left - dims.marginLeft + 'px',
-    });
-
+    
     this.nameSpan.textContent = (name || node.nodeName.toLowerCase());
-    this.dimSpan.textContent = box.width + 'px × ' + box.height + 'px';
-
-    var tipPos = findTipPos({
-      top: box.top - dims.marginTop,
-      left: box.left - dims.marginLeft,
-      height: box.height + dims.marginTop + dims.marginBottom,
-      width: box.width + dims.marginLeft + dims.marginRight,
-    }, this.win);
+    this.dimSpan.textContent = parseFloat((box.width).toFixed(2)) + 'px × ' + parseFloat((box.height).toFixed(2)) + 'px';
+  
     assign(this.tip.style, tipPos);
   }
 }
@@ -269,6 +294,12 @@ function getNestedBoundingClientRect(node: DOMNode, boundaryWindow: Window): DOM
   } else {
     return node.getBoundingClientRect();
   }
+}
+
+function getTextRect(node) {
+  var range = window.document.createRange();
+  range.selectNode(node);
+  return range.getBoundingClientRect();
 }
 
 function boxWrap(dims, what, node) {
