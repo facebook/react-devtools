@@ -1,4 +1,4 @@
-#### This project has migrated to [github.com/facebook/react](https://github.com/facebook/react)
+#### This project has migrated to [github.com/facebook/react](https://github.com/facebook/react-devtools)
 
 The source code for the v3 of the extension can be found in the [`v3` branch](https://github.com/facebook/react-devtools/tree/v3).
 
